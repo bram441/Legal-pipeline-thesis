@@ -1,6 +1,4 @@
-# toy_legal_kb.py
-from idp_backend import run_idp
-from legal_template import LEGAL_VOCAB_AND_RULES
+from .idp_backend import run_idp
 
 
 LEGAL_VOCAB_AND_RULES = """
@@ -12,7 +10,8 @@ vocabulary V {
 }
 
 theory T:V {
-  ! p in Party: negligent(p) & causedDamage(p) <=> liable(p).
+  // A party is liable iff they are negligent and caused damage
+  ! p in Party: liable(p) <=> negligent(p) & causedDamage(p).
 }
 """
 

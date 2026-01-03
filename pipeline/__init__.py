@@ -1,0 +1,1 @@
+from pipeline.pipeline import answer_legal_prompt
