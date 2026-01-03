@@ -1,6 +1,8 @@
 import json
 
 from pipeline.pipeline import answer_legal_prompt
+from dotenv import load_dotenv
+
 
 
 def main():
@@ -31,4 +33,5 @@ def main():
 
 
 if __name__ == "__main__":
+    load_dotenv()
     main()
