@@ -1,3 +1,16 @@
+# Produces a deterministic, hard-coded (or heuristic) extraction result for development.
+# This bypasses any LLM calls and returns a minimal structured object with:
+#   - "case": facts (parties/negligent/caused_damage)
+#   - "query": what to ask the symbolic layer (predicate/mode/args/explain)
+# Used for debugging the pipeline end-to-end without external dependencies.
+#
+# Params:
+#   case_text (str): Natural-language case description (currently ignored or minimally parsed).
+#   user_question (str): Natural-language user question (used to choose query shape).
+#
+# Returns:
+#   dict: {"case": {...}, "query": {...}} in the same format expected by schema validation.
+
 def extract_case_and_query_dummy(case_text, user_question):
     text = (case_text or "").lower()
     q = (user_question or "").lower()

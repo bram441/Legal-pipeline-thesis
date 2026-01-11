@@ -1,0 +1,50 @@
+=== LAW (plain text input) ===
+Tort liability rule (toy example):
+
+If a person is negligent and causes damage,
+then that person is liable.
+
+This rule applies to all parties involved in the case.
+
+=== KB USED (kb.fo) ===
+vocabulary V {
+  type Party
+  negligent: Party -> Bool
+  causedDamage: Party -> Bool
+  liable: Party -> Bool
+}
+
+theory T:V {
+  ! p in Party: liable(p) <=> negligent(p) & causedDamage(p).
+}
+
+=== CASE ===
+Alice and Bob are involved in an accident.
+
+Alice acted negligently.
+Alice caused damage.
+Bob did not act negligently.
+
+---
+Q: Who is liable?
+SAT? True
+Case: {'parties': ['alice', 'bob'], 'negligent': ['alice'], 'caused_damage': ['alice']}
+Query: {'type': 'predicate', 'predicate': 'liable', 'mode': 'set', 'args': [], 'explain': False}
+Answer: Liable parties: alice.
+---
+Q: Is Alice liable?
+SAT? True
+Case: {'parties': ['alice', 'bob'], 'negligent': ['alice'], 'caused_damage': ['alice']}
+Query: {'type': 'predicate', 'predicate': 'liable', 'mode': 'boolean', 'args': ['alice'], 'explain': False}
+Answer: Yes. alice is liable.
+---
+Q: Why is Alice liable?
+SAT? True
+Case: {'parties': ['alice', 'bob'], 'negligent': ['alice'], 'caused_damage': ['alice']}
+Query: {'type': 'predicate', 'predicate': 'liable', 'mode': 'boolean', 'args': ['alice'], 'explain': True}
+Answer: Yes. alice is liable.
+Explanation:
+Rule(s) from KB:
+! p in Party: liable(p) <=> negligent(p) & causedDamage(p).
+
+alice is liable given the case facts.
