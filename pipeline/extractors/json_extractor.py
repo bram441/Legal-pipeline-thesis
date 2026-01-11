@@ -68,9 +68,9 @@ def _extract_json_from_text(text):
 # Raises:
 #   ValueError: If the extracted case/query violate schema constraints.
 
-def _validate_case_and_query(obj):
-    case = normalize_and_validate_case(obj.get("case"))
-    query = normalize_and_validate_query(obj.get("query"), case)
+def _validate_case_and_query(obj, kb_schema=None):
+    case = normalize_and_validate_case(obj.get("case"), kb_schema=kb_schema)
+    query = normalize_and_validate_query(obj.get("query"), case, kb_schema=kb_schema)
     return case, query
 
 
@@ -110,7 +110,7 @@ def _auto_provider():
 # Raises:
 #   ExtractionError: If extraction/parsing/validation fails after retries.
 
-def extract_case_and_query(case_text, user_question, provider="auto", model=None, max_retries=2):
+def extract_case_and_query(case_text, user_question, kb_schema=None, provider="auto", model=None, max_retries=2):
     if provider == "auto":
         provider = _auto_provider()
 
@@ -143,14 +143,20 @@ def extract_case_and_query(case_text, user_question, provider="auto", model=None
             )
 
         try:
-            raw_text = extract_case_and_query_llm(case_text, user_question, model=chosen_model, feedback=feedback)
+            raw_text = extract_case_and_query_llm(
+                case_text,
+                user_question,
+                model=chosen_model,
+                kb_schema=kb_schema,
+                feedback=feedback,
+            )
         except LLMExtractionError as e:
             raise ExtractionError(str(e))
 
         obj = _extract_json_from_text(raw_text)
 
         try:
-            _validate_case_and_query(obj)
+            _validate_case_and_query(obj, kb_schema=kb_schema)
             return obj
         except ValueError as e:
             last_error = e

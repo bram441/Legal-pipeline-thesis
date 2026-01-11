@@ -5,6 +5,7 @@ from pipeline.schema import normalize_and_validate_case, normalize_and_validate_
 from pipeline.extractors.json_extractor import extract_case_and_query, ExtractionError
 from pipeline.symbolic.router import run_query
 from pipeline.rendering.answer_renderer import render_answer
+import json
 
 # Orchestrates the end-to-end pipeline for a single (case_text, user_question):
 #   1) builds an extraction prompt (for traceability/debugging),
@@ -38,21 +39,66 @@ def answer_legal_prompt(
     extractor_provider="auto",
     extractor_model=None,
     extractor_max_retries=2,
+    kb_schema=None,
     debug=False,
 ):
+   # --- Text-mode directive support (deterministic intent forcing) ---
+    # Allows questions.txt lines like:
+    #   @intent satisfiable
+    # to force an intent query without relying on the extractor (LLM or dummy)
+    # to interpret the question correctly.
+    #
+    # We still extract/normalize the *case* from case_text as usual, but we
+    # override the extracted query with the forced intent.
+    forced_query = None
+    original_question = user_question or ""
+    q_strip = original_question.strip()
+    if q_strip.lower().startswith("@intent"):
+        # Support: "@intent satisfiable" and "@intent: satisfiable"
+        rest = q_strip[len("@intent"):].strip()
+        if rest.startswith(":"):
+            rest = rest[1:].strip()
+        intent_name = rest.split()[0].strip() if rest else ""
+        if not intent_name:
+            return {
+                "sat": None,
+                "case": None,
+                "query": None,
+                "symbolic_result": None,
+                "natural_language": None,
+                "explanation": None,
+                "extraction_prompt": None,
+                "raw_extracted": None,
+                "error_stage": "validation",
+                "error": "Intent directive missing intent name. Use '@intent satisfiable'.",
+            }
+
+        forced_query = {
+            "type": "intent",
+            "intent": intent_name.lower(),
+            "explain": False,
+        }
+
+        # Important: don't let the extractor hallucinate a predicate called "satisfiable".
+        # We only need the extractor for the case extraction in this directive mode.
+        user_question = "(intent directive)"
     extraction_prompt = EXTRACTION_PROMPT_TEMPLATE.format(
         case_text=case_text,
         user_question=user_question,
+        kb_schema_json=json.dumps(kb_schema, ensure_ascii=False, indent=2),
     )
+
 
     try:
         raw = extract_case_and_query(
             case_text,
             user_question,
+            kb_schema=kb_schema,
             provider=extractor_provider,
             model=extractor_model,
             max_retries=extractor_max_retries,
         )
+
     except ExtractionError as e:
         return {
             "sat": None,
@@ -68,8 +114,10 @@ def answer_legal_prompt(
         }
 
     try:
-        case = normalize_and_validate_case(raw.get("case"))
-        query = normalize_and_validate_query(raw.get("query"), case)
+        case = normalize_and_validate_case(raw.get("case"), kb_schema=kb_schema)
+        if forced_query is not None:
+            raw["query"] = forced_query
+        query = normalize_and_validate_query(raw.get("query"), case, kb_schema=kb_schema)
     except ValueError as e:
         return {
             "sat": None,

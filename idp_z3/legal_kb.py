@@ -1,25 +1,12 @@
 # idp_z3/legal_kb.py
 
 from .idp_backend import run_idp
-from .case_structure import build_structure_block
+from .case_structure import build_structure_block, build_structure_block_from_facts
 
-
-# Composes a complete FO(.) program by combining:
-#   (1) the base KB (vocabulary + theory) and
-#   (2) the case-specific structure (facts).
-# This keeps the "law" reusable and isolates per-case data.
-#
-# Params:
-#   parties (list[str]): Domain constants for Party.
-#   negligent (list[str]): Parties marked negligent in this case.
-#   caused_damage (list[str]): Parties marked as having caused damage in this case.
-#
-# Returns:
-#   str: Full FO(.) program (base KB + structure) ready for IDP.from_str.
 
 def build_fo_program(parties, negligent, caused_damage, base_kb_text):
     """
-    Composes full FO(.) program = base KB (law) + case structure.
+    Legacy demo builder: Composes full FO(.) program = base KB (law) + legacy case structure.
     base_kb_text must contain vocabulary+theory only.
     """
     if not base_kb_text:
@@ -29,82 +16,82 @@ def build_fo_program(parties, negligent, caused_damage, base_kb_text):
     return base_kb_text.strip() + "\n\n" + struct_block
 
 
-# Extracts the extension of the predicate `liable` from IDP's expanded model output.
-# This is a lightweight text parser that searches for a line like:
-#   liable := {alice, bob}.
-# and returns the set of constants inside the braces.
-#
-# Params:
-#   models (list[str]): Expanded model(s) as text returned by the IDP backend.
-#
-# Returns:
-#   set[str]: Party identifiers that are liable in (typically) the first expanded model.
-#            (This is "naive" and can be generalized later to multiple models/uncertainty.)
+def build_fo_program_from_case(case, base_kb_text):
+    """
+    New generic builder:
+    - If case has "facts": uses build_structure_block_from_facts
+    - Else: falls back to legacy demo format
+    """
+    if not base_kb_text:
+        raise ValueError("base_kb_text is required (no hardcoded KB fallback).")
+
+    if isinstance(case, dict) and "facts" in case:
+        struct_block = build_structure_block_from_facts(case["facts"])
+        return base_kb_text.strip() + "\n\n" + struct_block
+
+    # legacy fallback
+    parties = case["parties"]
+    negligent = case["negligent"]
+    caused_damage = case["caused_damage"]
+    return build_fo_program(parties, negligent, caused_damage, base_kb_text)
+
 
 def parse_liable_from_models(models):
+    """
+    Extracts the extension of the predicate `liable` from IDP's expanded model output.
+
+    NOTE: This is still a toy/demo parser.
+    """
     liable_set = set()
 
-    for line in "\n".join(models).splitlines():
-        line = line.strip()
-        if line.startswith("liable :="):
-            _, right = line.split(":=", 1)
-            right = right.strip()
-            if right.endswith("."):
-                right = right[:-1].strip()
-            if right.startswith("{") and right.endswith("}"):
-                inner = right[1:-1].strip()
-                if inner:
-                    parts = [p.strip() for p in inner.split(",")]
-                    liable_set.update(parts)
-            break
+    if not models:
+        return liable_set
+
+    # Search through the model chunks for a line that contains "liable := { ... }"
+    for chunk in models:
+        if not isinstance(chunk, str):
+            continue
+
+        for raw_line in chunk.splitlines():
+            line = raw_line.strip()
+
+            # Typical IDP model output often contains: "liable := {alice,bob}."
+            if line.startswith("liable") and ":=" in line:
+                # naive parse of {...}
+                lb = line.find("{")
+                rb = line.find("}", lb + 1)
+                if lb >= 0 and rb > lb:
+                    inner = line[lb + 1 : rb].strip()
+                    if inner:
+                        parts = [p.strip() for p in inner.split(",")]
+                        liable_set.update([p for p in parts if p])
+                return liable_set
 
     return liable_set
 
 
-# Runs the IDP pipeline for the current liability toy domain:
-# builds FO(.) program, calls the IDP backend, and returns SAT + liable parties.
-# This is the "symbolic solve" function for the current predicate of interest.
-#
-# Params:
-#   parties (list[str]): Domain constants for Party.
-#   negligent (list[str]): Parties negligent in the case.
-#   caused_damage (list[str]): Parties that caused damage in the case.
-#
-# Returns:
-#   tuple[bool, set[str]]:
-#     - sat (bool): Whether the FO(.) theory is satisfiable given the case facts.
-#     - liable_set (set[str]): Parties inferred to be liable (empty if UNSAT or none inferred).
-
 def decide_liability(parties, negligent, caused_damage, base_kb_text):
+    """
+    Legacy demo entrypoint: returns (sat, liable_set).
+    """
     fo_code = build_fo_program(parties, negligent, caused_damage, base_kb_text=base_kb_text)
-    result = run_idp(fo_code, max_models=5)
-
-    if not result["sat"]:
-        return False, set()
-
-    liable_set = parse_liable_from_models(result["models"])
-    return True, liable_set
-
-
-
-# Convenience wrapper that extracts the required fields from a normalized `case` dict
-# and calls `decide_liability`. Keeps upstream pipeline code cleaner.
-#
-# Params:
-#   case (dict): Normalized case object with keys:
-#     - "parties": list[str]
-#     - "negligent": list[str]
-#     - "caused_damage": list[str]
-#
-# Returns:
-#   tuple[bool, set[str]]: Same as decide_liability(sat, liable_set).
+    result = run_idp(fo_code, max_models=1)
+    sat = bool(result.get("sat"))
+    liable = parse_liable_from_models(result.get("models") or [])
+    return sat, liable
 
 
 def decide_liability_from_case(case, base_kb_text):
-    parties = case["parties"]
-    negligent = case["negligent"]
-    caused_damage = case["caused_damage"]
-    return decide_liability(parties, negligent, caused_damage, base_kb_text=base_kb_text)
+    """
+    NEW: Works with both:
+      - legacy case: {"parties":[...], "negligent":[...], "caused_damage":[...]}
+      - schema-driven case: {"facts":[ "negligent(alice).", "causedDamage(alice)." ]}
+    """
+    fo_code = build_fo_program_from_case(case, base_kb_text=base_kb_text)
+    result = run_idp(fo_code, max_models=1)
+    sat = bool(result.get("sat"))
+    liable = parse_liable_from_models(result.get("models") or [])
+    return sat, liable
 
 
 if __name__ == "__main__":
@@ -112,7 +99,5 @@ if __name__ == "__main__":
     negligent = ["alice"]
     caused_damage = ["alice", "bob"]
 
-    sat, liable = decide_liability(parties, negligent, caused_damage)
-
-    print("SAT?", sat)
-    print("Liable parties:", ", ".join(sorted(liable)) if liable else "none")
+    # NOTE: this will require a base KB text to run, so it's not a standalone runnable demo anymore.
+    print("This module is intended to be called via the pipeline.")

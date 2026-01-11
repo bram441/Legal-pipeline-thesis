@@ -2,6 +2,10 @@
 # under the current toy rule(s). This is intentionally simple and should evolve
 # as you add more rules/predicates (e.g., rule labels, missing-premise reporting).
 #
+# NEW (incremental): optional LLM-based paraphrase layer for explanations.
+# The paraphrase is always grounded because we *always* include the exact FO(.) rule snippet
+# and the exact case facts used for the explanation. The LLM only rewrites those into NL.
+#
 # Params:
 #   case (dict): Normalized case facts (e.g., parties, negligent, caused_damage).
 #   query (dict): Normalized query (predicate/mode/args/explain).
@@ -11,6 +15,9 @@
 #   str: Explanation text describing why the answer holds (or what premise is missing).
 
 # pipeline/rendering/explanations.py
+
+from pipeline.rendering.llm_nl_explainer import paraphrase_liability_explanation, NLExplanationError
+
 
 def _kb_rule_snippet(kb_text):
     """
@@ -66,18 +73,67 @@ def _kb_rule_snippet(kb_text):
     return None
 
 
+def _liability_fact_lines(case, parties):
+    """
+    Builds a list of exact fact-lines (strings) that are allowed in the NL paraphrase.
+    If the case is schema-driven, we return those exact facts (grounded).
+    """
+    if isinstance(case, dict) and "facts" in case:
+        return list(case.get("facts") or [])
+
+    negligent_set = set(case.get("negligent") or [])
+    caused_set = set(case.get("caused_damage") or [])
+
+    facts = []
+    for p in parties:
+        facts.append("negligent(" + str(p) + ") = " + ("true" if p in negligent_set else "false") + ".")
+        facts.append("causedDamage(" + str(p) + ") = " + ("true" if p in caused_set else "false") + ".")
+    return facts
+
+
 
 def explain_liable(case, query, result, base_kb_text=None):
     rule = _kb_rule_snippet(base_kb_text)
-    header = "Rule(s) from KB:\n" + (rule if rule else "(KB rule snippet unavailable)")
+    rule_block = rule if rule else "(KB rule snippet unavailable)"
+    header = "Rule(s) from KB:\n" + rule_block
 
+    # --- Mode: set query (who is liable?) ---
     if query["mode"] == "set":
         liable_set = result.get("liable_set") or []
-        return header + "\n\nDerived liable parties: " + (", ".join(liable_set) if liable_set else "none") + "."
+        parties = liable_set[:]  # explain only the derived liable parties for now
+        fact_lines = _liability_fact_lines(case, parties) if parties else []
 
+        conclusion = "Derived liable parties: " + (", ".join(liable_set) if liable_set else "none") + "."
+
+        try:
+            paraphrase = paraphrase_liability_explanation(rule_block, fact_lines, conclusion)
+            return (
+                header
+                + "\n\nRelevant case facts:\n"
+                + ("\n".join(fact_lines) if fact_lines else "(none)")
+                + "\n\nParaphrase:\n"
+                + paraphrase
+            )
+        except NLExplanationError:
+            return header + "\n\n" + conclusion
+
+    # --- Mode: individual query (is X liable?) ---
     target = result.get("target")
     is_liable = result.get("is_liable")
 
-    if is_liable:
-        return header + "\n\n" + str(target) + " is liable given the case facts."
-    return header + "\n\n" + str(target) + " is not liable given the case facts."
+    parties = [target] if target is not None else []
+    fact_lines = _liability_fact_lines(case, parties) if parties else []
+
+    conclusion = str(target) + " is " + ("" if is_liable else "not ") + "liable."
+
+    try:
+        paraphrase = paraphrase_liability_explanation(rule_block, fact_lines, conclusion)
+        return (
+            header
+            + "\n\nRelevant case facts:\n"
+            + ("\n".join(fact_lines) if fact_lines else "(none)")
+            + "\n\nParaphrase:\n"
+            + paraphrase
+        )
+    except NLExplanationError:
+        return header + "\n\n" + str(target) + " is " + ("" if is_liable else "not ") + "liable given the case facts."

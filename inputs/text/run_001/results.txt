@@ -8,14 +8,14 @@ This rule applies to all parties involved in the case.
 
 === KB USED (kb.fo) ===
 vocabulary V {
-  type Party
-  negligent: Party -> Bool
-  causedDamage: Party -> Bool
-  liable: Party -> Bool
+    type Party
+    negligent: Party -> Bool
+    causedDamage: Party -> Bool
+    liable: Party -> Bool
 }
 
 theory T:V {
-  ! p in Party: liable(p) <=> negligent(p) & causedDamage(p).
+    ! p in Party: liable(p) <=> negligent(p) & causedDamage(p).
 }
 
 === CASE ===
@@ -27,24 +27,15 @@ Bob did not act negligently.
 
 ---
 Q: Who is liable?
-SAT? True
-Case: {'parties': ['alice', 'bob'], 'negligent': ['alice'], 'caused_damage': ['alice']}
+SAT? None
+Case: {'facts': ['negligent(alice).', 'causedDamage(alice).']}
 Query: {'type': 'predicate', 'predicate': 'liable', 'mode': 'set', 'args': [], 'explain': False}
-Answer: Liable parties: alice.
+Answer: No parties are liable.
 ---
 Q: Is Alice liable?
-SAT? True
-Case: {'parties': ['alice', 'bob'], 'negligent': ['alice'], 'caused_damage': ['alice']}
-Query: {'type': 'predicate', 'predicate': 'liable', 'mode': 'boolean', 'args': ['alice'], 'explain': False}
-Answer: Yes. alice is liable.
+ERROR STAGE: symbolic
+ERROR: Error: line 19 - colStart 10 - colEnd 15 => Symbol not in vocabulary: alice
 ---
 Q: Why is Alice liable?
-SAT? True
-Case: {'parties': ['alice', 'bob'], 'negligent': ['alice'], 'caused_damage': ['alice']}
-Query: {'type': 'predicate', 'predicate': 'liable', 'mode': 'boolean', 'args': ['alice'], 'explain': True}
-Answer: Yes. alice is liable.
-Explanation:
-Rule(s) from KB:
-! p in Party: liable(p) <=> negligent(p) & causedDamage(p).
-
-alice is liable given the case facts.
+ERROR STAGE: symbolic
+ERROR: Error: line 19 - colStart 10 - colEnd 15 => Symbol not in vocabulary: alice
