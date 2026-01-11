@@ -3,6 +3,22 @@ import re
 
 _identifier = re.compile("^[a-z][a-z0-9_]*$")
 
+# Normalizes and validates a list of identifiers used in the symbolic layer.
+# Ensures:
+#   - input is a list
+#   - elements are strings
+#   - trimming + lowercasing is applied
+#   - each identifier matches the allowed FO(.)-safe pattern (e.g., a-z, 0-9, underscore)
+#
+# Params:
+#   xs (any): Candidate value expected to be list[str].
+#   field_name (str): Name of the field (used for clear error messages).
+#
+# Returns:
+#   list[str]: Normalized identifier list.
+#
+# Raises:
+#   ValueError: If the input is not a valid identifier list.
 
 def _norm_identifier_list(xs, field_name):
     if not isinstance(xs, list):
@@ -17,6 +33,20 @@ def _norm_identifier_list(xs, field_name):
             out.append(y)
     return out
 
+# Validates and normalizes the "case" object produced by extraction.
+# Enforces core semantic constraints required by the symbolic KB, such as:
+#   - required keys exist (parties, negligent, caused_damage)
+#   - all identifiers are normalized and FO(.)-safe
+#   - negligent and caused_damage are subsets of parties (soundness guard)
+#
+# Params:
+#   case_obj (dict | None): Raw extracted case dict.
+#
+# Returns:
+#   dict: Normalized case dict with canonical keys and normalized identifier lists.
+#
+# Raises:
+#   ValueError: If required fields are missing or constraints are violated.
 
 def normalize_and_validate_case(raw_case):
     if not isinstance(raw_case, dict):
@@ -47,6 +77,23 @@ def normalize_and_validate_case(raw_case):
         "caused_damage": caused_damage,
     }
 
+# Validates and normalizes the "query" object produced by extraction.
+# Ensures the query is coherent for the router/symbolic layer, including:
+#   - supported query type (currently "predicate")
+#   - required fields exist (predicate, mode, args, explain)
+#   - mode/args constraints:
+#       * boolean -> exactly 1 arg that must be a known party
+#       * set -> args must be empty
+#
+# Params:
+#   query_obj (dict | None): Raw extracted query dict.
+#   case (dict): Normalized case dict (used to validate args against parties).
+#
+# Returns:
+#   dict: Normalized query dict (canonical structure expected by router).
+#
+# Raises:
+#   ValueError: If query is invalid, unsupported, or inconsistent with the case.
 
 def normalize_and_validate_query(raw_query, case):
     if not isinstance(raw_query, dict):

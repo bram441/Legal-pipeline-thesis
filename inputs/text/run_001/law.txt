@@ -1,0 +1,6 @@
+Tort liability rule (toy example):
+
+If a person is negligent and causes damage,
+then that person is liable.
+
+This rule applies to all parties involved in the case.

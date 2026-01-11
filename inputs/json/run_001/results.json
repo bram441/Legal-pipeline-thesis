@@ -1,0 +1,207 @@
+{
+  "id": "run_001",
+  "law": {
+    "text": "If a party is negligent and causes damage, then that party is liable."
+  },
+  "case": {
+    "text": "Alice and Bob are involved in an accident. Alice was negligent and caused damage."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Who is liable?",
+      "expected": {
+        "predicate": "liable",
+        "mode": "set",
+        "value": [
+          "alice"
+        ]
+      },
+      "pipeline": {
+        "sat": true,
+        "case": {
+          "parties": [
+            "alice",
+            "bob"
+          ],
+          "negligent": [
+            "alice"
+          ],
+          "caused_damage": [
+            "alice"
+          ]
+        },
+        "query": {
+          "type": "predicate",
+          "predicate": "liable",
+          "mode": "set",
+          "args": [],
+          "explain": false
+        },
+        "symbolic_result": {
+          "liable_set": [
+            "alice"
+          ]
+        },
+        "natural_language": "Based on the extracted facts and the toy rule, alice is liable.",
+        "explanation": null,
+        "extraction_prompt": "You are a legal assistant. You receive:\n(1) A short description of a civil case (facts in natural language)\n(2) A legal question from the user\n\nYour job is to extract a minimal structured object with TWO parts:\n- \"case\": facts for the knowledge base\n- \"query\": what the user is asking, in a structured way\n\nReturn ONLY valid JSON with this schema:\n\n{\n  \"case\": {\n    \"parties\": [\"alice\", \"bob\"],\n    \"negligent\": [\"alice\"],\n    \"caused_damage\": [\"alice\"]\n  },\n  \"query\": {\n    \"type\": \"predicate\",\n    \"predicate\": \"liable\",\n    \"mode\": \"set\",\n    \"args\": [],\n    \"explain\": false\n  }\n}\n\nRules:\n- Use lowercase identifiers (alice, bob, charlie)\n- Use underscores instead of spaces\n- No extra keys beyond those shown\n- \"negligent\" and \"caused_damage\" must be subsets of \"parties\"\n- If unknown, use empty lists\n- query.mode is either:\n  - \"set\" for \"who is liable?\"\n  - \"boolean\" for \"is X liable?\"\n- For boolean mode, put the party in query.args, e.g. [\"alice\"]\n\nCase:\nAlice and Bob are involved in an accident. Alice was negligent and caused damage.\n\nUser question:\nWho is liable?",
+        "raw_extracted": {
+          "case": {
+            "parties": [
+              "alice",
+              "bob"
+            ],
+            "negligent": [
+              "alice"
+            ],
+            "caused_damage": [
+              "alice"
+            ]
+          },
+          "query": {
+            "type": "predicate",
+            "predicate": "liable",
+            "mode": "set",
+            "args": [],
+            "explain": false
+          }
+        }
+      }
+    },
+    {
+      "id": "q2",
+      "text": "Is Alice liable?",
+      "expected": {
+        "predicate": "liable",
+        "mode": "boolean",
+        "target": "alice",
+        "value": true
+      },
+      "pipeline": {
+        "sat": true,
+        "case": {
+          "parties": [
+            "alice",
+            "bob"
+          ],
+          "negligent": [
+            "alice"
+          ],
+          "caused_damage": [
+            "alice"
+          ]
+        },
+        "query": {
+          "type": "predicate",
+          "predicate": "liable",
+          "mode": "boolean",
+          "args": [
+            "alice"
+          ],
+          "explain": false
+        },
+        "symbolic_result": {
+          "target": "alice",
+          "is_liable": true,
+          "liable_set": [
+            "alice"
+          ]
+        },
+        "natural_language": "Yes. Based on the extracted facts and the toy rule, alice is liable.",
+        "explanation": null,
+        "extraction_prompt": "You are a legal assistant. You receive:\n(1) A short description of a civil case (facts in natural language)\n(2) A legal question from the user\n\nYour job is to extract a minimal structured object with TWO parts:\n- \"case\": facts for the knowledge base\n- \"query\": what the user is asking, in a structured way\n\nReturn ONLY valid JSON with this schema:\n\n{\n  \"case\": {\n    \"parties\": [\"alice\", \"bob\"],\n    \"negligent\": [\"alice\"],\n    \"caused_damage\": [\"alice\"]\n  },\n  \"query\": {\n    \"type\": \"predicate\",\n    \"predicate\": \"liable\",\n    \"mode\": \"set\",\n    \"args\": [],\n    \"explain\": false\n  }\n}\n\nRules:\n- Use lowercase identifiers (alice, bob, charlie)\n- Use underscores instead of spaces\n- No extra keys beyond those shown\n- \"negligent\" and \"caused_damage\" must be subsets of \"parties\"\n- If unknown, use empty lists\n- query.mode is either:\n  - \"set\" for \"who is liable?\"\n  - \"boolean\" for \"is X liable?\"\n- For boolean mode, put the party in query.args, e.g. [\"alice\"]\n\nCase:\nAlice and Bob are involved in an accident. Alice was negligent and caused damage.\n\nUser question:\nIs Alice liable?",
+        "raw_extracted": {
+          "case": {
+            "parties": [
+              "alice",
+              "bob"
+            ],
+            "negligent": [
+              "alice"
+            ],
+            "caused_damage": [
+              "alice"
+            ]
+          },
+          "query": {
+            "type": "predicate",
+            "predicate": "liable",
+            "mode": "boolean",
+            "args": [
+              "alice"
+            ],
+            "explain": false
+          }
+        }
+      }
+    },
+    {
+      "id": "q3",
+      "text": "Is Bob liable?",
+      "expected": {
+        "predicate": "liable",
+        "mode": "boolean",
+        "target": "bob",
+        "value": false
+      },
+      "pipeline": {
+        "sat": true,
+        "case": {
+          "parties": [
+            "alice",
+            "bob"
+          ],
+          "negligent": [
+            "alice"
+          ],
+          "caused_damage": [
+            "alice"
+          ]
+        },
+        "query": {
+          "type": "predicate",
+          "predicate": "liable",
+          "mode": "boolean",
+          "args": [
+            "bob"
+          ],
+          "explain": false
+        },
+        "symbolic_result": {
+          "target": "bob",
+          "is_liable": false,
+          "liable_set": [
+            "alice"
+          ]
+        },
+        "natural_language": "No. Based on the extracted facts and the toy rule, bob is not liable.",
+        "explanation": null,
+        "extraction_prompt": "You are a legal assistant. You receive:\n(1) A short description of a civil case (facts in natural language)\n(2) A legal question from the user\n\nYour job is to extract a minimal structured object with TWO parts:\n- \"case\": facts for the knowledge base\n- \"query\": what the user is asking, in a structured way\n\nReturn ONLY valid JSON with this schema:\n\n{\n  \"case\": {\n    \"parties\": [\"alice\", \"bob\"],\n    \"negligent\": [\"alice\"],\n    \"caused_damage\": [\"alice\"]\n  },\n  \"query\": {\n    \"type\": \"predicate\",\n    \"predicate\": \"liable\",\n    \"mode\": \"set\",\n    \"args\": [],\n    \"explain\": false\n  }\n}\n\nRules:\n- Use lowercase identifiers (alice, bob, charlie)\n- Use underscores instead of spaces\n- No extra keys beyond those shown\n- \"negligent\" and \"caused_damage\" must be subsets of \"parties\"\n- If unknown, use empty lists\n- query.mode is either:\n  - \"set\" for \"who is liable?\"\n  - \"boolean\" for \"is X liable?\"\n- For boolean mode, put the party in query.args, e.g. [\"alice\"]\n\nCase:\nAlice and Bob are involved in an accident. Alice was negligent and caused damage.\n\nUser question:\nIs Bob liable?",
+        "raw_extracted": {
+          "case": {
+            "parties": [
+              "alice",
+              "bob"
+            ],
+            "negligent": [
+              "alice"
+            ],
+            "caused_damage": [
+              "alice"
+            ]
+          },
+          "query": {
+            "type": "predicate",
+            "predicate": "liable",
+            "mode": "boolean",
+            "args": [
+              "bob"
+            ],
+            "explain": false
+          }
+        }
+      }
+    }
+  ]
+}
