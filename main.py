@@ -18,7 +18,7 @@ def run_text_mode(run_dir, provider):
     questions = payload["questions"]
 
     # ✅ Compile (or reuse cached) KB once per run
-    kb_text = get_or_compile_kb(run_dir, law_text)
+    kb_text, kb_schema = get_or_compile_kb(run_dir, law_text)
 
     out_lines = []
     out_lines.append("=== LAW (plain text input) ===")
@@ -41,6 +41,7 @@ def run_text_mode(run_dir, provider):
             q,
             base_kb_text=kb_text,
             extractor_provider=provider,
+            kb_schema=kb_schema,
         )
 
         if result.get("error_stage"):
@@ -69,7 +70,7 @@ def run_json_mode(run_dir, provider):
     questions = run_obj.get("questions") or []
 
     # ✅ Compile (or reuse cached) KB once per run
-    kb_text = get_or_compile_kb(run_dir, law_text)
+    kb_text, kb_schema = get_or_compile_kb(run_dir, law_text)
 
     results = {
         "id": run_obj.get("id"),
@@ -97,6 +98,7 @@ def run_json_mode(run_dir, provider):
             qtext,
             base_kb_text=kb_text,
             extractor_provider=provider,
+            kb_schema=kb_schema,
         )
 
         item = {

@@ -1,0 +1,29 @@
+{
+  "types": [
+    "Party"
+  ],
+  "predicates": [
+    {
+      "name": "causedDamage",
+      "args": [
+        "Party"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "liable",
+      "args": [
+        "Party"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "negligent",
+      "args": [
+        "Party"
+      ],
+      "returns": "Bool"
+    }
+  ],
+  "functions": []
+}

@@ -1,28 +1,27 @@
 # pipeline/extractors/llm_extractor.py
 
 import os
+import json
 
 
 class LLMExtractionError(Exception):
     pass
 
-# Defines the JSON Schema used to constrain the LLM output shape (Structured Outputs).
-# This schema is intentionally limited to structural/type constraints (keys + basic types).
-# Cross-field semantic constraints are enforced later by pipeline/schema.py.
-#
-# Params:
-#   (none)
-#
-# Returns:
-#   dict: A response_format payload specifying a strict json_schema for the LLM response.
 
 def _response_format_schema():
-    # Keep schema simple; semantic constraints live in pipeline/schema.py
+    """
+    Some Structured Output schema subsets do NOT allow oneOf/anyOf.
+    They also require that 'required' includes every key in 'properties'.
+
+    So we use a fixed-shape query object where all fields are always present.
+    Unused fields must be filled with defaults:
+      - for intent queries: predicate="", mode="set", args=[]
+      - for predicate queries: intent=""
+    """
     return {
         "type": "json_schema",
         "json_schema": {
             "name": "case_query_extraction",
-            "strict": True,
             "schema": {
                 "type": "object",
                 "additionalProperties": False,
@@ -31,23 +30,22 @@ def _response_format_schema():
                     "case": {
                         "type": "object",
                         "additionalProperties": False,
-                        "required": ["parties", "negligent", "caused_damage"],
+                        "required": ["facts"],
                         "properties": {
-                            "parties": {"type": "array", "items": {"type": "string"}},
-                            "negligent": {"type": "array", "items": {"type": "string"}},
-                            "caused_damage": {"type": "array", "items": {"type": "string"}},
+                            "facts": {"type": "array", "items": {"type": "string"}},
                         },
                     },
                     "query": {
                         "type": "object",
                         "additionalProperties": False,
-                        "required": ["type", "predicate", "mode", "args", "explain"],
+                        "required": ["type", "explain", "predicate", "mode", "args", "intent"],
                         "properties": {
-                            "type": {"type": "string", "enum": ["predicate"]},
+                            "type": {"type": "string", "enum": ["predicate", "intent"]},
+                            "explain": {"type": "boolean"},
                             "predicate": {"type": "string"},
                             "mode": {"type": "string", "enum": ["set", "boolean"]},
                             "args": {"type": "array", "items": {"type": "string"}},
-                            "explain": {"type": "boolean"},
+                            "intent": {"type": "string"},
                         },
                     },
                 },
@@ -55,24 +53,8 @@ def _response_format_schema():
         },
     }
 
-# Calls an LLM to extract a structured {"case": {...}, "query": {...}} object
-# from (case_text, user_question). Uses Structured Outputs (JSON Schema) to force
-# well-formed JSON and stable keys/types. Optionally accepts validation feedback
-# to retry and correct previously invalid outputs.
-#
-# Params:
-#   case_text (str): Natural-language case description.
-#   user_question (str): Natural-language question to be answered.
-#   model (str): Model identifier to use for extraction.
-#   feedback (str | None): Optional error feedback and previous JSON to guide a retry.
-#
-# Returns:
-#   str: JSON string (the model output) that should parse into {"case": {...}, "query": {...}}.
-#
-# Raises:
-#   LLMExtractionError: If the API key is missing, the SDK is unavailable, or the API call fails.
 
-def extract_case_and_query_llm(case_text, user_question, model, feedback=None):
+def extract_case_and_query_llm(case_text, user_question, model, kb_schema=None, feedback=None):
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise LLMExtractionError("Missing OPENAI_API_KEY environment variable")
@@ -88,20 +70,39 @@ def extract_case_and_query_llm(case_text, user_question, model, feedback=None):
     rules = (
         "Rules:\n"
         "- Output must be VALID JSON matching the provided schema.\n"
-        "- Use lowercase identifiers and underscores.\n"
-        "- negligent and caused_damage must be subsets of parties.\n"
-        "- If unknown, use empty lists.\n"
-        "- query.mode:\n"
-        "  - 'set' -> args MUST be []\n"
-        "  - 'boolean' -> args MUST contain exactly one party\n"
+        "- Use lowercase identifiers (snake_case) for constants/individuals.\n"
+        "- IMPORTANT: You MUST use ONLY predicate/function symbol NAMES that appear in KB_SCHEMA.\n"
+        "- Copy symbol names EXACTLY (case-sensitive). Do NOT invent synonyms.\n"
+        "- If you cannot express something with the allowed symbols, OMIT that fact.\n"
+        "- Facts must be valid FO(.) structure lines ending with '.'.\n"
+        "- Do NOT output a 'structure { }' block, only the list of fact lines.\n"
         "\n"
-        "IMPORTANT SEMANTICS:\n"
-        "- caused_damage lists parties who CAUSED damage (actor), not the victim.\n"
+        "How to use KB_SCHEMA:\n"
+        "- Allowed predicate symbols are KB_SCHEMA.predicates[].name\n"
+        "- Allowed function symbols are KB_SCHEMA.functions[].name\n"
+        "- Type names (KB_SCHEMA.types) are NOT predicates unless listed as a predicate.\n"
+        "\n"
+        "Examples (assume KB_SCHEMA has predicates: negligent, causedDamage):\n"
+        "- ✅ negligent(alice).\n"
+        "- ✅ causedDamage(alice).\n"
+        "- ❌ acted_negligently(alice).   (NOT allowed: invented synonym)\n"
+        "- ❌ causes(alice,damage).       (NOT allowed: invented predicate)\n"
+        "\n"
+        "Query:\n"
+        "- type='intent' only for meta questions like satisfiable/consistency.\n"
+        "- otherwise type='predicate' with predicate/mode/args.\n"
+        "- For intent queries: set predicate='' mode='set' args=[] (defaults).\n"
+        "- For predicate queries: set intent='' (default).\n"
     )
+
+    schema_text = ""
+    if kb_schema is not None:
+        schema_text = "\n\nKB_SCHEMA (hard contract):\n" + json.dumps(kb_schema, ensure_ascii=False, indent=2)
 
     user_content = (
         rules
-        + "\nCase:\n" + str(case_text)
+        + schema_text
+        + "\n\nCase:\n" + str(case_text)
         + "\n\nUser question:\n" + str(user_question)
     )
 

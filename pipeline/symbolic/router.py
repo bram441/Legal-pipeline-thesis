@@ -1,43 +1,80 @@
-from idp_z3.legal_kb import decide_liability_from_case
-
-# Routes a normalized query to the appropriate symbolic solver and returns structured results.
-# This is the dispatch layer between the general pipeline and specific symbolic KB modules.
-# In the current minimal version, it supports liability queries and calls idp_z3/legal_kb.py.
-#
-# Params:
-#   case (dict): Normalized case facts.
-#   query (dict): Normalized query specification (predicate/mode/args/explain).
-#
-# Returns:
-#   tuple[bool, dict]:
-#     - sat (bool): Whether the FO(.) theory is satisfiable for the case
-#     - result (dict): Structured symbolic result (e.g., liable_set, is_liable, target, etc.)
-#
-# Raises:
-#   ValueError: If the query is unsupported or malformed.
-#   Other exceptions may propagate from the IDP backend if the FO(.) program fails.
-
 # pipeline/symbolic/router.py
 
+from importlib import import_module
+
+
+def _run_intent(case, query, base_kb_text):
+    intent = (query.get("intent") or "").strip().lower()
+    if not intent:
+        raise ValueError("Intent query missing 'intent'")
+
+    try:
+        mod = import_module("idp_z3.intents." + intent)
+    except Exception as e:
+        raise ValueError("Unsupported intent: " + intent + " (" + str(e) + ")")
+
+    run_fn = getattr(mod, "run", None)
+    if run_fn is None:
+        raise ValueError("Intent handler has no run(): " + intent)
+
+    return run_fn(case=case, base_kb_text=base_kb_text, query=query)
+
+
+def _normalize_predicate_query_to_intent(query):
+    """
+    Predicate queries are just a UI-friendly surface form.
+
+    We translate them to a symbolic *intent* so the backend remains generic:
+      - mode == "boolean"  -> intent "deduction" (entailment-like)
+      - mode == "set"      -> intent "model_expansion" (extension of predicate)
+
+    This keeps strict validation and avoids per-predicate handlers.
+    """
+    pred = (query.get("predicate") or "").strip()
+    if not pred:
+        raise ValueError("Predicate query missing 'predicate'")
+
+    mode = (query.get("mode") or "").strip().lower()
+    explain = bool(query.get("explain", False))
+    args = query.get("args") or []
+    if not isinstance(args, list):
+        raise ValueError("query.args must be a list")
+
+    if mode == "boolean":
+        if len(args) < 1:
+            raise ValueError("Boolean predicate query requires at least 1 argument")
+        # Deduction intent will interpret (predicate,args)
+        return {
+            "type": "intent",
+            "intent": "deduction",
+            "explain": explain,
+            "predicate": pred,
+            "mode": "boolean",
+            "args": args,
+        }
+
+    if mode == "set":
+        # Model expansion intent will interpret (predicate) and ignore args
+        return {
+            "type": "intent",
+            "intent": "model_expansion",
+            "explain": explain,
+            "predicate": pred,
+            "mode": "set",
+            "args": [],
+        }
+
+    raise ValueError("Unsupported predicate query mode: " + str(mode))
 
 
 def run_query(case, query, base_kb_text):
-    """
-    Dispatches query to the relevant solver using the provided base KB.
-    """
-    if query["type"] != "predicate":
-        raise ValueError("Unsupported query.type: " + str(query["type"]))
+    q_type = (query.get("type") or "").strip().lower()
 
-    if query["predicate"] != "liable":
-        raise ValueError("Unsupported predicate: " + str(query["predicate"]))
+    if q_type == "intent":
+        return _run_intent(case, query, base_kb_text)
 
-    sat, liable_set = decide_liability_from_case(case, base_kb_text=base_kb_text)
+    if q_type == "predicate":
+        normalized = _normalize_predicate_query_to_intent(query)
+        return _run_intent(case, normalized, base_kb_text)
 
-    if not sat:
-        return False, {}
-
-    if query["mode"] == "set":
-        return True, {"liable_set": sorted(list(liable_set))}
-
-    target = query["args"][0]
-    return True, {"target": target, "is_liable": target in liable_set, "liable_set": sorted(list(liable_set))}
+    raise ValueError("Unsupported query.type: " + str(q_type))
