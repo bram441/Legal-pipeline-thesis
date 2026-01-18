@@ -15,23 +15,13 @@ import json
 #   4) runs symbolic inference via the router,
 #   5) renders a natural-language answer (and optional explanation).
 #
-# Params:
-#   case_text (str): Natural-language description of the case facts.
-#   user_question (str): Natural-language user question about the case.
-#
 # Returns:
-#   dict: A result object containing:
-#     - "sat" (bool): satisfiable or not (symbolic core result)
-#     - "case" (dict): normalized case facts used for inference
-#     - "query" (dict): normalized query used for inference
-#     - "symbolic_result" (dict): structured symbolic output from the router
-#     - "natural_language" (str): final answer text
-#     - "explanation" (str | None): optional explanation text
-#     - "extraction_prompt" (str): prompt used for extraction (debug/trace)
-#     - "raw_extracted" (dict): raw extracted JSON before normalization
+#   dict with keys:
+#     "sat", "case", "query", "symbolic_result", "natural_language", "explanation",
+#     "extraction_prompt", "raw_extracted"
 #
-# Raises:
-#   ValueError / ExtractionError may propagate depending on your current error-handling strategy.
+# On errors, returns a dict with:
+#   "error_stage" and "error", plus partial context where available.
 
 def answer_legal_prompt(
     case_text,
@@ -44,7 +34,9 @@ def answer_legal_prompt(
     debug=False,
 ):
     debug_log("pipeline.answer_legal_prompt", "start")
-   # --- Text-mode directive support (deterministic intent forcing) ---
+    debug_log("pipeline.answer_legal_prompt", "extraction_provider=" + str(extractor_provider))
+
+    # --- Text-mode directive support (deterministic intent forcing) ---
     # Allows questions.txt lines like:
     #   @intent satisfiable
     # to force an intent query without relying on the extractor (LLM or dummy)
@@ -55,6 +47,7 @@ def answer_legal_prompt(
     forced_query = None
     original_question = user_question or ""
     q_strip = original_question.strip()
+
     if q_strip.lower().startswith("@intent"):
         # Support: "@intent satisfiable" and "@intent: satisfiable"
         rest = q_strip[len("@intent"):].strip()
@@ -84,14 +77,13 @@ def answer_legal_prompt(
         # Important: don't let the extractor hallucinate a predicate called "satisfiable".
         # We only need the extractor for the case extraction in this directive mode.
         user_question = "(intent directive)"
+
     extraction_prompt = EXTRACTION_PROMPT_TEMPLATE.format(
         case_text=case_text,
         user_question=user_question,
         kb_schema_json=json.dumps(kb_schema, ensure_ascii=False, indent=2),
     )
 
-
-    debug_log("pipeline.answer_legal_prompt", "extraction_provider=" + str(extractor_provider))
     try:
         raw = extract_case_and_query(
             case_text,
@@ -101,7 +93,6 @@ def answer_legal_prompt(
             model=extractor_model,
             max_retries=extractor_max_retries,
         )
-
     except ExtractionError as e:
         return {
             "sat": None,
