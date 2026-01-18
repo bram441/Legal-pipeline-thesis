@@ -16,19 +16,6 @@ class ExtractionError(Exception):
     pass
 
 
-def _strip_code_fences(text):
-    s = text.strip()
-    if s.startswith("```"):
-        # remove first fence line
-        first_nl = s.find("\n")
-        if first_nl != -1:
-            s = s[first_nl + 1 :].strip()
-        # remove trailing fence
-        if s.endswith("```"):
-            s = s[:-3].strip()
-    return s
-
-
 # Parses a JSON object from a text blob.
 # Supports two modes:
 #   1) direct JSON (text is exactly JSON)
@@ -48,7 +35,7 @@ def _extract_json_from_text(text):
     if not isinstance(text, str):
         raise ExtractionError("Extractor output must be a string")
 
-    s = _strip_code_fences(text).strip()
+    s = text.strip()
     if not s:
         raise ExtractionError("Extractor output is empty")
 
@@ -67,7 +54,6 @@ def _extract_json_from_text(text):
         return json.loads(candidate)
     except json.JSONDecodeError as e:
         raise ExtractionError("Failed to parse JSON substring: " + str(e))
-
 
 # Validates and normalizes the extracted JSON payload using pipeline.schema.
 # This enforces structural + semantic constraints (identifiers, subset constraints, query rules).
@@ -102,7 +88,6 @@ def _auto_provider():
             return "dummy"
 
     return "dummy"
-
 
 # Top-level extraction entrypoint used by the pipeline.
 # Depending on configuration, this may:
