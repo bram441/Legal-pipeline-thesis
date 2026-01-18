@@ -9,13 +9,6 @@ def _run_intent(case, query, base_kb_text):
     intent = (query.get("intent") or "").strip().lower()
     if not intent:
         raise ValueError("Intent query missing 'intent'")
-    
-    if intent == "unknown":
-        return True, {
-            "intent": "unknown",
-            "error": "unknown_intent",
-            "message": "Query could not be expressed using the current KB schema."
-        }
 
     debug_log("router._run_intent", "intent=" + intent)
 

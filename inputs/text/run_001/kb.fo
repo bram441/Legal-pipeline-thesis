@@ -1,10 +1,10 @@
 vocabulary V {
-    type Party
-    negligent: Party -> Bool
-    causedDamage: Party -> Bool
-    liable: Party -> Bool
+  type Party
+  negligent: Party -> Bool
+  causedDamage: Party -> Bool
+  liable: Party -> Bool
 }
 
 theory T:V {
-    ! p in Party: liable(p) <=> negligent(p) & causedDamage(p).
+  ! p in Party: liable(p) <=> negligent(p) & causedDamage(p).
 }
