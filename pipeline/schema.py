@@ -132,7 +132,12 @@ def normalize_and_validate_query(raw_query, case, kb_schema=None):
         intent = str(raw_query.get("intent", "")).strip().lower()
         if not intent:
             raise ValueError("intent query requires query.intent")
-        return {"type": "intent", "intent": intent, "explain": explain}
+        # Preserve additional intent-specific fields (e.g. max_models, symbol, ...).
+        out = dict(raw_query)
+        out["type"] = "intent"
+        out["intent"] = intent
+        out["explain"] = explain
+        return out
 
     if q_type != "predicate":
         raise ValueError("Unsupported query.type: " + str(raw_query.get("type")))
