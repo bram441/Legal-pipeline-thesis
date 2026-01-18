@@ -26,7 +26,7 @@ def _normalize_predicate_query_to_intent(query):
 
     We translate them to a symbolic *intent* so the backend remains generic:
       - mode == "boolean"  -> intent "deduction" (entailment-like)
-      - mode == "set"      -> intent "model_expansion" (extension of predicate)
+      - mode == "set"      -> intent "deduction_set" (extension of predicate)
 
     This keeps strict validation and avoids per-predicate handlers.
     """
@@ -54,15 +54,15 @@ def _normalize_predicate_query_to_intent(query):
         }
 
     if mode == "set":
-        # Model expansion intent will interpret (predicate) and ignore args
         return {
             "type": "intent",
-            "intent": "model_expansion",
+            "intent": "deduction_set",
             "explain": explain,
             "predicate": pred,
             "mode": "set",
             "args": [],
         }
+
 
     raise ValueError("Unsupported predicate query mode: " + str(mode))
 
