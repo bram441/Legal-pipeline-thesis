@@ -9,25 +9,22 @@ _bool_assign_line = re.compile(
     r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*\((.*)\)\s*=\s*(true|false)\s*\.\s*$",
     re.IGNORECASE
 )
+_bool_is_line = re.compile(
+    r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*\((.*)\)\s+is\s+(true|false)\s*\.\s*$",
+    re.IGNORECASE
+)
 _bad_star_call = re.compile(r"[A-Za-z_][A-Za-z0-9_]*\s*\*\s*\(")
 _number = re.compile(r"^-?\d+(\.\d+)?$")
 
 
 def _to_idp_elem(token):
-    """
-    Convert token like alice -> 'alice' so it is a domain element literal,
-    not a vocabulary constant.
-    """
     s = str(token).strip()
     if not s:
         return s
-
     if s.startswith("'") and s.endswith("'"):
         return s
-
     if _number.match(s):
         return s
-
     s = s.lower()
     s = s.replace("'", "''")
     return "'" + s + "'"
@@ -79,6 +76,15 @@ def build_structure_block_from_facts(facts):
     pos_atoms = []
     neg_atoms = []
 
+    def _handle_bool(pred, args, val, original_line):
+        if not args:
+            raise ValueError("Empty argument list in fact: " + original_line)
+        v = val.strip().lower()
+        if v == "true":
+            pos_atoms.append((pred, args))
+        else:
+            neg_atoms.append((pred, args))
+
     for ln in facts:
         if not isinstance(ln, str):
             raise ValueError("case.facts entries must be strings")
@@ -97,13 +103,16 @@ def build_structure_block_from_facts(facts):
         if mb:
             pred = mb.group(1)
             args = _split_args(mb.group(2))
-            val = mb.group(3).strip().lower()
-            if not args:
-                raise ValueError("Empty argument list in fact: " + s)
-            if val == "true":
-                pos_atoms.append((pred, args))
-            else:
-                neg_atoms.append((pred, args))
+            val = mb.group(3)
+            _handle_bool(pred, args, val, s)
+            continue
+
+        mbi = _bool_is_line.match(s)
+        if mbi:
+            pred = mbi.group(1)
+            args = _split_args(mbi.group(2))
+            val = mbi.group(3)
+            _handle_bool(pred, args, val, s)
             continue
 
         mneg = _neg_atom_line.match(s)
@@ -180,3 +189,39 @@ structure S:V {{
   {body}
 }}
 """.strip()
+
+
+def extract_constants_from_facts(facts):
+    constants = set()
+
+    for ln in facts or []:
+        if not isinstance(ln, str):
+            continue
+        s = ln.strip()
+        if not s or not s.endswith("."):
+            continue
+
+        mneg = _neg_atom_line.match(s)
+        if mneg:
+            args = _split_args(mneg.group(2))
+            constants.update(args)
+            continue
+
+        mb = _bool_assign_line.match(s)
+        if mb:
+            args = _split_args(mb.group(2))
+            constants.update(args)
+            continue
+
+        mbi = _bool_is_line.match(s)
+        if mbi:
+            args = _split_args(mbi.group(2))
+            constants.update(args)
+            continue
+
+        m = _atom_line.match(s)
+        if m:
+            args = _split_args(m.group(2))
+            constants.update(args)
+
+    return sorted(constants)

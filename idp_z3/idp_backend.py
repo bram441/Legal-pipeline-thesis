@@ -20,31 +20,23 @@ from idp_engine.Run import model_check, model_expand
 #     - optionally other debug fields depending on your implementation.
 
 def run_idp(fo_code, theory_name="T", struct_name="S", max_models=10, timeout_seconds=5):
-    """
-    Run IDP-Z3 model_check + model_expand on a FO(.) program.
-
-    Returns a dict:
-      {
-        "sat": bool,
-        "models": [str, ...],   # pretty-printed models + final message
-      }
-    """
     kb = IDP.from_str(fo_code)
 
-    # Access blocks by name (simpler than get_blocks for now)
-    T = kb.theories[theory_name]
+    if isinstance(theory_name, (list, tuple)):
+        theories = [kb.theories[name] for name in theory_name]
+    else:
+        theories = [kb.theories[theory_name]]
+
     S = kb.structures[struct_name]
 
-    sat_status = model_check(T, S)
+    sat_status = model_check(*theories, S)
 
     models = []
-    for chunk in model_expand(T, S, max=max_models, timeout_seconds=timeout_seconds):
+    for chunk in model_expand(*theories, S, max=max_models, timeout_seconds=timeout_seconds):
         models.append(chunk)
 
-    return {
-        "sat": sat_status == "sat",
-        "models": models,
-    }
+    return {"sat": sat_status == "sat", "models": models}
+
 
 
 if __name__ == "__main__":

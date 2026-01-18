@@ -8,14 +8,14 @@ This rule applies to all parties involved in the case.
 
 === KB USED (kb.fo) ===
 vocabulary V {
-    type Party
-    negligent: Party -> Bool
-    causedDamage: Party -> Bool
-    liable: Party -> Bool
+  type Party
+  negligent: Party -> Bool
+  causedDamage: Party -> Bool
+  liable: Party -> Bool
 }
 
 theory T:V {
-    ! p in Party: liable(p) <=> negligent(p) & causedDamage(p).
+  ! p in Party: liable(p) <=> negligent(p) & causedDamage(p).
 }
 
 === CASE ===
@@ -27,15 +27,53 @@ Bob did not act negligently.
 
 ---
 Q: Who is liable?
-SAT? None
-Case: {'facts': ['negligent(alice).', 'causedDamage(alice).']}
-Query: {'type': 'predicate', 'predicate': 'liable', 'mode': 'set', 'args': [], 'explain': False}
-Answer: No parties are liable.
+SAT? True
+Case: {'facts': ['negligent(alice).', 'causedDamage(alice).', 'not negligent(bob).']}
+Query: {'type': 'predicate', 'predicate': 'liable', 'mode': 'set', 'args': [], 'explain': True}
+Answer: Set query requires model_expansion (not implemented yet).
 ---
 Q: Is Alice liable?
-ERROR STAGE: symbolic
-ERROR: Error: line 19 - colStart 10 - colEnd 15 => Symbol not in vocabulary: alice
+SAT? True
+Case: {'facts': ['negligent(alice).', 'causedDamage(alice).']}
+Query: {'type': 'predicate', 'predicate': 'liable', 'mode': 'boolean', 'args': ['alice'], 'explain': True}
+Answer: Yes. liable(x0) is entailed by the law and case facts.
+Explanation:
+Rule(s) from KB:
+! p in Party: liable(p) <=> negligent(p) & causedDamage(p).
+
+Relevant case facts:
+negligent(alice).
+causedDamage(alice).
+
+Constraint checked:
+? x0 in Party: __sel0(x0) & liable(x0).
+
+Status:
+possible = True
+certain = True
+
+Natural-language paraphrase:
+According to the rule, a party is liable if and only if they are negligent and caused damage. Since Alice is both negligent and caused damage, it follows that Alice is liable.
 ---
 Q: Why is Alice liable?
-ERROR STAGE: symbolic
-ERROR: Error: line 19 - colStart 10 - colEnd 15 => Symbol not in vocabulary: alice
+SAT? True
+Case: {'facts': ['negligent(alice).', 'causedDamage(alice).']}
+Query: {'type': 'predicate', 'predicate': 'liable', 'mode': 'boolean', 'args': ['alice'], 'explain': True}
+Answer: Yes. liable(x0) is entailed by the law and case facts.
+Explanation:
+Rule(s) from KB:
+! p in Party: liable(p) <=> negligent(p) & causedDamage(p).
+
+Relevant case facts:
+negligent(alice).
+causedDamage(alice).
+
+Constraint checked:
+? x0 in Party: __sel0(x0) & liable(x0).
+
+Status:
+possible = True
+certain = True
+
+Natural-language paraphrase:
+Because Alice is both negligent and caused damage, according to the rule that a party is liable if and only if they are negligent and caused damage, it follows that Alice is liable.

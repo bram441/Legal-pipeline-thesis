@@ -3,9 +3,6 @@
 from idp_z3.predicate_solver import evaluate_atom
 import idp_z3.predicate_solver as ps
 
-
-
-
 def run(case, base_kb_text, query):
     """
     Generic deduction / entailment-like intent.
