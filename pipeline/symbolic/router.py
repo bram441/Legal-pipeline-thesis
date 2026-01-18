@@ -2,11 +2,15 @@
 
 from importlib import import_module
 
+from debug import debug_log
+
 
 def _run_intent(case, query, base_kb_text):
     intent = (query.get("intent") or "").strip().lower()
     if not intent:
         raise ValueError("Intent query missing 'intent'")
+
+    debug_log("router._run_intent", "intent=" + intent)
 
     try:
         mod = import_module("idp_z3.intents." + intent)
@@ -44,6 +48,7 @@ def _normalize_predicate_query_to_intent(query):
         if len(args) < 1:
             raise ValueError("Boolean predicate query requires at least 1 argument")
         # Deduction intent will interpret (predicate,args)
+        debug_log("router._normalize", "predicate boolean -> deduction")
         return {
             "type": "intent",
             "intent": "deduction",
@@ -54,6 +59,7 @@ def _normalize_predicate_query_to_intent(query):
         }
 
     if mode == "set":
+        debug_log("router._normalize", "predicate set -> deduction_set")
         return {
             "type": "intent",
             "intent": "deduction_set",
@@ -69,6 +75,8 @@ def _normalize_predicate_query_to_intent(query):
 
 def run_query(case, query, base_kb_text):
     q_type = (query.get("type") or "").strip().lower()
+
+    debug_log("router.run_query", "type=" + str(q_type))
 
     if q_type == "intent":
         return _run_intent(case, query, base_kb_text)

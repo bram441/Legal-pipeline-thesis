@@ -5,6 +5,7 @@ from pipeline.schema import normalize_and_validate_case, normalize_and_validate_
 from pipeline.extractors.json_extractor import extract_case_and_query, ExtractionError
 from pipeline.symbolic.router import run_query
 from pipeline.rendering.answer_renderer import render_answer
+from debug import debug_log
 import json
 
 # Orchestrates the end-to-end pipeline for a single (case_text, user_question):
@@ -42,6 +43,7 @@ def answer_legal_prompt(
     kb_schema=None,
     debug=False,
 ):
+    debug_log("pipeline.answer_legal_prompt", "start")
    # --- Text-mode directive support (deterministic intent forcing) ---
     # Allows questions.txt lines like:
     #   @intent satisfiable
@@ -89,6 +91,7 @@ def answer_legal_prompt(
     )
 
 
+    debug_log("pipeline.answer_legal_prompt", "extraction_provider=" + str(extractor_provider))
     try:
         raw = extract_case_and_query(
             case_text,
@@ -113,11 +116,13 @@ def answer_legal_prompt(
             "error": str(e),
         }
 
+    debug_log("pipeline.answer_legal_prompt", "normalize+validate")
     try:
         case = normalize_and_validate_case(raw.get("case"), kb_schema=kb_schema)
         if forced_query is not None:
             raw["query"] = forced_query
         query = normalize_and_validate_query(raw.get("query"), case, kb_schema=kb_schema)
+        debug_log("pipeline.answer_legal_prompt", "validation ok")
     except ValueError as e:
         return {
             "sat": None,
@@ -132,7 +137,9 @@ def answer_legal_prompt(
             "error": str(e),
         }
 
+    debug_log("pipeline.answer_legal_prompt", "symbolic.run_query")
     try:
+        debug_log("pipeline.answer_legal_prompt", "symbolic route")
         sat, result = run_query(case, query, base_kb_text=base_kb_text)
     except Exception as e:
         return {
@@ -151,6 +158,8 @@ def answer_legal_prompt(
     rendered = render_answer(case, query, sat, result, base_kb_text=base_kb_text)
 
     if debug:
+        # Backwards compatible explicit flag.
+        debug_log("pipeline.answer_legal_prompt", "debug flag enabled")
         print("DEBUG case:", case)
         print("DEBUG query:", query)
         print("DEBUG symbolic_result:", result)

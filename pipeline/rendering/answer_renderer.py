@@ -65,15 +65,33 @@ def render_answer(case, query, sat, result, base_kb_text=None):
 
         # Set: routed to model_expansion (next step). For now we avoid misleading “No parties…”
         if mode == "set":
-            # Once model_expansion is implemented, you’ll return something like:
-            # result = {"predicate": "liable", "tuples": [["alice"],["bob"]]}
+            # Preferred representation for set queries in this project:
+            #   result = {"predicate":"liable","mode":"set","certain":[...],"possible":[...]}
+            if isinstance(result, dict) and "possible" in result and "certain" in result:
+                pred = result.get("predicate") or query.get("predicate")
+                certain = result.get("certain") or []
+                possible = result.get("possible") or []
+
+                if not certain and not possible:
+                    return {"answer": "No results for " + str(pred) + ".", "explanation": None}
+
+                # Keep it simple and explicit (useful for debugging).
+                parts = []
+                if certain:
+                    parts.append("certain=" + ", ".join(certain))
+                if possible:
+                    parts.append("possible=" + ", ".join(possible))
+
+                ans = str(pred) + " -> " + " | ".join(parts)
+                return {"answer": ans, "explanation": None}
+
+            # Legacy/alternate representation (tuple list)
             if isinstance(result, dict) and "tuples" in result:
                 pred = result.get("predicate") or query.get("predicate")
                 tuples = result.get("tuples") or []
                 if not tuples:
                     return {"answer": "No results for " + str(pred) + ".", "explanation": None}
 
-                # Pretty print unary vs n-ary
                 if all(isinstance(t, list) and len(t) == 1 for t in tuples):
                     vals = [t[0] for t in tuples]
                     return {"answer": str(pred) + ": " + ", ".join(vals) + ".", "explanation": None}
@@ -81,6 +99,6 @@ def render_answer(case, query, sat, result, base_kb_text=None):
                 pretty = [("(" + ",".join(t) + ")") for t in tuples if isinstance(t, list)]
                 return {"answer": str(pred) + ": " + ", ".join(pretty) + ".", "explanation": None}
 
-            return {"answer": "Set query requires model_expansion (not implemented yet).", "explanation": None}
+            return {"answer": "Unsupported set-result format.", "explanation": None}
 
     return {"answer": "Unsupported query.", "explanation": None}

@@ -2,6 +2,7 @@
 
 from idp_z3.predicate_solver import evaluate_atom
 import idp_z3.predicate_solver as ps
+from debug import debug_log
 
 def run(case, base_kb_text, query):
     """
@@ -14,7 +15,7 @@ def run(case, base_kb_text, query):
     Returns:
       (ok: bool, payload: dict)
     """
-    print("USING predicate_solver from:", ps.__file__)
+    debug_log("intents.deduction.run", "predicate_solver=" + str(ps.__file__))
     predicate = (query.get("predicate") or "").strip()
     if not predicate:
         raise ValueError("deduction intent requires query.predicate")
