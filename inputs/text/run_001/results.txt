@@ -8,14 +8,14 @@ This rule applies to all parties involved in the case.
 
 === KB USED (kb.fo) ===
 vocabulary V {
-  type Party
-  negligent: Party -> Bool
-  causedDamage: Party -> Bool
-  liable: Party -> Bool
+    type Party
+    negligent: Party -> Bool
+    causedDamage: Party -> Bool
+    liable: Party -> Bool
 }
 
 theory T:V {
-  ! p in Party: liable(p) <=> negligent(p) & causedDamage(p).
+    ! p in Party: liable(p) <=> negligent(p) & causedDamage(p).
 }
 
 === CASE ===
@@ -28,21 +28,22 @@ Bob did not act negligently.
 ---
 Q: Who is liable?
 SAT? True
-Case: {'facts': ['negligent(alice).', 'causedDamage(alice).']}
-Query: {'type': 'predicate', 'predicate': 'liable', 'mode': 'set', 'args': [], 'explain': True}
-Answer: liable -> certain=alice | possible=alice
+Case: {'facts': ['negligent(alice).', 'causedDamage(alice).', 'not negligent(bob).']}
+Query: {'type': 'predicate', 'predicate': 'liable', 'mode': 'set', 'args': [], 'explain': False}
+Answer: Certain liable: alice
+Possible liable: alice
 ---
 Q: Is Alice liable?
 SAT? True
-Case: {'facts': ['negligent(alice).', 'causedDamage(alice).']}
+Case: {'facts': ['negligent(alice).', 'causedDamage(alice).', 'not negligent(bob).']}
 Query: {'type': 'predicate', 'predicate': 'liable', 'mode': 'boolean', 'args': ['alice'], 'explain': False}
-Answer: Yes. liable(x0) is entailed by the law and case facts.
+Answer: Yes. liable(alice) is entailed by the law and case facts.
 ---
 Q: Why is Alice liable?
 SAT? True
-Case: {'facts': ['negligent(alice).', 'causedDamage(alice).', 'negligent(bob) = false.']}
+Case: {'facts': ['negligent(alice).', 'causedDamage(alice).', 'not negligent(bob).']}
 Query: {'type': 'predicate', 'predicate': 'liable', 'mode': 'boolean', 'args': ['alice'], 'explain': True}
-Answer: Yes. liable(x0) is entailed by the law and case facts.
+Answer: Yes. liable(alice) is entailed by the law and case facts.
 Explanation:
 Rule(s) from KB:
 ! p in Party: liable(p) <=> negligent(p) & causedDamage(p).
@@ -50,7 +51,7 @@ Rule(s) from KB:
 Relevant case facts:
 negligent(alice).
 causedDamage(alice).
-negligent(bob) = false.
+not negligent(bob).
 
 Constraint checked:
 ? x0 in Party: __sel0(x0) & liable(x0).
@@ -60,4 +61,4 @@ possible = True
 certain = True
 
 Natural-language paraphrase:
-The conclusion that someone is liable follows from the rule stating a party is liable if and only if they are negligent and caused damage. Since Alice is negligent and caused damage, she is liable, as entailed by the rule and facts.
+Since Alice is negligent and caused damage, and liability requires both negligence and causing damage, Alice is liable.
