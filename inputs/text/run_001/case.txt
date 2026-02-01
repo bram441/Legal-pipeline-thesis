@@ -1,5 +1,1 @@
-Alice and Bob are involved in an accident.
-
-Alice acted negligently.
-Alice caused damage.
-Bob did not act negligently.
+Alice and Bob are involved. Alice acted negligently. Alice caused damage.

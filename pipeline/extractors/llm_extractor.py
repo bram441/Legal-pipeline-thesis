@@ -59,7 +59,6 @@ def extract_case_and_query_llm(case_text, user_question, model, kb_schema=None, 
     if not api_key:
         raise LLMExtractionError("Missing OPENAI_API_KEY environment variable")
 
-    # Lazy import so dummy mode never requires OpenAI SDK.
     try:
         from openai import OpenAI
     except Exception as e:
@@ -67,68 +66,87 @@ def extract_case_and_query_llm(case_text, user_question, model, kb_schema=None, 
 
     client = OpenAI(api_key=api_key)
 
-    rules = (
-        "Rules:\n"
-        "- Output must be VALID JSON matching the provided schema.\n"
-        "- Use lowercase identifiers (snake_case) for constants/individuals.\n"
-        "- IMPORTANT: You MUST use ONLY predicate/function symbol NAMES that appear in KB_SCHEMA.\n"
-        "- Copy symbol names EXACTLY (case-sensitive). Do NOT invent synonyms.\n"
-        "- If you cannot express something with the allowed symbols, OMIT that fact.\n"
-        "- Facts must be valid FO(.) structure lines ending with '.'.\n"
-        "- Do NOT output a 'structure { }' block, only the list of fact lines.\n"
-        "\n"
-        "How to use KB_SCHEMA:\n"
-        "- Allowed predicate symbols are KB_SCHEMA.predicates[].name\n"
-        "- Allowed function symbols are KB_SCHEMA.functions[].name\n"
-        "- Type names (KB_SCHEMA.types) are NOT predicates unless listed as a predicate.\n"
-        "\n"
-        "Examples (assume KB_SCHEMA has predicates: negligent, causedDamage):\n"
-        "- ✅ negligent(alice).\n"
-        "- ✅ causedDamage(alice).\n"
-        "- ❌ acted_negligently(alice).   (NOT allowed: invented synonym)\n"
-        "- ❌ causes(alice,damage).       (NOT allowed: invented predicate)\n"
-        "\n"
-        "Query:\n"
-        "- type='intent' only for meta questions like satisfiable/consistency.\n"
-        "- otherwise type='predicate' with predicate/mode/args.\n"
-        "- For intent queries: set predicate='' mode='set' args=[] (defaults).\n"
-        "- For predicate queries: set intent='' (default).\n"
-    )
-
     schema_text = ""
     if kb_schema is not None:
         schema_text = "\n\nKB_SCHEMA (hard contract):\n" + json.dumps(kb_schema, ensure_ascii=False, indent=2)
 
-    user_content = (
-        rules
-        + schema_text
-        + "\n\nCase:\n" + str(case_text)
-        + "\n\nUser question:\n" + str(user_question)
+    # ---------------------------
+    # CASE-ONLY call
+    # ---------------------------
+    case_rules = (
+        "Rules:\n"
+        "- Output must be VALID JSON.\n"
+        "- Use lowercase identifiers (snake_case) for constants.\n"
+        "- IMPORTANT: Use ONLY predicate/function symbol NAMES from KB_SCHEMA. Copy EXACTLY.\n"
+        "- Extract ALL expressible facts. Do NOT drop facts because they seem irrelevant.\n"
+        "- Facts must be FO(.) structure lines ending with '.'.\n"
+        "- NEGATION: use 'not pred(x).' (do NOT use 'pred(x) = false.').\n"
+        "- Output JSON shape: {\"facts\": [\"...\"]}\n"
     )
 
+    case_user = case_rules + schema_text + "\n\nCase:\n" + str(case_text)
     if feedback:
-        user_content += (
-            "\n\nValidation feedback (fix your previous JSON):\n"
-            + str(feedback)
-            + "\n\nReturn corrected JSON only."
-        )
+        case_user += "\n\nValidation feedback:\n" + str(feedback)
 
-    messages = [
-        {"role": "system", "content": "You extract a minimal legal case object and a query object."},
-        {"role": "user", "content": user_content},
+    case_messages = [
+        {"role": "system", "content": "Extract case facts only."},
+        {"role": "user", "content": case_user},
     ]
 
-    try:
-        resp = client.chat.completions.create(
-            model=model,
-            messages=messages,
-            response_format=_response_format_schema(),
-        )
-    except Exception as e:
-        raise LLMExtractionError("OpenAI call failed: " + str(e))
+    case_resp = client.chat.completions.create(
+        model=model,
+        messages=case_messages,
+        response_format={
+            "type": "json_schema",
+            "json_schema": {
+                "name": "case_only",
+                "schema": {
+                    "type": "object",
+                    "additionalProperties": False,
+                    "required": ["facts"],
+                    "properties": {"facts": {"type": "array", "items": {"type": "string"}}},
+                },
+            },
+        },
+    )
 
-    text = resp.choices[0].message.content
-    if not text:
-        raise LLMExtractionError("Empty model output")
+    case_obj = json.loads(case_resp.choices[0].message.content)
 
-    return text
+    # ---------------------------
+    # QUERY-ONLY call
+    # ---------------------------
+    query_rules = (
+        "Rules:\n"
+        "- Output must be VALID JSON.\n"
+        "- Use lowercase identifiers (snake_case) for constants.\n"
+        "- IMPORTANT: Use ONLY predicate/function symbol NAMES from KB_SCHEMA. Copy EXACTLY.\n"
+        "- 'Why X?' is NOT a separate intent. It is the same predicate query as 'Is X?', but explain=true.\n"
+        "- Only use type='intent' for meta questions like satisfiable/propagation/optimization.\n"
+        "- Output JSON shape:\n"
+        "  {\"type\":\"predicate\"|\"intent\",\"explain\":bool,\"predicate\":\"\",\"mode\":\"set\"|\"boolean\",\"args\":[],\"intent\":\"\"}\n"
+        "- For predicate queries: intent=\"\".\n"
+        "- For intent queries: predicate=\"\", mode=\"set\", args=[].\n"
+    )
+
+    query_user = query_rules + schema_text + "\n\nUser question:\n" + str(user_question)
+    if feedback:
+        query_user += "\n\nValidation feedback:\n" + str(feedback)
+
+    query_messages = [
+        {"role": "system", "content": "Extract query only."},
+        {"role": "user", "content": query_user},
+    ]
+
+    query_resp = client.chat.completions.create(
+        model=model,
+        messages=query_messages,
+        response_format=_response_format_schema(),  # reuse your existing combined schema
+    )
+
+    # We used your combined schema, but we only need query part.
+    # Safer: parse and take the "query" field if present; else parse as query itself.
+    raw = json.loads(query_resp.choices[0].message.content)
+    query_obj = raw.get("query") if isinstance(raw, dict) and "query" in raw else raw
+
+    combined = {"case": {"facts": case_obj.get("facts", [])}, "query": query_obj}
+    return json.dumps(combined, ensure_ascii=False)

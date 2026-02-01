@@ -64,7 +64,7 @@ def _split_args(arg_blob):
     return parts
 
 
-def build_structure_block_from_facts(facts):
+def build_structure_block_from_facts(facts, entities=None):
     if not isinstance(facts, list):
         raise ValueError("case.facts must be a list of strings")
 
@@ -154,6 +154,15 @@ def build_structure_block_from_facts(facts):
         if pred in neg:
             ext[pred] = ext[pred] - neg[pred]
 
+    # --- Domain seeding hook (optional) ---
+    if isinstance(entities, dict):
+        party_entities = entities.get("Party")
+        if isinstance(party_entities, list):
+            for p in party_entities:
+                if isinstance(p, str) and p.strip():
+                    constants.add(_to_idp_elem(p.strip()))
+        # If you later support other types, you can extend here schema-driven.
+
     has_party_domain = any(x.strip().startswith("Party") and ":=" in x for x in passthrough)
     inferred_party_line = None
     if not has_party_domain and constants:
@@ -189,6 +198,7 @@ structure S:V {{
   {body}
 }}
 """.strip()
+
 
 
 def extract_constants_from_facts(facts):

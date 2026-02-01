@@ -11,8 +11,19 @@ def _compose_program(case, base_kb_text):
     if not base_kb_text:
         raise ValueError("base_kb_text is required")
 
+    structure = None  # important: avoid UnboundLocalError
+
     if isinstance(case, dict) and "facts" in case:
-        structure = build_structure_block_from_facts(case["facts"])
+        # If you upgraded build_structure_block_from_facts to accept entities,
+        # this will work. If not, it will fall back safely.
+        try:
+            structure = build_structure_block_from_facts(
+                case["facts"],
+                entities=case.get("entities"),
+            )
+        except TypeError:
+            # Backwards compatibility: old signature without entities
+            structure = build_structure_block_from_facts(case["facts"])
     else:
         structure = build_structure_block(
             case["parties"],
@@ -20,7 +31,11 @@ def _compose_program(case, base_kb_text):
             case["caused_damage"],
         )
 
+    if not structure:
+        raise ValueError("Failed to build structure block")
+
     return base_kb_text.strip() + "\n\n" + structure + "\n"
+
 
 
 def _find_matching_brace(text, open_brace_index):
