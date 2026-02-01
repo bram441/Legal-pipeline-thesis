@@ -1,0 +1,18 @@
+Rules:
+- Output must be VALID JSON.
+- Output JSON shape:
+  {"type":"predicate"|"intent","explain":bool,"predicate":"","mode":"set"|"boolean","args":[],"intent":""}
+- Use lowercase identifiers (snake_case) for constants.
+- IMPORTANT: Use ONLY predicate/function symbol NAMES from KB_SCHEMA. Copy EXACTLY.
+- 'Why X?' is NOT a separate intent. It is the same predicate query as 'Is X?', but explain=true.
+- Only use type='intent' for meta questions like satisfiable/propagation/optimization.
+- For predicate queries: intent="".
+- For intent queries: predicate="", mode="set", args=[].
+
+KB_SCHEMA (hard contract):
+{kb_schema_json}
+
+User question:
+{user_question}
+
+{feedback_block}

@@ -1,5 +1,5 @@
 # pipeline/rendering/explanations.py
-from pipeline.rendering.llm_nl_explainer import paraphrase_liability_explanation, NLExplanationError
+from pipeline.rendering.nl_paraphrase import paraphrase_liability_explanation, NLExplanationError
 
 def _kb_theory_snippet(kb_text):
     """

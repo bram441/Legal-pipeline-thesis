@@ -1,0 +1,90 @@
+You are compiling a legal rule description into a FO(.) knowledge base for IDP-Z3.
+
+CRITICAL: Output MUST be valid FO(.) syntax that IDP-Z3 can parse.
+CRITICAL: Output MUST contain ONLY FO(.) code. No explanations, no markdown, no comments.
+
+========================
+OUTPUT FORMAT (MANDATORY)
+========================
+Return EXACTLY two blocks in this order:
+
+1) vocabulary V { ... }
+2) theory T:V { ... }
+
+Do NOT output anything before "vocabulary V {" and do NOT output anything after the final "}".
+
+========================
+FO(.) VOCABULARY RULES
+========================
+
+A) Types
+- Every type MUST be declared with the keyword "type".
+  ✅ Correct:   type Person
+  ❌ Wrong:     Person
+
+B) Predicates
+- Predicates MUST be declared using FO(.) signature syntax with ":" and "-> Bool".
+  ✅ Correct (arity 1):  Negligent: Person -> Bool
+  ✅ Correct (arity 2):  Owns: Person * Thing -> Bool
+  ❌ Wrong:              Negligent(Person)
+  ❌ Wrong:              Negligent(Person, Thing)
+  ❌ Wrong:              Negligent(Person) -> Bool
+  ❌ Wrong:              Negligent: Person
+
+C) Functions (only if needed)
+- Functions MUST be declared using ":" and "-> ReturnType".
+  ✅ Correct: age: Person -> Int
+  ✅ Correct: parentOf: Person -> Person
+  ❌ Wrong:   age(Person): Int
+  ❌ Wrong:   age(Person)
+
+D) Naming
+- Preserve names EXACTLY as you choose them: case-sensitive and consistent.
+- Use simple ASCII identifiers (letters/digits/underscore). No spaces, hyphens, or punctuation in names.
+
+E) Minimality
+- Declare ONLY symbols that are necessary to express the law text.
+- If the law text contains something you cannot formalize cleanly, OMIT it rather than inventing extra ontology.
+
+========================
+FO(.) THEORY RULES
+========================
+- Use FO(.) connectives:  &  |  ~  =>  <=> 
+- Use FO(.) quantifiers:  !  ?  and "in" for typing.
+  ✅ Correct: ! p in Person: ...
+  ✅ Correct: ? p in Person: ...
+- DO NOT use Prolog/Datalog syntax (no ":-", no "." endings).
+- Every top-level formula in the theory MUST end with a period .
+- DO NOT use "forall", "exists" keywords.
+- Put a ":" after the quantifier header line, then the formula on the next line(s).
+
+========================
+QUALITY & PARSING SAFETY
+========================
+- Ensure braces are balanced.
+- Ensure every predicate in the theory is declared in the vocabulary.
+- Ensure every type used in signatures is declared with "type".
+- Do NOT use constants in the theory (no "alice" inside theory). Quantify variables instead.
+
+========================
+EXAMPLE (STYLE TO COPY)
+========================
+vocabulary V {
+  type Party
+  negligent: Party -> Bool
+  causedDamage: Party -> Bool
+  liable: Party -> Bool
+}
+
+theory T:V {
+  ! p in Party:
+    (negligent(p) & causedDamage(p)) => liable(p).
+}
+
+========================
+TASK
+========================
+Compile the following law text into FO(.) using the exact output format and rules above.
+
+LAW TEXT:
+{law_text}

@@ -1,0 +1,10 @@
+Rule (exact):
+{rule_line}
+
+Facts (exact):
+{facts_block}
+
+Conclusion (exact):
+{conclusion_line}
+
+Task: Paraphrase the conclusion in plain language, explicitly linking it to the rule and facts.

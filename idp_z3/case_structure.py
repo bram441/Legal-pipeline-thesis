@@ -154,20 +154,23 @@ def build_structure_block_from_facts(facts, entities=None):
         if pred in neg:
             ext[pred] = ext[pred] - neg[pred]
 
-    # --- Domain seeding hook (optional) ---
+    # --- Domain seeding hook (schema-driven via entities keys) ---
+    domain_type = None
     if isinstance(entities, dict):
-        party_entities = entities.get("Party")
-        if isinstance(party_entities, list):
-            for p in party_entities:
-                if isinstance(p, str) and p.strip():
-                    constants.add(_to_idp_elem(p.strip()))
-        # If you later support other types, you can extend here schema-driven.
+        for t_name, t_vals in entities.items():
+            if isinstance(t_name, str) and isinstance(t_vals, list) and t_vals:
+                domain_type = t_name
+                # note: entities may be raw names; normalize to IDP constants
+                for v in t_vals:
+                    if isinstance(v, str) and v.strip():
+                        constants.add(_to_idp_elem(v.strip()))
+                break
 
-    has_party_domain = any(x.strip().startswith("Party") and ":=" in x for x in passthrough)
-    inferred_party_line = None
-    if not has_party_domain and constants:
-        inferred_party_line = "Party := " + _mk_set(sorted(constants)) + "."
+    inferred_domain_line = None
+    if domain_type and constants:
+        inferred_domain_line = domain_type + " := " + _mk_set(sorted(constants)) + "."
 
+    # Build predicate extension lines
     pred_lines = []
     for pred in sorted(ext.keys()):
         tuples = sorted(ext[pred])
@@ -186,9 +189,15 @@ def build_structure_block_from_facts(facts, entities=None):
             tuple_strs = sorted(set(tuple_strs))
             pred_lines.append(pred + " := {" + ",".join(tuple_strs) + "}.")
 
+    # Assemble structure lines (IMPORTANT: define lines BEFORE appending)
     lines = []
-    if inferred_party_line:
-        lines.append(inferred_party_line)
+
+    # Only add inferred domain if caller didn't already provide a domain line of that type
+    if inferred_domain_line and domain_type:
+        has_domain = any(x.strip().startswith(domain_type) and ":=" in x for x in passthrough)
+        if not has_domain:
+            lines.append(inferred_domain_line)
+
     lines.extend(passthrough)
     lines.extend(pred_lines)
 
@@ -198,6 +207,7 @@ structure S:V {{
   {body}
 }}
 """.strip()
+
 
 
 

@@ -1,1 +1,1 @@
-from pipeline.pipeline import answer_legal_prompt
+from pipeline.app.pipeline import answer_legal_prompt

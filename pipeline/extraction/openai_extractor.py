@@ -1,7 +1,7 @@
-# pipeline/extractors/llm_extractor.py
-
-import os
 import json
+import os
+
+from pipeline.utils.prompt_loader import render_prompt
 
 
 class LLMExtractionError(Exception):
@@ -9,14 +9,12 @@ class LLMExtractionError(Exception):
 
 
 def _response_format_schema():
-    """
-    Some Structured Output schema subsets do NOT allow oneOf/anyOf.
-    They also require that 'required' includes every key in 'properties'.
+    """Structured output schema for query extraction.
 
-    So we use a fixed-shape query object where all fields are always present.
-    Unused fields must be filled with defaults:
-      - for intent queries: predicate="", mode="set", args=[]
-      - for predicate queries: intent=""
+    We keep a fixed-shape query object where all fields are always present.
+    Unused fields must be filled with defaults by the model:
+    - intent query: predicate="", mode="set", args=[]
+    - predicate query: intent=""
     """
     return {
         "type": "json_schema",
@@ -54,7 +52,7 @@ def _response_format_schema():
     }
 
 
-def extract_case_and_query_llm(case_text, user_question, model, kb_schema=None, feedback=None):
+def extract_case_and_query_openai(case_text, user_question, model, kb_schema=None, feedback=None):
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise LLMExtractionError("Missing OPENAI_API_KEY environment variable")
@@ -66,36 +64,27 @@ def extract_case_and_query_llm(case_text, user_question, model, kb_schema=None, 
 
     client = OpenAI(api_key=api_key)
 
-    schema_text = ""
-    if kb_schema is not None:
-        schema_text = "\n\nKB_SCHEMA (hard contract):\n" + json.dumps(kb_schema, ensure_ascii=False, indent=2)
+    kb_schema_json = json.dumps(kb_schema or {}, ensure_ascii=False, indent=2)
+    feedback_block = ""
+    if feedback:
+        feedback_block = "Validation feedback:\n" + str(feedback)
 
     # ---------------------------
     # CASE-ONLY call
     # ---------------------------
-    case_rules = (
-        "Rules:\n"
-        "- Output must be VALID JSON.\n"
-        "- Use lowercase identifiers (snake_case) for constants.\n"
-        "- IMPORTANT: Use ONLY predicate/function symbol NAMES from KB_SCHEMA. Copy EXACTLY.\n"
-        "- Extract ALL expressible facts. Do NOT drop facts because they seem irrelevant.\n"
-        "- Facts must be FO(.) structure lines ending with '.'.\n"
-        "- NEGATION: use 'not pred(x).' (do NOT use 'pred(x) = false.').\n"
-        "- Output JSON shape: {\"facts\": [\"...\"]}\n"
+    case_user = render_prompt(
+        "openai_extract_case_prompt.txt",
+        kb_schema_json=kb_schema_json,
+        case_text=str(case_text),
+        feedback_block=feedback_block,
     )
-
-    case_user = case_rules + schema_text + "\n\nCase:\n" + str(case_text)
-    if feedback:
-        case_user += "\n\nValidation feedback:\n" + str(feedback)
-
-    case_messages = [
-        {"role": "system", "content": "Extract case facts only."},
-        {"role": "user", "content": case_user},
-    ]
 
     case_resp = client.chat.completions.create(
         model=model,
-        messages=case_messages,
+        messages=[
+            {"role": "system", "content": "Extract case facts only."},
+            {"role": "user", "content": case_user},
+        ],
         response_format={
             "type": "json_schema",
             "json_schema": {
@@ -115,36 +104,22 @@ def extract_case_and_query_llm(case_text, user_question, model, kb_schema=None, 
     # ---------------------------
     # QUERY-ONLY call
     # ---------------------------
-    query_rules = (
-        "Rules:\n"
-        "- Output must be VALID JSON.\n"
-        "- Use lowercase identifiers (snake_case) for constants.\n"
-        "- IMPORTANT: Use ONLY predicate/function symbol NAMES from KB_SCHEMA. Copy EXACTLY.\n"
-        "- 'Why X?' is NOT a separate intent. It is the same predicate query as 'Is X?', but explain=true.\n"
-        "- Only use type='intent' for meta questions like satisfiable/propagation/optimization.\n"
-        "- Output JSON shape:\n"
-        "  {\"type\":\"predicate\"|\"intent\",\"explain\":bool,\"predicate\":\"\",\"mode\":\"set\"|\"boolean\",\"args\":[],\"intent\":\"\"}\n"
-        "- For predicate queries: intent=\"\".\n"
-        "- For intent queries: predicate=\"\", mode=\"set\", args=[].\n"
+    query_user = render_prompt(
+        "openai_extract_query_prompt.txt",
+        kb_schema_json=kb_schema_json,
+        user_question=str(user_question),
+        feedback_block=feedback_block,
     )
-
-    query_user = query_rules + schema_text + "\n\nUser question:\n" + str(user_question)
-    if feedback:
-        query_user += "\n\nValidation feedback:\n" + str(feedback)
-
-    query_messages = [
-        {"role": "system", "content": "Extract query only."},
-        {"role": "user", "content": query_user},
-    ]
 
     query_resp = client.chat.completions.create(
         model=model,
-        messages=query_messages,
-        response_format=_response_format_schema(),  # reuse your existing combined schema
+        messages=[
+            {"role": "system", "content": "Extract query only."},
+            {"role": "user", "content": query_user},
+        ],
+        response_format=_response_format_schema(),
     )
 
-    # We used your combined schema, but we only need query part.
-    # Safer: parse and take the "query" field if present; else parse as query itself.
     raw = json.loads(query_resp.choices[0].message.content)
     query_obj = raw.get("query") if isinstance(raw, dict) and "query" in raw else raw
 
