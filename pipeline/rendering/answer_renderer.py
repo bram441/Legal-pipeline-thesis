@@ -49,19 +49,23 @@ def render_answer(case, query, sat, result, base_kb_text=None):
             display_atom = atom
             args = query.get("args") or []
             pred = query.get("predicate") or ""
-            if pred and len(args) == 1:
-                display_atom = pred + "(" + str(args[0]) + ")"
+            if pred and args:
+                display_atom = pred + "(" + ", ".join(str(a) for a in args) + ")"
+
 
             # 3-valued style:
             # - certain=True  => entailed
             # - possible=False => impossible (entailed negation under satisfiable KB+case)
             # - otherwise => unknown / not provable
+            shown = display_atom if display_atom else "The statement"
+
             if certain:
-                ans = "Yes. " + (atom if display_atom else "The statement") + " is entailed by the law and case facts."
+                ans = "Yes. " + shown + " is entailed by the law and case facts."
             elif possible is False:
-                ans = "No. " + (atom if display_atom else "The statement") + " cannot hold given the law and case facts."
+                ans = "No. " + shown + " cannot hold given the law and case facts."
             else:
-                ans = "Unknown. " + (atom if display_atom else "The statement") + " is not determined by the law and case facts."
+                ans = "Unknown. " + shown + " is not determined by the law and case facts."
+
 
             explanation = None
             if query.get("explain"):

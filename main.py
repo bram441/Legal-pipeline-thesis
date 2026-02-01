@@ -3,11 +3,11 @@ import os
 
 from dotenv import load_dotenv
 
-from pipeline.pipeline import answer_legal_prompt
+from pipeline.app.pipeline import answer_legal_prompt
 from pipeline.io.text_runs import load_text_run, write_text_results
 from pipeline.io.json_runs import load_json_run, write_json_results, write_score
 from pipeline.eval.scoring import score_question
-from pipeline.io.kb_cache import get_or_compile_kb
+from pipeline.kb.cache import get_or_compile_kb
 
 
 def run_text_mode(run_dir, provider):
@@ -17,7 +17,7 @@ def run_text_mode(run_dir, provider):
     case_text = payload["case_text"]
     questions = payload["questions"]
 
-    # ✅ Compile (or reuse cached) KB once per run
+    # Compile (or reuse cached) KB once per run
     kb_text, kb_schema = get_or_compile_kb(run_dir, law_text)
 
     out_lines = []
@@ -35,7 +35,6 @@ def run_text_mode(run_dir, provider):
         out_lines.append("---")
         out_lines.append("Q: " + q)
 
-        # ✅ Pass the compiled KB into the pipeline (no hardcoded rules)
         result = answer_legal_prompt(
             case_text,
             q,
@@ -69,7 +68,6 @@ def run_json_mode(run_dir, provider):
     case_text = (run_obj.get("case") or {}).get("text", "")
     questions = run_obj.get("questions") or []
 
-    # ✅ Compile (or reuse cached) KB once per run
     kb_text, kb_schema = get_or_compile_kb(run_dir, law_text)
 
     results = {
@@ -92,7 +90,6 @@ def run_json_mode(run_dir, provider):
         qtext = q.get("text", "")
         expected = q.get("expected")
 
-        # ✅ Pass compiled KB into the pipeline (no hardcoded rules)
         result = answer_legal_prompt(
             case_text,
             qtext,
@@ -136,7 +133,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode", choices=["text", "json"], required=True)
     parser.add_argument("--run", required=True, help="Path to run folder (e.g., inputs/text/run_001)")
-    parser.add_argument("--provider", choices=["auto", "dummy", "openai"], default="auto")
+    parser.add_argument("--provider", choices=["auto", "openai"], default="auto")
     args = parser.parse_args()
 
     if args.mode == "text":

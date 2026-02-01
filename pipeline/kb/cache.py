@@ -1,8 +1,8 @@
 import os
 import re
 
-from pipeline.law.law_compiler import compile_law_to_kb_fo, LawCompilationError
-from pipeline.kb_schema import extract_schema_from_kb_fo, load_kb_schema, save_kb_schema
+from pipeline.kb.compiler import compile_law_to_kb_fo, LawCompilationError
+from pipeline.kb.schema import extract_schema_from_kb_fo, load_kb_schema, save_kb_schema
 
 
 class KBCacheError(Exception):
