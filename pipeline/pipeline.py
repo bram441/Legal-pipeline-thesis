@@ -33,6 +33,26 @@ import json
 # Raises:
 #   ValueError / ExtractionError may propagate depending on your current error-handling strategy.
 
+def _seed_party_entities_from_case_text(case_text):
+    if not isinstance(case_text, str):
+        return []
+
+    tokens = []
+    for raw in case_text.replace("\n", " ").split(" "):
+        w = raw.strip(".,;:!?()[]{}\"'")
+        if len(w) >= 2 and w[0].isupper() and w[1:].islower():
+            tokens.append(w.lower())
+
+    # unique preserving order
+    seen = set()
+    out = []
+    for t in tokens:
+        if t not in seen:
+            seen.add(t)
+            out.append(t)
+    return out
+
+
 def answer_legal_prompt(
     case_text,
     user_question,
@@ -119,6 +139,11 @@ def answer_legal_prompt(
     debug_log("pipeline.answer_legal_prompt", "normalize+validate")
     try:
         case = normalize_and_validate_case(raw.get("case"), kb_schema=kb_schema)
+        if isinstance(case, dict) and "entities" not in case:
+            seeded = _seed_party_entities_from_case_text(case_text)
+            if seeded:
+                case["entities"] = {"Party": seeded}
+
         if forced_query is not None:
             raw["query"] = forced_query
         query = normalize_and_validate_query(raw.get("query"), case, kb_schema=kb_schema)

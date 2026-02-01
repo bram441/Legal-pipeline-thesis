@@ -19,28 +19,24 @@ theory T:V {
 }
 
 === CASE ===
-Alice and Bob are involved in an accident.
-
-Alice acted negligently.
-Alice caused damage.
-Bob did not act negligently.
+Alice and Bob are involved. Alice acted negligently. Alice caused damage.
 
 ---
 Q: Who is liable?
 SAT? True
-Case: {'facts': ['negligent(alice).', 'causedDamage(alice).']}
-Query: {'type': 'predicate', 'predicate': 'liable', 'mode': 'set', 'args': [], 'explain': True}
+Case: {'facts': ['negligent(alice).', 'causedDamage(alice).'], 'entities': {'Party': ['alice', 'bob']}}
+Query: {'type': 'predicate', 'predicate': 'liable', 'mode': 'set', 'args': [], 'explain': False}
 Answer: liable -> certain=alice | possible=alice
 ---
 Q: Is Alice liable?
 SAT? True
-Case: {'facts': ['negligent(alice).', 'causedDamage(alice).']}
+Case: {'facts': ['negligent(alice).', 'causedDamage(alice).'], 'entities': {'Party': ['alice', 'bob']}}
 Query: {'type': 'predicate', 'predicate': 'liable', 'mode': 'boolean', 'args': ['alice'], 'explain': False}
 Answer: Yes. liable(x0) is entailed by the law and case facts.
 ---
 Q: Why is Alice liable?
 SAT? True
-Case: {'facts': ['negligent(alice).', 'causedDamage(alice).', 'negligent(bob) = false.']}
+Case: {'facts': ['negligent(alice).', 'causedDamage(alice).'], 'entities': {'Party': ['alice', 'bob']}}
 Query: {'type': 'predicate', 'predicate': 'liable', 'mode': 'boolean', 'args': ['alice'], 'explain': True}
 Answer: Yes. liable(x0) is entailed by the law and case facts.
 Explanation:
@@ -50,7 +46,6 @@ Rule(s) from KB:
 Relevant case facts:
 negligent(alice).
 causedDamage(alice).
-negligent(bob) = false.
 
 Constraint checked:
 ? x0 in Party: __sel0(x0) & liable(x0).
@@ -60,4 +55,4 @@ possible = True
 certain = True
 
 Natural-language paraphrase:
-The conclusion that someone is liable follows from the rule stating a party is liable if and only if they are negligent and caused damage. Since Alice is negligent and caused damage, she is liable, as entailed by the rule and facts.
+According to the rule, a person is liable if they are negligent and caused damage. Since Alice is negligent and caused damage, it follows that Alice is liable.
