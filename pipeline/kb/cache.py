@@ -55,23 +55,38 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
     schema_path = os.path.join(run_dir, "kb_schema.json")
     log_path = os.path.join(run_dir, log_filename)
 
+    repair_feedback = None
+    last_raw = None
+
     if os.path.exists(kb_path):
         status_log("KB", "Loading from cache")
         with open(kb_path, "r", encoding="utf-8") as f:
-            kb_text = f.read()
-        kb_text = _validate_kb_fo_text(kb_text)
-        _idp_parse_check(kb_text)
-
-        if os.path.exists(schema_path):
-            kb_schema = load_kb_schema(run_dir)
-        else:
-            kb_schema = extract_schema_from_kb_fo(kb_text)
-            save_kb_schema(run_dir, kb_schema)
-
-        return kb_text, kb_schema
-
-    repair_feedback = None
-    last_raw = None
+            cached_kb = f.read()
+        try:
+            kb_text = _validate_kb_fo_text(cached_kb)
+            _idp_parse_check(kb_text)
+            if os.path.exists(schema_path):
+                kb_schema = load_kb_schema(run_dir)
+            else:
+                kb_schema = extract_schema_from_kb_fo(kb_text)
+                save_kb_schema(run_dir, kb_schema)
+            return kb_text, kb_schema
+        except Exception as e:
+            status_log("KB", "Cached KB invalid, recompiling with repair")
+            try:
+                os.remove(kb_path)
+            except OSError:
+                pass
+            if os.path.exists(schema_path):
+                try:
+                    os.remove(schema_path)
+                except OSError:
+                    pass
+            repair_feedback = {
+                "error_message": str(e),
+                "previous_output": cached_kb.strip(),
+            }
+            last_raw = cached_kb
 
     for attempt in range(max_repair_attempts):
         if attempt == 0:

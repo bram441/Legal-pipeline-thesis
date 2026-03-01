@@ -177,7 +177,9 @@ def normalize_and_validate_query(raw_query, case, kb_schema=None):
                 raise ValueError("get_range intent requires query.symbol")
             if kb_schema:
                 funcs = [f.get("name") for f in (kb_schema.get("functions") or []) if f.get("name")]
-                symbol_match = next((f for f in funcs if f == symbol or (f and f.lower() == symbol.lower())), None)
+                def _norm_name(s):
+                    return (s or "").lower().replace("_", "")
+                symbol_match = next((f for f in funcs if f == symbol or (f and _norm_name(f) == _norm_name(symbol))), None)
                 if not symbol_match:
                     raise ValueError("get_range symbol must be a function from kb_schema: " + symbol)
                 symbol = symbol_match
@@ -218,13 +220,15 @@ def normalize_and_validate_query(raw_query, case, kb_schema=None):
     if kb_schema:
         sig = None
         predicate_canonical = predicate
+        def _norm_name(s):
+            return (s or "").lower().replace("_", "")
         for p in kb_schema.get("predicates", []):
             n = p.get("name")
             if n == predicate:
                 sig = p
                 predicate_canonical = n
                 break
-            if n and n.lower() == predicate.lower():
+            if n and (_norm_name(n) == _norm_name(predicate)):
                 sig = p
                 predicate_canonical = n
                 break
