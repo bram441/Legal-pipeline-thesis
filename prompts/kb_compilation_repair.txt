@@ -28,5 +28,6 @@ COMMON FO(.) MISTAKES TO FIX
 - Built-in types: use "Bool", "Int", "Real" (capitalized), NOT "bool", "int", "real"
 - Braces: ensure all { } are balanced
 - Symbols: use consistent names; predicates/functions in theory must be declared in vocabulary
+- "Bool expected, Int found": An Int appeared where Bool is required. Replace numeric comparisons like `f(x) > 4` in logical formulas with a Bool predicate (e.g. define `incapacityExceedsMonths(p): Person -> Bool` and add a rule linking it to the numeric check), or ensure the comparison is properly parenthesized and used only in Bool context.
 
 Output ONLY the corrected FO(.) code. No explanations, no markdown.

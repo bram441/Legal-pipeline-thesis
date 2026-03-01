@@ -71,6 +71,7 @@ FO(.) THEORY RULES
 ========================
 QUALITY & PARSING SAFETY
 ========================
+- Do NOT use inline numeric comparisons (e.g. f(x) > 4 or duration(x) > 4) inside logical formulas (disjunctions, implications). IDP requires Bool in those positions. Instead, define a Bool predicate (e.g. incapacityExceedsFourMonths: Person -> Bool) and add a separate rule linking it to the numeric check.
 - Ensure braces are balanced.
 - Ensure every predicate in the theory is declared in the vocabulary.
 - Ensure every type used in signatures is declared with "type".
