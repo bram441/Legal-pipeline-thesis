@@ -1,0 +1,4 @@
+Translate the following text to English. Preserve the meaning and structure exactly. Do not add explanations or notes. Output only the translation.
+
+TEXT:
+{text}

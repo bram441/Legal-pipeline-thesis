@@ -1,0 +1,22 @@
+{
+  "suite": "baseline_v1",
+  "cases": [
+    {
+      "case_id": "001_liability_basic",
+      "kb_source": "file",
+      "stage": "exception",
+      "passed": false,
+      "prediction": null,
+      "score": null,
+      "error": "'NoneType' object has no attribute 'get'"
+    }
+  ],
+  "totals": {
+    "count": 1,
+    "passed": 0,
+    "stage_failed": 1,
+    "stage_counts": {
+      "exception": 1
+    }
+  }
+}

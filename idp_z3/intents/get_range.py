@@ -6,16 +6,16 @@ def run(case, base_kb_text, query):
     """Get a range for a symbol (if supported by bindings).
 
     Expected query:
-      {"type":"intent","intent":"get_range","symbol":"<name>"}
+      {"type":"intent","intent":"get_range","symbol":"<name>","entity":"<optional>"}
 
-    Returns:
-      {"range": "<raw idp output>"}
+    When entity is set, only that entity's value is returned (filters full mapping).
     """
     symbol = (query.get("symbol") or "").strip()
     if not symbol:
         raise ValueError("get_range intent requires query.symbol")
+    entity = (query.get("entity") or "").strip().lower()
 
     fo_code = _compose_program(case, base_kb_text)
-    debug_log("intents.get_range.run", "symbol=" + symbol)
-    out = run_get_range(fo_code, symbol_name=symbol)
-    return True, {"symbol": symbol, "range": out.get("range")}
+    debug_log("intents.get_range.run", "symbol=" + symbol + " entity=" + entity)
+    out = run_get_range(fo_code, symbol_name=symbol, filter_entity=entity)
+    return True, {"symbol": symbol, "range": out.get("range"), "entity": entity}

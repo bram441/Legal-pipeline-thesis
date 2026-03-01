@@ -8,14 +8,33 @@ class LLMExtractionError(Exception):
     pass
 
 
-def _response_format_schema():
-    """Structured output schema for query extraction.
+def _query_schema():
+    """Query-only schema for extract_query_only_openai."""
+    return {
+        "type": "json_schema",
+        "json_schema": {
+            "name": "query_only",
+            "schema": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["type", "explain", "predicate", "mode", "args", "intent", "symbol", "entity"],
+                "properties": {
+                    "type": {"type": "string", "enum": ["predicate", "intent"]},
+                    "explain": {"type": "boolean"},
+                    "predicate": {"type": "string"},
+                    "mode": {"type": "string", "enum": ["set", "boolean"]},
+                    "args": {"type": "array", "items": {"type": "string"}},
+                    "intent": {"type": "string"},
+                    "symbol": {"type": "string"},
+                    "entity": {"type": "string"},
+                },
+            },
+        },
+    }
 
-    We keep a fixed-shape query object where all fields are always present.
-    Unused fields must be filled with defaults by the model:
-    - intent query: predicate="", mode="set", args=[]
-    - predicate query: intent=""
-    """
+
+def _response_format_schema():
+    """Full case+query schema for backward compatibility."""
     return {
         "type": "json_schema",
         "json_schema": {
@@ -36,7 +55,7 @@ def _response_format_schema():
                     "query": {
                         "type": "object",
                         "additionalProperties": False,
-                        "required": ["type", "explain", "predicate", "mode", "args", "intent"],
+                        "required": ["type", "explain", "predicate", "mode", "args", "intent", "symbol", "entity"],
                         "properties": {
                             "type": {"type": "string", "enum": ["predicate", "intent"]},
                             "explain": {"type": "boolean"},
@@ -44,6 +63,8 @@ def _response_format_schema():
                             "mode": {"type": "string", "enum": ["set", "boolean"]},
                             "args": {"type": "array", "items": {"type": "string"}},
                             "intent": {"type": "string"},
+                            "symbol": {"type": "string"},
+                            "entity": {"type": "string"},
                         },
                     },
                 },
@@ -52,7 +73,14 @@ def _response_format_schema():
     }
 
 
-def extract_case_and_query_openai(case_text, user_question, model, kb_schema=None, feedback=None):
+def _feedback_block(feedback):
+    if not feedback:
+        return ""
+    return "Validation feedback (schema-aware):\n" + str(feedback)
+
+
+def extract_case_only_openai(case_text, model, kb_schema=None, feedback=None):
+    """Extract case facts only. Used by schema-aware feedback loop."""
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise LLMExtractionError("Missing OPENAI_API_KEY environment variable")
@@ -63,23 +91,16 @@ def extract_case_and_query_openai(case_text, user_question, model, kb_schema=Non
         raise LLMExtractionError("OpenAI SDK not installed or not importable: " + str(e))
 
     client = OpenAI(api_key=api_key)
-
     kb_schema_json = json.dumps(kb_schema or {}, ensure_ascii=False, indent=2)
-    feedback_block = ""
-    if feedback:
-        feedback_block = "Validation feedback:\n" + str(feedback)
 
-    # ---------------------------
-    # CASE-ONLY call
-    # ---------------------------
     case_user = render_prompt(
         "openai_extract_case_prompt.txt",
         kb_schema_json=kb_schema_json,
         case_text=str(case_text),
-        feedback_block=feedback_block,
+        feedback_block=_feedback_block(feedback),
     )
 
-    case_resp = client.chat.completions.create(
+    resp = client.chat.completions.create(
         model=model,
         messages=[
             {"role": "system", "content": "Extract case facts only."},
@@ -99,29 +120,50 @@ def extract_case_and_query_openai(case_text, user_question, model, kb_schema=Non
         },
     )
 
-    case_obj = json.loads(case_resp.choices[0].message.content)
+    return json.loads(resp.choices[0].message.content)
 
-    # ---------------------------
-    # QUERY-ONLY call
-    # ---------------------------
+
+def extract_query_only_openai(user_question, model, kb_schema=None, feedback=None):
+    """Extract query only. Used by schema-aware feedback loop."""
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise LLMExtractionError("Missing OPENAI_API_KEY environment variable")
+
+    try:
+        from openai import OpenAI
+    except Exception as e:
+        raise LLMExtractionError("OpenAI SDK not installed or not importable: " + str(e))
+
+    client = OpenAI(api_key=api_key)
+    kb_schema_json = json.dumps(kb_schema or {}, ensure_ascii=False, indent=2)
+
     query_user = render_prompt(
         "openai_extract_query_prompt.txt",
         kb_schema_json=kb_schema_json,
         user_question=str(user_question),
-        feedback_block=feedback_block,
+        feedback_block=_feedback_block(feedback),
     )
 
-    query_resp = client.chat.completions.create(
+    resp = client.chat.completions.create(
         model=model,
         messages=[
             {"role": "system", "content": "Extract query only."},
             {"role": "user", "content": query_user},
         ],
-        response_format=_response_format_schema(),
+        response_format=_query_schema(),
     )
 
-    raw = json.loads(query_resp.choices[0].message.content)
-    query_obj = raw.get("query") if isinstance(raw, dict) and "query" in raw else raw
+    return json.loads(resp.choices[0].message.content)
+
+
+def extract_case_and_query_openai(case_text, user_question, model, kb_schema=None, feedback=None,
+                                  case_feedback=None, query_feedback=None):
+    """Extract case and query. Supports component-specific feedback for repair loops."""
+    case_fb = case_feedback if case_feedback is not None else feedback
+    query_fb = query_feedback if query_feedback is not None else feedback
+
+    case_obj = extract_case_only_openai(case_text, model, kb_schema=kb_schema, feedback=case_fb)
+    query_obj = extract_query_only_openai(user_question, model, kb_schema=kb_schema, feedback=query_fb)
 
     combined = {"case": {"facts": case_obj.get("facts", [])}, "query": query_obj}
     return json.dumps(combined, ensure_ascii=False)

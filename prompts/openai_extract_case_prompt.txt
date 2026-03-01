@@ -3,9 +3,13 @@ Rules:
 - Output JSON shape: {"facts": ["..."]}
 - Use lowercase identifiers (snake_case) for constants.
 - IMPORTANT: Use ONLY predicate/function symbol NAMES from KB_SCHEMA. Copy EXACTLY.
+- Case text may be in any language; map to the schema symbols.
 - Extract ALL expressible facts; do NOT drop facts because they seem irrelevant.
 - Facts must be FO(.) structure lines ending with '.'.
 - NEGATION: use 'not pred(x).' (do NOT use 'pred(x) = false.').
+- Do NOT output both pred(x) and not pred(x) for the same predicate and entity - that is a contradiction. Output only the fact supported by the case text.
+- CRITICAL: Predicates about consequences of actions refer to the ACTOR/SUBJECT (the person who committed the act), not the victim. Map each predicate to the correct entity from the case.
+- CRITICAL: Severity predicates (e.g. severe injury, incurable illness, organ loss) have a strict legal meaning. Minor injuries (bruises, broken nose, cuts) do NOT qualify. Only assert them when the case explicitly describes qualifying severity.
 
 KB_SCHEMA (hard contract):
 {kb_schema_json}

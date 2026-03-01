@@ -2,6 +2,8 @@
 from idp_engine import IDP
 from idp_engine.Run import model_check, model_expand
 
+from pipeline.utils.unicode_sanitize import sanitize_for_output
+
 # Executes an FO(.) program with IDP-Z3 and returns satisfiability + expanded models.
 # This is the low-level backend wrapper around IDP.from_str, model_check, and model_expand.
 # It is intentionally generic: it does not assume any particular legal domain predicates.
@@ -79,20 +81,66 @@ def run_propagate(fo_code, theory_name="T", struct_name="S", timeout_seconds=5):
     return {"structure": str(out)}
 
 
-def run_get_range(fo_code, symbol_name, theory_name="T", struct_name="S", timeout_seconds=5):
-    """Compute a range (if supported) for a symbol in the current problem."""
+def run_get_range(fo_code, symbol_name, theory_name="T", struct_name="S", timeout_seconds=5, filter_entity=None):
+    """Compute a range for a function symbol. Uses Run.get_range if available, else falls back to model_expand.
+
+    When filter_entity is set, extracts only that entity's value from the mapping.
+    """
+    import re
+
     kb = IDP.from_str(fo_code)
     if isinstance(theory_name, (list, tuple)):
         theories = [kb.theories[name] for name in theory_name]
     else:
         theories = [kb.theories[theory_name]]
     S = kb.structures[struct_name]
-    get_range = _load_optional_run_fn("get_range")
+
     try:
-        out = get_range(*theories, S, symbol_name, timeout_seconds=timeout_seconds)
-    except TypeError:
-        out = get_range(*theories, S, symbol_name, timeout=timeout_seconds)
-    return {"range": str(out)}
+        get_range_fn = _load_optional_run_fn("get_range")
+        try:
+            out = get_range_fn(*theories, S, symbol_name, timeout_seconds=timeout_seconds)
+        except TypeError:
+            out = get_range_fn(*theories, S, symbol_name, timeout=timeout_seconds)
+        raw = sanitize_for_output(str(out))
+        if filter_entity:
+            raw = _filter_range_to_entity(raw, filter_entity)
+        return {"range": raw}
+    except RuntimeError:
+        pass
+
+    # Fallback: use model_expand and extract function values from the expanded model
+    sat_status = model_check(*theories, S)
+    if sat_status != "sat":
+        return {"range": "No model exists (theory is unsatisfiable)."}
+    models = list(model_expand(*theories, S, max=1, timeout_seconds=timeout_seconds))
+    if not models:
+        return {"range": "Could not expand model."}
+    model_str = sanitize_for_output(str(models[0]))
+    pat = re.compile(r"\b" + re.escape(symbol_name) + r"\s*:=\s*(\{[^}]*\}|\d+)")
+    m = pat.search(model_str)
+    if m:
+        raw = m.group(1).strip()
+        if filter_entity:
+            raw = _filter_range_to_entity(raw, filter_entity)
+        return {"range": raw}
+    return {"range": "Symbol " + symbol_name + " not found in model output."}
+
+
+def _filter_range_to_entity(range_str, entity):
+    """Extract only entity's value from a mapping like {'a' -> 1, 'b' -> 2}."""
+    import re
+    entity_clean = entity.strip().lower().replace("'", "").replace('"', "")
+    if not entity_clean:
+        return range_str
+    # Match 'entity' -> value, "entity" -> value, or entity -> value
+    for pattern in [
+        r"['\"]" + re.escape(entity_clean) + r"['\"]\s*->\s*(-?\d+)",
+        r"\b" + re.escape(entity_clean) + r"\s*->\s*(-?\d+)",
+    ]:
+        m = re.search(pattern, range_str)
+        if m:
+            return m.group(1)
+    return range_str
 
 
 def run_relevance(fo_code, theory_name="T", struct_name="S", timeout_seconds=5):

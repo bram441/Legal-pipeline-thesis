@@ -64,7 +64,7 @@ def _split_args(arg_blob):
     return parts
 
 
-def build_structure_block_from_facts(facts, entities=None):
+def build_structure_block_from_facts(facts, entities=None, kb_primary_type=None, kb_types=None, kb_predicate_names=None):
     if not isinstance(facts, list):
         raise ValueError("case.facts must be a list of strings")
 
@@ -154,12 +154,34 @@ def build_structure_block_from_facts(facts, entities=None):
         if pred in neg:
             ext[pred] = ext[pred] - neg[pred]
 
-    # --- Domain seeding hook (schema-driven via entities keys) ---
-    domain_type = None
+    # Include predicates that appear only in neg_atoms (e.g. "not pred(x)") - they need extension {} to assert false
+    for pred in neg:
+        if pred not in ext:
+            ext[pred] = set()
+
+    # Close world for condition predicates: predicates in the KB but not in facts get extension {} (false).
+    # Skip conclusion predicates (e.g. punishmentArt*, punished*, liable) - those are derived by the theory.
+    if kb_predicate_names:
+        for pred in kb_predicate_names:
+            if not pred or pred in ext:
+                continue
+            low = pred.lower()
+            # Skip predicates that are legal conclusions (derived by theory), not observable conditions
+            if low.startswith("punishment") or low.startswith("punished"):
+                continue
+            if "punished" in low and ("under" in low or "art" in low):
+                continue
+            if low in ("liable", "eligible", "qualifies", "convicted"):
+                continue
+            ext[pred] = set()
+
+    # --- Domain: use kb_primary_type when given (aligns with vocabulary), else entities keys ---
+    domain_type = kb_primary_type if kb_primary_type else None
     if isinstance(entities, dict):
         for t_name, t_vals in entities.items():
             if isinstance(t_name, str) and isinstance(t_vals, list) and t_vals:
-                domain_type = t_name
+                if not domain_type:
+                    domain_type = t_name
                 # note: entities may be raw names; normalize to IDP constants
                 for v in t_vals:
                     if isinstance(v, str) and v.strip():
@@ -191,14 +213,26 @@ def build_structure_block_from_facts(facts, entities=None):
 
     # Assemble structure lines (IMPORTANT: define lines BEFORE appending)
     lines = []
+    types_defined = set()
 
     # Only add inferred domain if caller didn't already provide a domain line of that type
     if inferred_domain_line and domain_type:
         has_domain = any(x.strip().startswith(domain_type) and ":=" in x for x in passthrough)
         if not has_domain:
             lines.append(inferred_domain_line)
+            types_defined.add(domain_type)
 
     lines.extend(passthrough)
+    for x in passthrough:
+        t = x.strip().split(":")[0].strip()
+        if t and ":=" in x:
+            types_defined.add(t)
+
+    # IDP requires every type in the vocabulary to have an interpretation
+    if kb_types:
+        for t in kb_types:
+            if t and t not in types_defined:
+                lines.append(t + " := {'__none'}.")
     lines.extend(pred_lines)
 
     body = "\n  ".join(lines)

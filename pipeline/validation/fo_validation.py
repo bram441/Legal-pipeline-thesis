@@ -2,6 +2,8 @@ import re
 
 
 _callname = re.compile(r"\b([A-Za-z_]\w*)\s*\(")
+_neg_atom = re.compile(r"^\s*(?:not|~|¬)\s+([A-Za-z_][A-Za-z0-9_]*)\s*\((.*)\)\s*\.\s*$")
+_pos_atom = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*\((.*)\)\s*\.\s*$")
 _bad_star_call = re.compile(r"[A-Za-z_][A-Za-z0-9_]*\s*\*\s*\(")
 
 
@@ -37,17 +39,56 @@ def _schema_symbol_sets(kb_schema):
     return preds, funs
 
 
-def _check_symbols_in_fact_line(line, allowed_predicates, allowed_functions):
+def _schema_symbol_lookup(kb_schema):
+    """Build case-insensitive mapping: lowercase_name -> canonical_name (unique only)."""
+    lookup = {}
+    all_symbols = []
+    if kb_schema:
+        for p in kb_schema.get("predicates", []) or []:
+            n = p.get("name")
+            if n:
+                all_symbols.append(n)
+        for f in kb_schema.get("functions", []) or []:
+            n = f.get("name")
+            if n:
+                all_symbols.append(n)
+
+    for canonical in all_symbols:
+        key = canonical.lower()
+        if key in lookup and lookup[key] != canonical:
+            lookup[key] = None  # ambiguous, don't use
+        else:
+            lookup[key] = canonical
+
+    return {k: v for k, v in lookup.items() if v is not None}
+
+
+def _normalize_symbol_casing_in_fact(line, symbol_lookup):
+    """Replace symbol names with canonical schema names when case-insensitive match exists."""
+    if not symbol_lookup:
+        return line
+
+    def repl(m):
+        name = m.group(1)
+        canonical = symbol_lookup.get(name.lower())
+        return canonical if canonical else name
+
+    return _callname.sub(lambda m: repl(m) + "(", line)
+
+
+def _check_symbols_in_fact_line(line, allowed_predicates, allowed_functions, symbol_lookup=None):
     if _bad_star_call.search(line):
         raise ValueError("Invalid symbol token in case facts (unexpected '*'): " + line)
 
     for m in _callname.finditer(line):
         name = m.group(1)
-        # Allow a tiny whitelist for arithmetic helpers if they appear in KBs later.
         if name in ["max", "min", "abs"]:
             continue
-        if name not in allowed_predicates and name not in allowed_functions:
-            raise ValueError("Unknown symbol in case facts: " + name)
+        if name in allowed_predicates or name in allowed_functions:
+            continue
+        if symbol_lookup and name.lower() in symbol_lookup:
+            continue
+        raise ValueError("Unknown symbol in case facts: " + name)
 
 
 def normalize_and_validate_case(raw_case, kb_schema=None):
@@ -59,6 +100,7 @@ def normalize_and_validate_case(raw_case, kb_schema=None):
     Design
     - Facts are FO(.) structure lines (must end with '.')
     - If kb_schema is provided, every called symbol must exist in kb_schema
+    - Symbol names are normalized to canonical schema casing (e.g. intentionalinjury -> IntentionalInjury)
     """
     if not isinstance(raw_case, dict):
         raise ValueError("case must be a dict")
@@ -72,12 +114,36 @@ def normalize_and_validate_case(raw_case, kb_schema=None):
         if not ln.endswith("."):
             raise ValueError("Each case fact must end with '.' (got: " + ln + ")")
 
-    if kb_schema:
-        allowed_predicates, allowed_functions = _schema_symbol_sets(kb_schema)
-        for ln in facts:
-            _check_symbols_in_fact_line(ln, allowed_predicates, allowed_functions)
+    symbol_lookup = _schema_symbol_lookup(kb_schema) if kb_schema else {}
+    allowed_predicates, allowed_functions = _schema_symbol_sets(kb_schema) if kb_schema else (set(), set())
 
-    out = {"facts": facts}
+    normalized_facts = []
+    for ln in facts:
+        norm_ln = _normalize_symbol_casing_in_fact(ln, symbol_lookup)
+        if kb_schema:
+            _check_symbols_in_fact_line(norm_ln, allowed_predicates, allowed_functions, symbol_lookup)
+        normalized_facts.append(norm_ln)
+
+    # Remove contradictions: if both pred(x) and not pred(x) exist, keep only not pred(x)
+    def _args_key(s):
+        return tuple(a.strip() for a in (s or "").split(",") if a.strip())
+
+    neg_keys = set()
+    for ln in normalized_facts:
+        mneg = _neg_atom.match(ln.strip())
+        if mneg:
+            neg_keys.add((mneg.group(1), _args_key(mneg.group(2))))
+
+    deduped = []
+    for ln in normalized_facts:
+        mpos = _pos_atom.match(ln.strip())
+        if mpos and "=" not in ln:
+            key = (mpos.group(1), _args_key(mpos.group(2)))
+            if key in neg_keys:
+                continue  # drop pos when we have neg
+        deduped.append(ln)
+
+    out = {"facts": deduped}
 
     # Entities are optional and used for domain seeding in the symbolic layer.
     ents = raw_case.get("entities")
@@ -105,10 +171,24 @@ def normalize_and_validate_query(raw_query, case, kb_schema=None):
         if not intent:
             raise ValueError("intent query requires query.intent")
 
+        symbol = str(raw_query.get("symbol", "")).strip()
+        if intent == "get_range":
+            if not symbol:
+                raise ValueError("get_range intent requires query.symbol")
+            if kb_schema:
+                funcs = [f.get("name") for f in (kb_schema.get("functions") or []) if f.get("name")]
+                symbol_match = next((f for f in funcs if f == symbol or (f and f.lower() == symbol.lower())), None)
+                if not symbol_match:
+                    raise ValueError("get_range symbol must be a function from kb_schema: " + symbol)
+                symbol = symbol_match
+
         out = dict(raw_query)
         out["type"] = "intent"
         out["intent"] = intent
         out["explain"] = explain
+        if intent == "get_range":
+            out["symbol"] = symbol
+            out["entity"] = str(raw_query.get("entity", "")).strip().lower()
         return out
 
     if q_type != "predicate":
@@ -137,12 +217,20 @@ def normalize_and_validate_query(raw_query, case, kb_schema=None):
 
     if kb_schema:
         sig = None
+        predicate_canonical = predicate
         for p in kb_schema.get("predicates", []):
-            if p.get("name") == predicate:
+            n = p.get("name")
+            if n == predicate:
                 sig = p
+                predicate_canonical = n
+                break
+            if n and n.lower() == predicate.lower():
+                sig = p
+                predicate_canonical = n
                 break
         if sig is None:
             raise ValueError("Unknown predicate in query (not in kb_schema): " + predicate)
+        predicate = predicate_canonical
 
         arity = len(sig.get("args", []))
         if mode == "boolean" and len(args_norm) != arity:

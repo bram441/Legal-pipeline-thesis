@@ -1,0 +1,5 @@
+{
+  "query_mode": "set",
+  "certain_set": ["alice"],
+  "possible_set": ["alice"]
+}
