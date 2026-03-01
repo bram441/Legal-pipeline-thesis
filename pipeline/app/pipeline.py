@@ -9,6 +9,43 @@ from pipeline.validation.fo_validation import normalize_and_validate_case, norma
 from pipeline.utils.prompt_loader import render_prompt
 from pipeline.domain.seeding import seed_entities_from_case_text
 
+def _build_prediction_summary(query, symbolic_result):
+    """
+    Build a structured, machine-readable prediction summary
+    for evaluation / testing purposes.
+    """
+    if not isinstance(query, dict):
+        return None
+
+    mode = query.get("mode")
+
+    # --- Boolean predicate query ---
+    if mode == "boolean":
+        certain = bool(symbolic_result.get("certain"))
+        possible = bool(symbolic_result.get("possible"))
+
+        if certain:
+            label = "entailed"
+        elif not possible:
+            label = "contradicted"
+        else:
+            label = "unknown"
+
+        return {
+            "mode": "boolean",
+            "label": label,
+        }
+
+    # --- Set query ---
+    if mode == "set":
+        return {
+            "mode": "set",
+            "certain_set": symbolic_result.get("certain", []),
+            "possible_set": symbolic_result.get("possible", []),
+        }
+
+    return None
+
 
 def answer_legal_prompt(
     case_text,
@@ -16,7 +53,7 @@ def answer_legal_prompt(
     base_kb_text,
     extractor_provider="auto",
     extractor_model=None,
-    extractor_max_retries=2,
+    extractor_max_retries=6,
     kb_schema=None,
     debug=False,
 ):
@@ -98,15 +135,25 @@ def answer_legal_prompt(
         # optional domain seeding (kept separate from validation)
         if isinstance(case, dict) and "entities" not in case:
             seeded = seed_entities_from_case_text(case_text)
+            if seeded and kb_schema:
+                # Use primary (first-declared) type from KB for domain alignment
+                from pipeline.kb.schema import get_primary_type_from_kb
+                primary = get_primary_type_from_kb(base_kb_text)
+                if primary:
+                    case["entities"] = {primary: seeded}
+        # filter entities from extractor if present (remove common non-entity words)
+        if isinstance(case, dict) and "entities" in case and isinstance(case["entities"], dict):
+            from pipeline.domain.seeding import _NON_ENTITY_WORDS
+            filtered = {}
+            for t, vals in case["entities"].items():
+                if isinstance(vals, list):
+                    filtered[t] = [v for v in vals if isinstance(v, str) and v.strip().lower() not in _NON_ENTITY_WORDS]
+                else:
+                    filtered[t] = vals
+            case["entities"] = {k: v for k, v in filtered.items() if v}
 
-            if seeded:
-                types = kb_schema.get("types") or []
-                default_type = types[0] if types else None
-
-                if default_type:
-                    case["entities"] = {default_type: seeded}
-                    if forced_query is not None:
-                        raw["query"] = forced_query
+        if forced_query is not None:
+            raw["query"] = forced_query
 
         query = normalize_and_validate_query(raw.get("query"), case, kb_schema=kb_schema)
         debug_log("pipeline.answer_legal_prompt", "validation ok")
@@ -128,6 +175,8 @@ def answer_legal_prompt(
     try:
         sat, result = run_query(case, query, base_kb_text=base_kb_text)
     except Exception as e:
+        from pipeline.utils.unicode_sanitize import sanitize_for_output
+        err_msg = sanitize_for_output(str(e))
         return {
             "sat": None,
             "case": case,
@@ -138,7 +187,7 @@ def answer_legal_prompt(
             "extraction_prompt": extraction_prompt,
             "raw_extracted": raw,
             "error_stage": "symbolic",
-            "error": str(e),
+            "error": err_msg,
         }
 
     rendered = render_answer(case, query, sat, result, base_kb_text=base_kb_text)
@@ -149,13 +198,17 @@ def answer_legal_prompt(
         print("DEBUG query:", query)
         print("DEBUG symbolic_result:", result)
 
+    prediction = _build_prediction_summary(query, result)
+
     return {
         "sat": sat,
         "case": case,
         "query": query,
         "symbolic_result": result,
+        "prediction": prediction,          # ← NEW (for tests)
         "natural_language": rendered.get("answer"),
         "explanation": rendered.get("explanation"),
         "extraction_prompt": extraction_prompt,
         "raw_extracted": raw,
     }
+

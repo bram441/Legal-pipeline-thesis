@@ -13,6 +13,13 @@ def render_answer(case, query, sat, result, base_kb_text=None):
                 return {"answer": "Yes. The law and case facts are satisfiable (a model exists).", "explanation": None}
             return {"answer": "No. The law and case facts are inconsistent (no model exists).", "explanation": None}
 
+        if intent == "get_range":
+            if isinstance(result, dict) and "range" in result:
+                sym = result.get("symbol", "")
+                rng = str(result.get("range", ""))
+                return {"answer": str(sym) + ": " + rng, "explanation": None}
+            return {"answer": "Could not compute range.", "explanation": None}
+
         # Generic fallback for other intents (until you implement them)
         if isinstance(result, dict) and result.get("error") == "intent_not_implemented":
             return {
@@ -65,7 +72,6 @@ def render_answer(case, query, sat, result, base_kb_text=None):
                 ans = "No. " + shown + " cannot hold given the law and case facts."
             else:
                 ans = "Unknown. " + shown + " is not determined by the law and case facts."
-
 
             explanation = None
             if query.get("explain"):

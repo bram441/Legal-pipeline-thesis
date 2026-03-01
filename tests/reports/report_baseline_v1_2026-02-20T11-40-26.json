@@ -1,0 +1,22 @@
+{
+  "suite": "baseline_v1",
+  "cases": [
+    {
+      "case_id": "001_liability_basic",
+      "kb_source": "file",
+      "stage": "extraction",
+      "passed": false,
+      "prediction": null,
+      "score": null,
+      "error": "Missing OPENAI_API_KEY environment variable"
+    }
+  ],
+  "totals": {
+    "count": 1,
+    "passed": 0,
+    "stage_failed": 1,
+    "stage_counts": {
+      "extraction": 1
+    }
+  }
+}

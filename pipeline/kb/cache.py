@@ -26,6 +26,14 @@ def _sanitize_common_llm_syntax(kb_text):
     s = kb_text
     s = re.sub(r'!\s*([A-Za-z_]\w*)\s*\[\s*Party\s*\]\s*:', r'! \1 in Party:', s)
     s = re.sub(r'\bforall\s+([A-Za-z_]\w*)\s+in\s+Party\s*:', r'! \1 in Party:', s, flags=re.IGNORECASE)
+    # LLM often outputs "theory T: V" (space after colon); IDP expects "theory T:V"
+    s = re.sub(r'theory\s+T\s*:\s*V\b', 'theory T:V', s, flags=re.IGNORECASE)
+    # FO(.) requires capitalized built-in types: Bool, Int, Real
+    s = re.sub(r'\b->\s*bool\b', ' -> Bool', s)
+    s = re.sub(r'\b->\s*int\b', ' -> Int', s)
+    s = re.sub(r'\b->\s*real\b', ' -> Real', s)
+    # Equivalence: IDP expects <=> , not <-> (Prolog/math style)
+    s = re.sub(r'<->', '<=>', s)
     return s
 
 
@@ -37,7 +45,11 @@ def _idp_parse_check(kb_text):
         raise KBCacheError("IDP failed to parse compiled KB: " + str(e))
 
 
-def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.log"):
+def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.log", max_repair_attempts=6, cache_subdir=None):
+    """Compile or load KB. When cache_subdir is set (e.g. 'translated'), use run_dir/cache_subdir/ for cache."""
+    if cache_subdir:
+        run_dir = os.path.join(run_dir, cache_subdir)
+        os.makedirs(run_dir, exist_ok=True)
     kb_path = os.path.join(run_dir, "kb.fo")
     schema_path = os.path.join(run_dir, "kb_schema.json")
     log_path = os.path.join(run_dir, log_filename)
@@ -56,28 +68,42 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
 
         return kb_text, kb_schema
 
-    try:
-        raw_kb_text = compile_law_to_kb_fo(law_text, model=model)
-    except LawCompilationError as e:
-        with open(log_path, "w", encoding="utf-8") as f:
-            f.write("KB compilation FAILED (LLM call).\n")
-            f.write(str(e) + "\n")
-        raise KBCacheError("Law compilation failed: " + str(e))
+    repair_feedback = None
+    last_raw = None
 
-    try:
-        kb_text = _validate_kb_fo_text(raw_kb_text)
-        kb_text = _sanitize_common_llm_syntax(kb_text)
-        _idp_parse_check(kb_text)
-        kb_schema = extract_schema_from_kb_fo(kb_text)
-    except Exception as e:
-        with open(log_path, "w", encoding="utf-8") as f:
-            f.write("KB compilation FAILED (invalid FO syntax).\n\n")
-            f.write("Error:\n" + str(e) + "\n\n")
-            f.write("=== RAW KB (from LLM) ===\n")
-            f.write(raw_kb_text.strip() + "\n")
-            f.write("\n=== AFTER SANITIZE ===\n")
-            f.write(kb_text.strip() + "\n")
-        raise
+    for attempt in range(max_repair_attempts):
+        try:
+            raw_kb_text = compile_law_to_kb_fo(law_text, model=model, repair_feedback=repair_feedback)
+        except LawCompilationError as e:
+            with open(log_path, "w", encoding="utf-8") as f:
+                f.write("KB compilation FAILED (LLM call).\n")
+                f.write(str(e) + "\n")
+                if last_raw:
+                    f.write("\n=== LAST RAW KB ===\n" + last_raw.strip() + "\n")
+            raise KBCacheError("Law compilation failed: " + str(e))
+
+        last_raw = raw_kb_text
+
+        try:
+            kb_text = _sanitize_common_llm_syntax(raw_kb_text)
+            kb_text = _validate_kb_fo_text(kb_text)
+            _idp_parse_check(kb_text)
+            kb_schema = extract_schema_from_kb_fo(kb_text)
+        except Exception as e:
+            repair_feedback = {
+                "error_message": str(e),
+                "previous_output": raw_kb_text.strip(),
+            }
+            if attempt < max_repair_attempts - 1:
+                continue
+            with open(log_path, "w", encoding="utf-8") as f:
+                f.write("KB compilation FAILED (invalid FO syntax after {} repair attempts).\n\n".format(max_repair_attempts))
+                f.write("Error:\n" + str(e) + "\n\n")
+                f.write("=== LAST RAW KB ===\n")
+                f.write(raw_kb_text.strip() + "\n")
+            raise KBCacheError("KB compilation failed after {} repair attempts: {}".format(max_repair_attempts, e))
+
+        break
 
     with open(kb_path, "w", encoding="utf-8") as f:
         f.write(kb_text.strip() + "\n")

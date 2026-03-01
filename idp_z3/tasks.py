@@ -7,22 +7,56 @@ from .case_structure import build_structure_block, build_structure_block_from_fa
 from debug import debug_enabled, debug_log
 
 
-def _compose_program(case, base_kb_text):
+def _primary_type_from_kb(kb_text):
+    """Extract first-declared type from vocabulary for structure domain alignment."""
+    try:
+        from pipeline.kb.schema import get_primary_type_from_kb
+        return get_primary_type_from_kb(kb_text or "")
+    except Exception:
+        return None
+
+
+def _all_types_from_kb(kb_text):
+    """Extract all types from vocabulary for complete structure interpretation."""
+    try:
+        from pipeline.kb.schema import get_all_types_from_kb
+        return get_all_types_from_kb(kb_text or "")
+    except Exception:
+        return []
+
+
+def _predicate_names_from_kb(kb_text):
+    """Extract predicate names for closing open predicates in structure."""
+    try:
+        from pipeline.kb.schema import get_predicate_names_from_kb
+        return get_predicate_names_from_kb(kb_text or "")
+    except Exception:
+        return []
+
+
+def _compose_program(case, base_kb_text, base_kb_for_schema=None):
+    """Compose KB + structure. Use base_kb_for_schema (default: base_kb_text) for extracting
+    types and predicate names - important when base_kb_text has been augmented with aux symbols
+    like __sel0, to avoid adding those to the structure and causing duplicates."""
     if not base_kb_text:
         raise ValueError("base_kb_text is required")
 
+    schema_kb = base_kb_for_schema if base_kb_for_schema is not None else base_kb_text
     structure = None  # important: avoid UnboundLocalError
 
     if isinstance(case, dict) and "facts" in case:
-        # If you upgraded build_structure_block_from_facts to accept entities,
-        # this will work. If not, it will fall back safely.
+        kb_primary = _primary_type_from_kb(schema_kb)
+        kb_types = _all_types_from_kb(schema_kb)
+        kb_preds = _predicate_names_from_kb(schema_kb)
         try:
             structure = build_structure_block_from_facts(
                 case["facts"],
                 entities=case.get("entities"),
+                kb_primary_type=kb_primary,
+                kb_types=kb_types,
+                kb_predicate_names=kb_preds,
             )
         except TypeError:
-            # Backwards compatibility: old signature without entities
             structure = build_structure_block_from_facts(case["facts"])
     else:
         structure = build_structure_block(
@@ -138,7 +172,9 @@ def satisfiable_check_with_constraint(case, base_kb_text, constraint_fo, extra_v
 
     kb_with_aux = _inject_into_vocabulary(base_kb_text, extra_vocab_lines)
 
-    fo_code = _compose_program(case, kb_with_aux)
+    # Use original base_kb_text for schema extraction so aux symbols (e.g. __sel0) are not
+    # added to the structure, which would cause "Duplicate '__sel0' in interpretations"
+    fo_code = _compose_program(case, kb_with_aux, base_kb_for_schema=base_kb_text)
     fo_code = _inject_into_structure(fo_code, extra_struct_lines)
 
     constraint = constraint_fo.strip()

@@ -1,0 +1,166 @@
+vocabulary V {
+  type Offender
+  intentionalCausesWoundsOrBlows: Offender -> Bool
+  premeditated: Offender -> Bool
+  resultsInIllnessOrIncapacity: Offender -> Bool
+  resultsInIncurableDiseaseOrSeriousConsequence: Offender -> Bool
+  causesDeathWithoutPurposeOfKilling: Offender -> Bool
+  imprisonmentMinDays: Offender -> Int
+  imprisonmentMaxDays: Offender -> Int
+  fineMinEuro: Offender -> Int
+  fineMaxEuro: Offender -> Int
+  punishedArt398Basic: Offender -> Bool
+  punishedArt398Premeditated: Offender -> Bool
+  punishedArt399Basic: Offender -> Bool
+  punishedArt399Premeditated: Offender -> Bool
+  punishedArt400Basic: Offender -> Bool
+  punishedArt400Premeditated: Offender -> Bool
+  punishedArt401Basic: Offender -> Bool
+  punishedArt401Premeditated: Offender -> Bool
+}
+
+theory T:V {
+  ! o in Offender:
+    punishedArt398Basic(o) <=>
+      intentionalCausesWoundsOrBlows(o) & ~premeditated(o) & ~resultsInIllnessOrIncapacity(o) & ~resultsInIncurableDiseaseOrSeriousConsequence(o) & ~causesDeathWithoutPurposeOfKilling(o).
+
+  ! o in Offender:
+    punishedArt398Premeditated(o) <=>
+      intentionalCausesWoundsOrBlows(o) & premeditated(o) & ~resultsInIllnessOrIncapacity(o) & ~resultsInIncurableDiseaseOrSeriousConsequence(o) & ~causesDeathWithoutPurposeOfKilling(o).
+
+  ! o in Offender:
+    punishedArt399Basic(o) <=>
+      resultsInIllnessOrIncapacity(o) & ~premeditated(o) & ~resultsInIncurableDiseaseOrSeriousConsequence(o) & ~causesDeathWithoutPurposeOfKilling(o).
+
+  ! o in Offender:
+    punishedArt399Premeditated(o) <=>
+      resultsInIllnessOrIncapacity(o) & premeditated(o) & ~resultsInIncurableDiseaseOrSeriousConsequence(o) & ~causesDeathWithoutPurposeOfKilling(o).
+
+  ! o in Offender:
+    punishedArt400Basic(o) <=>
+      resultsInIncurableDiseaseOrSeriousConsequence(o) & ~premeditated(o) & ~causesDeathWithoutPurposeOfKilling(o).
+
+  ! o in Offender:
+    punishedArt400Premeditated(o) <=>
+      resultsInIncurableDiseaseOrSeriousConsequence(o) & premeditated(o) & ~causesDeathWithoutPurposeOfKilling(o).
+
+  ! o in Offender:
+    punishedArt401Basic(o) <=>
+      causesDeathWithoutPurposeOfKilling(o) & ~premeditated(o).
+
+  ! o in Offender:
+    punishedArt401Premeditated(o) <=>
+      causesDeathWithoutPurposeOfKilling(o) & premeditated(o).
+
+  ! o in Offender:
+    imprisonmentMinDays(o) = 8 <=>
+      punishedArt398Basic(o).
+
+  ! o in Offender:
+    imprisonmentMaxDays(o) = 180 <=>
+      punishedArt398Basic(o).
+
+  ! o in Offender:
+    fineMinEuro(o) = 26 <=>
+      punishedArt398Basic(o).
+
+  ! o in Offender:
+    fineMaxEuro(o) = 100 <=>
+      punishedArt398Basic(o).
+
+  ! o in Offender:
+    imprisonmentMinDays(o) = 30 <=>
+      punishedArt398Premeditated(o).
+
+  ! o in Offender:
+    imprisonmentMaxDays(o) = 365 <=>
+      punishedArt398Premeditated(o).
+
+  ! o in Offender:
+    fineMinEuro(o) = 50 <=>
+      punishedArt398Premeditated(o).
+
+  ! o in Offender:
+    fineMaxEuro(o) = 200 <=>
+      punishedArt398Premeditated(o).
+
+  ! o in Offender:
+    imprisonmentMinDays(o) = 60 <=>
+      punishedArt399Basic(o).
+
+  ! o in Offender:
+    imprisonmentMaxDays(o) = 730 <=>
+      punishedArt399Basic(o).
+
+  ! o in Offender:
+    fineMinEuro(o) = 50 <=>
+      punishedArt399Basic(o).
+
+  ! o in Offender:
+    fineMaxEuro(o) = 200 <=>
+      punishedArt399Basic(o).
+
+  ! o in Offender:
+    imprisonmentMinDays(o) = 180 <=>
+      punishedArt399Premeditated(o).
+
+  ! o in Offender:
+    imprisonmentMaxDays(o) = 1095 <=>
+      punishedArt399Premeditated(o).
+
+  ! o in Offender:
+    fineMinEuro(o) = 100 <=>
+      punishedArt399Premeditated(o).
+
+  ! o in Offender:
+    fineMaxEuro(o) = 500 <=>
+      punishedArt399Premeditated(o).
+
+  ! o in Offender:
+    imprisonmentMinDays(o) = 730 <=>
+      punishedArt400Basic(o).
+
+  ! o in Offender:
+    imprisonmentMaxDays(o) = 1825 <=>
+      punishedArt400Basic(o).
+
+  ! o in Offender:
+    fineMinEuro(o) = 200 <=>
+      punishedArt400Basic(o).
+
+  ! o in Offender:
+    fineMaxEuro(o) = 500 <=>
+      punishedArt400Basic(o).
+
+  ! o in Offender:
+    imprisonmentMinDays(o) = 1825 <=>
+      punishedArt400Premeditated(o).
+
+  ! o in Offender:
+    imprisonmentMaxDays(o) = 3650 <=>
+      punishedArt400Premeditated(o).
+
+  ! o in Offender:
+    fineMinEuro(o) = 200 <=>
+      punishedArt400Premeditated(o).
+
+  ! o in Offender:
+    fineMaxEuro(o) = 500 <=>
+      punishedArt400Premeditated(o).
+
+  ! o in Offender:
+    imprisonmentMinDays(o) = 1825 <=>
+      punishedArt401Basic(o).
+
+  ! o in Offender:
+    imprisonmentMaxDays(o) = 3650 <=>
+      punishedArt401Basic(o).
+
+  ! o in Offender:
+    imprisonmentMinDays(o) = 3650 <=>
+      punishedArt401Premeditated(o).
+
+  ! o in Offender:
+    imprisonmentMaxDays(o) = 5475 <=>
+      punishedArt401Premeditated(o).
+}

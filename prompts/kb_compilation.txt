@@ -46,14 +46,24 @@ E) Minimality
 - Declare ONLY symbols that are necessary to express the law text.
 - If the law text contains something you cannot formalize cleanly, OMIT it rather than inventing extra ontology.
 
+F) Convenience predicates for legal conclusions
+- When the law defines conditions under which a legal consequence applies (e.g. punishment, liability, eligibility, obligation), add a predicate that holds when those conditions are met.
+- Name it after the consequence or provision. Declare it in the vocabulary and define it in the theory as an equivalence with the condition formula.
+- This enables natural queries like "Is X liable?" or "Does Y qualify under article Z?" to map to a single predicate.
+
+G) Quantitative consequences
+- When the law specifies numeric ranges (durations, amounts, etc.), add functions and assign values in the theory based on which conditions apply.
+- Name functions descriptively (e.g. MinDurationDays, MaxAmountEuro) so they match natural questions. This enables range/amount queries.
+- Use a SINGLE unit per quantity type: e.g. imprisonmentMinDays and imprisonmentMaxDays for all imprisonment (convert months/years to days). This ensures "what is the minimum prison sentence?" maps to one clear function.
+
 ========================
 FO(.) THEORY RULES
 ========================
-- Use FO(.) connectives:  &  |  ~  =>  <=> 
+- Use FO(.) connectives:  &  |  ~  =>  <=>  (exactly these; no <-> or :=)
 - Use FO(.) quantifiers:  !  ?  and "in" for typing.
   ✅ Correct: ! p in Person: ...
   ✅ Correct: ? p in Person: ...
-- DO NOT use Prolog/Datalog syntax (no ":-", no "." endings).
+- DO NOT use Prolog/Datalog syntax (no ":-", no "." endings, no "<->").
 - Every top-level formula in the theory MUST end with a period .
 - DO NOT use "forall", "exists" keywords.
 - Put a ":" after the quantifier header line, then the formula on the next line(s).
@@ -65,6 +75,7 @@ QUALITY & PARSING SAFETY
 - Ensure every predicate in the theory is declared in the vocabulary.
 - Ensure every type used in signatures is declared with "type".
 - Do NOT use constants in the theory (no "alice" inside theory). Quantify variables instead.
+- Do NOT add rules that contradict punishment rules (e.g. "X => false" when X should lead to a punishment). Rules for different articles (e.g. basic vs. aggravated) are mutually exclusive by their conditions, not by negating each other.
 
 ========================
 EXAMPLE (STYLE TO COPY)

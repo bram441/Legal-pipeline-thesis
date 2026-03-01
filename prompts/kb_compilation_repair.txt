@@ -1,0 +1,32 @@
+You previously compiled legal rules into FO(.) code, but the output contains errors that IDP-Z3 cannot parse.
+
+Your task: Fix the errors and output corrected FO(.) code. Follow the same output format as before (vocabulary V { ... } then theory T:V { ... }).
+
+========================
+ERROR REPORT
+========================
+{error_message}
+
+========================
+YOUR PREVIOUS OUTPUT (has errors)
+========================
+{previous_output}
+
+========================
+ORIGINAL LAW TEXT (for reference)
+========================
+{law_text}
+
+========================
+COMMON FO(.) MISTAKES TO FIX
+========================
+- Equivalence: use "<=>" NOT "<->" (IDP requires <=>)
+- Predicate syntax: use "pred: Type -> Bool" or "pred: Type1 * Type2 -> Bool", NOT "pred(Type)" or "pred(Type): Bool"
+- Quantifiers: use "! x in Type:" and "? x in Type:", NOT "forall" or "exists"
+- Theory formulas: end each with a period; no Prolog ":-" or "." after predicate names in declarations
+- Types: every type must be declared with "type Name := {...}" or "type Name"
+- Built-in types: use "Bool", "Int", "Real" (capitalized), NOT "bool", "int", "real"
+- Braces: ensure all { } are balanced
+- Symbols: use consistent names; predicates/functions in theory must be declared in vocabulary
+
+Output ONLY the corrected FO(.) code. No explanations, no markdown.
