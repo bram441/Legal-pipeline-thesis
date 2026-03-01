@@ -1,6 +1,6 @@
 import json
 
-from debug import debug_log
+from debug import debug_log, status_log
 
 from pipeline.extraction.extractor import extract_case_and_query, ExtractionError
 from pipeline.symbolic.router import run_query
@@ -104,6 +104,7 @@ def answer_legal_prompt(
         kb_schema_json=json.dumps(kb_schema, ensure_ascii=False, indent=2),
     )
 
+    status_log("Extraction", "Extracting case and query")
     debug_log("pipeline.answer_legal_prompt", "extraction_provider=" + str(extractor_provider))
     try:
         raw = extract_case_and_query(
@@ -171,6 +172,7 @@ def answer_legal_prompt(
             "error": str(e),
         }
 
+    status_log("Reasoning", "Running symbolic reasoning (IDP-Z3)")
     debug_log("pipeline.answer_legal_prompt", "symbolic.run_query")
     try:
         sat, result = run_query(case, query, base_kb_text=base_kb_text)

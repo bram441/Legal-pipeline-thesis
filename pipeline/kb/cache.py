@@ -1,6 +1,7 @@
 import os
 import re
 
+from debug import status_log
 from pipeline.kb.compiler import compile_law_to_kb_fo, LawCompilationError
 from pipeline.kb.schema import extract_schema_from_kb_fo, load_kb_schema, save_kb_schema
 
@@ -55,6 +56,7 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
     log_path = os.path.join(run_dir, log_filename)
 
     if os.path.exists(kb_path):
+        status_log("KB", "Loading from cache")
         with open(kb_path, "r", encoding="utf-8") as f:
             kb_text = f.read()
         kb_text = _validate_kb_fo_text(kb_text)
@@ -72,6 +74,11 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
     last_raw = None
 
     for attempt in range(max_repair_attempts):
+        if attempt == 0:
+            status_log("KB", "Generating from law text")
+        else:
+            status_log("KB", "Repair attempt {}".format(attempt))
+
         try:
             raw_kb_text = compile_law_to_kb_fo(law_text, model=model, repair_feedback=repair_feedback)
         except LawCompilationError as e:
@@ -85,6 +92,7 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
         last_raw = raw_kb_text
 
         try:
+            status_log("KB", "Checking syntax and semantic validity")
             kb_text = _sanitize_common_llm_syntax(raw_kb_text)
             kb_text = _validate_kb_fo_text(kb_text)
             _idp_parse_check(kb_text)
@@ -113,4 +121,5 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
     with open(log_path, "w", encoding="utf-8") as f:
         f.write("KB compiled successfully.\n")
 
+    status_log("KB", "Compilation successful")
     return kb_text, kb_schema

@@ -1,19 +1,19 @@
 === LAW (plain text input) ===
-SECTION II. - INTENTIONAL KILLING, NOT CALLED MANSLAUGHTER, AND INTENTIONAL INFLICTING OF BODILY INJURY.
+SECTION II. - INTENTIONAL KILLING, NOT CALLED MANSLAUGHTER, AND INTENTIONAL INFLICTION OF BODILY INJURY.
 
-Art. 398. Whoever intentionally causes wounds or blows shall be punished with imprisonment from eight days to six months and a fine from twenty-six [euro] to one hundred [euro], or with one of these penalties only. <W 2000-06-26/42, art. 2, Effective date: 01-01-2002>
-If the offender acted with premeditation, he shall be sentenced to imprisonment from one month to one year and a fine from fifty [euro] to two hundred [euro]. <W 2000-06-26/42, art. 2, Effective date: 01-01-2002>
+  Art. 398. Whoever intentionally inflicts injuries or blows shall be punished with imprisonment from eight days to six months and a fine from twenty-six [euros] to one hundred [euros] or with one of these penalties only. <Law 2000-06-26/42, art. 2, Effective date: 01-01-2002>
+  In case the culprit acted with premeditation, he shall be sentenced to imprisonment from one month to one year and a fine from fifty [euros] to two hundred [euros]. <Law 2000-06-26/42, art. 2, Effective date: 01-01-2002>
 
-Art. 399. If the blows or wounds result in an illness or incapacity to perform personal labor, the offender shall be punished with imprisonment from two months to two years and a fine from fifty [euro] to two hundred [euro]. <W 2000-06-26/42, art. 2, Effective date: 01-01-2002>
-The offender shall be punished with imprisonment from six months to three years and a fine from one hundred [euro] to five hundred [euro], if he acted with premeditation. <W 2000-06-26/42, art. 2, Effective date: 01-01-2002>
+  Art. 399. If the blows or injuries result in illness or incapacity to perform personal labor, the culprit shall be punished with imprisonment from two months to two years and a fine from fifty [euros] to two hundred [euros]. <Law 2000-06-26/42, art. 2, Effective date: 01-01-2002>
+  The culprit shall be punished with imprisonment from six months to three years and a fine from one hundred [euros] to five hundred [euros] if he acted with premeditation. <Law 2000-06-26/42, art. 2, Effective date: 01-01-2002>
 
-Art. 400. (See NOTE 1 under TITLE) The penalty is imprisonment from two years to five years and a fine from two hundred [euro] to five hundred [euro], if the blows or wounds result in either an apparently incurable disease, or an incapacity to perform personal labor of more than four months, or the complete loss of the use of an organ, or a serious mutilation. <W 2000-06-26/42, art. 2, Effective date: 01-01-2002>
-The penalty is (imprisonment from five years to ten years), in case the offender acted with premeditation. <W 2003-01-23/42, art. 66, 041; Effective date: 13-03-2003>
-----------
-(1)<W 2016-02-05/11, art. 20, 114; Effective date: 29-02-2016>
+  Art. 400. (See NOTE 1 under TITLE) The penalty is imprisonment from two years to five years and a fine from two hundred [euros] to five hundred [euros], if the blows or injuries cause either an apparently incurable disease, or [1 incapacity to perform personal labor of more than four months]1, or the complete loss of use of an organ, or a severe disfigurement. <Law 2000-06-26/42, art. 2, Effective date: 01-01-2002>
+  The penalty is (detention from five years to ten years) if the culprit acted with premeditation. <Law 2003-01-23/42, art. 66, 041; Effective date: 13-03-2003>
+  ----------
+  (1)<Law 2016-02-05/11, art. 20, 114; Effective date: 29-02-2016>
 
-Art. 401. (See NOTE 1 under TITLE) <W 2003-01-23/42, art. 67, 041; Effective date: 13-03-2003> When the blows or wounds are intentionally inflicted, but without the purpose of killing, and nevertheless cause death, the offender shall be punished with imprisonment from five years to ten years.
-He shall be punished with imprisonment from ten years to fifteen years if he commits those violent acts with premeditation.
+  Art. 401. (See NOTE 1 under TITLE) <Law 2003-01-23/42, art. 67, 041; Effective date: 13-03-2003> When the blows or injuries are intentionally inflicted, but without the intent to kill, and nevertheless cause death, the culprit shall be punished with detention from five years to ten years.
+  He shall be punished with detention from ten years to fifteen years if he commits such acts of violence with premeditation.
 
 === KB USED (kb.fo) ===
 vocabulary V {
@@ -184,7 +184,7 @@ theory T:V {
 }
 
 === CASE ===
-Pieter and Karel have a conflict in a park. Pieter deliberately hits Karel multiple times with his fists. Karel sustains injuries: a broken nose and bruises on his face. Pieter did not act with premeditation. The injuries did not cause illness or incapacity to perform personal labor.
+Pieter and Karel have a conflict in a park. Pieter intentionally hits Karel multiple times with his fists. Karel sustains injuries: a broken nose and bruises on his face. Pieter did not act with premeditation. The injuries did not cause illness or incapacity to perform personal labor.
 
 ---
 Q: Is Pieter punishable?
@@ -195,13 +195,13 @@ Answer: Yes. punishedArt398Basic(pieter) is entailed by the law and case facts.
 ---
 Q: According to the situation and the law, what is the minimum prison sentence for Pieter?
 SAT? True
-Case: {'facts': ['intentionalCausesWoundsOrBlows(pieter).', 'not premeditated(pieter).', 'not resultsInIllnessOrIncapacity(pieter).', 'not resultsInIncurableDiseaseOrSeriousConsequence(pieter).'], 'entities': {'Offender': ['pieter', 'karel']}}
+Case: {'facts': ['intentionalCausesWoundsOrBlows(pieter).', 'not premeditated(pieter).', 'not resultsInIllnessOrIncapacity(pieter).'], 'entities': {'Offender': ['pieter', 'karel']}}
 Query: {'type': 'intent', 'explain': False, 'predicate': '', 'mode': 'set', 'args': [], 'intent': 'get_range', 'symbol': 'imprisonmentMinDays', 'entity': 'pieter'}
 Answer: imprisonmentMinDays: 8
 ---
 Q: According to the situation and the law, what is the maximum prison sentence for Pieter?
 SAT? True
-Case: {'facts': ['intentionalCausesWoundsOrBlows(pieter).', 'not premeditated(pieter).', 'not resultsInIllnessOrIncapacity(pieter).'], 'entities': {'Offender': ['pieter', 'karel']}}
+Case: {'facts': ['intentionalCausesWoundsOrBlows(pieter).', 'not premeditated(pieter).', 'not resultsInIllnessOrIncapacity(pieter).', 'not resultsInIncurableDiseaseOrSeriousConsequence(pieter).'], 'entities': {'Offender': ['pieter', 'karel']}}
 Query: {'type': 'intent', 'explain': False, 'predicate': '', 'mode': 'set', 'args': [], 'intent': 'get_range', 'symbol': 'imprisonmentMaxDays', 'entity': 'pieter'}
 Answer: imprisonmentMaxDays: 180
 ---
@@ -213,11 +213,11 @@ Answer: fineMinEuro: 26
 ---
 Q: According to the situation and the law, what is the maximum fine for Pieter?
 SAT? True
-Case: {'facts': ['intentionalCausesWoundsOrBlows(pieter).', 'not premeditated(pieter).', 'not resultsInIllnessOrIncapacity(pieter).'], 'entities': {'Offender': ['pieter', 'karel']}}
+Case: {'facts': ['intentionalCausesWoundsOrBlows(pieter).', 'not premeditated(pieter).', 'not resultsInIllnessOrIncapacity(pieter).', 'not resultsInIncurableDiseaseOrSeriousConsequence(pieter).'], 'entities': {'Offender': ['pieter', 'karel']}}
 Query: {'type': 'intent', 'explain': False, 'predicate': '', 'mode': 'set', 'args': [], 'intent': 'get_range', 'symbol': 'fineMaxEuro', 'entity': 'pieter'}
 Answer: fineMaxEuro: 100
 ---
-Q: Why is Pieter liable to punishment?
+Q: Why is Pieter liable?
 SAT? True
 Case: {'facts': ['intentionalCausesWoundsOrBlows(pieter).', 'not premeditated(pieter).', 'not resultsInIllnessOrIncapacity(pieter).'], 'entities': {'Offender': ['pieter', 'karel']}}
 Query: {'type': 'predicate', 'predicate': 'punishedArt398Basic', 'mode': 'boolean', 'args': ['pieter'], 'explain': True}
@@ -239,4 +239,4 @@ possible = True
 certain = True
 
 Natural-language paraphrase:
-Since Pieter intentionally caused wounds or blows but was not premeditated and did not cause illness or incapacity, and because he is not in the group called Offender, the rule applies and the conclusion is that Pieter is punished under Article 398 Basic.
+The conclusion states that Pieter is punished under Article 398 Basic, based on the facts that he intentionally caused wounds or blows, did not act with premeditation, and did not cause illness or incapacity, which aligns with the given rule excluding offenders.

@@ -15,6 +15,7 @@ if sys.platform == "win32" and hasattr(sys.stdout, "fileno"):
     except (AttributeError, OSError):
         pass
 
+from debug import status_log
 from pipeline.app.pipeline import answer_legal_prompt
 from pipeline.io.text_runs import load_text_run, write_text_results
 from pipeline.io.json_runs import load_json_run, write_json_results, write_score
@@ -33,6 +34,7 @@ def run_text_mode(run_dir, provider, translate=True):
 
     if translate:
         try:
+            status_log("Translation", "Translating law, case, and questions to English")
             law_text = translate_to_english(law_text)
             case_text = translate_to_english(case_text)
             questions = [translate_to_english(q) for q in questions]
@@ -41,6 +43,7 @@ def run_text_mode(run_dir, provider, translate=True):
             return
 
     # Compile (or reuse cached) KB once per run; use separate cache when translated
+    status_log("KB", "Loading or compiling knowledge base")
     kb_text, kb_schema = get_or_compile_kb(run_dir, law_text, cache_subdir="translated" if translate else None)
 
     out_lines = []
@@ -54,10 +57,11 @@ def run_text_mode(run_dir, provider, translate=True):
     out_lines.append(case_text)
     out_lines.append("")
 
-    for q in questions:
+    for i, q in enumerate(questions):
         out_lines.append("---")
         out_lines.append("Q: " + q)
 
+        status_log("Question", "Processing {} of {}".format(i + 1, len(questions)))
         result = answer_legal_prompt(
             case_text,
             q,
@@ -93,6 +97,7 @@ def run_json_mode(run_dir, provider, translate=True):
 
     if translate:
         try:
+            status_log("Translation", "Translating law, case, and questions to English")
             law_text = translate_to_english(law_text)
             case_text = translate_to_english(case_text)
             for i, q in enumerate(questions):
@@ -104,6 +109,7 @@ def run_json_mode(run_dir, provider, translate=True):
             print("Translation failed:", e)
             return
 
+    status_log("KB", "Loading or compiling knowledge base")
     kb_text, kb_schema = get_or_compile_kb(run_dir, law_text, cache_subdir="translated" if translate else None)
 
     results = {
@@ -121,11 +127,12 @@ def run_json_mode(run_dir, provider, translate=True):
         "items": [],
     }
 
-    for q in questions:
+    for i, q in enumerate(questions):
         qid = q.get("id")
         qtext = q.get("text", "")
         expected = q.get("expected")
 
+        status_log("Question", "Processing {} of {}".format(i + 1, len(questions)))
         result = answer_legal_prompt(
             case_text,
             qtext,
