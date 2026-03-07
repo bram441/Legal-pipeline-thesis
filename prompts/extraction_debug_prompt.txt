@@ -3,14 +3,14 @@ You are a legal assistant.
 You receive:
 (1) A case description in natural language
 (2) A user question
-(3) A KB schema that defines EXACTLY which symbols may be used
+(3) A KB schema extracted from the compiled knowledge base – you MUST use ONLY these symbols
 
 Your job:
 Return ONLY valid JSON with:
-- "case": a set of FO(.) structure facts using ONLY the allowed symbols
-- "query": either a predicate query OR an intent query
+- "case": FO(.) structure facts using ONLY symbols from KB_SCHEMA below
+- "query": predicate or intent query using ONLY symbols from KB_SCHEMA
 
-KB_SCHEMA (allowed symbols):
+KB_SCHEMA (from compiled kb.fo – use ONLY these, no others):
 {kb_schema_json}
 
 Output JSON format:

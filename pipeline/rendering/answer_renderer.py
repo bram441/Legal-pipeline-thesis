@@ -1,6 +1,7 @@
 # pipeline/rendering/answer_renderer.py
 
 from pipeline.rendering.explanations import explain_generic
+from pipeline.rendering.nl_answer import render_get_range_nl, render_set_nl, render_boolean_nl
 
 
 def render_answer(case, query, sat, result, base_kb_text=None):
@@ -17,7 +18,11 @@ def render_answer(case, query, sat, result, base_kb_text=None):
             if isinstance(result, dict) and "range" in result:
                 sym = result.get("symbol", "")
                 rng = str(result.get("range", ""))
-                return {"answer": str(sym) + ": " + rng, "explanation": None}
+                entity = (query.get("entity") or "").strip()
+                rng_lower = rng.lower()
+                skip_nl = any(x in rng_lower for x in ("not found", "error", "no model", "could not", "unsatisfiable"))
+                ans = render_get_range_nl(sym, rng, entity) if rng and not skip_nl else str(sym) + ": " + rng
+                return {"answer": ans, "explanation": None}
             return {"answer": "Could not compute range.", "explanation": None}
 
         # Generic fallback for other intents (until you implement them)
@@ -60,18 +65,17 @@ def render_answer(case, query, sat, result, base_kb_text=None):
                 display_atom = pred + "(" + ", ".join(str(a) for a in args) + ")"
 
 
-            # 3-valued style:
-            # - certain=True  => entailed
-            # - possible=False => impossible (entailed negation under satisfiable KB+case)
-            # - otherwise => unknown / not provable
-            shown = display_atom if display_atom else "The statement"
-
-            if certain:
-                ans = "Yes. " + shown + " is entailed by the law and case facts."
-            elif possible is False:
-                ans = "No. " + shown + " cannot hold given the law and case facts."
+            # 3-valued style: use NL answer when we have predicate + args
+            if pred and args and (certain is True or possible is False):
+                ans = render_boolean_nl(pred, args, certain, possible)
             else:
-                ans = "Unknown. " + shown + " is not determined by the law and case facts."
+                shown = display_atom if display_atom else "The statement"
+                if certain:
+                    ans = "Yes. " + shown + " is entailed by the law and case facts."
+                elif possible is False:
+                    ans = "No. " + shown + " cannot hold given the law and case facts."
+                else:
+                    ans = "Unknown. " + shown + " is not determined by the law and case facts."
 
             explanation = None
             if query.get("explain"):
@@ -91,14 +95,7 @@ def render_answer(case, query, sat, result, base_kb_text=None):
                 if not certain and not possible:
                     return {"answer": "No results for " + str(pred) + ".", "explanation": None}
 
-                # Keep it simple and explicit (useful for debugging).
-                parts = []
-                if certain:
-                    parts.append("certain=" + ", ".join(certain))
-                if possible:
-                    parts.append("possible=" + ", ".join(possible))
-
-                ans = str(pred) + " -> " + " | ".join(parts)
+                ans = render_set_nl(pred, certain, possible)
                 return {"answer": ans, "explanation": None}
 
             # Legacy/alternate representation (tuple list)

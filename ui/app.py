@@ -24,6 +24,7 @@ from pipeline.app.pipeline import answer_legal_prompt
 from pipeline.io.text_runs import write_text_run
 from pipeline.kb.cache import get_or_compile_kb
 from pipeline.translation.translator import translate_to_english, TranslationError
+from pipeline.rendering.explanations import explain_on_demand
 from pipeline.utils.unicode_sanitize import sanitize_for_output
 
 
@@ -46,11 +47,11 @@ def run_pipeline(law_text, case_text, questions, translate, provider="auto", for
     questions = [q.strip() for q in questions if q and q.strip()]
 
     if not law_text:
-        return None, "Please enter law text."
+        return None, None, "Please enter law text."
     if not case_text:
-        return None, "Please enter case text."
+        return None, None, "Please enter case text."
     if not questions:
-        return None, "Please enter at least one question."
+        return None, None, "Please enter at least one question."
 
     try:
         if translate:
@@ -59,7 +60,7 @@ def run_pipeline(law_text, case_text, questions, translate, provider="auto", for
             case_text = translate_to_english(case_text)
             questions = [translate_to_english(q) for q in questions]
     except TranslationError as e:
-        return None, f"Translation failed: {e}"
+        return None, None, f"Translation failed: {e}"
 
     run_path = _get_run_dir(law_text, translate)
     write_text_run(run_path, law_text, case_text, questions)
@@ -80,7 +81,7 @@ def run_pipeline(law_text, case_text, questions, translate, provider="auto", for
             run_path, law_text, cache_subdir="translated" if translate else None
         )
     except Exception as e:
-        return None, f"KB compilation failed: {e}"
+        return None, None, f"KB compilation failed: {e}"
 
     results = []
     for i, q in enumerate(questions):
@@ -94,7 +95,7 @@ def run_pipeline(law_text, case_text, questions, translate, provider="auto", for
         )
         results.append({"question": q, "result": result})
 
-    return results, None
+    return results, kb_text, None
 
 
 def main():
@@ -135,7 +136,7 @@ def main():
 
     if st.button("Run pipeline", type="primary"):
         with st.spinner("Running pipeline..."):
-            results, err = run_pipeline(
+            results, kb_text, err = run_pipeline(
                 law_text, case_text, questions,
                 translate=translate, provider=provider, force_recompile=force_recompile
             )
@@ -144,9 +145,18 @@ def main():
             st.error(err)
             return
 
+        st.session_state["pipeline_results"] = results
+        st.session_state["pipeline_kb_text"] = kb_text
+        for k in list(st.session_state.keys()):
+            if k.startswith("explanation_"):
+                del st.session_state[k]
         st.success("Done!")
-        st.divider()
 
+    results = st.session_state.get("pipeline_results", [])
+    kb_text = st.session_state.get("pipeline_kb_text", "")
+
+    if results:
+        st.divider()
         for i, item in enumerate(results):
             q = item["question"]
             r = item["result"]
@@ -159,6 +169,21 @@ def main():
                     if r.get("explanation"):
                         st.markdown("**Explanation:**")
                         st.markdown(sanitize_for_output(r["explanation"]))
+
+                    expl_key = f"explanation_{i}"
+                    if expl_key in st.session_state:
+                        st.markdown("**Explanation:**")
+                        st.markdown(sanitize_for_output(st.session_state[expl_key]))
+                    elif st.button("Explain", key=f"btn_explain_{i}", help="Generate explanation from KB, facts, and result"):
+                        with st.spinner("Generating explanation..."):
+                            expl = explain_on_demand(
+                                r.get("case"),
+                                r.get("query"),
+                                r.get("symbolic_result"),
+                                base_kb_text=kb_text,
+                            )
+                            st.session_state[expl_key] = expl
+                        st.rerun()
 
                     with st.expander("Details (case & query)"):
                         st.text(f"Case: {r.get('case')}")
