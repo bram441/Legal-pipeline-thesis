@@ -3,7 +3,7 @@
 import re
 
 from .idp_backend import run_idp
-from .case_structure import build_structure_block, build_structure_block_from_facts
+from .case_structure import build_structure_block_from_facts
 from debug import debug_enabled, debug_log
 
 
@@ -40,30 +40,23 @@ def _compose_program(case, base_kb_text, base_kb_for_schema=None):
     like __sel0, to avoid adding those to the structure and causing duplicates."""
     if not base_kb_text:
         raise ValueError("base_kb_text is required")
+    if not isinstance(case, dict) or "facts" not in case:
+        raise ValueError("case must be a dict with 'facts' (schema-driven case format)")
 
     schema_kb = base_kb_for_schema if base_kb_for_schema is not None else base_kb_text
-    structure = None  # important: avoid UnboundLocalError
-
-    if isinstance(case, dict) and "facts" in case:
-        kb_primary = _primary_type_from_kb(schema_kb)
-        kb_types = _all_types_from_kb(schema_kb)
-        kb_preds = _predicate_names_from_kb(schema_kb)
-        try:
-            structure = build_structure_block_from_facts(
-                case["facts"],
-                entities=case.get("entities"),
-                kb_primary_type=kb_primary,
-                kb_types=kb_types,
-                kb_predicate_names=kb_preds,
-            )
-        except TypeError:
-            structure = build_structure_block_from_facts(case["facts"])
-    else:
-        structure = build_structure_block(
-            case["parties"],
-            case["negligent"],
-            case["caused_damage"],
+    kb_primary = _primary_type_from_kb(schema_kb)
+    kb_types = _all_types_from_kb(schema_kb)
+    kb_preds = _predicate_names_from_kb(schema_kb)
+    try:
+        structure = build_structure_block_from_facts(
+            case["facts"],
+            entities=case.get("entities"),
+            kb_primary_type=kb_primary,
+            kb_types=kb_types,
+            kb_predicate_names=kb_preds,
         )
+    except TypeError:
+        structure = build_structure_block_from_facts(case["facts"])
 
     if not structure:
         raise ValueError("Failed to build structure block")

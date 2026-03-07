@@ -36,12 +36,14 @@ Rules:
 - Use lowercase identifiers for constants (alice, bob, art398).
 - Facts must be valid FO(.) structure lines ending with '.'.
 - Do NOT invent new predicates/functions/types.
+- Do NOT include contradictory facts (e.g. both pred(x) and not pred(x) for the same predicate and entity).
+- Use only entities that appear in the case description; query entities must be in the case.
 - If a fact is unknown or unexpressible with allowed symbols, omit it.
 
 CRITICAL SYMBOL RULES:
 - You MUST ONLY use predicate/function names that appear in KB_SCHEMA.
-- Copy symbol names EXACTLY as written in KB_SCHEMA (case-sensitive).
-- Do NOT invent synonyms.
+- Copy symbol names EXACTLY as written in KB_SCHEMA (case-sensitive, character-for-character).
+- Do NOT use synonyms: e.g. if the schema has "intentionalCausesWoundsOrBlows" do NOT write "inflictedWoundsOrBlows". The system matches by exact name only; synonyms make the answer wrong.
 
 Query rules:
 - Meta questions about satisfiable/consistency: type="intent" with intent="satisfiable".

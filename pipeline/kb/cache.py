@@ -4,6 +4,7 @@ import re
 from debug import status_log
 from pipeline.kb.compiler import compile_law_to_kb_fo, LawCompilationError
 from pipeline.kb.schema import extract_schema_from_kb_fo, load_kb_schema, save_kb_schema
+from pipeline.kb.semantic_check import check_kb_semantic, KBSemanticError
 
 
 class KBCacheError(Exception):
@@ -65,6 +66,7 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
         try:
             kb_text = _validate_kb_fo_text(cached_kb)
             _idp_parse_check(kb_text)
+            check_kb_semantic(kb_text)
             if os.path.exists(schema_path):
                 kb_schema = load_kb_schema(run_dir)
             else:
@@ -107,12 +109,14 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
         last_raw = raw_kb_text
 
         try:
-            status_log("KB", "Checking syntax and semantic validity")
+            status_log("KB", "Checking syntax validity")
             kb_text = _sanitize_common_llm_syntax(raw_kb_text)
             kb_text = _validate_kb_fo_text(kb_text)
             _idp_parse_check(kb_text)
             kb_schema = extract_schema_from_kb_fo(kb_text)
-        except Exception as e:
+            status_log("KB", "Checking semantic validity (satisfiability)")
+            check_kb_semantic(kb_text)
+        except (KBCacheError, KBSemanticError, Exception) as e:
             repair_feedback = {
                 "error_message": str(e),
                 "previous_output": raw_kb_text.strip(),

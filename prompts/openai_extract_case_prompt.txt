@@ -2,7 +2,8 @@ Rules:
 - Output must be VALID JSON.
 - Output JSON shape: {"facts": ["..."]}
 - Use lowercase identifiers (snake_case) for constants.
-- IMPORTANT: Use ONLY predicate/function symbol NAMES from KB_SCHEMA. Copy EXACTLY.
+- IMPORTANT: Use ONLY predicate/function symbol NAMES from KB_SCHEMA. Copy EXACTLY (character-for-character).
+- Do NOT use synonyms or alternative phrasings: if the schema has "intentionalCausesWoundsOrBlows" you must write that exact name, not "inflictedWoundsOrBlows" or "causesWounds". The reasoning engine matches by symbol name only.
 - Case text may be in any language; map to the schema symbols.
 - Extract ALL expressible facts; do NOT drop facts because they seem irrelevant.
 - Facts must be FO(.) structure lines ending with '.'.
