@@ -59,19 +59,22 @@ G) Quantitative consequences
 ========================
 FO(.) THEORY RULES
 ========================
-- Use FO(.) connectives:  &  |  ~  =>  <=>  (exactly these; no <-> or :=)
+- Use ONLY these connectives:  &  |  ~  =>  <=>  (no <->, :=, *else, ?:, or programming-style conditionals).
+- NO ternary/conditional: Do NOT use "if-then-else", "*else", "? :", "case of", or similar. For functions with multiple possible values, write SEPARATE rules:  f(x) = v1 <=> cond1(x).  and  f(x) = v2 <=> cond2(x).  Each rule stands alone.
 - Use FO(.) quantifiers:  !  ?  and "in" for typing.
   ✅ Correct: ! p in Person: ...
   ✅ Correct: ? p in Person: ...
-- DO NOT use Prolog/Datalog syntax (no ":-", no "." endings, no "<->").
+- DO NOT use Prolog/Datalog syntax (no ":-", no "<->").
 - Every top-level formula in the theory MUST end with a period .
 - DO NOT use "forall", "exists" keywords.
 - Put a ":" after the quantifier header line, then the formula on the next line(s).
+- Function assignment: Use  f(x) = N <=> condition(x).  for each case. Never  f(x) = (condition ? a : b).
 
 ========================
 QUALITY & PARSING SAFETY
 ========================
-- Do NOT use inline numeric comparisons (e.g. f(x) > 4 or duration(x) > 4) inside logical formulas (disjunctions, implications). IDP requires Bool in those positions. Instead, define a Bool predicate (e.g. incapacityExceedsFourMonths: Person -> Bool) and add a separate rule linking it to the numeric check.
+- NO inline numeric comparisons in logical formulas: Do NOT use f(x) > N or f(x) >= N inside &, |, =>, <=>. IDP requires Bool there. Define a Bool predicate (e.g. exceedsThreshold: Type -> Bool) and add  exceedsThreshold(x) <=> f(x) > N.  as a separate rule.
+- NO programming constructs: No *else, ?:, if-then-else, case/when. Use multiple rules with <=> for each branch.
 - Ensure braces are balanced.
 - Ensure every predicate in the theory is declared in the vocabulary.
 - Ensure every type used in signatures is declared with "type".

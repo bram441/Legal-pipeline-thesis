@@ -69,3 +69,55 @@ def paraphrase_liability_explanation(rule_line, fact_lines, conclusion_line, mod
         raise NLExplanationError("Empty model output")
 
     return text
+
+
+def paraphrase_range_explanation(rules_block, facts_block, result_line, model=None):
+    """Paraphrase a get_range explanation. Uses ONLY the provided rules, facts, and result.
+    The result_line is the EXACT computed value – the LLM must not change it.
+    """
+    if not _enabled():
+        raise NLExplanationError("LLM NL explanations disabled (set PIPELINE_USE_LLM_EXPLANATIONS=1)")
+
+    provider = _provider()
+    if provider != "openai":
+        raise NLExplanationError("PIPELINE_NL_EXPLAINER_PROVIDER must be 'openai' for now")
+
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise NLExplanationError("Missing OPENAI_API_KEY")
+
+    try:
+        from openai import OpenAI
+    except Exception as e:
+        raise NLExplanationError("OpenAI SDK not installed: " + str(e))
+
+    chosen_model = model or _model()
+    client = OpenAI(api_key=api_key)
+
+    system = (
+        "You paraphrase formal logic into plain language. You MUST use ONLY the provided "
+        "Rule(s), Facts, and Result. Do NOT add, remove, or change any value or fact. "
+        "Do NOT invent reasoning. Paraphrase the exact result only."
+    )
+    user = render_prompt(
+        "nl_paraphrase_range.txt",
+        rules_block=(rules_block or "(no rules)"),
+        facts_block=(facts_block or "(no facts)"),
+        result_line=(result_line or "(no result)"),
+    )
+
+    try:
+        resp = client.chat.completions.create(
+            model=chosen_model,
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+            ],
+        )
+    except Exception as e:
+        raise NLExplanationError("OpenAI call failed: " + str(e))
+
+    text = (resp.choices[0].message.content or "").strip()
+    if not text:
+        raise NLExplanationError("Empty model output")
+    return text
