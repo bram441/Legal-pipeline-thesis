@@ -2,6 +2,7 @@ import re
 
 
 _callname = re.compile(r"\b([A-Za-z_]\w*)\s*\(")
+_atom_args = re.compile(r"\((.*)\)")
 _neg_atom = re.compile(r"^\s*(?:not|~|¬)\s+([A-Za-z_][A-Za-z0-9_]*)\s*\((.*)\)\s*\.\s*$")
 _pos_atom = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*\((.*)\)\s*\.\s*$")
 _bad_star_call = re.compile(r"[A-Za-z_][A-Za-z0-9_]*\s*\*\s*\(")
@@ -124,9 +125,9 @@ def normalize_and_validate_case(raw_case, kb_schema=None):
             _check_symbols_in_fact_line(norm_ln, allowed_predicates, allowed_functions, symbol_lookup)
         normalized_facts.append(norm_ln)
 
-    # Remove contradictions: if both pred(x) and not pred(x) exist, keep only not pred(x)
+    # Semantic check: detect contradictions (P(x) and not P(x)) and raise for repair
     def _args_key(s):
-        return tuple(a.strip() for a in (s or "").split(",") if a.strip())
+        return tuple(a.strip().lower() for a in (s or "").split(",") if a.strip())
 
     neg_keys = set()
     for ln in normalized_facts:
@@ -134,14 +135,20 @@ def normalize_and_validate_case(raw_case, kb_schema=None):
         if mneg:
             neg_keys.add((mneg.group(1), _args_key(mneg.group(2))))
 
-    deduped = []
     for ln in normalized_facts:
         mpos = _pos_atom.match(ln.strip())
         if mpos and "=" not in ln:
             key = (mpos.group(1), _args_key(mpos.group(2)))
             if key in neg_keys:
-                continue  # drop pos when we have neg
-        deduped.append(ln)
+                raise ValueError(
+                    "Case facts contain contradiction: {} and not {} both present. "
+                    "Remove one based on the case description.".format(
+                        mpos.group(1) + "(" + ", ".join(key[1]) + ")",
+                        mpos.group(1) + "(" + ", ".join(key[1]) + ")",
+                    )
+                )
+
+    deduped = normalized_facts
 
     out = {"facts": deduped}
 
@@ -151,6 +158,22 @@ def normalize_and_validate_case(raw_case, kb_schema=None):
         out["entities"] = ents
 
     return out
+
+
+def _entities_from_case(case):
+    """Extract entity names (lowercase, no quotes) that appear in case facts."""
+    entities = set()
+    facts = list((case or {}).get("facts") or []) if isinstance(case, dict) else []
+    for ln in facts:
+        if not isinstance(ln, str):
+            continue
+        m = _atom_args.search(ln)
+        if m:
+            for part in m.group(1).split(","):
+                e = part.strip().strip("'\"").lower()
+                if e and not e.isdigit():
+                    entities.add(e)
+    return entities
 
 
 def normalize_and_validate_query(raw_query, case, kb_schema=None):
@@ -189,8 +212,17 @@ def normalize_and_validate_query(raw_query, case, kb_schema=None):
         out["intent"] = intent
         out["explain"] = explain
         if intent == "get_range":
+            entity = str(raw_query.get("entity", "")).strip().lower()
+            if entity:
+                case_entities = _entities_from_case(case)
+                if case_entities and entity not in case_entities:
+                    raise ValueError(
+                        "Query entity '{}' not in case. Case entities: {}.".format(
+                            entity, ", ".join(sorted(case_entities))
+                        )
+                    )
             out["symbol"] = symbol
-            out["entity"] = str(raw_query.get("entity", "")).strip().lower()
+            out["entity"] = entity
         return out
 
     if q_type != "predicate":
@@ -242,6 +274,18 @@ def normalize_and_validate_query(raw_query, case, kb_schema=None):
         if mode == "set" and len(args_norm) != 0:
             raise ValueError("set mode requires args=[]")
 
+    # Semantic check: query args (entities) must appear in case
+    if args_norm and case:
+        case_entities = _entities_from_case(case)
+        if case_entities:
+            for a in args_norm:
+                if a not in case_entities:
+                    raise ValueError(
+                        "Query entity '{}' not in case. Case entities: {}.".format(
+                            a, ", ".join(sorted(case_entities))
+                        )
+                    )
+
     return {
         "type": "predicate",
         "predicate": predicate,
@@ -249,26 +293,3 @@ def normalize_and_validate_query(raw_query, case, kb_schema=None):
         "args": args_norm,
         "explain": explain,
     }
-
-
-def build_structure_block_from_facts(fact_lines):
-    if not isinstance(fact_lines, list) or not fact_lines:
-        raise ValueError("fact_lines must be a non-empty list")
-
-    cleaned = []
-    for ln in fact_lines:
-        if not isinstance(ln, str):
-            raise ValueError("fact line must be a string")
-        s = ln.strip()
-        if not s:
-            continue
-        if not s.endswith("."):
-            raise ValueError("fact line must end with '.': " + s)
-        cleaned.append(s)
-
-    body = "\n  ".join(cleaned)
-    return f"""
-structure S:V {{
-  {body}
-}}
-""".strip()

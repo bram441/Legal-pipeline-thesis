@@ -1,6 +1,31 @@
 # idp_z3/case_structure.py
 
+import os
 import re
+
+# Predicates that are legal conclusions (derived by theory), not observable conditions.
+# These are NOT closed to {} when absent from case facts.
+# Extend via env CONCLUSION_PREDICATE_EXTRAS (comma-separated names/prefixes).
+_CONCLUSION_PREFIXES = ("punishment", "punished")
+_CONCLUSION_EXACT = frozenset(("liable", "eligible", "qualifies", "convicted"))
+
+
+def _is_conclusion_predicate(pred_name_lower):
+    if not pred_name_lower:
+        return False
+    for prefix in _CONCLUSION_PREFIXES:
+        if pred_name_lower.startswith(prefix):
+            return True
+    if pred_name_lower in _CONCLUSION_EXACT:
+        return True
+    if "punished" in pred_name_lower and ("under" in pred_name_lower or "art" in pred_name_lower):
+        return True
+    extras = os.getenv("CONCLUSION_PREDICATE_EXTRAS", "")
+    for x in extras.split(","):
+        x = x.strip().lower()
+        if x and (pred_name_lower == x or pred_name_lower.startswith(x)):
+            return True
+    return False
 
 
 _atom_line = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*\((.*)\)\s*\.\s*$")
@@ -39,20 +64,6 @@ def _mk_set(elems):
                 xs.append(t)
     xs = sorted(set(xs))
     return "{" + ",".join(xs) + "}"
-
-
-def build_structure_block(parties, negligent, caused_damage):
-    party_set = _mk_set([_to_idp_elem(p) for p in parties or []])
-    negligent_set = _mk_set([_to_idp_elem(p) for p in negligent or []])
-    caused_set = _mk_set([_to_idp_elem(p) for p in caused_damage or []])
-
-    return f"""
-structure S:V {{
-  Party := {party_set}.
-  negligent := {negligent_set}.
-  causedDamage := {caused_set}.
-}}
-""".strip()
 
 
 def _split_args(arg_blob):
@@ -160,18 +171,12 @@ def build_structure_block_from_facts(facts, entities=None, kb_primary_type=None,
             ext[pred] = set()
 
     # Close world for condition predicates: predicates in the KB but not in facts get extension {} (false).
-    # Skip conclusion predicates (e.g. punishmentArt*, punished*, liable) - those are derived by the theory.
+    # Skip conclusion predicates (derived by theory) - see _is_conclusion_predicate().
     if kb_predicate_names:
         for pred in kb_predicate_names:
             if not pred or pred in ext:
                 continue
-            low = pred.lower()
-            # Skip predicates that are legal conclusions (derived by theory), not observable conditions
-            if low.startswith("punishment") or low.startswith("punished"):
-                continue
-            if "punished" in low and ("under" in low or "art" in low):
-                continue
-            if low in ("liable", "eligible", "qualifies", "convicted"):
+            if _is_conclusion_predicate(pred.lower()):
                 continue
             ext[pred] = set()
 

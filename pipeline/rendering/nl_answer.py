@@ -92,7 +92,10 @@ def render_boolean_nl(predicate, args, certain, possible):
         return f"Yes. {phrase}."
     if possible is False:
         phrase = _predicate_to_phrase_negative(predicate, args)
-        return f"No. {phrase}."
+        msg = f"No. {phrase}."
+        # Hint when answer is No: often caused by case facts using different predicate names than the KB
+        msg += " (If you expected Yes, ensure case facts use the exact predicate names from the KB schema.)"
+        return msg
     return "Unknown. The law and case facts do not determine this."
 
 

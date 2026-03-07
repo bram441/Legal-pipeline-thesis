@@ -30,5 +30,6 @@ COMMON FO(.) MISTAKES TO FIX
 - Braces: ensure all { } are balanced
 - Symbols: use consistent names; predicates/functions in theory must be declared in vocabulary
 - "Bool expected, Int found": Replace inline numeric comparisons (f(x) > N) inside &, |, => with a Bool predicate and a separate rule. Use only IDP connectives: & | ~ => <=> = < > =< >= ~=
+- "unsatisfiable" / "no model exists": The theory has no model. Check for contradictory rules (e.g. P <=> Q and P <=> ~Q for same conditions). Ensure conditions in different rules are mutually exclusive where needed. Avoid rules that imply false.
 
 Output ONLY the corrected FO(.) code. No explanations, no markdown.
