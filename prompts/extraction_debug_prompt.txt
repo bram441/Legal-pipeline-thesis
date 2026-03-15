@@ -46,6 +46,7 @@ CRITICAL SYMBOL RULES:
 - Do NOT use synonyms: e.g. if the schema has "intentionalCausesWoundsOrBlows" do NOT write "inflictedWoundsOrBlows". The system matches by exact name only; synonyms make the answer wrong.
 
 Query rules:
+- For boolean predicate queries, args MUST be the entity the question asks about (e.g. args: ["karel"] for "Is Karel liable?"). Do NOT use type names (Offender, Person) as args—use the person's name (jan, pieter). For "liable under Article N", prefer a predicate that names the article (punishedArt399); if none, use the condition that characterizes that article (e.g. CausesIllnessOrIncapacity for Art. 399).
 - Meta questions about satisfiable/consistency: type="intent" with intent="satisfiable".
 - Otherwise use type="predicate" with predicate/mode/args.
 - For predicate mode:

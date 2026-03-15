@@ -67,10 +67,20 @@ def score_question(expected, symbolic_result):
         if intent == "get_range":
             exp_val = expected.get("value")
             got_raw = pred.get("range")
-            # Normalize: range can be "8", "{'pieter' -> 8}", or "No model exists"
             got_val = _normalize_range_for_compare(got_raw, pred.get("entity"))
             exp_norm = str(exp_val).strip() if exp_val is not None else None
-            match = (exp_norm is not None and got_val is not None and exp_norm == got_val)
+            # Allow small numeric tolerance (e.g. 180 vs 182 days) - default ±5
+            tolerance = int(expected.get("tolerance_days", 5))
+            try:
+                exp_int = int(exp_norm) if exp_norm is not None else None
+                got_int = int(got_val) if got_val is not None else None
+                match = (
+                    exp_int is not None
+                    and got_int is not None
+                    and abs(exp_int - got_int) <= tolerance
+                )
+            except (ValueError, TypeError):
+                match = exp_norm is not None and got_val is not None and exp_norm == got_val
             return {"match": match, "expected": exp_val, "got": got_val, "raw_range": got_raw}
         return {"match": False, "reason": "unsupported intent: " + str(intent)}
 

@@ -31,5 +31,6 @@ COMMON FO(.) MISTAKES TO FIX
 - Symbols: use consistent names; predicates/functions in theory must be declared in vocabulary
 - "Bool expected, Int found": Replace inline numeric comparisons (f(x) > N) inside &, |, => with a Bool predicate and a separate rule. Use only IDP connectives: & | ~ => <=> = < > =< >= ~=
 - "unsatisfiable" / "no model exists": The theory has no model. Check for contradictory rules (e.g. P <=> Q and P <=> ~Q for same conditions). Ensure conditions in different rules are mutually exclusive where needed. Avoid rules that imply false.
+- Article predicates (punishedArt398, punishedArt399, etc.): each must hold only when the person qualifies for that article and NOT for a higher one (e.g. punishedArt398(x) must exclude cases where CausesIllnessOrIncapacity(x) or worse), so a person is liable under exactly one article in the section.
 
 Output ONLY the corrected FO(.) code. No explanations, no markdown.

@@ -1,5 +1,6 @@
 import json
 import os
+import re
 
 from debug import status_log
 from pipeline.extraction.openai_extractor import (
@@ -7,11 +8,111 @@ from pipeline.extraction.openai_extractor import (
     extract_query_only_openai,
     LLMExtractionError,
 )
-from pipeline.validation.fo_validation import normalize_and_validate_case, normalize_and_validate_query
+from pipeline.validation.fo_validation import (
+    normalize_and_validate_case,
+    normalize_and_validate_query,
+    _entities_from_case,
+)
 
 
 class ExtractionError(Exception):
     pass
+
+
+# Words that are not entity names when they appear in "Is X ..." patterns
+_QUESTION_STOPWORDS = frozenset({
+    "the", "what", "who", "which", "how", "why", "when", "where", "does", "did",
+    "is", "are", "was", "were", "can", "could", "article", "art", "belgian",
+    "law", "case", "facts", "sentence", "minimum", "maximum", "prison", "fine",
+})
+
+
+def _entity_asked_about_in_question(question):
+    """Extract the person/entity the question asks about (e.g. 'Is Karel liable?' -> karel)."""
+    if not question or not isinstance(question, str):
+        return None
+    q = question.strip()
+    # Patterns: "Is X liable?", "for X", "about X", "X is liable", "sentence for X"
+    patterns = [
+        r"\b(?:Is|Are|Does|Did|Was|Were)\s+([A-Z][a-zA-Z]+)\b",
+        r"\b(?:for|about)\s+([A-Z][a-zA-Z]+)\b",
+        r"\b([A-Z][a-zA-Z]+)\s+(?:liable|punishable|eligible|qualifies)\b",
+    ]
+    for pat in patterns:
+        m = re.search(pat, q)
+        if m:
+            name = m.group(1).strip().lower()
+            if name and name not in _QUESTION_STOPWORDS and len(name) >= 2:
+                return name
+    return None
+
+
+def _case_entity_set(case):
+    """All entity names (lowercase) that appear in the case: from facts and from case.entities."""
+    out = set(_entities_from_case(case))
+    for key, vals in (case.get("entities") or {}).items():
+        if isinstance(vals, list):
+            for v in vals:
+                if isinstance(v, str) and v.strip():
+                    out.add(v.strip().lower())
+    return out
+
+
+def _name_in_text(name_lower, text):
+    """True if name appears in text (case-insensitive or capitalized)."""
+    if not text or not isinstance(text, str):
+        return False
+    return name_lower in text.lower() or (name_lower.capitalize() in text and len(name_lower) >= 2)
+
+
+def _ensure_entity_in_case(asked, case, kb_schema=None):
+    """Ensure asked is listed in case['entities'] so downstream validation sees it."""
+    if not isinstance(case, dict):
+        return
+    ents = case.get("entities")
+    if isinstance(ents, dict):
+        for _t, vals in ents.items():
+            if isinstance(vals, list) and asked not in [str(v).strip().lower() for v in vals]:
+                vals.append(asked)
+                return
+    types = (kb_schema or {}).get("types") or []
+    primary = types[0] if types else "Person"
+    case["entities"] = case.get("entities") or {}
+    if not isinstance(case["entities"], dict):
+        case["entities"] = {}
+    case["entities"].setdefault(primary, []).append(asked)
+
+
+def _check_entity_consistency(user_question, query_obj, case, case_text=None, kb_schema=None):
+    """Raise ValueError if the question asks about an entity but query args/entity use a different one.
+    When the question clearly asks about E and E is in the case (or in case_text), fix args/entity to [E]."""
+    asked = _entity_asked_about_in_question(user_question)
+    if not asked:
+        return
+
+    case_entities = set(_case_entity_set(case))
+    if asked not in case_entities and case_text and _name_in_text(asked, case_text):
+        case_entities.add(asked)
+        _ensure_entity_in_case(asked, case, kb_schema)
+    if asked not in case_entities:
+        return
+
+    q_type = str(query_obj.get("type") or "").strip().lower()
+    if q_type == "intent":
+        entity = str(query_obj.get("entity") or "").strip().lower()
+        if entity and entity != asked:
+            query_obj["entity"] = asked
+            status_log("Query", "Entity overwrite: question asks about '{}', using entity '{}'".format(asked, asked))
+        return
+
+    if q_type == "predicate":
+        args = query_obj.get("args") or []
+        if not isinstance(args, list):
+            return
+        args_lower = [str(a).strip().lower() for a in args if a]
+        if args_lower and asked not in args_lower:
+            query_obj["args"] = [asked]
+            status_log("Query", "Entity overwrite: question asks about '{}', using args ['{}']".format(asked, asked))
 
 
 def _schema_feedback_message(error, previous_output, kb_schema=None):
@@ -103,6 +204,7 @@ def extract_case_and_query(case_text, user_question, kb_schema=None, provider="a
 
         try:
             status_log("Query", "Validating")
+            _check_entity_consistency(user_question, query_obj, case, case_text=case_text, kb_schema=kb_schema)
             query = normalize_and_validate_query(query_obj, case, kb_schema=kb_schema)
             break
         except ValueError as e:

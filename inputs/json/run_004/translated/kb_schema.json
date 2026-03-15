@@ -1,0 +1,79 @@
+{
+  "types": [
+    "Person"
+  ],
+  "predicates": [
+    {
+      "name": "causesDeathWithoutAimToKill",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "causesIllnessOrIncapacity",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "causesIncurableDiseaseOrSevereHarm",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "hasFine",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "intentionalInfliction",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "premeditated",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    }
+  ],
+  "functions": [
+    {
+      "name": "fineMaxEuro",
+      "args": [
+        "Person"
+      ],
+      "returns": "Int"
+    },
+    {
+      "name": "fineMinEuro",
+      "args": [
+        "Person"
+      ],
+      "returns": "Int"
+    },
+    {
+      "name": "imprisonmentMaxDays",
+      "args": [
+        "Person"
+      ],
+      "returns": "Int"
+    },
+    {
+      "name": "imprisonmentMinDays",
+      "args": [
+        "Person"
+      ],
+      "returns": "Int"
+    }
+  ]
+}
