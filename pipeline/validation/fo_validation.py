@@ -176,6 +176,17 @@ def _entities_from_case(case):
     return entities
 
 
+def _case_entity_set(case):
+    """All entity names (lowercase) from case: facts and case.entities."""
+    out = set(_entities_from_case(case))
+    for key, vals in (case.get("entities") or {}).items():
+        if isinstance(vals, list):
+            for v in vals:
+                if isinstance(v, str) and v.strip():
+                    out.add(v.strip().lower())
+    return out
+
+
 def normalize_and_validate_query(raw_query, case, kb_schema=None):
     """Normalize and validate a query.
 
@@ -214,7 +225,7 @@ def normalize_and_validate_query(raw_query, case, kb_schema=None):
         if intent == "get_range":
             entity = str(raw_query.get("entity", "")).strip().lower()
             if entity:
-                case_entities = _entities_from_case(case)
+                case_entities = _case_entity_set(case)
                 if case_entities and entity not in case_entities:
                     raise ValueError(
                         "Query entity '{}' not in case. Case entities: {}.".format(
@@ -242,11 +253,21 @@ def normalize_and_validate_query(raw_query, case, kb_schema=None):
         raise ValueError("query.args must be a list")
 
     args_norm = []
+    schema_type_names = set()
+    if kb_schema:
+        for t in (kb_schema.get("types") or []):
+            if isinstance(t, str) and t.strip():
+                schema_type_names.add(t.strip().lower())
     for a in args:
         if not isinstance(a, str):
             raise ValueError("query.args must contain strings")
         a2 = a.strip().lower()
         if a2:
+            if schema_type_names and a2 in schema_type_names:
+                raise ValueError(
+                    "query.args must be concrete entity names from the case (e.g. 'jan', 'pieter'), "
+                    "not type names like '{}'. Use the person the question asks about.".format(a2)
+                )
             args_norm.append(a2)
 
     if kb_schema:
@@ -274,9 +295,9 @@ def normalize_and_validate_query(raw_query, case, kb_schema=None):
         if mode == "set" and len(args_norm) != 0:
             raise ValueError("set mode requires args=[]")
 
-    # Semantic check: query args (entities) must appear in case
+    # Semantic check: query args (entities) must appear in case (facts or case.entities)
     if args_norm and case:
-        case_entities = _entities_from_case(case)
+        case_entities = _case_entity_set(case)
         if case_entities:
             for a in args_norm:
                 if a not in case_entities:

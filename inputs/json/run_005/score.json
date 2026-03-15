@@ -1,0 +1,29 @@
+{
+  "id": "run_005",
+  "total": 3,
+  "correct": 3,
+  "items": [
+    {
+      "match": true,
+      "expected": false,
+      "got": false,
+      "id": "q1",
+      "text": "Is Bruno liable under Article 398?"
+    },
+    {
+      "match": true,
+      "expected": false,
+      "got": false,
+      "id": "q2",
+      "text": "Is Anna liable under Article 398?"
+    },
+    {
+      "match": true,
+      "expected": true,
+      "got": true,
+      "id": "q3",
+      "text": "Are the law and case facts consistent (satisfiable)?"
+    }
+  ],
+  "accuracy": 1.0
+}

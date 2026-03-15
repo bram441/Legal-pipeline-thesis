@@ -1,7 +1,13 @@
 # tests/run_suite.py
 import argparse
 import json
+import sys
 from pathlib import Path
+
+# Ensure project root is on path so 'tests' and 'pipeline' can be imported
+_root = Path(__file__).resolve().parents[1]
+if str(_root) not in sys.path:
+    sys.path.insert(0, str(_root))
 
 from tests.metrics import set_equal, any_set_equal, prf1
 from tests.report import write_report

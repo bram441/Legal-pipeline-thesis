@@ -1,0 +1,100 @@
+{
+  "types": [
+    "Person"
+  ],
+  "predicates": [
+    {
+      "name": "CausesDeadlyDiseaseOrSevereHarm",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "CausesDeathWithoutIntentToKill",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "CausesIllnessOrIncapacity",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "IntentionalWoundingOrBeating",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "Premeditated",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "punishedArt398",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "punishedArt399",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "punishedArt400",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "punishedArt401",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    }
+  ],
+  "functions": [
+    {
+      "name": "fineMaxEuro",
+      "args": [
+        "Person"
+      ],
+      "returns": "Int"
+    },
+    {
+      "name": "fineMinEuro",
+      "args": [
+        "Person"
+      ],
+      "returns": "Int"
+    },
+    {
+      "name": "imprisonmentMaxDays",
+      "args": [
+        "Person"
+      ],
+      "returns": "Int"
+    },
+    {
+      "name": "imprisonmentMinDays",
+      "args": [
+        "Person"
+      ],
+      "returns": "Int"
+    }
+  ]
+}
