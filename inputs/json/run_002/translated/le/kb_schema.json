@@ -4,42 +4,70 @@
   ],
   "predicates": [
     {
-      "name": "causesDeathWithoutAimToKill",
+      "name": "ActedWithPremeditation",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "causesIllnessOrIncapacity",
+      "name": "CausedDeath",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "causesIncurableDiseaseOrSevereHarm",
+      "name": "DidNotIntendToKill",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "hasFine",
+      "name": "IntentionallyInflictedWoundsOrBlows",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "intentionalInfliction",
+      "name": "ResultedInIllnessOrIncapacity",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "premeditated",
+      "name": "ResultedInIncurableDiseaseOrLongIncapacity",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "punishedArt398",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "punishedArt399",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "punishedArt400",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "punishedArt401",
       "args": [
         "Person"
       ],
@@ -48,14 +76,14 @@
   ],
   "functions": [
     {
-      "name": "fineMaxEuro",
+      "name": "fineMaxEuros",
       "args": [
         "Person"
       ],
       "returns": "Int"
     },
     {
-      "name": "fineMinEuro",
+      "name": "fineMinEuros",
       "args": [
         "Person"
       ],

@@ -1,98 +1,105 @@
 {
   "types": [
-    "Offender"
+    "Person"
   ],
   "predicates": [
     {
-      "name": "IntentionalInjuryOrBlows",
+      "name": "ActsWithPremeditation",
       "args": [
-        "Offender"
+        "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "Premeditation",
+      "name": "CausesDeath",
       "args": [
-        "Offender"
+        "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "ResultedInApparentlyIncurableDiseaseOrSevereConsequence",
+      "name": "IntentionallyInflictsBlowsOrWounds",
       "args": [
-        "Offender"
+        "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "ResultedInDeathWithoutIntentToKill",
+      "name": "IntentionallyInflictsBlowsOrWoundsCausingIllnessOrIncapacity",
       "args": [
-        "Offender"
+        "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "ResultedInSicknessOrUnfitness",
+      "name": "IntentionallyInflictsBlowsOrWoundsResultingInIncurableDiseaseOrLongIncapacity",
       "args": [
-        "Offender"
+        "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "punishedArt398",
+      "name": "IntentionallyInflictsBlowsOrWoundsWithoutIntentToKill",
       "args": [
-        "Offender"
+        "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "punishedArt399",
+      "name": "liableArt398",
       "args": [
-        "Offender"
+        "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "punishedArt400",
+      "name": "liableArt399",
       "args": [
-        "Offender"
+        "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "punishedArt401",
+      "name": "liableArt400",
       "args": [
-        "Offender"
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "liableArt401",
+      "args": [
+        "Person"
       ],
       "returns": "Bool"
     }
   ],
   "functions": [
     {
-      "name": "fineMaxEuro",
+      "name": "fineMaxEuros",
       "args": [
-        "Offender"
+        "Person"
       ],
       "returns": "Int"
     },
     {
-      "name": "fineMinEuro",
+      "name": "fineMinEuros",
       "args": [
-        "Offender"
+        "Person"
       ],
       "returns": "Int"
     },
     {
       "name": "imprisonmentMaxDays",
       "args": [
-        "Offender"
+        "Person"
       ],
       "returns": "Int"
     },
     {
       "name": "imprisonmentMinDays",
       "args": [
-        "Offender"
+        "Person"
       ],
       "returns": "Int"
     }
