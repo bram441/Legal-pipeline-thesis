@@ -1,13 +1,42 @@
 """
 Semantic validation for the KB using IDP-Z3.
 Checks that the theory is satisfiable with a minimal structure.
+Also checks for circular article-predicate definitions (which cause unsatisfiability).
 """
+
+import re
 
 from pipeline.kb.schema import get_all_types_from_kb
 
 
 class KBSemanticError(Exception):
     pass
+
+
+# Pattern: article conclusion predicate used (negated or not) in body of another formula
+_ARTICLE_PRED = r"(liableArt\d+|punishedArt\d+)"
+_CIRCULARITY_MSG = (
+    "Article predicates (e.g. liableArt398, punishedArt399) must be defined using ONLY condition predicates "
+    "(e.g. IntentionallyInflictsWoundsOrBlows, CausesIllnessOrIncapacity). "
+    "Do NOT reference another article predicate in the body (e.g. ~liableArt399(x) or ~punishedArt398(x))—"
+    "that causes circularity and 'no model exists'. Define each article predicate with conditions only."
+)
+
+
+def check_kb_no_circular_article_definitions(kb_text):
+    """
+    Raise KBSemanticError if any article predicate is used in the definition of another
+    (e.g. liableArt398(x) <=> ... & ~liableArt399(x)), which makes the theory unsatisfiable.
+    """
+    if not kb_text or not kb_text.strip():
+        return
+    theory_match = re.search(r"theory\s+T\s*:\s*V\s*\{([^}]+)\}", kb_text, re.DOTALL | re.IGNORECASE)
+    if not theory_match:
+        return
+    theory = theory_match.group(1)
+    # After "<=>", any occurrence of ~articlePred( or & articlePred( or | articlePred( is circular
+    if re.search(r"<=>\s*[\s\S]*?[&\|~]\s*" + _ARTICLE_PRED + r"\s*\(", theory):
+        raise KBSemanticError(_CIRCULARITY_MSG)
 
 
 def _build_minimal_structure(kb_text):
@@ -40,6 +69,8 @@ def check_kb_semantic(kb_text, timeout_seconds=5):
     if not kb_text or not kb_text.strip():
         return
 
+    check_kb_no_circular_article_definitions(kb_text)
+
     struct = _build_minimal_structure(kb_text)
     if not struct:
         return
@@ -60,6 +91,7 @@ def check_kb_semantic(kb_text, timeout_seconds=5):
     if not result.get("sat", True):
         raise KBSemanticError(
             "KB theory is unsatisfiable: no model exists. "
-            "The rules may be contradictory or too restrictive. "
-            "Check for conflicting implications or impossible conditions."
+            "Common cause: article predicates (liableArt398, punishedArt399, etc.) defined in terms of each other (circular). "
+            "Define each article predicate using ONLY condition predicates (e.g. IntentionallyInflictsWoundsOrBlows, CausesIllnessOrIncapacity), never reference another article predicate in the body. "
+            "Also check for conflicting implications or impossible conditions."
         )

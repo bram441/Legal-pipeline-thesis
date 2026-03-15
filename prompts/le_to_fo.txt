@@ -1,4 +1,4 @@
-You are compiling a legal rule description into a FO(.) knowledge base for IDP-Z3.
+You are converting Logical English (LE) rules into a FO(.) knowledge base for IDP-Z3.
 
 CRITICAL: Output MUST be valid FO(.) syntax that IDP-Z3 can parse.
 CRITICAL: Output MUST contain ONLY FO(.) code. No explanations, no markdown, no comments.
@@ -43,21 +43,19 @@ D) Naming
 - Use simple ASCII identifiers (letters/digits/underscore). No spaces, hyphens, or punctuation in names.
 
 E) Minimality
-- Declare ONLY symbols that are necessary to express the law text.
-- If the law text contains something you cannot formalize cleanly, OMIT it rather than inventing extra ontology.
+- Declare ONLY symbols that are necessary to express the LE rules.
+- Do not add predicates or functions that do not appear in the LE text.
 
 F) REQUIRED: One conclusion predicate per article (mutually exclusive, NO CIRCULARITY)
-- For EACH article that imposes punishment/liability (e.g. Art. 398, 399, 400, 401), declare exactly one Bool predicate in the vocabulary and define it in the theory with <=>.
-- Name it after the article so queries map clearly: e.g. punishedArt398, punishedArt399, punishedArt400, punishedArt401 (or liableArt398, etc.). Use consistent naming.
-- Define each as: predicateName(x) <=> condition_formula(x). This ensures "Is X liable under Article 399?" can always be answered by querying that one predicate.
-- MUTUAL EXCLUSIVITY: When articles form a hierarchy (base vs aggravated, e.g. 398 = base, 399 = illness/incapacity, 400 = severe harm, 401 = death), define each article predicate so that it holds ONLY when the person qualifies for THAT article and NOT for a higher one. Use ONLY the condition/primitive predicates (e.g. IntentionallyInflictsWoundsOrBlows, CausesIllnessOrIncapacity, ActsWithPremeditation) on the right-hand side.
-- NO CIRCULARITY (CRITICAL): Do NOT use any other article predicate (punishedArt398, punishedArt399, liableArt398, liableArt399, etc.) in the definition of an article predicate. The reasoner cannot handle "liableArt398(x) <=> ... & ~liableArt399(x)". Define each article predicate using ONLY condition predicates. Example: punishedArt398(x) <=> IntentionallyInflictsWoundsOrBlows(x) & ~CausesIllnessOrIncapacity(x) & ~CausesSevereHarm(x) & ~CausesDeath(x). punishedArt399(x) <=> IntentionallyInflictsWoundsOrBlows(x) & CausesIllnessOrIncapacity(x) & ~CausesSevereHarm(x) & ~CausesDeath(x). Mutual exclusivity follows from the conditions; no reference to other article predicates.
-- Do NOT output only implications (=>) without a named conclusion predicate per article; the pipeline needs these for question answering.
+- For EACH article that the LE text says "liable under Article N", declare exactly one Bool predicate in the vocabulary and define it in the theory with <=>.
+- Name it after the article: e.g. punishedArt398, punishedArt399, punishedArt400, punishedArt401 (or liableArt398, etc.). Use consistent naming.
+- Define each as: predicateName(x) <=> condition_formula(x). Use ONLY condition/primitive predicates in the formula (e.g. IntentionallyInflictsWoundsOrBlows, CausesIllnessOrIncapacity).
+- NO CIRCULARITY (CRITICAL): Do NOT use any other article predicate (punishedArt398, liableArt399, etc.) in the definition of an article predicate. Wrong: liableArt398(x) <=> ... & ~liableArt399(x). Right: liableArt398(x) <=> IntentionallyInflictsWoundsOrBlows(x) & ~CausesIllnessOrIncapacity(x) & ~CausesSevereHarm(x) & ~CausesDeath(x). Mutual exclusivity is achieved by the conditions alone.
+- Do NOT output only implications (=>) without a named conclusion predicate per article.
 
 G) Quantitative consequences
-- When the law specifies numeric ranges (durations, amounts, etc.), add functions and assign values in the theory based on which conditions apply.
-- Name functions descriptively (e.g. MinDurationDays, MaxAmountEuro) so they match natural questions. This enables range/amount queries.
-- Use a SINGLE unit per quantity type: e.g. imprisonmentMinDays and imprisonmentMaxDays for all imprisonment (convert months/years to days). This ensures "what is the minimum prison sentence?" maps to one clear function.
+- When the LE text states minimum/maximum imprisonment or fines, add functions (e.g. imprisonmentMinDays, imprisonmentMaxDays, fineMinEuros, fineMaxEuros) and assign values in the theory with separate rules per case: f(x) = N <=> condition(x).
+- Use a SINGLE unit per quantity type: imprisonmentMinDays and imprisonmentMaxDays for all imprisonment (values in days); fineMinEuros and fineMaxEuros for fines (values in euros).
 
 ========================
 FO(.) THEORY RULES
@@ -82,27 +80,12 @@ QUALITY & PARSING SAFETY
 - Ensure every predicate in the theory is declared in the vocabulary.
 - Ensure every type used in signatures is declared with "type".
 - Do NOT use constants in the theory (no "alice" inside theory). Quantify variables instead.
-- Do NOT add rules that contradict punishment rules (e.g. "X => false" when X should lead to a punishment). Conclusion predicates per article must be defined with condition predicates only—never reference another article predicate in the body (see F, NO CIRCULARITY).
-
-========================
-EXAMPLE (STYLE TO COPY)
-========================
-vocabulary V {
-  type Party
-  negligent: Party -> Bool
-  causedDamage: Party -> Bool
-  liable: Party -> Bool
-}
-
-theory T:V {
-  ! p in Party:
-    (negligent(p) & causedDamage(p)) => liable(p).
-}
+- Conclusion predicates per article must be defined using only condition predicates—never reference another article predicate in the body (NO CIRCULARITY).
 
 ========================
 TASK
 ========================
-Compile the following law text into FO(.) using the exact output format and rules above.
+Translate the Logical English below into FO(.) using the exact output format and rules above. Preserve all rules, conditions, and numeric consequences from the LE text. Use consistent identifiers (e.g. Person or Offender, IntentionallyInflictsWoundsOrBlows, CausesIllnessOrIncapacity, punishedArt398, punishedArt399, imprisonmentMinDays, imprisonmentMaxDays, fineMinEuros, fineMaxEuros).
 
-LAW TEXT:
-{law_text}
+LOGICAL ENGLISH:
+{le_text}

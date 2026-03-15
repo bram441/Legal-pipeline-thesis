@@ -1,0 +1,39 @@
+You are converting legal text into Logical English (LE): a controlled, unambiguous form of natural language that will later be translated into FO(.) for a reasoner.
+
+CRITICAL: Output ONLY the Logical English text. No FO(.) code, no markdown, no comments, no section headers.
+
+========================
+LOGICAL ENGLISH STRUCTURE
+========================
+
+1) TYPES AND ENTITIES
+- Use one consistent term for the subject of the law (e.g. "a person", "the offender", "an entity") throughout. Use the same term in every rule.
+- Do not mix different type names (e.g. do not alternate "the offender" and "the accused" for the same role).
+
+2) REQUIRED: ONE CONCLUSION PER ARTICLE (MUTUALLY EXCLUSIVE)
+- For EACH article that imposes punishment or liability (e.g. Art. 398, 399, 400, 401), you MUST state exactly one rule of the form: "A [type] is liable under Article N if and only if [conditions]."
+- When articles form a hierarchy (base vs aggravated):
+  - The BASE article (e.g. 398) must apply ONLY when the person satisfies the base conditions AND does NOT satisfy the conditions for any higher article (399, 400, 401). State this explicitly: "A person is liable under Article 398 if and only if they [base conditions], and they did NOT [condition for 399], and they did NOT [condition for 400], and they did NOT [condition for 401]."
+  - The next article (e.g. 399) applies when its conditions hold but not those of 400/401, and so on.
+- So a person is liable under exactly one article in the section: the one that matches their situation.
+
+3) CONDITIONS
+- Use explicit logical structure: "if and only if", "and", "or", "not". Prefer "did not" / "does not" for negations.
+- Name every condition that the law uses (e.g. intentionally inflicted wounds or blows, acted with premeditation, caused illness or incapacity, caused severe/incurable harm, caused death without intent to kill). Use consistent phrasing.
+
+4) QUANTITATIVE CONSEQUENCES (SENTENCES, FINES)
+- For every punishment the law specifies, state the numeric ranges in a SINGLE unit: days for imprisonment (convert months/years to days: 1 month = 30 days, 1 year = 365 days), euros for fines.
+- For each branch (e.g. Article 398 without premeditation, Article 398 with premeditation, Article 399 without premeditation, etc.), state clearly: "If a person is liable under Article N and [additional condition such as premeditation or not], then the minimum imprisonment is X days and the maximum imprisonment is Y days, and the minimum fine is Z euros and the maximum fine is W euros."
+- Cover every case the law distinguishes (e.g. with/without premeditation, different articles). So the LE text must allow a later step to assign exactly one numeric range per situation.
+
+5) MINIMALITY
+- Include only concepts that appear in the law text. Do not invent new conditions or exceptions.
+- If the law leaves something ambiguous or you cannot formalize it cleanly, omit it rather than guessing.
+
+========================
+OUTPUT
+========================
+Output ONLY the Logical English text. No preamble, no "Here is the LE:", no FO(.) symbols (no "&", "|", "=>", "<=>", "type", "vocabulary", "theory"). Use only natural English sentences with the structure above.
+
+LAW TEXT:
+{law_text}

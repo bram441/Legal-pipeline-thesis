@@ -47,10 +47,24 @@ def _idp_parse_check(kb_text):
         raise KBCacheError("IDP failed to parse compiled KB: " + str(e))
 
 
+def _use_le_enabled():
+    try:
+        from pipeline.le import use_le_enabled
+        return use_le_enabled()
+    except ImportError:
+        return False
+
+
 def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.log", max_repair_attempts=6, cache_subdir=None):
-    """Compile or load KB. When cache_subdir is set (e.g. 'translated'), use run_dir/cache_subdir/ for cache."""
+    """Compile or load KB. When cache_subdir is set (e.g. 'translated'), use run_dir/cache_subdir/ for cache.
+    When PIPELINE_USE_LE=1, appends 'le' to cache path so LE and non-LE KBs are cached separately."""
+    parts = []
     if cache_subdir:
-        run_dir = os.path.join(run_dir, cache_subdir)
+        parts.append(cache_subdir)
+    if _use_le_enabled():
+        parts.append("le")
+    if parts:
+        run_dir = os.path.join(run_dir, *parts)
         os.makedirs(run_dir, exist_ok=True)
     kb_path = os.path.join(run_dir, "kb.fo")
     schema_path = os.path.join(run_dir, "kb_schema.json")
@@ -92,7 +106,7 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
 
     for attempt in range(max_repair_attempts):
         if attempt == 0:
-            status_log("KB", "Generating from law text")
+            status_log("KB", "Generating from law text (Logical English)" if _use_le_enabled() else "Generating from law text")
         else:
             status_log("KB", "Repair attempt {}".format(attempt))
 
