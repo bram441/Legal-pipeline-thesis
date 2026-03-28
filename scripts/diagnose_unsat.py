@@ -1,9 +1,14 @@
 #!/usr/bin/env python
 """
-Diagnose why a run produces "theory is unsatisfiable".
+Diagnose why a run produces "theory is unsatisfiable" at reasoning time.
+
 Run from project root: python scripts/diagnose_unsat.py inputs/json/run_003
 
-Composes KB + case structure and uses IDP Theory.explain() to show which rules conflict.
+Composes KB + case structure, then uses the same UNSAT explanation helper as the
+pipeline: ``pipeline.kb.semantic_check.explain_unsat_fo`` (IDP Theory.propagate + explain).
+
+The automatic KB semantic check only sees KB + minimal dummy structure; this script
+is for debugging full KB + case. Not invoked by main.py or the UI.
 """
 import json
 import sys
@@ -96,21 +101,15 @@ def main():
     print("SAT:", result["sat"])
 
     if not result["sat"]:
-        print("\n=== FETCHING UNSAT EXPLANATION (Theory.explain) ===")
+        print("\n=== UNSAT EXPLANATION (same helper as pipeline semantic check: explain_unsat_fo) ===")
         try:
-            from idp_engine import IDP, Theory
-            kb = IDP.from_str(fo_code)
-            T_block, S_block = kb.get_blocks("T, S")
-            theory = Theory(T_block, S_block)
-            theory.propagate()
-            facts, formulas = theory.explain()
-            print("Conflicting facts/assignments:")
-            for f in facts:
-                print(" ", f)
-            print("Conflicting formulas:")
-            for fm in formulas:
-                code = getattr(fm, "code", str(fm))
-                print(" ", code)
+            from pipeline.kb.semantic_check import explain_unsat_fo
+
+            expl = explain_unsat_fo(fo_code)
+            if expl:
+                print(expl)
+            else:
+                print("(No structured explanation from IDP; theory may be unsat without explain() detail.)")
         except Exception as e:
             print("Could not get explanation:", e)
 

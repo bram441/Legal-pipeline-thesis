@@ -104,6 +104,10 @@ Outputs:
 
 ---
 
+## Scripts
+
+See `scripts/README.md` for `compare_kb_strategies.py`, `diagnose_unsat.py`, and how UNSAT explanation relates to `pipeline/kb/semantic_check.py`.
+
 ## Prompts
 
 All LLM prompts live under `/prompts` in subfolders (`kb/`, `le/`, `extraction/`, `translation/`, `nl/`); see `pipeline/utils/prompt_loader.py`.

@@ -9,6 +9,10 @@ See README: four modes from `PIPELINE_USE_LE` × `PIPELINE_KB_TWO_PHASE` (direct
 
 JSON runs: optional `run.json` field `kb_compile_strategy`; CLI `--kb-strategy` overrides it and `.env`. Results include `kb_compile_strategy` / `kb_compile_flags`; `run.json` is merged after a successful run.
 
+## Scripts (`scripts/`)
+
+See `scripts/README.md`. Notable: **`diagnose_unsat.py` is not run by the pipeline**—it is a manual tool. KB compilation uses `pipeline/kb/semantic_check.py` (`check_kb_semantic`, `explain_unsat_fo`) on **KB + minimal structure**; `diagnose_unsat.py` composes **KB + case** for reasoning-time UNSAT debugging.
+
 ## End-to-end flow
 
 `main.py` (demo runner)
