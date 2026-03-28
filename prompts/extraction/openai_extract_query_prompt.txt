@@ -2,7 +2,7 @@ Rules:
 - Output must be VALID JSON.
 - Output JSON shape: {"type":"predicate"|"intent","explain":bool,"predicate":"","mode":"set"|"boolean","args":[],"intent":"","symbol":"","entity":""}
 - Use lowercase identifiers (snake_case) for constants.
-- IMPORTANT: Use ONLY predicate/function symbol NAMES from KB_SCHEMA. Copy EXACTLY.
+- IMPORTANT: Use ONLY predicate/function symbol NAMES from KB_SCHEMA. Copy EXACTLY (including long names if the KB defines them that way; do not invent new sentence-like symbol names).
 - Case and question may be in any language; map them to the schema symbols (schema names are from the KB).
 - 'Why X?' / 'Waarom X?' = the SAME predicate as 'Is X?' but with explain=true. Do NOT pick a different predicate.
 - For questions about legal conclusions (Is X liable? Is X punishable? Does X qualify?): use the conclusion predicate from KB_SCHEMA that matches. The system infers which rule applies from the case facts.

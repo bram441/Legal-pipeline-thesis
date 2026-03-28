@@ -37,7 +37,9 @@ def compile_law_to_kb_fo(law_text, model=None, repair_feedback=None):
         is_unsat = any(
             s in err for s in ("unsatisfiable", "Conflicting", "rules led to an inconsistency")
         )
-        prompt_name = "kb_compilation_repair_unsat.txt" if is_unsat else "kb_compilation_repair.txt"
+        prompt_name = (
+            "kb/kb_compilation_repair_unsat.txt" if is_unsat else "kb/kb_compilation_repair.txt"
+        )
         user_prompt = render_prompt(
             prompt_name,
             law_text=(law_text or "").strip(),
@@ -70,7 +72,7 @@ def compile_law_to_kb_fo(law_text, model=None, repair_feedback=None):
             except Exception as e:
                 raise LawCompilationError("Logical English layer failed: " + str(e))
         else:
-            user_prompt = render_prompt("kb_compilation.txt", law_text=(law_text or "").strip())
+            user_prompt = render_prompt("kb/kb_compilation.txt", law_text=(law_text or "").strip())
             try:
                 resp = client.chat.completions.create(
                     model=chosen_model,

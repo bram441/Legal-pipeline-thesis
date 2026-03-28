@@ -100,10 +100,10 @@ def answer_legal_prompt(
         }
         user_question = "(intent directive)"
 
-    # For result metadata/debugging only. Actual extraction uses openai_extract_case_prompt
-    # and openai_extract_query_prompt separately (see pipeline/extraction/openai_extractor.py).
+    # For result metadata/debugging only. Actual extraction uses
+    # prompts/extraction/openai_extract_{case,query}_prompt.txt (see openai_extractor.py).
     extraction_prompt = render_prompt(
-        "extraction_debug_prompt.txt",
+        "extraction/extraction_debug_prompt.txt",
         case_text=case_text,
         user_question=user_question,
         kb_schema_json=json.dumps(kb_schema, ensure_ascii=False, indent=2),

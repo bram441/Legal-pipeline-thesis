@@ -30,6 +30,7 @@ B) Predicates
   ❌ Wrong:              Negligent(Person, Thing)
   ❌ Wrong:              Negligent(Person) -> Bool
   ❌ Wrong:              Negligent: Person
+- Name each predicate after a single legal concept: short camelCase (e.g. causesDeath, actsWithPremeditation). Do not use natural-language sentences, spaces, or punctuation inside identifier names. Prefer several small predicates combined in the theory over one huge predicate name.
 
 C) Functions (only if needed)
 - Functions MUST be declared using ":" and "-> ReturnType".

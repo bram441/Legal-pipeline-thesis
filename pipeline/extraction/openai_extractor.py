@@ -94,7 +94,7 @@ def extract_case_only_openai(case_text, model, kb_schema=None, feedback=None):
     kb_schema_json = json.dumps(kb_schema or {}, ensure_ascii=False, indent=2)
 
     case_user = render_prompt(
-        "openai_extract_case_prompt.txt",
+        "extraction/openai_extract_case_prompt.txt",
         kb_schema_json=kb_schema_json,
         case_text=str(case_text),
         feedback_block=_feedback_block(feedback),
@@ -138,7 +138,7 @@ def extract_query_only_openai(user_question, model, kb_schema=None, feedback=Non
     kb_schema_json = json.dumps(kb_schema or {}, ensure_ascii=False, indent=2)
 
     query_user = render_prompt(
-        "openai_extract_query_prompt.txt",
+        "extraction/openai_extract_query_prompt.txt",
         kb_schema_json=kb_schema_json,
         user_question=str(user_question),
         feedback_block=_feedback_block(feedback),

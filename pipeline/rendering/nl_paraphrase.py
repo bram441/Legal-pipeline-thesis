@@ -45,9 +45,9 @@ def paraphrase_liability_explanation(rule_line, fact_lines, conclusion_line, mod
 
     facts_block = "\n".join(["- " + f for f in (fact_lines or [])]) or "(no facts provided)"
 
-    system = load_prompt("nl_paraphrase_system.txt")
+    system = load_prompt("nl/nl_paraphrase_system.txt")
     user = render_prompt(
-        "nl_paraphrase_user.txt",
+        "nl/nl_paraphrase_user.txt",
         rule_line=(rule_line or "(missing rule)"),
         facts_block=facts_block,
         conclusion_line=(conclusion_line or "(missing conclusion)"),
@@ -100,7 +100,7 @@ def paraphrase_range_explanation(rules_block, facts_block, result_line, model=No
         "Do NOT invent reasoning. Paraphrase the exact result only."
     )
     user = render_prompt(
-        "nl_paraphrase_range.txt",
+        "nl/nl_paraphrase_range.txt",
         rules_block=(rules_block or "(no rules)"),
         facts_block=(facts_block or "(no facts)"),
         result_line=(result_line or "(no result)"),
