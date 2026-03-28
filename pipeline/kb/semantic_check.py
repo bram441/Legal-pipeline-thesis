@@ -59,6 +59,17 @@ def _build_minimal_structure(kb_text):
 """
 
 
+def explain_unsat_fo(fo_code: str):
+    """
+    If the FO(.) program is UNSAT after propagation, return a human-readable explanation
+    from IDP Theory.explain(); otherwise None. Used by KB semantic check and by
+    ``scripts/diagnose_unsat.py`` (full KB + case).
+
+    Note: KB-only checks use KB + minimal structure; diagnose_unsat uses KB + case structure.
+    """
+    return _get_unsat_explanation(fo_code)
+
+
 def _get_unsat_explanation(fo_code):
     """
     Use IDP Theory.propagate() and Theory.explain() to get structured UNSAT feedback.
