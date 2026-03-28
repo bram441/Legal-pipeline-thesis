@@ -5,6 +5,7 @@ from debug import status_log
 from pipeline.kb.compiler import compile_law_to_kb_fo, LawCompilationError
 from pipeline.kb.schema import extract_schema_from_kb_fo, load_kb_schema, save_kb_schema
 from pipeline.kb.semantic_check import check_kb_semantic, KBSemanticError
+from pipeline.utils.run_trace import trace_enabled, RunTraceWriter
 
 
 class KBCacheError(Exception):
@@ -39,6 +40,25 @@ def _sanitize_common_llm_syntax(kb_text):
     return s
 
 
+def _fix_sentence_equivalence(kb_text):
+    """
+    Convert function-assignment rules from <=> to => to avoid UNSAT.
+    Rules like 'imprisonmentMinDays(p) = 180 <=> cond' create conflicts when
+    multiple rules constrain the same function for the same person; use => instead.
+    """
+    def repl(m):
+        lhs, val, cond = m.group(1), m.group(2), m.group(3)
+        cond = cond.strip().rstrip(".")
+        return "(" + cond + ") => " + lhs + " = " + val + "."
+
+    return re.sub(
+        r"(\w+\([^)]+\))\s*=\s*(-?\d+)\s*<=>\s*(.+?)\.\s*$",
+        repl,
+        kb_text,
+        flags=re.MULTILINE,
+    )
+
+
 def _idp_parse_check(kb_text):
     try:
         from idp_engine import IDP
@@ -57,7 +77,11 @@ def _use_le_enabled():
 
 def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.log", max_repair_attempts=6, cache_subdir=None):
     """Compile or load KB. When cache_subdir is set (e.g. 'translated'), use run_dir/cache_subdir/ for cache.
-    When PIPELINE_USE_LE=1, appends 'le' to cache path so LE and non-LE KBs are cached separately."""
+    When PIPELINE_USE_LE=1, appends 'le' to cache path so LE and non-LE KBs are cached separately.
+    When PIPELINE_TRACE=1, writes all steps to run_dir/run_trace.txt for debugging."""
+    base_run_dir = run_dir
+    trace_path = os.path.join(base_run_dir, "run_trace.txt") if trace_enabled() else None
+
     parts = []
     if cache_subdir:
         parts.append(cache_subdir)
@@ -73,12 +97,22 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
     repair_feedback = None
     last_raw = None
 
+    trace = RunTraceWriter(trace_path) if trace_path else None
+    if trace:
+        trace.section("RUN TRACE")
+        trace.log("Run dir", base_run_dir)
+        trace.log("Cache subdir (effective)", run_dir)
+
     if os.path.exists(kb_path):
         status_log("KB", "Loading from cache")
         with open(kb_path, "r", encoding="utf-8") as f:
             cached_kb = f.read()
         try:
-            kb_text = _validate_kb_fo_text(cached_kb)
+            kb_text = _fix_sentence_equivalence(cached_kb)
+            if kb_text != cached_kb:
+                with open(kb_path, "w", encoding="utf-8") as f:
+                    f.write(kb_text.strip() + "\n")
+            kb_text = _validate_kb_fo_text(kb_text)
             _idp_parse_check(kb_text)
             check_kb_semantic(kb_text)
             if os.path.exists(schema_path):
@@ -86,9 +120,17 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
             else:
                 kb_schema = extract_schema_from_kb_fo(kb_text)
                 save_kb_schema(run_dir, kb_schema)
+            if trace:
+                trace.section("KB LOADED FROM CACHE")
+                trace.log("Status", "OK (syntax and semantic checks passed)")
+                trace.close()
             return kb_text, kb_schema
         except Exception as e:
             status_log("KB", "Cached KB invalid, recompiling with repair")
+            if trace:
+                trace.section("CACHED KB INVALID - RECOMPILING")
+                trace.log_error("Validation failed", e)
+                trace.log("Cached KB (that failed)", cached_kb.strip())
             try:
                 os.remove(kb_path)
             except OSError:
@@ -105,6 +147,13 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
             last_raw = cached_kb
 
     for attempt in range(max_repair_attempts):
+        if trace:
+            trace.section("KB COMPILATION - Attempt {}".format(attempt + 1))
+            trace.log("Law text", law_text)
+            if repair_feedback:
+                trace.log("Repair feedback (from previous attempt)", repair_feedback.get("error_message", ""))
+                trace.log("Previous output (sent to repair prompt)", repair_feedback.get("previous_output", "")[:3000] + ("..." if len(repair_feedback.get("previous_output", "")) > 3000 else ""))
+
         if attempt == 0:
             status_log("KB", "Generating from law text (Logical English)" if _use_le_enabled() else "Generating from law text")
         else:
@@ -113,6 +162,9 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
         try:
             raw_kb_text = compile_law_to_kb_fo(law_text, model=model, repair_feedback=repair_feedback)
         except LawCompilationError as e:
+            if trace:
+                trace.log_error("LLM call failed", e)
+                trace.close()
             with open(log_path, "w", encoding="utf-8") as f:
                 f.write("KB compilation FAILED (LLM call).\n")
                 f.write(str(e) + "\n")
@@ -121,22 +173,37 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
             raise KBCacheError("Law compilation failed: " + str(e))
 
         last_raw = raw_kb_text
+        if trace:
+            trace.log("LLM response (raw)", raw_kb_text)
 
         try:
             status_log("KB", "Checking syntax validity")
             kb_text = _sanitize_common_llm_syntax(raw_kb_text)
+            kb_text = _fix_sentence_equivalence(kb_text)
+            if trace:
+                trace.log("After sanitization", kb_text[:2000] + ("..." if len(kb_text) > 2000 else ""))
             kb_text = _validate_kb_fo_text(kb_text)
             _idp_parse_check(kb_text)
+            if trace:
+                trace.log("Syntax validation", "OK (vocabulary+theory present, IDP parse OK)")
             kb_schema = extract_schema_from_kb_fo(kb_text)
             status_log("KB", "Checking semantic validity (satisfiability)")
             check_kb_semantic(kb_text)
+            if trace:
+                trace.log("Semantic validation", "OK (theory satisfiable)")
         except (KBCacheError, KBSemanticError, Exception) as e:
+            if trace:
+                trace.log_error("Validation failed", e)
             repair_feedback = {
                 "error_message": str(e),
                 "previous_output": raw_kb_text.strip(),
             }
             if attempt < max_repair_attempts - 1:
                 continue
+            if trace:
+                trace.section("KB COMPILATION FAILED")
+                trace.log("Final error", str(e))
+                trace.close()
             with open(log_path, "w", encoding="utf-8") as f:
                 f.write("KB compilation FAILED (invalid FO syntax after {} repair attempts).\n\n".format(max_repair_attempts))
                 f.write("Error:\n" + str(e) + "\n\n")
@@ -145,6 +212,11 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
             raise KBCacheError("KB compilation failed after {} repair attempts: {}".format(max_repair_attempts, e))
 
         break
+
+    if trace:
+        trace.section("KB COMPILATION SUCCESS")
+        trace.log("Final KB", kb_text)
+        trace.close()
 
     with open(kb_path, "w", encoding="utf-8") as f:
         f.write(kb_text.strip() + "\n")

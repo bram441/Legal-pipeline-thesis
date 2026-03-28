@@ -41,8 +41,8 @@ def check_kb_no_circular_article_definitions(kb_text):
 
 def _build_minimal_structure(kb_text):
     """Build a minimal structure so the theory can be checked for satisfiability.
-    Each domain type gets one dummy element. Predicates/functions are left open
-    (IDP will propagate or expand as needed).
+    Each domain type gets one dummy element (ASCII-only to avoid encoding issues).
+    Predicates/functions are left open (IDP will propagate or expand as needed).
     """
     types = get_all_types_from_kb(kb_text)
     if not types:
@@ -51,12 +51,42 @@ def _build_minimal_structure(kb_text):
     lines = []
     for t in types:
         if t:
-            lines.append("  " + t + " := {'dummy'}.")
+            lines.append("  " + t + " := {x}.")
     body = "\n".join(lines)
     return f"""structure S:V {{
 {body}
 }}
 """
+
+
+def _get_unsat_explanation(fo_code):
+    """
+    Use IDP Theory.propagate() and Theory.explain() to get structured UNSAT feedback.
+    Returns a string describing which facts and formulas conflict, or None if unavailable.
+    (Inspired by VERUS-LM explain_unsat_theory.)
+    """
+    try:
+        from idp_engine import IDP, Theory
+        kb = IDP.from_str(fo_code)
+        T_block, S_block = kb.get_blocks("T, S")
+        theory = Theory(T_block, S_block)
+        theory.propagate()
+        if getattr(theory, "satisfied", True):
+            return None
+        facts, formulas = theory.explain()
+        parts = []
+        if facts:
+            parts.append("Conflicting assignments/facts:")
+            parts.append("\n".join(str(f) for f in facts))
+        if formulas:
+            formula_codes = [getattr(f, "code", str(f)) for f in formulas]
+            parts.append("Conflicting formulas:")
+            parts.append("\n".join(str(c) for c in formula_codes))
+        if parts:
+            return "The following rules led to an inconsistency:\n" + "\n\n".join(parts)
+    except Exception:
+        pass
+    return None
 
 
 def check_kb_semantic(kb_text, timeout_seconds=5):
@@ -89,9 +119,17 @@ def check_kb_semantic(kb_text, timeout_seconds=5):
         raise KBSemanticError("IDP semantic check failed: " + str(e))
 
     if not result.get("sat", True):
-        raise KBSemanticError(
-            "KB theory is unsatisfiable: no model exists. "
-            "Common cause: article predicates (liableArt398, punishedArt399, etc.) defined in terms of each other (circular). "
-            "Define each article predicate using ONLY condition predicates (e.g. IntentionallyInflictsWoundsOrBlows, CausesIllnessOrIncapacity), never reference another article predicate in the body. "
-            "Also check for conflicting implications or impossible conditions."
-        )
+        explanation = _get_unsat_explanation(fo_code)
+        if explanation:
+            msg = (
+                "KB theory is unsatisfiable. " + explanation + "\n\n"
+                "Fix the conflicting rules (e.g. make conditions mutually exclusive, avoid circular article predicates)."
+            )
+        else:
+            msg = (
+                "KB theory is unsatisfiable: no model exists. "
+                "Common cause: article predicates (liableArt398, punishedArt399, etc.) defined in terms of each other (circular). "
+                "Define each article predicate using ONLY condition predicates (e.g. IntentionallyInflictsWoundsOrBlows, CausesIllnessOrIncapacity), never reference another article predicate in the body. "
+                "Also check for conflicting implications or impossible conditions."
+            )
+        raise KBSemanticError(msg)

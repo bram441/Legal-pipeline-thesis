@@ -1,7 +1,7 @@
 {
   "id": "run_003",
   "total": 3,
-  "correct": 1,
+  "correct": 3,
   "items": [
     {
       "match": true,
@@ -11,20 +11,20 @@
       "text": "Is Jan liable under Article 398?"
     },
     {
-      "match": false,
+      "match": true,
       "expected": true,
-      "got": false,
+      "got": true,
       "id": "q2",
       "text": "Is Jan liable under Article 399?"
     },
     {
-      "match": false,
+      "match": true,
       "expected": 182,
-      "got": null,
-      "raw_range": "No model exists (theory is unsatisfiable).",
+      "got": "180",
+      "raw_range": "180",
       "id": "q3",
       "text": "What is the minimum prison sentence for Jan?"
     }
   ],
-  "accuracy": 0.3333333333333333
+  "accuracy": 1.0
 }

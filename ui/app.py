@@ -21,8 +21,10 @@ import streamlit as st
 
 from debug import status_log
 from pipeline.app.pipeline import answer_legal_prompt
+from pipeline.extraction.extractor import extract_case_only, ExtractionError
 from pipeline.io.text_runs import write_text_run
 from pipeline.kb.cache import get_or_compile_kb
+from pipeline.utils.run_trace import trace_enabled
 from pipeline.translation.translator import translate_to_english, TranslationError
 from pipeline.rendering.explanations import explain_on_demand
 from pipeline.utils.unicode_sanitize import sanitize_for_output
@@ -83,15 +85,25 @@ def run_pipeline(law_text, case_text, questions, translate, provider="auto", for
     except Exception as e:
         return None, None, f"KB compilation failed: {e}"
 
+    pre_extracted_case = None
+    try:
+        status_log("Case", "Extracting case once for all questions")
+        pre_extracted_case = extract_case_only(case_text, kb_schema=kb_schema, provider=provider)
+    except ExtractionError as e:
+        return None, None, f"Case extraction failed: {e}"
+
     results = []
     for i, q in enumerate(questions):
         status_log("Question", f"Processing {i + 1} of {len(questions)}")
+        trace_path = os.path.join(run_path, "run_trace.txt") if trace_enabled() else None
         result = answer_legal_prompt(
             case_text,
             q,
             base_kb_text=kb_text,
             extractor_provider=provider,
             kb_schema=kb_schema,
+            trace_path=trace_path,
+            pre_extracted_case=pre_extracted_case,
         )
         results.append({"question": q, "result": result})
 

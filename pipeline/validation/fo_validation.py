@@ -6,6 +6,7 @@ _atom_args = re.compile(r"\((.*)\)")
 _neg_atom = re.compile(r"^\s*(?:not|~|¬)\s+([A-Za-z_][A-Za-z0-9_]*)\s*\((.*)\)\s*\.\s*$")
 _pos_atom = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*\((.*)\)\s*\.\s*$")
 _bad_star_call = re.compile(r"[A-Za-z_][A-Za-z0-9_]*\s*\*\s*\(")
+_bool_assign_false = re.compile(r"^\s*[A-Za-z_][A-Za-z0-9_]*\s*\([^)]*\)\s*=\s*(?:false|False)\s*\.\s*$")
 
 
 def _norm_str_list(xs, field_name):
@@ -77,6 +78,27 @@ def _normalize_symbol_casing_in_fact(line, symbol_lookup):
     return _callname.sub(lambda m: repl(m) + "(", line)
 
 
+# Invalid patterns for fact arguments (negation must wrap the predicate, not the entity)
+_INVALID_ARG_PREFIXES = ("not ", "~", "¬")
+_INVALID_ARG_EXACT = frozenset({"not", "~", "¬"})
+
+
+def _validate_fact_args(line, args_str):
+    """Reject arguments like 'not jan' — negation applies to the predicate, not the entity."""
+    if not args_str or "=" in line:
+        return
+    for part in args_str.split(","):
+        a = part.strip().strip("'\"").lower()
+        if not a:
+            continue
+        if a in _INVALID_ARG_EXACT or any(a.startswith(p) for p in _INVALID_ARG_PREFIXES):
+            raise ValueError(
+                "Invalid argument in case fact: negation applies to the predicate, not the entity. "
+                "Use 'not Predicate(entity).' never 'Predicate(not entity).' "
+                "Fix: " + line
+            )
+
+
 def _check_symbols_in_fact_line(line, allowed_predicates, allowed_functions, symbol_lookup=None):
     if _bad_star_call.search(line):
         raise ValueError("Invalid symbol token in case facts (unexpected '*'): " + line)
@@ -120,6 +142,15 @@ def normalize_and_validate_case(raw_case, kb_schema=None):
 
     normalized_facts = []
     for ln in facts:
+        s = ln.strip()
+        if _bool_assign_false.match(s):
+            raise ValueError(
+                "Use 'not Predicate(entity).' instead of 'Predicate(entity) = false.'. "
+                "Fix: " + ln
+            )
+        m_args = _atom_args.search(ln)
+        if m_args:
+            _validate_fact_args(ln, m_args.group(1))
         norm_ln = _normalize_symbol_casing_in_fact(ln, symbol_lookup)
         if kb_schema:
             _check_symbols_in_fact_line(norm_ln, allowed_predicates, allowed_functions, symbol_lookup)

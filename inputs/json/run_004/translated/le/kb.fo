@@ -1,18 +1,20 @@
 vocabulary V {
   type Person
-  IntentionallyInflictedBlowsOrInjuries: Person -> Bool
-  IntentionallyInflictedBlowsOrInjuriesCausedDeath: Person -> Bool
-  BluesOrInjuriesCausedIncurableDisease: Person -> Bool
-  BluesOrInjuriesCausedIncapacityMoreThanFourMonths: Person -> Bool
-  BluesOrInjuriesCausedCompleteLossOfUseOfOrgan: Person -> Bool
-  BluesOrInjuriesCausedSevereMutilation: Person -> Bool
-  BluesOrInjuriesCausedDeath: Person -> Bool
-  BluesOrInjuriesResultedInIllnessOrIncapacityToPerformPersonalLabor: Person -> Bool
-  ActedWithPremeditation: Person -> Bool
-  punishedArt401: Person -> Bool
-  punishedArt400: Person -> Bool
-  punishedArt399: Person -> Bool
-  punishedArt398: Person -> Bool
+
+  IntentionallyInflictsWoundsOrBlows: Person -> Bool
+  CausedDeath: Person -> Bool
+  CausesIncurableIllness: Person -> Bool
+  CausesIncapacityMoreThanFourMonths: Person -> Bool
+  CausesTotalLossOrganUse: Person -> Bool
+  CausesSevereMutilation: Person -> Bool
+  CausesIllnessOrIncapacity: Person -> Bool
+  Premeditation: Person -> Bool
+
+  liableArt398: Person -> Bool
+  liableArt399: Person -> Bool
+  liableArt400: Person -> Bool
+  liableArt401: Person -> Bool
+
   imprisonmentMinDays: Person -> Int
   imprisonmentMaxDays: Person -> Int
   fineMinEuros: Person -> Int
@@ -21,135 +23,93 @@ vocabulary V {
 
 theory T:V {
   !p in Person:
-    punishedArt401(p) <=> 
-      IntentionallyInflictedBlowsOrInjuries(p) & 
-      ~ (IntentionallyInflictedBlowsOrInjuriesCausedDeath(p)) = false & 
-      IntentionallyInflictedBlowsOrInjuriesCausedDeath(p) & 
-      ~ punishedArt400(p) & 
-      ~ punishedArt399(p) & 
-      ~ punishedArt398(p).
+    liableArt401(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) & CausedDeath(p) & ~Premeditation(p).
+  !p in Person:
+    liableArt401(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) & CausedDeath(p) & Premeditation(p).
 
   !p in Person:
-    punishedArt400(p) <=> 
-      (BluesOrInjuriesCausedIncurableDisease(p) | BluesOrInjuriesCausedIncapacityMoreThanFourMonths(p) | BluesOrInjuriesCausedCompleteLossOfUseOfOrgan(p) | BluesOrInjuriesCausedSevereMutilation(p)) & 
-      ~ IntentionallyInflictedBlowsOrInjuriesCausedDeath(p) & 
-      ~ punishedArt401(p) & 
-      ~ punishedArt399(p) & 
-      ~ punishedArt398(p).
+    liableArt400(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) &
+      (CausesIncurableIllness(p) | CausesIncapacityMoreThanFourMonths(p) | CausesTotalLossOrganUse(p) | CausesSevereMutilation(p)) &
+      ~CausedDeath(p).
 
   !p in Person:
-    punishedArt399(p) <=> 
-      BluesOrInjuriesResultedInIllnessOrIncapacityToPerformPersonalLabor(p) & 
-      ~ punishedArt400(p) & 
-      ~ punishedArt401(p) & 
-      ~ punishedArt398(p).
+    liableArt399(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) &
+      CausesIllnessOrIncapacity(p) &
+      ~(
+        CausesIncurableIllness(p) | CausesIncapacityMoreThanFourMonths(p) | CausesTotalLossOrganUse(p) | CausesSevereMutilation(p) | CausedDeath(p)
+      ).
 
   !p in Person:
-    punishedArt398(p) <=> 
-      IntentionallyInflictedBlowsOrInjuries(p) & 
-      ~ BluesOrInjuriesResultedInIllnessOrIncapacityToPerformPersonalLabor(p) & 
-      ~ BluesOrInjuriesCausedIncurableDisease(p) & 
-      ~ BluesOrInjuriesCausedIncapacityMoreThanFourMonths(p) & 
-      ~ BluesOrInjuriesCausedCompleteLossOfUseOfOrgan(p) & 
-      ~ BluesOrInjuriesCausedSevereMutilation(p) & 
-      ~ BluesOrInjuriesCausedDeath(p) & 
-      ~ punishedArt399(p) & 
-      ~ punishedArt400(p) & 
-      ~ punishedArt401(p).
+    liableArt398(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) &
+      ~CausesIllnessOrIncapacity(p) &
+      ~CausesTotalLossOrganUse(p) &
+      ~CausesSevereMutilation(p) &
+      ~CausesIncurableIllness(p) &
+      ~CausesIncapacityMoreThanFourMonths(p) &
+      ~CausedDeath(p).
 
   !p in Person:
-    (punishedArt401(p) & ~ ActedWithPremeditation(p)) => imprisonmentMinDays(p) = 1825.
+    imprisonmentMinDays(p) = 8 <=> liableArt398(p) & ~Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 180 <=> liableArt398(p) & ~Premeditation(p).
+  !p in Person:
+    fineMinEuros(p) = 26 <=> liableArt398(p) & ~Premeditation(p).
+  !p in Person:
+    fineMaxEuros(p) = 100 <=> liableArt398(p) & ~Premeditation(p).
 
   !p in Person:
-    (punishedArt401(p) & ~ ActedWithPremeditation(p)) => imprisonmentMaxDays(p) = 3650.
+    imprisonmentMinDays(p) = 30 <=> liableArt398(p) & Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 365 <=> liableArt398(p) & Premeditation(p).
+  !p in Person:
+    fineMinEuros(p) = 50 <=> liableArt398(p) & Premeditation(p).
+  !p in Person:
+    fineMaxEuros(p) = 200 <=> liableArt398(p) & Premeditation(p).
 
   !p in Person:
-    (punishedArt401(p) & ~ ActedWithPremeditation(p)) => fineMinEuros(p) = 0.
+    imprisonmentMinDays(p) = 60 <=> liableArt399(p) & ~Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 730 <=> liableArt399(p) & ~Premeditation(p).
+  !p in Person:
+    fineMinEuros(p) = 50 <=> liableArt399(p) & ~Premeditation(p).
+  !p in Person:
+    fineMaxEuros(p) = 200 <=> liableArt399(p) & ~Premeditation(p).
 
   !p in Person:
-    (punishedArt401(p) & ~ ActedWithPremeditation(p)) => fineMaxEuros(p) = 0.
+    imprisonmentMinDays(p) = 180 <=> liableArt399(p) & Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 1095 <=> liableArt399(p) & Premeditation(p).
+  !p in Person:
+    fineMinEuros(p) = 100 <=> liableArt399(p) & Premeditation(p).
+  !p in Person:
+    fineMaxEuros(p) = 500 <=> liableArt399(p) & Premeditation(p).
 
   !p in Person:
-    (punishedArt401(p) & ActedWithPremeditation(p)) => imprisonmentMinDays(p) = 3650.
+    imprisonmentMinDays(p) = 730 <=> liableArt400(p) & ~Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 1825 <=> liableArt400(p) & ~Premeditation(p).
+  !p in Person:
+    fineMinEuros(p) = 200 <=> liableArt400(p) & ~Premeditation(p).
+  !p in Person:
+    fineMaxEuros(p) = 500 <=> liableArt400(p) & ~Premeditation(p).
 
   !p in Person:
-    (punishedArt401(p) & ActedWithPremeditation(p)) => imprisonmentMaxDays(p) = 5475.
+    imprisonmentMinDays(p) = 1825 <=> liableArt400(p) & Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 3650 <=> liableArt400(p) & Premeditation(p).
 
   !p in Person:
-    (punishedArt401(p) & ActedWithPremeditation(p)) => fineMinEuros(p) = 0.
+    imprisonmentMinDays(p) = 1825 <=> liableArt401(p) & ~Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 3650 <=> liableArt401(p) & ~Premeditation(p).
 
   !p in Person:
-    (punishedArt401(p) & ActedWithPremeditation(p)) => fineMaxEuros(p) = 0.
-
+    imprisonmentMinDays(p) = 3650 <=> liableArt401(p) & Premeditation(p).
   !p in Person:
-    (punishedArt400(p) & ~ ActedWithPremeditation(p)) => imprisonmentMinDays(p) = 730.
-
-  !p in Person:
-    (punishedArt400(p) & ~ ActedWithPremeditation(p)) => imprisonmentMaxDays(p) = 1825.
-
-  !p in Person:
-    (punishedArt400(p) & ~ ActedWithPremeditation(p)) => fineMinEuros(p) = 200.
-
-  !p in Person:
-    (punishedArt400(p) & ~ ActedWithPremeditation(p)) => fineMaxEuros(p) = 500.
-
-  !p in Person:
-    (punishedArt400(p) & ActedWithPremeditation(p)) => imprisonmentMinDays(p) = 1825.
-
-  !p in Person:
-    (punishedArt400(p) & ActedWithPremeditation(p)) => imprisonmentMaxDays(p) = 3650.
-
-  !p in Person:
-    (punishedArt400(p) & ActedWithPremeditation(p)) => fineMinEuros(p) = 0.
-
-  !p in Person:
-    (punishedArt400(p) & ActedWithPremeditation(p)) => fineMaxEuros(p) = 0.
-
-  !p in Person:
-    (punishedArt399(p) & ~ ActedWithPremeditation(p)) => imprisonmentMinDays(p) = 60.
-
-  !p in Person:
-    (punishedArt399(p) & ~ ActedWithPremeditation(p)) => imprisonmentMaxDays(p) = 730.
-
-  !p in Person:
-    (punishedArt399(p) & ~ ActedWithPremeditation(p)) => fineMinEuros(p) = 50.
-
-  !p in Person:
-    (punishedArt399(p) & ~ ActedWithPremeditation(p)) => fineMaxEuros(p) = 200.
-
-  !p in Person:
-    (punishedArt399(p) & ActedWithPremeditation(p)) => imprisonmentMinDays(p) = 180.
-
-  !p in Person:
-    (punishedArt399(p) & ActedWithPremeditation(p)) => imprisonmentMaxDays(p) = 1095.
-
-  !p in Person:
-    (punishedArt399(p) & ActedWithPremeditation(p)) => fineMinEuros(p) = 100.
-
-  !p in Person:
-    (punishedArt399(p) & ActedWithPremeditation(p)) => fineMaxEuros(p) = 500.
-
-  !p in Person:
-    (punishedArt398(p) & ~ ActedWithPremeditation(p)) => imprisonmentMinDays(p) = 8.
-
-  !p in Person:
-    (punishedArt398(p) & ~ ActedWithPremeditation(p)) => imprisonmentMaxDays(p) = 180.
-
-  !p in Person:
-    (punishedArt398(p) & ~ ActedWithPremeditation(p)) => fineMinEuros(p) = 26.
-
-  !p in Person:
-    (punishedArt398(p) & ~ ActedWithPremeditation(p)) => fineMaxEuros(p) = 100.
-
-  !p in Person:
-    (punishedArt398(p) & ActedWithPremeditation(p)) => imprisonmentMinDays(p) = 30.
-
-  !p in Person:
-    (punishedArt398(p) & ActedWithPremeditation(p)) => imprisonmentMaxDays(p) = 365.
-
-  !p in Person:
-    (punishedArt398(p) & ActedWithPremeditation(p)) => fineMinEuros(p) = 50.
-
-  !p in Person:
-    (punishedArt398(p) & ActedWithPremeditation(p)) => fineMaxEuros(p) = 200.
+    imprisonmentMaxDays(p) = 5475 <=> liableArt401(p) & Premeditation(p).
 }

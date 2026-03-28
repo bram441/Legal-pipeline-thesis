@@ -33,8 +33,13 @@ def compile_law_to_kb_fo(law_text, model=None, repair_feedback=None):
     chosen_model = model or os.getenv("OPENAI_MODEL") or "gpt-4.1-mini"
 
     if repair_feedback:
+        err = repair_feedback.get("error_message", "") or ""
+        is_unsat = any(
+            s in err for s in ("unsatisfiable", "Conflicting", "rules led to an inconsistency")
+        )
+        prompt_name = "kb_compilation_repair_unsat.txt" if is_unsat else "kb_compilation_repair.txt"
         user_prompt = render_prompt(
-            "kb_compilation_repair.txt",
+            prompt_name,
             law_text=(law_text or "").strip(),
             error_message=repair_feedback["error_message"],
             previous_output=repair_feedback["previous_output"],

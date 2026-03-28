@@ -2,11 +2,12 @@ import json
 
 from debug import debug_log, status_log
 
-from pipeline.extraction.extractor import extract_case_and_query, ExtractionError
+from pipeline.extraction.extractor import extract_case_and_query, extract_case_only, extract_query_only, ExtractionError
 from pipeline.symbolic.router import run_query
 from pipeline.rendering.answer_renderer import render_answer
 from pipeline.validation.fo_validation import normalize_and_validate_case, normalize_and_validate_query
 from pipeline.utils.prompt_loader import render_prompt
+from pipeline.utils.run_trace import RunTraceWriter
 from pipeline.domain.seeding import seed_entities_from_case_text
 
 def _build_prediction_summary(query, symbolic_result):
@@ -56,6 +57,8 @@ def answer_legal_prompt(
     extractor_max_retries=6,
     kb_schema=None,
     debug=False,
+    trace_path=None,
+    pre_extracted_case=None,
 ):
     """Run the full pipeline for a single (case_text, user_question).
 
@@ -106,30 +109,72 @@ def answer_legal_prompt(
         kb_schema_json=json.dumps(kb_schema, ensure_ascii=False, indent=2),
     )
 
-    status_log("Extraction", "Extracting case and query")
-    debug_log("pipeline.answer_legal_prompt", "extraction_provider=" + str(extractor_provider))
-    try:
-        raw = extract_case_and_query(
-            case_text,
-            user_question,
-            kb_schema=kb_schema,
-            provider=extractor_provider,
-            model=extractor_model,
-            max_retries=extractor_max_retries,
-        )
-    except ExtractionError as e:
-        return {
-            "sat": None,
-            "case": None,
-            "query": None,
-            "symbolic_result": None,
-            "natural_language": None,
-            "explanation": None,
-            "extraction_prompt": extraction_prompt,
-            "raw_extracted": None,
-            "error_stage": "extraction",
-            "error": str(e),
-        }
+    trace = RunTraceWriter(trace_path, append=True) if trace_path else None
+
+    if pre_extracted_case is not None:
+        status_log("Extraction", "Using pre-extracted case, extracting query only")
+        raw = {"case": dict(pre_extracted_case), "query": None}
+        try:
+            raw["query"] = extract_query_only(
+                user_question,
+                raw["case"],
+                kb_schema=kb_schema,
+                provider=extractor_provider,
+                model=extractor_model,
+                max_retries=extractor_max_retries,
+                case_text=case_text,
+            )
+        except ExtractionError as e:
+            if trace:
+                trace.section("QUESTION: " + (user_question[:60] + "..." if len(user_question) > 60 else user_question))
+                trace.log_error("Query extraction failed", e)
+                trace.close()
+            return {
+                "sat": None,
+                "case": raw["case"],
+                "query": None,
+                "symbolic_result": None,
+                "natural_language": None,
+                "explanation": None,
+                "extraction_prompt": None,
+                "raw_extracted": raw,
+                "error_stage": "extraction",
+                "error": str(e),
+            }
+    else:
+        status_log("Extraction", "Extracting case and query")
+        debug_log("pipeline.answer_legal_prompt", "extraction_provider=" + str(extractor_provider))
+        try:
+            raw = extract_case_and_query(
+                case_text,
+                user_question,
+                kb_schema=kb_schema,
+                provider=extractor_provider,
+                model=extractor_model,
+                max_retries=extractor_max_retries,
+            )
+        except ExtractionError as e:
+            if trace:
+                trace.section("QUESTION: " + (user_question[:60] + "..." if len(user_question) > 60 else user_question))
+                trace.log_error("Extraction failed", e)
+                trace.close()
+            return {
+                "sat": None,
+                "case": None,
+                "query": None,
+                "symbolic_result": None,
+                "natural_language": None,
+                "explanation": None,
+                "extraction_prompt": extraction_prompt,
+                "raw_extracted": None,
+                "error_stage": "extraction",
+                "error": str(e),
+            }
+
+    if trace:
+        trace.section("QUESTION: " + (user_question[:80] + "..." if len(user_question) > 80 else user_question))
+        trace.log("Raw extracted (case)", json.dumps(raw.get("case"), indent=2, ensure_ascii=False))
+        trace.log("Raw extracted (query)", json.dumps(raw.get("query"), indent=2, ensure_ascii=False))
 
     debug_log("pipeline.answer_legal_prompt", "normalize+validate")
     try:
@@ -161,6 +206,9 @@ def answer_legal_prompt(
         query = normalize_and_validate_query(raw.get("query"), case, kb_schema=kb_schema)
         debug_log("pipeline.answer_legal_prompt", "validation ok")
     except ValueError as e:
+        if trace:
+            trace.log_error("Validation failed (case/query)", e)
+            trace.close()
         return {
             "sat": None,
             "case": raw.get("case"),
@@ -174,6 +222,10 @@ def answer_legal_prompt(
             "error": str(e),
         }
 
+    if trace:
+        trace.log("Case (normalized)", json.dumps(case, indent=2, ensure_ascii=False))
+        trace.log("Query (normalized)", json.dumps(query, indent=2, ensure_ascii=False))
+
     status_log("Reasoning", "Running symbolic reasoning (IDP-Z3)")
     debug_log("pipeline.answer_legal_prompt", "symbolic.run_query")
     try:
@@ -181,6 +233,9 @@ def answer_legal_prompt(
     except Exception as e:
         from pipeline.utils.unicode_sanitize import sanitize_for_output
         err_msg = sanitize_for_output(str(e))
+        if trace:
+            trace.log_error("Symbolic reasoning failed", err_msg)
+            trace.close()
         return {
             "sat": None,
             "case": case,
@@ -193,6 +248,11 @@ def answer_legal_prompt(
             "error_stage": "symbolic",
             "error": err_msg,
         }
+
+    if trace:
+        trace.log("Symbolic result", json.dumps(result, indent=2, ensure_ascii=False, default=str))
+        trace.log("Prediction", json.dumps(_build_prediction_summary(query, result), indent=2))
+        trace.close()
 
     rendered = render_answer(case, query, sat, result, base_kb_text=base_kb_text)
 

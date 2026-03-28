@@ -6,8 +6,8 @@ import re
 # Predicates that are legal conclusions (derived by theory), not observable conditions.
 # These are NOT closed to {} when absent from case facts.
 # Extend via env CONCLUSION_PREDICATE_EXTRAS (comma-separated names/prefixes).
-_CONCLUSION_PREFIXES = ("punishment", "punished")
-_CONCLUSION_EXACT = frozenset(("liable", "eligible", "qualifies", "convicted"))
+_CONCLUSION_PREFIXES = ("liable", "punishment", "punished")
+_CONCLUSION_EXACT = frozenset(("eligible", "qualifies", "convicted"))
 
 
 def _is_conclusion_predicate(pred_name_lower):
@@ -180,18 +180,25 @@ def build_structure_block_from_facts(facts, entities=None, kb_primary_type=None,
                 continue
             ext[pred] = set()
 
-    # --- Domain: use kb_primary_type when given (aligns with vocabulary), else entities keys ---
+    # --- Domain: prefer constants from facts to avoid unsatisfiability. When sentence
+    # functions (imprisonmentMinDays etc.) apply to persons with no condition facts,
+    # they stay undefined and can make the theory UNSAT. Restrict Person to those
+    # appearing in facts; add query-relevant entities only if already in facts.
     domain_type = kb_primary_type if kb_primary_type else None
+    constants_from_facts = set(constants)  # persons in predicate args
     if isinstance(entities, dict):
         for t_name, t_vals in entities.items():
             if isinstance(t_name, str) and isinstance(t_vals, list) and t_vals:
                 if not domain_type:
                     domain_type = t_name
-                # note: entities may be raw names; normalize to IDP constants
+                # Only include entities that appear in facts (avoids UNSAT for sentence functions)
                 for v in t_vals:
                     if isinstance(v, str) and v.strip():
-                        constants.add(_to_idp_elem(v.strip()))
+                        e = _to_idp_elem(v.strip())
+                        if e in constants_from_facts:
+                            constants.add(e)
                 break
+    # If no entities dict, constants come from facts only (no filtering needed)
 
     inferred_domain_line = None
     if domain_type and constants:

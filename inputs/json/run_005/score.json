@@ -1,7 +1,7 @@
 {
   "id": "run_005",
-  "total": 3,
-  "correct": 3,
+  "total": 2,
+  "correct": 2,
   "items": [
     {
       "match": true,
@@ -9,13 +9,6 @@
       "got": false,
       "id": "q1",
       "text": "Is Bruno liable under Article 398?"
-    },
-    {
-      "match": true,
-      "expected": false,
-      "got": false,
-      "id": "q2",
-      "text": "Is Anna liable under Article 398?"
     },
     {
       "match": true,

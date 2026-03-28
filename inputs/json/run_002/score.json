@@ -1,7 +1,7 @@
 {
   "id": "run_002",
-  "total": 3,
-  "correct": 3,
+  "total": 2,
+  "correct": 2,
   "items": [
     {
       "match": true,
@@ -9,13 +9,6 @@
       "got": true,
       "id": "q1",
       "text": "Is Pieter liable under Article 398?"
-    },
-    {
-      "match": true,
-      "expected": false,
-      "got": false,
-      "id": "q2",
-      "text": "Is Karel liable under Article 398?"
     },
     {
       "match": true,

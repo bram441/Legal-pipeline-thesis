@@ -39,6 +39,8 @@ Rules:
 - Do NOT include contradictory facts (e.g. both pred(x) and not pred(x) for the same predicate and entity).
 - Use only entities that appear in the case description; query entities must be in the case.
 - If a fact is unknown or unexpressible with allowed symbols, omit it.
+- NEGATION: Use 'not Predicate(entity).' never 'Predicate(not entity).' — arguments must be entity names only.
+- Predicates about death, organ loss, incurable disease, or severe harm: only assert them when the case explicitly states that outcome. If the case says "did not cause death" or "no organ loss", assert 'not ThatPredicate(entity).'.
 
 CRITICAL SYMBOL RULES:
 - You MUST ONLY use predicate/function names that appear in KB_SCHEMA.
