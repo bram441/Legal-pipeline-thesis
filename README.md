@@ -113,6 +113,37 @@ Goals:
 - Prompts are editable without code changes
 - Prompts enforce FO(.) output constraints (especially for KB compilation)
 
+**KB compilation modes** (set env vars, then run; use separate cache dirs or runs to compare)
+
+| `PIPELINE_USE_LE` | `PIPELINE_KB_TWO_PHASE` | Pipeline |
+|-------------------|-------------------------|----------|
+| off | off | Law → single-shot FO (`kb/kb_compilation.txt`) |
+| off | on | Law → vocab → theory (`kb/kb_*_only.txt`), fallback single-shot |
+| on | off | Law → LE → single-shot FO (`le/le_to_fo.txt`) |
+| on | on | Law → LE → vocab → theory (`le/le_*_only.txt`), fallback `le_to_fo` |
+
+Repair after validation failure always uses full KB + `kb/kb_compilation_repair*.txt`.
+
+To **recompile** and compare modes on the same run, remove the cached `kb.fo` (and optionally `kb_schema.json`) under that run’s `translated/le/` or `translated/` folder, or use a fresh run directory.
+
+**Optional `run.json` fields (JSON runs)**  
+- `kb_compile_strategy`: one of `direct_single`, `direct_two_phase`, `le_single`, `le_two_phase`. Used when you do not pass `--kb-strategy` on the CLI.  
+- After each successful JSON run, `run.json` is merged with `kb_compile_strategy` and `kb_compile_flags` reflecting what was actually used.
+
+**CLI override**  
+```text
+python main.py --mode json --run inputs/json/run_001 --kb-strategy le_two_phase
+```
+`--kb-strategy` overrides both `run.json` and `.env` for that invocation only.
+
+**Compare all four strategies on one JSON run** (writes separate folders + `compare_summary.json`):
+
+```text
+python scripts/compare_kb_strategies.py --run inputs/json/run_003
+```
+
+Output: `inputs/json/run_003/kb_strategy_compare/<strategy>/` for each of `direct_single`, `direct_two_phase`, `le_single`, `le_two_phase`. Use `--clean` to wipe a previous compare folder first.
+
 ---
 
 ## Deduction semantics (boolean predicate queries)

@@ -1,7 +1,7 @@
 {
   "id": "run_003",
   "total": 3,
-  "correct": 3,
+  "correct": 2,
   "items": [
     {
       "match": true,
@@ -18,14 +18,14 @@
       "text": "Is Jan liable under Article 399?"
     },
     {
-      "match": true,
+      "match": false,
       "expected": 182,
-      "got": "180",
-      "raw_range": "180",
+      "got": null,
+      "raw_range": "Symbol imprisonmentMinDaysArt398 not found in model output.",
       "id": "q3",
       "text": "What is the minimum prison sentence for Jan?"
     }
   ],
-  "kb_compile_strategy": "direct_single",
-  "accuracy": 1.0
+  "kb_compile_strategy": "direct_two_phase",
+  "accuracy": 0.6666666666666666
 }

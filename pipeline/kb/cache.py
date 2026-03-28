@@ -2,7 +2,8 @@ import os
 import re
 
 from debug import status_log
-from pipeline.kb.compiler import compile_law_to_kb_fo, LawCompilationError
+from pipeline.kb.compiler import compile_law_to_kb_fo
+from pipeline.kb.exceptions import LawCompilationError
 from pipeline.kb.schema import extract_schema_from_kb_fo, load_kb_schema, save_kb_schema
 from pipeline.kb.semantic_check import check_kb_semantic, KBSemanticError
 from pipeline.utils.run_trace import trace_enabled, RunTraceWriter

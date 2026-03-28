@@ -24,20 +24,24 @@ from debug import status_log
 from pipeline.app.pipeline import answer_legal_prompt
 from pipeline.extraction.extractor import extract_case_only, ExtractionError
 from pipeline.io.text_runs import load_text_run, write_text_results
-from pipeline.io.json_runs import load_json_run, write_json_results, write_score
+from pipeline.io.json_runs import load_json_run, write_json_results, write_score, merge_json_run_file
 from pipeline.eval.scoring import score_question
 from pipeline.kb.cache import get_or_compile_kb
+from pipeline.kb.compile_strategy import kb_run_context, strategy_to_flags, STRATEGY_CHOICES
 from pipeline.utils.run_trace import trace_enabled
 from pipeline.translation.translator import translate_to_english, TranslationError
 from pipeline.utils.unicode_sanitize import sanitize_for_output
 
 
-def run_text_mode(run_dir, provider, translate=True):
+def run_text_mode(run_dir, provider, translate=True, cli_kb_strategy=None):
     payload = load_text_run(run_dir)
 
     law_text = payload["law_text"]
     case_text = payload["case_text"]
     questions = payload["questions"]
+
+    ctx, strategy_label = kb_run_context(cli_strategy=cli_kb_strategy, run_json=None, mode="text")
+    ul, tp = strategy_to_flags(strategy_label)
 
     if translate:
         try:
@@ -49,11 +53,14 @@ def run_text_mode(run_dir, provider, translate=True):
             print("Translation failed:", e)
             return
 
-    # Compile (or reuse cached) KB once per run; use separate cache when translated
-    status_log("KB", "Loading or compiling knowledge base")
-    kb_text, kb_schema = get_or_compile_kb(run_dir, law_text, cache_subdir="translated" if translate else None)
+    with ctx:
+        status_log("KB", "Loading or compiling knowledge base")
+        kb_text, kb_schema = get_or_compile_kb(run_dir, law_text, cache_subdir="translated" if translate else None)
 
     out_lines = []
+    out_lines.append("=== KB COMPILE STRATEGY ===")
+    out_lines.append(strategy_label + " (use_le=" + str(ul) + ", two_phase=" + str(tp) + ")")
+    out_lines.append("")
     out_lines.append("=== LAW (plain text input) ===")
     out_lines.append(law_text)
     out_lines.append("")
@@ -106,12 +113,15 @@ def run_text_mode(run_dir, provider, translate=True):
     print("Wrote:", os.path.join(run_dir, "results.txt"))
 
 
-def run_json_mode(run_dir, provider, translate=True):
+def run_json_mode(run_dir, provider, translate=True, cli_kb_strategy=None):
     run_obj = load_json_run(run_dir)
 
     law_text = (run_obj.get("law") or {}).get("text", "")
     case_text = (run_obj.get("case") or {}).get("text", "")
     questions = run_obj.get("questions") or []
+
+    ctx, strategy_label = kb_run_context(cli_strategy=cli_kb_strategy, run_json=run_obj, mode="json")
+    ul, tp = strategy_to_flags(strategy_label)
 
     if translate:
         try:
@@ -127,14 +137,17 @@ def run_json_mode(run_dir, provider, translate=True):
             print("Translation failed:", e)
             return
 
-    status_log("KB", "Loading or compiling knowledge base")
-    kb_text, kb_schema = get_or_compile_kb(run_dir, law_text, cache_subdir="translated" if translate else None)
+    with ctx:
+        status_log("KB", "Loading or compiling knowledge base")
+        kb_text, kb_schema = get_or_compile_kb(run_dir, law_text, cache_subdir="translated" if translate else None)
 
     results = {
         "id": run_obj.get("id"),
         "law": {"text": law_text},
         "kb_used": {"fo": kb_text},
         "case": {"text": case_text},
+        "kb_compile_strategy": strategy_label,
+        "kb_compile_flags": {"use_le": ul, "two_phase": tp},
         "questions": [],
     }
 
@@ -143,6 +156,7 @@ def run_json_mode(run_dir, provider, translate=True):
         "total": 0,
         "correct": 0,
         "items": [],
+        "kb_compile_strategy": strategy_label,
     }
 
     pre_extracted_case = None
@@ -197,8 +211,17 @@ def run_json_mode(run_dir, provider, translate=True):
     write_json_results(run_dir, results)
     write_score(run_dir, score)
 
+    merge_json_run_file(
+        run_dir,
+        {
+            "kb_compile_strategy": strategy_label,
+            "kb_compile_flags": {"use_le": ul, "two_phase": tp},
+        },
+    )
+
     print("Wrote:", os.path.join(run_dir, "results.json"))
     print("Wrote:", os.path.join(run_dir, "score.json"))
+    print("KB strategy:", strategy_label, "(use_le=" + str(ul) + ", two_phase=" + str(tp) + ")")
 
 
 def main():
@@ -207,9 +230,19 @@ def main():
     parser.add_argument("--run", required=True, help="Path to run folder (e.g., inputs/text/run_001)")
     parser.add_argument("--provider", choices=["auto", "openai"], default="auto")
     parser.add_argument("--no-translate", action="store_true", help="Skip translation to English (input already in English)")
+    parser.add_argument(
+        "--kb-strategy",
+        metavar="NAME",
+        default=None,
+        help="KB compilation: one of "
+        + ", ".join(STRATEGY_CHOICES)
+        + ". Overrides run.json and .env for this process during the run.",
+    )
     args = parser.parse_args()
 
-    # Resolve run path: relative paths are from project root so it works from any cwd
+    if args.kb_strategy is not None and args.kb_strategy not in STRATEGY_CHOICES:
+        parser.error("--kb-strategy must be one of: " + ", ".join(STRATEGY_CHOICES))
+
     run_path = Path(args.run)
     if not run_path.is_absolute():
         run_path = _PROJECT_ROOT / run_path
@@ -217,9 +250,9 @@ def main():
 
     translate = not args.no_translate
     if args.mode == "text":
-        run_text_mode(run_dir, args.provider, translate=translate)
+        run_text_mode(run_dir, args.provider, translate=translate, cli_kb_strategy=args.kb_strategy)
     else:
-        run_json_mode(run_dir, args.provider, translate=translate)
+        run_json_mode(run_dir, args.provider, translate=translate, cli_kb_strategy=args.kb_strategy)
 
 
 if __name__ == "__main__":

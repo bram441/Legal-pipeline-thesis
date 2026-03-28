@@ -14,8 +14,12 @@ _root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _root not in sys.path:
     sys.path.insert(0, _root)
 
+from pathlib import Path
+
 from dotenv import load_dotenv
-load_dotenv()
+
+_UI_ROOT = Path(__file__).resolve().parents[1]
+load_dotenv(_UI_ROOT / ".env")
 
 import streamlit as st
 
@@ -24,6 +28,7 @@ from pipeline.app.pipeline import answer_legal_prompt
 from pipeline.extraction.extractor import extract_case_only, ExtractionError
 from pipeline.io.text_runs import write_text_run
 from pipeline.kb.cache import get_or_compile_kb
+from pipeline.kb.compile_strategy import kb_run_context, strategy_to_flags, STRATEGY_CHOICES
 from pipeline.utils.run_trace import trace_enabled
 from pipeline.translation.translator import translate_to_english, TranslationError
 from pipeline.rendering.explanations import explain_on_demand
@@ -43,17 +48,25 @@ def _normalize_text(s):
     return "\n".join(ln.strip() for ln in s.strip().splitlines()).strip()
 
 
-def run_pipeline(law_text, case_text, questions, translate, provider="auto", force_recompile=False):
+def run_pipeline(
+    law_text,
+    case_text,
+    questions,
+    translate,
+    provider="auto",
+    force_recompile=False,
+    kb_strategy=None,
+):
     law_text = _normalize_text(law_text)
     case_text = _normalize_text(case_text)
     questions = [q.strip() for q in questions if q and q.strip()]
 
     if not law_text:
-        return None, None, "Please enter law text."
+        return None, None, "Please enter law text.", None
     if not case_text:
-        return None, None, "Please enter case text."
+        return None, None, "Please enter case text.", None
     if not questions:
-        return None, None, "Please enter at least one question."
+        return None, None, "Please enter at least one question.", None
 
     try:
         if translate:
@@ -62,7 +75,7 @@ def run_pipeline(law_text, case_text, questions, translate, provider="auto", for
             case_text = translate_to_english(case_text)
             questions = [translate_to_english(q) for q in questions]
     except TranslationError as e:
-        return None, None, f"Translation failed: {e}"
+        return None, None, f"Translation failed: {e}", None
 
     run_path = _get_run_dir(law_text, translate)
     write_text_run(run_path, law_text, case_text, questions)
@@ -77,20 +90,23 @@ def run_pipeline(law_text, case_text, questions, translate, provider="auto", for
                 except OSError:
                     pass
 
+    ctx, strategy_label = kb_run_context(cli_strategy=kb_strategy, run_json=None, mode="text")
+
     status_log("KB", "Loading or compiling knowledge base")
     try:
-        kb_text, kb_schema = get_or_compile_kb(
-            run_path, law_text, cache_subdir="translated" if translate else None
-        )
+        with ctx:
+            kb_text, kb_schema = get_or_compile_kb(
+                run_path, law_text, cache_subdir="translated" if translate else None
+            )
     except Exception as e:
-        return None, None, f"KB compilation failed: {e}"
+        return None, None, f"KB compilation failed: {e}", None
 
     pre_extracted_case = None
     try:
         status_log("Case", "Extracting case once for all questions")
         pre_extracted_case = extract_case_only(case_text, kb_schema=kb_schema, provider=provider)
     except ExtractionError as e:
-        return None, None, f"Case extraction failed: {e}"
+        return None, None, f"Case extraction failed: {e}", None
 
     results = []
     for i, q in enumerate(questions):
@@ -107,7 +123,7 @@ def run_pipeline(law_text, case_text, questions, translate, provider="auto", for
         )
         results.append({"question": q, "result": result})
 
-    return results, kb_text, None
+    return results, kb_text, None, strategy_label
 
 
 def main():
@@ -119,14 +135,23 @@ def main():
         "and runs symbolic reasoning (IDP-Z3) to produce answers."
     )
 
+    strategy_options = ["(from environment / .env)"] + list(STRATEGY_CHOICES)
+    strategy_help = (
+        "KB compilation path: direct_single (law→FO), direct_two_phase (law→vocab→theory), "
+        "le_single (law→LE→FO), le_two_phase (law→LE→vocab→theory). "
+        "First option uses PIPELINE_USE_LE and PIPELINE_KB_TWO_PHASE from .env."
+    )
+
     with st.sidebar:
         st.header("Settings")
         translate = st.checkbox("Translate to English", value=True)
         provider = st.selectbox("LLM provider", ["auto", "openai"], index=0)
+        kb_strategy_choice = st.selectbox("KB compile strategy", strategy_options, index=0, help=strategy_help)
+        kb_strategy_ui = None if kb_strategy_choice.startswith("(") else kb_strategy_choice
         force_recompile = st.checkbox(
             "Force recompile KB",
             value=False,
-            help="Ignore cached KB and recompile (use if you get IDP/compilation errors).",
+            help="Ignore cached kb.fo and recompile (use when switching strategy or after errors).",
         )
 
     law_text = st.text_area(
@@ -148,9 +173,14 @@ def main():
 
     if st.button("Run pipeline", type="primary"):
         with st.spinner("Running pipeline..."):
-            results, kb_text, err = run_pipeline(
-                law_text, case_text, questions,
-                translate=translate, provider=provider, force_recompile=force_recompile
+            results, kb_text, err, strat = run_pipeline(
+                law_text,
+                case_text,
+                questions,
+                translate=translate,
+                provider=provider,
+                force_recompile=force_recompile,
+                kb_strategy=kb_strategy_ui,
             )
 
         if err:
@@ -159,13 +189,17 @@ def main():
 
         st.session_state["pipeline_results"] = results
         st.session_state["pipeline_kb_text"] = kb_text
+        st.session_state["pipeline_kb_strategy"] = strat
         for k in list(st.session_state.keys()):
             if k.startswith("explanation_"):
                 del st.session_state[k]
-        st.success("Done!")
+        ul, tp = strategy_to_flags(strat)
+        st.success("Done! KB strategy: " + strat + " (use_le=" + str(ul) + ", two_phase=" + str(tp) + ")")
 
     results = st.session_state.get("pipeline_results", [])
     kb_text = st.session_state.get("pipeline_kb_text", "")
+    if st.session_state.get("pipeline_kb_strategy"):
+        st.caption("Last run KB strategy: " + str(st.session_state.get("pipeline_kb_strategy")))
 
     if results:
         st.divider()

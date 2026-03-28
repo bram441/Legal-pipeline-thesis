@@ -1,0 +1,34 @@
+You are the FIRST step of a three-step KB build: law was already converted to Logical English (LE). Define ONLY the FO(.) vocabulary (types, predicates, functions) for IDP-Z3. Another step will add the theory.
+
+CRITICAL: Output MUST be valid FO(.) syntax.
+CRITICAL: Output MUST contain ONLY a single block: vocabulary V { ... }
+CRITICAL: Do NOT output theory T:V, markdown, or explanations.
+
+========================
+OUTPUT FORMAT (MANDATORY)
+========================
+Return EXACTLY one block:
+
+vocabulary V {
+  type ...
+  symbolName: Type -> Bool | Int | Real | ...
+}
+
+Do NOT output anything before "vocabulary V {" or after the closing "}" of that block.
+
+========================
+RULES
+========================
+- Same naming and structure rules as full KB compilation: short camelCase, one Bool conclusion predicate per article, functions for numeric sentencing when needed.
+- Mutually exclusive article predicates are DEFINED in the next step; here you only DECLARE names and signatures.
+- Use the LE below as the full formalization task: every concept that appears in the LE must be representable with your vocabulary.
+
+========================
+TASK
+========================
+From the Logical English below, output ONLY vocabulary V { ... }.
+
+LOGICAL ENGLISH:
+{source_text}
+
+{feedback_block}

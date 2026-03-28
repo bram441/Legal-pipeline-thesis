@@ -1,0 +1,37 @@
+You are the FIRST step of a two-step KB build: define ONLY the vocabulary (types, predicates, functions) for IDP-Z3. Another model will add the theory in a second step.
+
+CRITICAL: Output MUST be valid FO(.) syntax.
+CRITICAL: Output MUST contain ONLY a single block: vocabulary V { ... }
+CRITICAL: Do NOT output theory T:V, markdown, or explanations.
+
+========================
+OUTPUT FORMAT (MANDATORY)
+========================
+Return EXACTLY one block:
+
+vocabulary V {
+  type ...
+  symbolName: Type -> Bool | Int | Real | ...
+}
+
+Do NOT output anything before "vocabulary V {" or after the closing "}" of that block.
+
+========================
+RULES (same as full KB compilation)
+========================
+- Types: use "type Person" (or other domain types as needed).
+- Predicates: Name: Domain -> Bool
+- Functions: Name: Domain -> Int (e.g. imprisonmentMinDays, fineMaxEuros) when the law specifies quantities.
+- Short camelCase identifiers; one concept per symbol.
+- Declare every symbol needed later for rules: condition predicates (facts from cases), one Bool conclusion predicate per liability/punishment article (e.g. liableArt398, liableArt399), and numeric functions for sentencing/fines if applicable.
+- Mutually exclusive article predicates will be DEFINED in step 2; here you only DECLARE their names and signatures.
+
+========================
+TASK
+========================
+From the law text below, output ONLY vocabulary V { ... }.
+
+SOURCE (natural-language law):
+{source_text}
+
+{feedback_block}

@@ -1,0 +1,184 @@
+{
+  "types": [
+    "Person"
+  ],
+  "predicates": [
+    {
+      "name": "hasPremeditation",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "injuryCausesDeathWithoutIntentToKill",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "injuryCausesIllnessOrIncapacity",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "injuryCausesIncurableDiseaseOrSevereMutilation",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "intentionallyInflictsInjury",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "liableArt398",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "liableArt399",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "liableArt400",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "liableArt401",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    }
+  ],
+  "functions": [
+    {
+      "name": "detentionMaxDaysArt400",
+      "args": [
+        "Person"
+      ],
+      "returns": "Int"
+    },
+    {
+      "name": "detentionMaxDaysArt401",
+      "args": [
+        "Person"
+      ],
+      "returns": "Int"
+    },
+    {
+      "name": "detentionMinDaysArt400",
+      "args": [
+        "Person"
+      ],
+      "returns": "Int"
+    },
+    {
+      "name": "detentionMinDaysArt401",
+      "args": [
+        "Person"
+      ],
+      "returns": "Int"
+    },
+    {
+      "name": "fineMaxEurosArt398",
+      "args": [
+        "Person"
+      ],
+      "returns": "Int"
+    },
+    {
+      "name": "fineMaxEurosArt399",
+      "args": [
+        "Person"
+      ],
+      "returns": "Int"
+    },
+    {
+      "name": "fineMaxEurosArt400",
+      "args": [
+        "Person"
+      ],
+      "returns": "Int"
+    },
+    {
+      "name": "fineMinEurosArt398",
+      "args": [
+        "Person"
+      ],
+      "returns": "Int"
+    },
+    {
+      "name": "fineMinEurosArt399",
+      "args": [
+        "Person"
+      ],
+      "returns": "Int"
+    },
+    {
+      "name": "fineMinEurosArt400",
+      "args": [
+        "Person"
+      ],
+      "returns": "Int"
+    },
+    {
+      "name": "imprisonmentMaxDaysArt398",
+      "args": [
+        "Person"
+      ],
+      "returns": "Int"
+    },
+    {
+      "name": "imprisonmentMaxDaysArt399",
+      "args": [
+        "Person"
+      ],
+      "returns": "Int"
+    },
+    {
+      "name": "imprisonmentMaxDaysArt400",
+      "args": [
+        "Person"
+      ],
+      "returns": "Int"
+    },
+    {
+      "name": "imprisonmentMinDaysArt398",
+      "args": [
+        "Person"
+      ],
+      "returns": "Int"
+    },
+    {
+      "name": "imprisonmentMinDaysArt399",
+      "args": [
+        "Person"
+      ],
+      "returns": "Int"
+    },
+    {
+      "name": "imprisonmentMinDaysArt400",
+      "args": [
+        "Person"
+      ],
+      "returns": "Int"
+    }
+  ]
+}

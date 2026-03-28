@@ -1,0 +1,104 @@
+vocabulary V {
+  type Person
+  intentionallyInflictsWoundsOrBlows: Person -> Bool
+  actsWithPremeditation: Person -> Bool
+  causesIllnessOrIncapacity: Person -> Bool
+  causesSevereHarm: Person -> Bool
+  causesDeath: Person -> Bool
+  punishedArt398: Person -> Bool
+  punishedArt399: Person -> Bool
+  punishedArt400: Person -> Bool
+  punishedArt401: Person -> Bool
+  imprisonmentMinDays: Person -> Int
+  imprisonmentMaxDays: Person -> Int
+  fineMinEuro: Person -> Int
+  fineMaxEuro: Person -> Int
+}
+
+theory T:V {
+  ! p in Person:
+    punishedArt398(p) <=>
+      intentionallyInflictsWoundsOrBlows(p) &
+      ~causesIllnessOrIncapacity(p) &
+      ~causesSevereHarm(p) &
+      ~causesDeath(p).
+
+  ! p in Person:
+    punishedArt399(p) <=>
+      intentionallyInflictsWoundsOrBlows(p) &
+      causesIllnessOrIncapacity(p) &
+      ~causesSevereHarm(p) &
+      ~causesDeath(p).
+
+  ! p in Person:
+    punishedArt400(p) <=>
+      intentionallyInflictsWoundsOrBlows(p) &
+      causesSevereHarm(p) &
+      ~causesDeath(p).
+
+  ! p in Person:
+    punishedArt401(p) <=>
+      intentionallyInflictsWoundsOrBlows(p) &
+      causesDeath(p).
+
+  ! p in Person:
+    (punishedArt398(p) & actsWithPremeditation(p)) => imprisonmentMinDays(p) = 30.
+  ! p in Person:
+    (punishedArt398(p) & actsWithPremeditation(p)) => imprisonmentMaxDays(p) = 365.
+  ! p in Person:
+    (punishedArt398(p) & actsWithPremeditation(p)) => fineMinEuro(p) = 50.
+  ! p in Person:
+    (punishedArt398(p) & actsWithPremeditation(p)) => fineMaxEuro(p) = 200.
+  ! p in Person:
+    (punishedArt398(p) & ~actsWithPremeditation(p)) => imprisonmentMinDays(p) = 8.
+  ! p in Person:
+    (punishedArt398(p) & ~actsWithPremeditation(p)) => imprisonmentMaxDays(p) = 183.
+  ! p in Person:
+    (punishedArt398(p) & ~actsWithPremeditation(p)) => fineMinEuro(p) = 26.
+  ! p in Person:
+    (punishedArt398(p) & ~actsWithPremeditation(p)) => fineMaxEuro(p) = 100.
+  ! p in Person:
+    (punishedArt399(p) & ~actsWithPremeditation(p)) => imprisonmentMinDays(p) = 60.
+  ! p in Person:
+    (punishedArt399(p) & ~actsWithPremeditation(p)) => imprisonmentMaxDays(p) = 730.
+  ! p in Person:
+    (punishedArt399(p) & ~actsWithPremeditation(p)) => fineMinEuro(p) = 50.
+  ! p in Person:
+    (punishedArt399(p) & ~actsWithPremeditation(p)) => fineMaxEuro(p) = 200.
+  ! p in Person:
+    (punishedArt399(p) & actsWithPremeditation(p)) => imprisonmentMinDays(p) = 180.
+  ! p in Person:
+    (punishedArt399(p) & actsWithPremeditation(p)) => imprisonmentMaxDays(p) = 1095.
+  ! p in Person:
+    (punishedArt399(p) & actsWithPremeditation(p)) => fineMinEuro(p) = 100.
+  ! p in Person:
+    (punishedArt399(p) & actsWithPremeditation(p)) => fineMaxEuro(p) = 500.
+  ! p in Person:
+    (punishedArt400(p) & ~actsWithPremeditation(p)) => imprisonmentMinDays(p) = 730.
+  ! p in Person:
+    (punishedArt400(p) & ~actsWithPremeditation(p)) => imprisonmentMaxDays(p) = 1825.
+  ! p in Person:
+    (punishedArt400(p) & ~actsWithPremeditation(p)) => fineMinEuro(p) = 200.
+  ! p in Person:
+    (punishedArt400(p) & ~actsWithPremeditation(p)) => fineMaxEuro(p) = 500.
+  ! p in Person:
+    (punishedArt400(p) & actsWithPremeditation(p)) => imprisonmentMinDays(p) = 1825.
+  ! p in Person:
+    (punishedArt400(p) & actsWithPremeditation(p)) => imprisonmentMaxDays(p) = 3650.
+  ! p in Person:
+    (punishedArt400(p) & actsWithPremeditation(p)) => fineMinEuro(p) = 0.
+  ! p in Person:
+    (punishedArt400(p) & actsWithPremeditation(p)) => fineMaxEuro(p) = 0.
+  ! p in Person:
+    (punishedArt401(p) & ~actsWithPremeditation(p)) => imprisonmentMinDays(p) = 1825.
+  ! p in Person:
+    (punishedArt401(p) & ~actsWithPremeditation(p)) => imprisonmentMaxDays(p) = 3650.
+  ! p in Person:
+    (punishedArt401(p) & actsWithPremeditation(p)) => imprisonmentMinDays(p) = 3650.
+  ! p in Person:
+    (punishedArt401(p) & actsWithPremeditation(p)) => imprisonmentMaxDays(p) = 5475.
+  ! p in Person:
+    (~intentionallyInflictsWoundsOrBlows(p)) => fineMinEuro(p) = 0.
+  ! p in Person:
+    (~intentionallyInflictsWoundsOrBlows(p)) => fineMaxEuro(p) = 0.
+}

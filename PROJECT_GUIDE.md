@@ -3,6 +3,12 @@
 This file is a *quick map* of what each module does in the current codebase.
 It is meant to reduce cognitive load while you iterate.
 
+## KB compilation
+
+See README: four modes from `PIPELINE_USE_LE` × `PIPELINE_KB_TWO_PHASE` (direct single-shot, direct two-phase, LE single-shot, LE + two-phase). Implementation: `pipeline/kb/compiler.py`, `pipeline/kb/staged_compile.py`, `pipeline/kb/compile_strategy.py`.
+
+JSON runs: optional `run.json` field `kb_compile_strategy`; CLI `--kb-strategy` overrides it and `.env`. Results include `kb_compile_strategy` / `kb_compile_flags`; `run.json` is merged after a successful run.
+
 ## End-to-end flow
 
 `main.py` (demo runner)
