@@ -1,0 +1,77 @@
+vocabulary V {
+  type Person
+
+  intentionallyInflictsInjury: Person -> Bool
+  hasPremeditation: Person -> Bool
+  injuryCausesIllnessOrIncapacity: Person -> Bool
+  injuryCausesIncurableDiseaseOrSevereMutilation: Person -> Bool
+  injuryCausesDeathWithoutIntentToKill: Person -> Bool
+
+  liableArt398: Person -> Bool
+  imprisonmentMinDaysArt398: Person -> Int
+  imprisonmentMaxDaysArt398: Person -> Int
+  fineMinEurosArt398: Person -> Int
+  fineMaxEurosArt398: Person -> Int
+
+  liableArt399: Person -> Bool
+  imprisonmentMinDaysArt399: Person -> Int
+  imprisonmentMaxDaysArt399: Person -> Int
+  fineMinEurosArt399: Person -> Int
+  fineMaxEurosArt399: Person -> Int
+
+  liableArt400: Person -> Bool
+  imprisonmentMinDaysArt400: Person -> Int
+  imprisonmentMaxDaysArt400: Person -> Int
+  fineMinEurosArt400: Person -> Int
+  fineMaxEurosArt400: Person -> Int
+  detentionMinDaysArt400: Person -> Int
+  detentionMaxDaysArt400: Person -> Int
+
+  liableArt401: Person -> Bool
+  detentionMinDaysArt401: Person -> Int
+  detentionMaxDaysArt401: Person -> Int
+}
+
+theory T:V {
+  !p in Person: liableArt398(p) <=> intentionallyInflictsInjury(p) & ~injuryCausesIllnessOrIncapacity(p) & ~injuryCausesIncurableDiseaseOrSevereMutilation(p) & ~injuryCausesDeathWithoutIntentToKill(p).
+
+  !p in Person: (intentionallyInflictsInjury(p) & ~injuryCausesIllnessOrIncapacity(p) & ~injuryCausesIncurableDiseaseOrSevereMutilation(p) & ~injuryCausesDeathWithoutIntentToKill(p) & ~hasPremeditation(p)) => imprisonmentMinDaysArt398(p) = 8.
+  !p in Person: (intentionallyInflictsInjury(p) & ~injuryCausesIllnessOrIncapacity(p) & ~injuryCausesIncurableDiseaseOrSevereMutilation(p) & ~injuryCausesDeathWithoutIntentToKill(p) & ~hasPremeditation(p)) => imprisonmentMaxDaysArt398(p) = 180.
+  !p in Person: (intentionallyInflictsInjury(p) & ~injuryCausesIllnessOrIncapacity(p) & ~injuryCausesIncurableDiseaseOrSevereMutilation(p) & ~injuryCausesDeathWithoutIntentToKill(p) & ~hasPremeditation(p)) => fineMinEurosArt398(p) = 26.
+  !p in Person: (intentionallyInflictsInjury(p) & ~injuryCausesIllnessOrIncapacity(p) & ~injuryCausesIncurableDiseaseOrSevereMutilation(p) & ~injuryCausesDeathWithoutIntentToKill(p) & ~hasPremeditation(p)) => fineMaxEurosArt398(p) = 100.
+
+  !p in Person: (intentionallyInflictsInjury(p) & ~injuryCausesIllnessOrIncapacity(p) & ~injuryCausesIncurableDiseaseOrSevereMutilation(p) & ~injuryCausesDeathWithoutIntentToKill(p) & hasPremeditation(p)) => imprisonmentMinDaysArt398(p) = 30.
+  !p in Person: (intentionallyInflictsInjury(p) & ~injuryCausesIllnessOrIncapacity(p) & ~injuryCausesIncurableDiseaseOrSevereMutilation(p) & ~injuryCausesDeathWithoutIntentToKill(p) & hasPremeditation(p)) => imprisonmentMaxDaysArt398(p) = 365.
+  !p in Person: (intentionallyInflictsInjury(p) & ~injuryCausesIllnessOrIncapacity(p) & ~injuryCausesIncurableDiseaseOrSevereMutilation(p) & ~injuryCausesDeathWithoutIntentToKill(p) & hasPremeditation(p)) => fineMinEurosArt398(p) = 50.
+  !p in Person: (intentionallyInflictsInjury(p) & ~injuryCausesIllnessOrIncapacity(p) & ~injuryCausesIncurableDiseaseOrSevereMutilation(p) & ~injuryCausesDeathWithoutIntentToKill(p) & hasPremeditation(p)) => fineMaxEurosArt398(p) = 200.
+
+  !p in Person: liableArt399(p) <=> injuryCausesIllnessOrIncapacity(p) & ~injuryCausesIncurableDiseaseOrSevereMutilation(p) & ~injuryCausesDeathWithoutIntentToKill(p).
+
+  !p in Person: (injuryCausesIllnessOrIncapacity(p) & ~injuryCausesIncurableDiseaseOrSevereMutilation(p) & ~injuryCausesDeathWithoutIntentToKill(p) & ~hasPremeditation(p)) => imprisonmentMinDaysArt399(p) = 60.
+  !p in Person: (injuryCausesIllnessOrIncapacity(p) & ~injuryCausesIncurableDiseaseOrSevereMutilation(p) & ~injuryCausesDeathWithoutIntentToKill(p) & ~hasPremeditation(p)) => imprisonmentMaxDaysArt399(p) = 730.
+  !p in Person: (injuryCausesIllnessOrIncapacity(p) & ~injuryCausesIncurableDiseaseOrSevereMutilation(p) & ~injuryCausesDeathWithoutIntentToKill(p) & ~hasPremeditation(p)) => fineMinEurosArt399(p) = 50.
+  !p in Person: (injuryCausesIllnessOrIncapacity(p) & ~injuryCausesIncurableDiseaseOrSevereMutilation(p) & ~injuryCausesDeathWithoutIntentToKill(p) & ~hasPremeditation(p)) => fineMaxEurosArt399(p) = 200.
+
+  !p in Person: (injuryCausesIllnessOrIncapacity(p) & ~injuryCausesIncurableDiseaseOrSevereMutilation(p) & ~injuryCausesDeathWithoutIntentToKill(p) & hasPremeditation(p)) => imprisonmentMinDaysArt399(p) = 180.
+  !p in Person: (injuryCausesIllnessOrIncapacity(p) & ~injuryCausesIncurableDiseaseOrSevereMutilation(p) & ~injuryCausesDeathWithoutIntentToKill(p) & hasPremeditation(p)) => imprisonmentMaxDaysArt399(p) = 1095.
+  !p in Person: (injuryCausesIllnessOrIncapacity(p) & ~injuryCausesIncurableDiseaseOrSevereMutilation(p) & ~injuryCausesDeathWithoutIntentToKill(p) & hasPremeditation(p)) => fineMinEurosArt399(p) = 100.
+  !p in Person: (injuryCausesIllnessOrIncapacity(p) & ~injuryCausesIncurableDiseaseOrSevereMutilation(p) & ~injuryCausesDeathWithoutIntentToKill(p) & hasPremeditation(p)) => fineMaxEurosArt399(p) = 500.
+
+  !p in Person: liableArt400(p) <=> injuryCausesIncurableDiseaseOrSevereMutilation(p) & ~injuryCausesDeathWithoutIntentToKill(p).
+
+  !p in Person: (injuryCausesIncurableDiseaseOrSevereMutilation(p) & ~injuryCausesDeathWithoutIntentToKill(p) & ~hasPremeditation(p)) => imprisonmentMinDaysArt400(p) = 730.
+  !p in Person: (injuryCausesIncurableDiseaseOrSevereMutilation(p) & ~injuryCausesDeathWithoutIntentToKill(p) & ~hasPremeditation(p)) => imprisonmentMaxDaysArt400(p) = 1825.
+  !p in Person: (injuryCausesIncurableDiseaseOrSevereMutilation(p) & ~injuryCausesDeathWithoutIntentToKill(p) & ~hasPremeditation(p)) => fineMinEurosArt400(p) = 200.
+  !p in Person: (injuryCausesIncurableDiseaseOrSevereMutilation(p) & ~injuryCausesDeathWithoutIntentToKill(p) & ~hasPremeditation(p)) => fineMaxEurosArt400(p) = 500.
+
+  !p in Person: (injuryCausesIncurableDiseaseOrSevereMutilation(p) & ~injuryCausesDeathWithoutIntentToKill(p) & hasPremeditation(p)) => detentionMinDaysArt400(p) = 1825.
+  !p in Person: (injuryCausesIncurableDiseaseOrSevereMutilation(p) & ~injuryCausesDeathWithoutIntentToKill(p) & hasPremeditation(p)) => detentionMaxDaysArt400(p) = 3650.
+
+  !p in Person: liableArt401(p) <=> injuryCausesDeathWithoutIntentToKill(p).
+
+  !p in Person: (injuryCausesDeathWithoutIntentToKill(p) & ~hasPremeditation(p)) => detentionMinDaysArt401(p) = 1825.
+  !p in Person: (injuryCausesDeathWithoutIntentToKill(p) & ~hasPremeditation(p)) => detentionMaxDaysArt401(p) = 3650.
+
+  !p in Person: (injuryCausesDeathWithoutIntentToKill(p) & hasPremeditation(p)) => detentionMinDaysArt401(p) = 3650.
+  !p in Person: (injuryCausesDeathWithoutIntentToKill(p) & hasPremeditation(p)) => detentionMaxDaysArt401(p) = 5475.
+}

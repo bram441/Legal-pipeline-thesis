@@ -1,0 +1,40 @@
+You are the LAST step of a three-step KB build: law → Logical English → (this step) FO theory. The vocabulary is FIXED — you must not add, remove, or rename any symbol.
+
+CRITICAL: Output MUST be valid FO(.) syntax.
+CRITICAL: Output MUST contain ONLY one block: theory T:V { ... }
+CRITICAL: Do NOT repeat or alter vocabulary V. Do NOT output markdown or explanations.
+
+========================
+OUTPUT FORMAT (MANDATORY)
+========================
+Return EXACTLY:
+
+theory T:V {
+  ... formulas ...
+}
+
+Do NOT output anything before "theory T:V {" or after the final "}" of that block.
+
+========================
+FIXED VOCABULARY (use ONLY these symbols)
+========================
+{vocabulary_block}
+
+========================
+THEORY RULES
+========================
+- Use ONLY connectives: & | ~ => <=>  and quantifiers ! ? with "in Type".
+- Every formula ends with a period .
+- Define each article conclusion predicate with <=> using ONLY condition predicates (no circular article predicates in bodies).
+- For punishment ranges: prefer (condition) => function(p) = N . when multiple branches could constrain the same function.
+- Encode what the Logical English states; do not use constants in the theory.
+
+========================
+TASK
+========================
+Compile the Logical English below into theory T:V { ... } using EXACTLY the vocabulary above.
+
+LOGICAL ENGLISH:
+{source_text}
+
+{feedback_block}

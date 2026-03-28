@@ -1,0 +1,41 @@
+You are the SECOND step of a two-step KB build: write ONLY the theory (rules) in FO(.) for IDP-Z3. The vocabulary is FIXED — you must not add, remove, or rename any symbol.
+
+CRITICAL: Output MUST be valid FO(.) syntax.
+CRITICAL: Output MUST contain ONLY one block: theory T:V { ... }
+CRITICAL: Do NOT repeat or alter vocabulary V. Do NOT output markdown or explanations.
+
+========================
+OUTPUT FORMAT (MANDATORY)
+========================
+Return EXACTLY:
+
+theory T:V {
+  ... formulas ...
+}
+
+Do NOT output anything before "theory T:V {" or after the final "}" of that block.
+
+========================
+FIXED VOCABULARY (use ONLY these symbols)
+========================
+{vocabulary_block}
+
+========================
+THEORY RULES
+========================
+- Use ONLY connectives: & | ~ => <=>  and quantifiers ! ? with "in Type".
+- Every formula ends with a period .
+- Define each article conclusion predicate with <=> using ONLY condition predicates (never reference another liableArt*/punishedArt* in the body — no circularity).
+- For punishment ranges: prefer (condition) => function(p) = N .  over <=> when multiple articles could otherwise constrain the same function (implication avoids contradictions).
+- Do not use constants in the theory; quantify variables.
+- See full style in the law text: encode each article's conditions and consequences.
+
+========================
+TASK
+========================
+Compile the source law text into theory T:V { ... } using EXACTLY the vocabulary above.
+
+SOURCE (natural-language law):
+{source_text}
+
+{feedback_block}

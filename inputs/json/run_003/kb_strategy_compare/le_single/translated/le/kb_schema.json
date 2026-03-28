@@ -4,7 +4,7 @@
   ],
   "predicates": [
     {
-      "name": "ActedWithPremeditation",
+      "name": "CausesCompleteLossOfOrganUse",
       "args": [
         "Person"
       ],
@@ -18,21 +18,21 @@
       "returns": "Bool"
     },
     {
-      "name": "CausesIllnessOrIncapacity",
+      "name": "CausesDiseaseOrInabilityPerformPersonalLabor",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "CausesIncapacityToPerformPersonalLaborMoreThanFourMonths",
+      "name": "CausesInabilityPerformPersonalLaborMoreThanFourMonths",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "CausesIncurableAppearingDisease",
+      "name": "CausesIncurableSeemingDisease",
       "args": [
         "Person"
       ],
@@ -46,7 +46,7 @@
       "returns": "Bool"
     },
     {
-      "name": "CausesTotalLossOfUseOfAnOrgan",
+      "name": "IntentWithoutKill",
       "args": [
         "Person"
       ],
@@ -54,6 +54,13 @@
     },
     {
       "name": "IntentionallyInflictsWoundsOrBlows",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "Premeditation",
       "args": [
         "Person"
       ],

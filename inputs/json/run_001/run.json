@@ -1,5 +1,6 @@
 {
   "id": "run_001",
+  "kb_compile_strategy": "direct_single",
   "law": {
     "text": "If a party is negligent and causes damage, then that party is liable."
   },

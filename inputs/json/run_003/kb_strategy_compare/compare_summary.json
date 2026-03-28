@@ -1,0 +1,42 @@
+[
+  {
+    "strategy": "direct_single",
+    "path": "C:\\Users\\bramd\\Documents\\VUB\\Master Thesis\\Legal-pipeline\\inputs\\json\\run_003\\kb_strategy_compare\\direct_single",
+    "ok": true,
+    "exit_code": 0,
+    "accuracy": 1.0,
+    "correct": 3,
+    "total": 3,
+    "id": "run_003"
+  },
+  {
+    "strategy": "direct_two_phase",
+    "path": "C:\\Users\\bramd\\Documents\\VUB\\Master Thesis\\Legal-pipeline\\inputs\\json\\run_003\\kb_strategy_compare\\direct_two_phase",
+    "ok": true,
+    "exit_code": 0,
+    "accuracy": 0.6666666666666666,
+    "correct": 2,
+    "total": 3,
+    "id": "run_003"
+  },
+  {
+    "strategy": "le_single",
+    "path": "C:\\Users\\bramd\\Documents\\VUB\\Master Thesis\\Legal-pipeline\\inputs\\json\\run_003\\kb_strategy_compare\\le_single",
+    "ok": true,
+    "exit_code": 0,
+    "accuracy": 1.0,
+    "correct": 3,
+    "total": 3,
+    "id": "run_003"
+  },
+  {
+    "strategy": "le_two_phase",
+    "path": "C:\\Users\\bramd\\Documents\\VUB\\Master Thesis\\Legal-pipeline\\inputs\\json\\run_003\\kb_strategy_compare\\le_two_phase",
+    "ok": true,
+    "exit_code": 0,
+    "accuracy": 1.0,
+    "correct": 3,
+    "total": 3,
+    "id": "run_003"
+  }
+]

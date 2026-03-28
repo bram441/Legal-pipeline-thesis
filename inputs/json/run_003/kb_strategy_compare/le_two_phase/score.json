@@ -26,6 +26,6 @@
       "text": "What is the minimum prison sentence for Jan?"
     }
   ],
-  "kb_compile_strategy": "direct_single",
+  "kb_compile_strategy": "le_two_phase",
   "accuracy": 1.0
 }

@@ -32,9 +32,9 @@
       }
     }
   ],
-  "kb_compile_strategy": "direct_single",
+  "kb_compile_strategy": "le_single",
   "kb_compile_flags": {
-    "use_le": false,
+    "use_le": true,
     "two_phase": false
   }
 }

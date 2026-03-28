@@ -32,3 +32,20 @@ def write_score(run_dir, score_obj):
     path = os.path.join(run_dir, "score.json")
     with open(path, "w", encoding="utf-8") as f:
         json.dump(score_obj, f, ensure_ascii=False, indent=2)
+
+
+def merge_json_run_file(run_dir, updates):
+    """
+    Merge ``updates`` into existing run.json (creates nothing if run.json is missing).
+    Used to record kb_compile_strategy after a run.
+    """
+    path = os.path.join(run_dir, "run.json")
+    if not os.path.exists(path):
+        return
+    with open(path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    if not isinstance(data, dict):
+        return
+    data.update(updates)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
