@@ -1,22 +1,15 @@
 {
   "id": "run_004",
-  "total": 2,
+  "total": 1,
   "correct": 1,
   "items": [
-    {
-      "match": false,
-      "expected": false,
-      "got": true,
-      "id": "q2",
-      "text": "Is Tom liable under Article 399?"
-    },
     {
       "match": true,
       "expected": false,
       "got": false,
-      "id": "q3",
-      "text": "Is Lars liable under Article 398?"
+      "id": "q2",
+      "text": "Is Tom liable under Article 399?"
     }
   ],
-  "accuracy": 0.5
+  "accuracy": 1.0
 }

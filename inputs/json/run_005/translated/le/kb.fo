@@ -1,17 +1,18 @@
 vocabulary V {
   type Person
-  IntentionallyInflictedWoundsOrBlows: Person -> Bool
-  CausesDeath: Person -> Bool
-  CausesApparentlyIncurableDisease: Person -> Bool
-  CausesIncapacityMoreThanFourMonths: Person -> Bool
-  CausesCompleteLossOfUseOfOrgan: Person -> Bool
-  CausesSeriousMutilation: Person -> Bool
-  CausesIllnessOrIncapacity: Person -> Bool
-  Premeditated: Person -> Bool
-  punishedArt398: Person -> Bool
-  punishedArt399: Person -> Bool
-  punishedArt400: Person -> Bool
-  punishedArt401: Person -> Bool
+  IntentionallyInflictsBlowsOrInjuries: Person -> Bool
+  DidNotActWithAimToKill: Person -> Bool
+  CausedDeath: Person -> Bool
+  CausedApparentlyIncurableIllness: Person -> Bool
+  CausedIncapacityMoreThanFourMonths: Person -> Bool
+  CausedCompleteLossOfUseOfOrgan: Person -> Bool
+  CausedSevereMaiming: Person -> Bool
+  CausedIllnessOrIncapacity: Person -> Bool
+  ActedWithPremeditation: Person -> Bool
+  liableArt401: Person -> Bool
+  liableArt400: Person -> Bool
+  liableArt399: Person -> Bool
+  liableArt398: Person -> Bool
   imprisonmentMinDays: Person -> Int
   imprisonmentMaxDays: Person -> Int
   fineMinEuros: Person -> Int
@@ -20,97 +21,321 @@ vocabulary V {
 
 theory T:V {
   !p in Person:
-    punishedArt401(p) <=> 
-      IntentionallyInflictedWoundsOrBlows(p) & 
-      ~Premeditated(p) &
-      CausesDeath(p) .
+    liableArt401(p) <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      DidNotActWithAimToKill(p) &
+      CausedDeath(p).
 
   !p in Person:
-    punishedArt401(p) <=> 
-      IntentionallyInflictedWoundsOrBlows(p) & CausesDeath(p) .
-
-  !p in Person:
-    punishedArt400(p) <=>
-      IntentionallyInflictedWoundsOrBlows(p) & 
+    liableArt400(p) <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
       (
-        CausesApparentlyIncurableDisease(p) | 
-        CausesIncapacityMoreThanFourMonths(p) | 
-        CausesCompleteLossOfUseOfOrgan(p) | 
-        CausesSeriousMutilation(p)
+        CausedApparentlyIncurableIllness(p) |
+        CausedIncapacityMoreThanFourMonths(p) |
+        CausedCompleteLossOfUseOfOrgan(p) |
+        CausedSevereMaiming(p)
       ) &
-      ~punishedArt401(p) .
+      ~CausedDeath(p).
 
   !p in Person:
-    punishedArt399(p) <=>
-      IntentionallyInflictedWoundsOrBlows(p) &
-      CausesIllnessOrIncapacity(p) &
-      ~punishedArt400(p) &
-      ~punishedArt401(p) .
+    liableArt399(p) <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      CausedIllnessOrIncapacity(p) &
+      ~(
+        CausedApparentlyIncurableIllness(p) |
+        CausedIncapacityMoreThanFourMonths(p) |
+        CausedCompleteLossOfUseOfOrgan(p) |
+        CausedSevereMaiming(p) |
+        CausedDeath(p)
+      ).
 
   !p in Person:
-    punishedArt398(p) <=>
-      IntentionallyInflictedWoundsOrBlows(p) &
-      ~punishedArt399(p) &
-      ~punishedArt400(p) &
-      ~punishedArt401(p) .
+    liableArt398(p) <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      ~CausedIllnessOrIncapacity(p) &
+      ~CausedDeath(p).
 
   !p in Person:
-    imprisonmentMinDays(p) = 30 <=> punishedArt398(p) & Premeditated(p) .
-  !p in Person:
-    imprisonmentMaxDays(p) = 365 <=> punishedArt398(p) & Premeditated(p) .
-  !p in Person:
-    fineMinEuros(p) = 50 <=> punishedArt398(p) & Premeditated(p) .
-  !p in Person:
-    fineMaxEuros(p) = 200 <=> punishedArt398(p) & Premeditated(p) .
+    imprisonmentMinDays(p) = 1825 <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      DidNotActWithAimToKill(p) &
+      CausedDeath(p) &
+      ~ActedWithPremeditation(p).
 
   !p in Person:
-    imprisonmentMinDays(p) = 8 <=> punishedArt398(p) & ~Premeditated(p) .
-  !p in Person:
-    imprisonmentMaxDays(p) = 180 <=> punishedArt398(p) & ~Premeditated(p) .
-  !p in Person:
-    fineMinEuros(p) = 26 <=> punishedArt398(p) & ~Premeditated(p) .
-  !p in Person:
-    fineMaxEuros(p) = 100 <=> punishedArt398(p) & ~Premeditated(p) .
+    imprisonmentMaxDays(p) = 3650 <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      DidNotActWithAimToKill(p) &
+      CausedDeath(p) &
+      ~ActedWithPremeditation(p).
 
   !p in Person:
-    imprisonmentMinDays(p) = 180 <=> punishedArt399(p) & Premeditated(p) .
-  !p in Person:
-    imprisonmentMaxDays(p) = 1095 <=> punishedArt399(p) & Premeditated(p) .
-  !p in Person:
-    fineMinEuros(p) = 100 <=> punishedArt399(p) & Premeditated(p) .
-  !p in Person:
-    fineMaxEuros(p) = 500 <=> punishedArt399(p) & Premeditated(p) .
+    imprisonmentMinDays(p) = 3650 <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      DidNotActWithAimToKill(p) &
+      CausedDeath(p) &
+      ActedWithPremeditation(p).
 
   !p in Person:
-    imprisonmentMinDays(p) = 60 <=> punishedArt399(p) & ~Premeditated(p) .
-  !p in Person:
-    imprisonmentMaxDays(p) = 730 <=> punishedArt399(p) & ~Premeditated(p) .
-  !p in Person:
-    fineMinEuros(p) = 50 <=> punishedArt399(p) & ~Premeditated(p) .
-  !p in Person:
-    fineMaxEuros(p) = 200 <=> punishedArt399(p) & ~Premeditated(p) .
+    imprisonmentMaxDays(p) = 5475 <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      DidNotActWithAimToKill(p) &
+      CausedDeath(p) &
+      ActedWithPremeditation(p).
 
   !p in Person:
-    imprisonmentMinDays(p) = 1825 <=> punishedArt400(p) & Premeditated(p) .
-  !p in Person:
-    imprisonmentMaxDays(p) = 3650 <=> punishedArt400(p) & Premeditated(p) .
+    imprisonmentMinDays(p) = 730 <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      (
+        CausedApparentlyIncurableIllness(p) |
+        CausedIncapacityMoreThanFourMonths(p) |
+        CausedCompleteLossOfUseOfOrgan(p) |
+        CausedSevereMaiming(p)
+      ) &
+      ~CausedDeath(p) &
+      ~ActedWithPremeditation(p).
 
   !p in Person:
-    imprisonmentMinDays(p) = 730 <=> punishedArt400(p) & ~Premeditated(p) .
-  !p in Person:
-    imprisonmentMaxDays(p) = 1825 <=> punishedArt400(p) & ~Premeditated(p) .
-  !p in Person:
-    fineMinEuros(p) = 200 <=> punishedArt400(p) & ~Premeditated(p) .
-  !p in Person:
-    fineMaxEuros(p) = 500 <=> punishedArt400(p) & ~Premeditated(p) .
+    imprisonmentMaxDays(p) = 1825 <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      (
+        CausedApparentlyIncurableIllness(p) |
+        CausedIncapacityMoreThanFourMonths(p) |
+        CausedCompleteLossOfUseOfOrgan(p) |
+        CausedSevereMaiming(p)
+      ) &
+      ~CausedDeath(p) &
+      ~ActedWithPremeditation(p).
 
   !p in Person:
-    imprisonmentMinDays(p) = 3650 <=> punishedArt401(p) & Premeditated(p) .
-  !p in Person:
-    imprisonmentMaxDays(p) = 5475 <=> punishedArt401(p) & Premeditated(p) .
+    fineMinEuros(p) = 200 <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      (
+        CausedApparentlyIncurableIllness(p) |
+        CausedIncapacityMoreThanFourMonths(p) |
+        CausedCompleteLossOfUseOfOrgan(p) |
+        CausedSevereMaiming(p)
+      ) &
+      ~CausedDeath(p) &
+      ~ActedWithPremeditation(p).
 
   !p in Person:
-    imprisonmentMinDays(p) = 1825 <=> punishedArt401(p) & ~Premeditated(p) .
+    fineMaxEuros(p) = 500 <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      (
+        CausedApparentlyIncurableIllness(p) |
+        CausedIncapacityMoreThanFourMonths(p) |
+        CausedCompleteLossOfUseOfOrgan(p) |
+        CausedSevereMaiming(p)
+      ) &
+      ~CausedDeath(p) &
+      ~ActedWithPremeditation(p).
+
   !p in Person:
-    imprisonmentMaxDays(p) = 3650 <=> punishedArt401(p) & ~Premeditated(p) .
+    imprisonmentMinDays(p) = 1825 <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      (
+        CausedApparentlyIncurableIllness(p) |
+        CausedIncapacityMoreThanFourMonths(p) |
+        CausedCompleteLossOfUseOfOrgan(p) |
+        CausedSevereMaiming(p)
+      ) &
+      ~CausedDeath(p) &
+      ActedWithPremeditation(p).
+
+  !p in Person:
+    imprisonmentMaxDays(p) = 3650 <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      (
+        CausedApparentlyIncurableIllness(p) |
+        CausedIncapacityMoreThanFourMonths(p) |
+        CausedCompleteLossOfUseOfOrgan(p) |
+        CausedSevereMaiming(p)
+      ) &
+      ~CausedDeath(p) &
+      ActedWithPremeditation(p).
+
+  !p in Person:
+    fineMinEuros(p) = 200 <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      (
+        CausedApparentlyIncurableIllness(p) |
+        CausedIncapacityMoreThanFourMonths(p) |
+        CausedCompleteLossOfUseOfOrgan(p) |
+        CausedSevereMaiming(p)
+      ) &
+      ~CausedDeath(p) &
+      ActedWithPremeditation(p).
+
+  !p in Person:
+    fineMaxEuros(p) = 500 <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      (
+        CausedApparentlyIncurableIllness(p) |
+        CausedIncapacityMoreThanFourMonths(p) |
+        CausedCompleteLossOfUseOfOrgan(p) |
+        CausedSevereMaiming(p)
+      ) &
+      ~CausedDeath(p) &
+      ActedWithPremeditation(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 60 <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      CausedIllnessOrIncapacity(p) &
+      ~(
+        CausedApparentlyIncurableIllness(p) |
+        CausedIncapacityMoreThanFourMonths(p) |
+        CausedCompleteLossOfUseOfOrgan(p) |
+        CausedSevereMaiming(p) |
+        CausedDeath(p)
+      ) &
+      ~ActedWithPremeditation(p).
+
+  !p in Person:
+    imprisonmentMaxDays(p) = 730 <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      CausedIllnessOrIncapacity(p) &
+      ~(
+        CausedApparentlyIncurableIllness(p) |
+        CausedIncapacityMoreThanFourMonths(p) |
+        CausedCompleteLossOfUseOfOrgan(p) |
+        CausedSevereMaiming(p) |
+        CausedDeath(p)
+      ) &
+      ~ActedWithPremeditation(p).
+
+  !p in Person:
+    fineMinEuros(p) = 50 <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      CausedIllnessOrIncapacity(p) &
+      ~(
+        CausedApparentlyIncurableIllness(p) |
+        CausedIncapacityMoreThanFourMonths(p) |
+        CausedCompleteLossOfUseOfOrgan(p) |
+        CausedSevereMaiming(p) |
+        CausedDeath(p)
+      ) &
+      ~ActedWithPremeditation(p).
+
+  !p in Person:
+    fineMaxEuros(p) = 200 <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      CausedIllnessOrIncapacity(p) &
+      ~(
+        CausedApparentlyIncurableIllness(p) |
+        CausedIncapacityMoreThanFourMonths(p) |
+        CausedCompleteLossOfUseOfOrgan(p) |
+        CausedSevereMaiming(p) |
+        CausedDeath(p)
+      ) &
+      ~ActedWithPremeditation(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 180 <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      CausedIllnessOrIncapacity(p) &
+      ~(
+        CausedApparentlyIncurableIllness(p) |
+        CausedIncapacityMoreThanFourMonths(p) |
+        CausedCompleteLossOfUseOfOrgan(p) |
+        CausedSevereMaiming(p) |
+        CausedDeath(p)
+      ) &
+      ActedWithPremeditation(p).
+
+  !p in Person:
+    imprisonmentMaxDays(p) = 1095 <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      CausedIllnessOrIncapacity(p) &
+      ~(
+        CausedApparentlyIncurableIllness(p) |
+        CausedIncapacityMoreThanFourMonths(p) |
+        CausedCompleteLossOfUseOfOrgan(p) |
+        CausedSevereMaiming(p) |
+        CausedDeath(p)
+      ) &
+      ActedWithPremeditation(p).
+
+  !p in Person:
+    fineMinEuros(p) = 100 <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      CausedIllnessOrIncapacity(p) &
+      ~(
+        CausedApparentlyIncurableIllness(p) |
+        CausedIncapacityMoreThanFourMonths(p) |
+        CausedCompleteLossOfUseOfOrgan(p) |
+        CausedSevereMaiming(p) |
+        CausedDeath(p)
+      ) &
+      ActedWithPremeditation(p).
+
+  !p in Person:
+    fineMaxEuros(p) = 500 <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      CausedIllnessOrIncapacity(p) &
+      ~(
+        CausedApparentlyIncurableIllness(p) |
+        CausedIncapacityMoreThanFourMonths(p) |
+        CausedCompleteLossOfUseOfOrgan(p) |
+        CausedSevereMaiming(p) |
+        CausedDeath(p)
+      ) &
+      ActedWithPremeditation(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 8 <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      ~CausedIllnessOrIncapacity(p) &
+      ~CausedDeath(p) &
+      ~ActedWithPremeditation(p).
+
+  !p in Person:
+    imprisonmentMaxDays(p) = 180 <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      ~CausedIllnessOrIncapacity(p) &
+      ~CausedDeath(p) &
+      ~ActedWithPremeditation(p).
+
+  !p in Person:
+    fineMinEuros(p) = 26 <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      ~CausedIllnessOrIncapacity(p) &
+      ~CausedDeath(p) &
+      ~ActedWithPremeditation(p).
+
+  !p in Person:
+    fineMaxEuros(p) = 100 <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      ~CausedIllnessOrIncapacity(p) &
+      ~CausedDeath(p) &
+      ~ActedWithPremeditation(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 30 <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      ~CausedIllnessOrIncapacity(p) &
+      ~CausedDeath(p) &
+      ActedWithPremeditation(p).
+
+  !p in Person:
+    imprisonmentMaxDays(p) = 365 <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      ~CausedIllnessOrIncapacity(p) &
+      ~CausedDeath(p) &
+      ActedWithPremeditation(p).
+
+  !p in Person:
+    fineMinEuros(p) = 50 <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      ~CausedIllnessOrIncapacity(p) &
+      ~CausedDeath(p) &
+      ActedWithPremeditation(p).
+
+  !p in Person:
+    fineMaxEuros(p) = 200 <=>
+      IntentionallyInflictsBlowsOrInjuries(p) &
+      ~CausedIllnessOrIncapacity(p) &
+      ~CausedDeath(p) &
+      ActedWithPremeditation(p).
 }

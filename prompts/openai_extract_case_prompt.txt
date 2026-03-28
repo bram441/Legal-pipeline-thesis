@@ -7,10 +7,13 @@ Rules:
 - Case text may be in any language; map to the schema symbols.
 - Extract ALL expressible facts; do NOT drop facts because they seem irrelevant.
 - Facts must be FO(.) structure lines ending with '.'.
-- NEGATION: use 'not pred(x).' (do NOT use 'pred(x) = false.').
+- NEGATION: use 'not pred(x).' (do NOT use 'pred(x) = false.'). Negation applies to the PREDICATE, never to the entity. Write 'not Predicate(jan).' never 'Predicate(not jan).' — arguments must always be entity names only.
 - Do NOT output both pred(x) and not pred(x) for the same predicate and entity - that is a contradiction. Output only the fact supported by the case text.
 - CRITICAL: Predicates about consequences of actions refer to the ACTOR/SUBJECT (the person who committed the act), not the victim. Map each predicate to the correct entity from the case.
-- CRITICAL: Severity predicates (e.g. severe injury, incurable illness, organ loss) have a strict legal meaning. Minor injuries (bruises, broken nose, cuts) do NOT qualify. Only assert them when the case explicitly describes qualifying severity.
+- CRITICAL: Severity predicates (e.g. severe injury, incurable illness, organ loss, death) have a strict legal meaning. Only assert them when the case EXPLICITLY describes that outcome. If the case says injuries did NOT cause death, organ loss, incurable disease, or severe harm, assert the NEGATION: 'not Predicate(entity).' Do not assert the positive form.
+- CRITICAL: Predicates that include "death", "Death", "organ loss", "incurable", or similar in their name are TRUE only when the case states that outcome occurred. If the case says "did not cause death" or "no organ loss" or "no incurable disease", you MUST assert 'not ThatPredicate(entity).'.
+- CRITICAL: Duration thresholds are strict. "CausesIncapacityOverFourMonths" (or similar) is TRUE only when the case states incapacity of MORE than four months. Four weeks, one month, two months, or "a few weeks" are NOT more than four months — assert 'not CausesIncapacityOverFourMonths(entity).' in those cases.
+- CRITICAL: When the case says the victim could not work, was unable to work, had to stay home, or had illness/incapacity (even briefly), assert CausesIllnessOrIncapacity(offender). for the person who committed the act — this covers illness or incapacity for personal work regardless of duration.
 
 KB_SCHEMA (hard contract):
 {kb_schema_json}

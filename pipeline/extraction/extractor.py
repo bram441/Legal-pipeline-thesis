@@ -214,3 +214,80 @@ def extract_case_and_query(case_text, user_question, kb_schema=None, provider="a
         raise ExtractionError("Query extraction failed after {} repair attempts: {}".format(max_retries, last_query_error))
 
     return {"case": case, "query": query}
+
+
+def extract_case_only(case_text, kb_schema=None, provider="auto", model=None, max_retries=6):
+    """Extract and validate case facts only. Use for shared case across multiple questions."""
+    if provider == "auto":
+        provider = _auto_provider()
+    if provider != "openai":
+        raise ExtractionError("Unsupported provider: " + str(provider))
+
+    chosen_model = model or os.getenv("OPENAI_MODEL") or "gpt-4.1-mini"
+    case_feedback = None
+    case_obj = None
+    last_case_error = None
+    for case_attempt in range(max_retries):
+        if case_attempt == 0:
+            status_log("Case", "Extracting")
+        else:
+            status_log("Case", "Repair attempt {}".format(case_attempt))
+        try:
+            case_obj = extract_case_only_openai(
+                case_text,
+                model=chosen_model,
+                kb_schema=kb_schema,
+                feedback=case_feedback,
+            )
+        except LLMExtractionError as e:
+            raise ExtractionError(str(e))
+
+        try:
+            status_log("Case", "Validating")
+            case = normalize_and_validate_case(case_obj, kb_schema=kb_schema)
+            return case
+        except ValueError as e:
+            last_case_error = e
+            case_feedback = _schema_feedback_message(e, case_obj, kb_schema)
+    raise ExtractionError(
+        "Case extraction failed after {} repair attempts: {}".format(max_retries, last_case_error)
+    )
+
+
+def extract_query_only(user_question, case, kb_schema=None, provider="auto", model=None, max_retries=6, case_text=None):
+    """Extract and validate query only, given an already-validated case."""
+    if provider == "auto":
+        provider = _auto_provider()
+    if provider != "openai":
+        raise ExtractionError("Unsupported provider: " + str(provider))
+
+    chosen_model = model or os.getenv("OPENAI_MODEL") or "gpt-4.1-mini"
+    query_feedback = None
+    query_obj = None
+    last_query_error = None
+    for query_attempt in range(max_retries):
+        if query_attempt == 0:
+            status_log("Query", "Extracting")
+        else:
+            status_log("Query", "Repair attempt {}".format(query_attempt))
+        try:
+            query_obj = extract_query_only_openai(
+                user_question,
+                model=chosen_model,
+                kb_schema=kb_schema,
+                feedback=query_feedback,
+            )
+        except LLMExtractionError as e:
+            raise ExtractionError(str(e))
+
+        try:
+            status_log("Query", "Validating")
+            _check_entity_consistency(user_question, query_obj, case, case_text=case_text, kb_schema=kb_schema)
+            query = normalize_and_validate_query(query_obj, case, kb_schema=kb_schema)
+            return query
+        except ValueError as e:
+            last_query_error = e
+            query_feedback = _schema_feedback_message(e, query_obj, kb_schema)
+    raise ExtractionError(
+        "Query extraction failed after {} repair attempts: {}".format(max_retries, last_query_error)
+    )

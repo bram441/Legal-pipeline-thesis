@@ -4,91 +4,84 @@
   ],
   "predicates": [
     {
-      "name": "ActedWithPremeditation",
+      "name": "CausedDeath",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "BluesOrInjuriesCausedCompleteLossOfUseOfOrgan",
+      "name": "CausesIllnessOrIncapacity",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "BluesOrInjuriesCausedDeath",
+      "name": "CausesIncapacityMoreThanFourMonths",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "BluesOrInjuriesCausedIncapacityMoreThanFourMonths",
+      "name": "CausesIncurableIllness",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "BluesOrInjuriesCausedIncurableDisease",
+      "name": "CausesSevereMutilation",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "BluesOrInjuriesCausedSevereMutilation",
+      "name": "CausesTotalLossOrganUse",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "BluesOrInjuriesResultedInIllnessOrIncapacityToPerformPersonalLabor",
+      "name": "IntentionallyInflictsWoundsOrBlows",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "IntentionallyInflictedBlowsOrInjuries",
+      "name": "Premeditation",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "IntentionallyInflictedBlowsOrInjuriesCausedDeath",
+      "name": "liableArt398",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "punishedArt398",
+      "name": "liableArt399",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "punishedArt399",
+      "name": "liableArt400",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "punishedArt400",
-      "args": [
-        "Person"
-      ],
-      "returns": "Bool"
-    },
-    {
-      "name": "punishedArt401",
+      "name": "liableArt401",
       "args": [
         "Person"
       ],

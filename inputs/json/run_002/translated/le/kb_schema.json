@@ -11,63 +11,84 @@
       "returns": "Bool"
     },
     {
-      "name": "CausedDeath",
+      "name": "CausesCompleteLossOfUseOfOrgan",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "DidNotIntendToKill",
+      "name": "CausesDeath",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "IntentionallyInflictedWoundsOrBlows",
+      "name": "CausesIllnessOrIncapacity",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "ResultedInIllnessOrIncapacity",
+      "name": "CausesInabilityToPerformPersonalLaborForMoreThanFourMonths",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "ResultedInIncurableDiseaseOrLongIncapacity",
+      "name": "CausesIncurableAppearingDisease",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "punishedArt398",
+      "name": "CausesSevereMutilation",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "punishedArt399",
+      "name": "IntentionallyInflictsWoundsOrBlows",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "punishedArt400",
+      "name": "PurposeToKill",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "punishedArt401",
+      "name": "liableArt398",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "liableArt399",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "liableArt400",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "liableArt401",
       "args": [
         "Person"
       ],

@@ -4,84 +4,91 @@
   ],
   "predicates": [
     {
-      "name": "CausesApparentlyIncurableDisease",
+      "name": "ActedWithPremeditation",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "CausesCompleteLossOfUseOfOrgan",
+      "name": "CausedApparentlyIncurableIllness",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "CausesDeath",
+      "name": "CausedCompleteLossOfUseOfOrgan",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "CausesIllnessOrIncapacity",
+      "name": "CausedDeath",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "CausesIncapacityMoreThanFourMonths",
+      "name": "CausedIllnessOrIncapacity",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "CausesSeriousMutilation",
+      "name": "CausedIncapacityMoreThanFourMonths",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "IntentionallyInflictedWoundsOrBlows",
+      "name": "CausedSevereMaiming",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "Premeditated",
+      "name": "DidNotActWithAimToKill",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "punishedArt398",
+      "name": "IntentionallyInflictsBlowsOrInjuries",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "punishedArt399",
+      "name": "liableArt398",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "punishedArt400",
+      "name": "liableArt399",
       "args": [
         "Person"
       ],
       "returns": "Bool"
     },
     {
-      "name": "punishedArt401",
+      "name": "liableArt400",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool"
+    },
+    {
+      "name": "liableArt401",
       "args": [
         "Person"
       ],

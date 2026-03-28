@@ -1,0 +1,228 @@
+
+======================================================================
+  RUN TRACE
+======================================================================
+
+--- Run dir ---
+C:\Users\bramd\Documents\VUB\Master Thesis\Legal-pipeline\inputs\json\run_003
+
+--- Cache subdir (effective) ---
+C:\Users\bramd\Documents\VUB\Master Thesis\Legal-pipeline\inputs\json\run_003\translated\le
+
+
+======================================================================
+  KB LOADED FROM CACHE
+======================================================================
+
+--- Status ---
+OK (syntax and semantic checks passed)
+
+
+======================================================================
+  QUESTION: Is Jan liable under Article 398?
+======================================================================
+
+--- Raw extracted (case) ---
+{
+  "facts": [
+    "IntentionallyInflictsWoundsOrBlows(jan).",
+    "CausesIllnessOrIncapacity(jan).",
+    "not CausesIncurableAppearingDisease(jan).",
+    "not CausesTotalLossOfUseOfAnOrgan(jan).",
+    "ActedWithPremeditation(jan)."
+  ]
+}
+
+--- Raw extracted (query) ---
+{
+  "type": "predicate",
+  "predicate": "liableArt398",
+  "mode": "boolean",
+  "args": [
+    "jan"
+  ],
+  "explain": false
+}
+
+--- Case (normalized) ---
+{
+  "facts": [
+    "IntentionallyInflictsWoundsOrBlows(jan).",
+    "CausesIllnessOrIncapacity(jan).",
+    "not CausesIncurableAppearingDisease(jan).",
+    "not CausesTotalLossOfUseOfAnOrgan(jan).",
+    "ActedWithPremeditation(jan)."
+  ],
+  "entities": {
+    "Person": [
+      "jan",
+      "marie"
+    ]
+  }
+}
+
+--- Query (normalized) ---
+{
+  "type": "predicate",
+  "predicate": "liableArt398",
+  "mode": "boolean",
+  "args": [
+    "jan"
+  ],
+  "explain": false
+}
+
+--- Symbolic result ---
+{
+  "atom": "liableArt398(x0)",
+  "constraint": "? x0 in Person: __sel0(x0) & liableArt398(x0)",
+  "possible": false,
+  "certain": false
+}
+
+--- Prediction ---
+{
+  "mode": "boolean",
+  "label": "contradicted"
+}
+
+
+======================================================================
+  QUESTION: Is Jan liable under Article 399?
+======================================================================
+
+--- Raw extracted (case) ---
+{
+  "facts": [
+    "IntentionallyInflictsWoundsOrBlows(jan).",
+    "CausesIllnessOrIncapacity(jan).",
+    "not CausesIncurableAppearingDisease(jan).",
+    "not CausesTotalLossOfUseOfAnOrgan(jan).",
+    "ActedWithPremeditation(jan)."
+  ]
+}
+
+--- Raw extracted (query) ---
+{
+  "type": "predicate",
+  "predicate": "liableArt399",
+  "mode": "boolean",
+  "args": [
+    "jan"
+  ],
+  "explain": false
+}
+
+--- Case (normalized) ---
+{
+  "facts": [
+    "IntentionallyInflictsWoundsOrBlows(jan).",
+    "CausesIllnessOrIncapacity(jan).",
+    "not CausesIncurableAppearingDisease(jan).",
+    "not CausesTotalLossOfUseOfAnOrgan(jan).",
+    "ActedWithPremeditation(jan)."
+  ],
+  "entities": {
+    "Person": [
+      "jan",
+      "marie"
+    ]
+  }
+}
+
+--- Query (normalized) ---
+{
+  "type": "predicate",
+  "predicate": "liableArt399",
+  "mode": "boolean",
+  "args": [
+    "jan"
+  ],
+  "explain": false
+}
+
+--- Symbolic result ---
+{
+  "atom": "liableArt399(x0)",
+  "constraint": "? x0 in Person: __sel0(x0) & liableArt399(x0)",
+  "possible": true,
+  "certain": true
+}
+
+--- Prediction ---
+{
+  "mode": "boolean",
+  "label": "entailed"
+}
+
+
+======================================================================
+  QUESTION: What is the minimum prison sentence for Jan?
+======================================================================
+
+--- Raw extracted (case) ---
+{
+  "facts": [
+    "IntentionallyInflictsWoundsOrBlows(jan).",
+    "CausesIllnessOrIncapacity(jan).",
+    "not CausesIncurableAppearingDisease(jan).",
+    "not CausesTotalLossOfUseOfAnOrgan(jan).",
+    "ActedWithPremeditation(jan)."
+  ]
+}
+
+--- Raw extracted (query) ---
+{
+  "type": "intent",
+  "explain": false,
+  "predicate": "",
+  "mode": "set",
+  "args": [],
+  "intent": "get_range",
+  "symbol": "imprisonmentMinDays",
+  "entity": "jan"
+}
+
+--- Case (normalized) ---
+{
+  "facts": [
+    "IntentionallyInflictsWoundsOrBlows(jan).",
+    "CausesIllnessOrIncapacity(jan).",
+    "not CausesIncurableAppearingDisease(jan).",
+    "not CausesTotalLossOfUseOfAnOrgan(jan).",
+    "ActedWithPremeditation(jan)."
+  ],
+  "entities": {
+    "Person": [
+      "jan",
+      "marie"
+    ]
+  }
+}
+
+--- Query (normalized) ---
+{
+  "type": "intent",
+  "explain": false,
+  "predicate": "",
+  "mode": "set",
+  "args": [],
+  "intent": "get_range",
+  "symbol": "imprisonmentMinDays",
+  "entity": "jan"
+}
+
+--- Symbolic result ---
+{
+  "symbol": "imprisonmentMinDays",
+  "range": "180",
+  "entity": "jan"
+}
+
+--- Prediction ---
+{
+  "mode": "set",
+  "certain_set": [],
+  "possible_set": []
+}
+

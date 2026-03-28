@@ -1,0 +1,857 @@
+
+======================================================================
+  RUN TRACE
+======================================================================
+
+--- Run dir ---
+inputs/json/run_004
+
+--- Cache subdir (effective) ---
+inputs/json/run_004\translated\le
+
+
+======================================================================
+  KB COMPILATION - Attempt 1
+======================================================================
+
+--- Law text ---
+SECTION II. - INTENTIONAL KILLING, NOT CALLED MANSLAUGHTER, AND INTENTIONAL INFLICTING OF BODILY INJURY.
+
+  Art. 398. Whoever intentionally inflicts wounds or blows shall be punished with imprisonment from eight days to six months and a fine from twenty-six [euros] to one hundred [euros], or with one of these penalties alone.
+  In case the offender acted with premeditation, he shall be sentenced to imprisonment from one month to one year and a fine from fifty [euros] to two hundred [euros].
+
+  Art. 399. If the blows or wounds result in illness or incapacity to perform personal labor, the offender shall be punished with imprisonment from two months to two years and a fine from fifty [euros] to two hundred [euros].
+  The offender shall be punished with imprisonment from six months to three years and a fine from one hundred [euros] to five hundred [euros], if he acted with premeditation.
+
+  Art. 400. The penalty shall be imprisonment from two years to five years and a fine from two hundred [euros] to five hundred [euros], if the blows or wounds result in an apparently incurable illness, incapacity to perform personal labor for more than four months, total loss of the use of an organ, or a severe mutilation.
+  The penalty shall be imprisonment from five years to ten years, in case the offender acted with premeditation.
+
+  Art. 401. When the blows or wounds are intentionally inflicted, but without the intent to kill, and yet cause death, the offender shall be punished with imprisonment from five years to ten years.
+  He shall be punished with imprisonment from ten years to fifteen years if he commits these violent acts with premeditation.
+
+--- LLM response (raw) ---
+vocabulary V {
+  type Person
+
+  IntentionallyInflictsWoundsOrBlows: Person -> Bool
+  CausedDeath: Person -> Bool
+  CausesIncurableIllness: Person -> Bool
+  CausesIncapacityMoreThanFourMonths: Person -> Bool
+  CausesTotalLossOrganUse: Person -> Bool
+  CausesSevereMutilation: Person -> Bool
+  CausesIllnessOrIncapacity: Person -> Bool
+  Premeditation: Person -> Bool
+
+  liableArt398: Person -> Bool
+  liableArt399: Person -> Bool
+  liableArt400: Person -> Bool
+  liableArt401: Person -> Bool
+
+  imprisonmentMinDays: Person -> int
+  imprisonmentMaxDays: Person -> int
+  fineMinEuros: Person -> int
+  fineMaxEuros: Person -> int
+}
+
+theory T:V {
+  !p in Person:
+    liableArt401(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) & ~Premeditation(p) | true & CausedDeath(p) & IntentionallyInflictsWoundsOrBlows(p).
+  !p in Person:
+    liableArt401(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) & CausedDeath(p) & ~ ( 
+        (IntentionallyInflictsWoundsOrBlows(p) & ~Premeditation(p) | true) => false
+      ).
+  !p in Person:
+    liableArt401(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) & CausedDeath(p).
+
+  !p in Person:
+    liableArt400(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) &
+      (CausesIncurableIllness(p) | CausesIncapacityMoreThanFourMonths(p) | CausesTotalLossOrganUse(p) | CausesSevereMutilation(p)) &
+      ~CausedDeath(p).
+
+  !p in Person:
+    liableArt399(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) &
+      CausesIllnessOrIncapacity(p) &
+      ~( ( (CausesIncurableIllness(p) | CausesIncapacityMoreThanFourMonths(p) | CausesTotalLossOrganUse(p) | CausesSevereMutilation(p)) & ~CausedDeath(p) ) |
+         (CausedDeath(p)) ).
+
+  !p in Person:
+    liableArt398(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) &
+      ~CausesIllnessOrIncapacity(p) &
+      ~CausesTotalLossOrganUse(p) &
+      ~CausesSevereMutilation(p) &
+      ~CausesIncurableIllness(p) &
+      ~CausesIncapacityMoreThanFourMonths(p) &
+      ~CausedDeath(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 8 <=> liableArt398(p) & ~Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 180 <=> liableArt398(p) & ~Premeditation(p).
+  !p in Person:
+    fineMinEuros(p) = 26 <=> liableArt398(p) & ~Premeditation(p).
+  !p in Person:
+    fineMaxEuros(p) = 100 <=> liableArt398(p) & ~Premeditation(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 30 <=> liableArt398(p) & Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 365 <=> liableArt398(p) & Premeditation(p).
+  !p in Person:
+    fineMinEuros(p) = 50 <=> liableArt398(p) & Premeditation(p).
+  !p in Person:
+    fineMaxEuros(p) = 200 <=> liableArt398(p) & Premeditation(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 60 <=> liableArt399(p) & ~Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 730 <=> liableArt399(p) & ~Premeditation(p).
+  !p in Person:
+    fineMinEuros(p) = 50 <=> liableArt399(p) & ~Premeditation(p).
+  !p in Person:
+    fineMaxEuros(p) = 200 <=> liableArt399(p) & ~Premeditation(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 180 <=> liableArt399(p) & Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 1095 <=> liableArt399(p) & Premeditation(p).
+  !p in Person:
+    fineMinEuros(p) = 100 <=> liableArt399(p) & Premeditation(p).
+  !p in Person:
+    fineMaxEuros(p) = 500 <=> liableArt399(p) & Premeditation(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 730 <=> liableArt400(p) & ~Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 1825 <=> liableArt400(p) & ~Premeditation(p).
+  !p in Person:
+    fineMinEuros(p) = 200 <=> liableArt400(p) & ~Premeditation(p).
+  !p in Person:
+    fineMaxEuros(p) = 500 <=> liableArt400(p) & ~Premeditation(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 1825 <=> liableArt400(p) & Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 3650 <=> liableArt400(p) & Premeditation(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 1825 <=> liableArt401(p) & ~Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 3650 <=> liableArt401(p) & ~Premeditation(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 3650 <=> liableArt401(p) & Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 5475 <=> liableArt401(p) & Premeditation(p).
+}
+
+--- After sanitization ---
+vocabulary V {
+  type Person
+
+  IntentionallyInflictsWoundsOrBlows: Person -> Bool
+  CausedDeath: Person -> Bool
+  CausesIncurableIllness: Person -> Bool
+  CausesIncapacityMoreThanFourMonths: Person -> Bool
+  CausesTotalLossOrganUse: Person -> Bool
+  CausesSevereMutilation: Person -> Bool
+  CausesIllnessOrIncapacity: Person -> Bool
+  Premeditation: Person -> Bool
+
+  liableArt398: Person -> Bool
+  liableArt399: Person -> Bool
+  liableArt400: Person -> Bool
+  liableArt401: Person -> Bool
+
+  imprisonmentMinDays: Person -> int
+  imprisonmentMaxDays: Person -> int
+  fineMinEuros: Person -> int
+  fineMaxEuros: Person -> int
+}
+
+theory T:V {
+  !p in Person:
+    liableArt401(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) & ~Premeditation(p) | true & CausedDeath(p) & IntentionallyInflictsWoundsOrBlows(p).
+  !p in Person:
+    liableArt401(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) & CausedDeath(p) & ~ ( 
+        (IntentionallyInflictsWoundsOrBlows(p) & ~Premeditation(p) | true) => false
+      ).
+  !p in Person:
+    liableArt401(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) & CausedDeath(p).
+
+  !p in Person:
+    liableArt400(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) &
+      (CausesIncurableIllness(p) | CausesIncapacityMoreThanFourMonths(p) | CausesTotalLossOrganUse(p) | CausesSevereMutilation(p)) &
+      ~CausedDeath(p).
+
+  !p in Person:
+    liableArt399(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) &
+      CausesIllnessOrIncapacity(p) &
+      ~( ( (CausesIncurableIllness(p) | CausesIncapacityMoreThanFourMonths(p) | CausesTotalLossOrganUse(p) | CausesSevereMutilation(p)) & ~CausedDeath(p) ) |
+         (CausedDeath(p)) ).
+
+  !p in Person:
+    liableArt398(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) &
+      ~CausesIllnessOrIncapacity(p) &
+      ~CausesTotalLossOrganUse(p) &
+      ~CausesSevereMutilation(p) &
+      ~CausesIncurableIllness(p) &
+      ~CausesIncapacityMoreThanFourMonths(p) &
+      ~CausedDeath(p).
+
+  !p in Person:
+    impr...
+
+--- Validation failed (ERROR) ---
+IDP failed to parse compiled KB: Error: line 18 - colStart 34 - colEnd 37 => Undeclared symbol name: "int"
+
+
+======================================================================
+  KB COMPILATION - Attempt 2
+======================================================================
+
+--- Law text ---
+SECTION II. - INTENTIONAL KILLING, NOT CALLED MANSLAUGHTER, AND INTENTIONAL INFLICTING OF BODILY INJURY.
+
+  Art. 398. Whoever intentionally inflicts wounds or blows shall be punished with imprisonment from eight days to six months and a fine from twenty-six [euros] to one hundred [euros], or with one of these penalties alone.
+  In case the offender acted with premeditation, he shall be sentenced to imprisonment from one month to one year and a fine from fifty [euros] to two hundred [euros].
+
+  Art. 399. If the blows or wounds result in illness or incapacity to perform personal labor, the offender shall be punished with imprisonment from two months to two years and a fine from fifty [euros] to two hundred [euros].
+  The offender shall be punished with imprisonment from six months to three years and a fine from one hundred [euros] to five hundred [euros], if he acted with premeditation.
+
+  Art. 400. The penalty shall be imprisonment from two years to five years and a fine from two hundred [euros] to five hundred [euros], if the blows or wounds result in an apparently incurable illness, incapacity to perform personal labor for more than four months, total loss of the use of an organ, or a severe mutilation.
+  The penalty shall be imprisonment from five years to ten years, in case the offender acted with premeditation.
+
+  Art. 401. When the blows or wounds are intentionally inflicted, but without the intent to kill, and yet cause death, the offender shall be punished with imprisonment from five years to ten years.
+  He shall be punished with imprisonment from ten years to fifteen years if he commits these violent acts with premeditation.
+
+--- Repair feedback (from previous attempt) ---
+IDP failed to parse compiled KB: Error: line 18 - colStart 34 - colEnd 37 => Undeclared symbol name: "int"
+
+--- Previous output (sent to repair prompt) ---
+vocabulary V {
+  type Person
+
+  IntentionallyInflictsWoundsOrBlows: Person -> Bool
+  CausedDeath: Person -> Bool
+  CausesIncurableIllness: Person -> Bool
+  CausesIncapacityMoreThanFourMonths: Person -> Bool
+  CausesTotalLossOrganUse: Person -> Bool
+  CausesSevereMutilation: Person -> Bool
+  CausesIllnessOrIncapacity: Person -> Bool
+  Premeditation: Person -> Bool
+
+  liableArt398: Person -> Bool
+  liableArt399: Person -> Bool
+  liableArt400: Person -> Bool
+  liableArt401: Person -> Bool
+
+  imprisonmentMinDays: Person -> int
+  imprisonmentMaxDays: Person -> int
+  fineMinEuros: Person -> int
+  fineMaxEuros: Person -> int
+}
+
+theory T:V {
+  !p in Person:
+    liableArt401(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) & ~Premeditation(p) | true & CausedDeath(p) & IntentionallyInflictsWoundsOrBlows(p).
+  !p in Person:
+    liableArt401(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) & CausedDeath(p) & ~ ( 
+        (IntentionallyInflictsWoundsOrBlows(p) & ~Premeditation(p) | true) => false
+      ).
+  !p in Person:
+    liableArt401(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) & CausedDeath(p).
+
+  !p in Person:
+    liableArt400(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) &
+      (CausesIncurableIllness(p) | CausesIncapacityMoreThanFourMonths(p) | CausesTotalLossOrganUse(p) | CausesSevereMutilation(p)) &
+      ~CausedDeath(p).
+
+  !p in Person:
+    liableArt399(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) &
+      CausesIllnessOrIncapacity(p) &
+      ~( ( (CausesIncurableIllness(p) | CausesIncapacityMoreThanFourMonths(p) | CausesTotalLossOrganUse(p) | CausesSevereMutilation(p)) & ~CausedDeath(p) ) |
+         (CausedDeath(p)) ).
+
+  !p in Person:
+    liableArt398(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) &
+      ~CausesIllnessOrIncapacity(p) &
+      ~CausesTotalLossOrganUse(p) &
+      ~CausesSevereMutilation(p) &
+      ~CausesIncurableIllness(p) &
+      ~CausesIncapacityMoreThanFourMonths(p) &
+      ~CausedDeath(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 8 <=> liableArt398(p) & ~Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 180 <=> liableArt398(p) & ~Premeditation(p).
+  !p in Person:
+    fineMinEuros(p) = 26 <=> liableArt398(p) & ~Premeditation(p).
+  !p in Person:
+    fineMaxEuros(p) = 100 <=> liableArt398(p) & ~Premeditation(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 30 <=> liableArt398(p) & Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 365 <=> liableArt398(p) & Premeditation(p).
+  !p in Person:
+    fineMinEuros(p) = 50 <=> liableArt398(p) & Premeditation(p).
+  !p in Person:
+    fineMaxEuros(p) = 200 <=> liableArt398(p) & Premeditation(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 60 <=> liableArt399(p) & ~Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 730 <=> liableArt399(p) & ~Premeditation(p).
+  !p in Person:
+    fineMinEuros(p) = 50 <=> liableArt399(p) & ~Premeditation(p).
+  !p in Person:
+    fineMaxEuros(p) = 200 <=> liableArt399(p) & ~Premeditation...
+
+--- LLM response (raw) ---
+vocabulary V {
+  type Person
+
+  IntentionallyInflictsWoundsOrBlows: Person -> Bool
+  CausedDeath: Person -> Bool
+  CausesIncurableIllness: Person -> Bool
+  CausesIncapacityMoreThanFourMonths: Person -> Bool
+  CausesTotalLossOrganUse: Person -> Bool
+  CausesSevereMutilation: Person -> Bool
+  CausesIllnessOrIncapacity: Person -> Bool
+  Premeditation: Person -> Bool
+
+  liableArt398: Person -> Bool
+  liableArt399: Person -> Bool
+  liableArt400: Person -> Bool
+  liableArt401: Person -> Bool
+
+  imprisonmentMinDays: Person -> Int
+  imprisonmentMaxDays: Person -> Int
+  fineMinEuros: Person -> Int
+  fineMaxEuros: Person -> Int
+}
+
+theory T:V {
+  !p in Person:
+    liableArt401(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) & CausedDeath(p) & ~Premeditation(p).
+  !p in Person:
+    liableArt401(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) & CausedDeath(p) & Premeditation(p).
+
+  !p in Person:
+    liableArt400(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) &
+      (CausesIncurableIllness(p) | CausesIncapacityMoreThanFourMonths(p) | CausesTotalLossOrganUse(p) | CausesSevereMutilation(p)) &
+      ~CausedDeath(p).
+
+  !p in Person:
+    liableArt399(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) &
+      CausesIllnessOrIncapacity(p) &
+      ~(
+        CausesIncurableIllness(p) | CausesIncapacityMoreThanFourMonths(p) | CausesTotalLossOrganUse(p) | CausesSevereMutilation(p) | CausedDeath(p)
+      ).
+
+  !p in Person:
+    liableArt398(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) &
+      ~CausesIllnessOrIncapacity(p) &
+      ~CausesTotalLossOrganUse(p) &
+      ~CausesSevereMutilation(p) &
+      ~CausesIncurableIllness(p) &
+      ~CausesIncapacityMoreThanFourMonths(p) &
+      ~CausedDeath(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 8 <=> liableArt398(p) & ~Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 180 <=> liableArt398(p) & ~Premeditation(p).
+  !p in Person:
+    fineMinEuros(p) = 26 <=> liableArt398(p) & ~Premeditation(p).
+  !p in Person:
+    fineMaxEuros(p) = 100 <=> liableArt398(p) & ~Premeditation(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 30 <=> liableArt398(p) & Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 365 <=> liableArt398(p) & Premeditation(p).
+  !p in Person:
+    fineMinEuros(p) = 50 <=> liableArt398(p) & Premeditation(p).
+  !p in Person:
+    fineMaxEuros(p) = 200 <=> liableArt398(p) & Premeditation(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 60 <=> liableArt399(p) & ~Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 730 <=> liableArt399(p) & ~Premeditation(p).
+  !p in Person:
+    fineMinEuros(p) = 50 <=> liableArt399(p) & ~Premeditation(p).
+  !p in Person:
+    fineMaxEuros(p) = 200 <=> liableArt399(p) & ~Premeditation(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 180 <=> liableArt399(p) & Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 1095 <=> liableArt399(p) & Premeditation(p).
+  !p in Person:
+    fineMinEuros(p) = 100 <=> liableArt399(p) & Premeditation(p).
+  !p in Person:
+    fineMaxEuros(p) = 500 <=> liableArt399(p) & Premeditation(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 730 <=> liableArt400(p) & ~Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 1825 <=> liableArt400(p) & ~Premeditation(p).
+  !p in Person:
+    fineMinEuros(p) = 200 <=> liableArt400(p) & ~Premeditation(p).
+  !p in Person:
+    fineMaxEuros(p) = 500 <=> liableArt400(p) & ~Premeditation(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 1825 <=> liableArt400(p) & Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 3650 <=> liableArt400(p) & Premeditation(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 1825 <=> liableArt401(p) & ~Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 3650 <=> liableArt401(p) & ~Premeditation(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 3650 <=> liableArt401(p) & Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 5475 <=> liableArt401(p) & Premeditation(p).
+}
+
+--- After sanitization ---
+vocabulary V {
+  type Person
+
+  IntentionallyInflictsWoundsOrBlows: Person -> Bool
+  CausedDeath: Person -> Bool
+  CausesIncurableIllness: Person -> Bool
+  CausesIncapacityMoreThanFourMonths: Person -> Bool
+  CausesTotalLossOrganUse: Person -> Bool
+  CausesSevereMutilation: Person -> Bool
+  CausesIllnessOrIncapacity: Person -> Bool
+  Premeditation: Person -> Bool
+
+  liableArt398: Person -> Bool
+  liableArt399: Person -> Bool
+  liableArt400: Person -> Bool
+  liableArt401: Person -> Bool
+
+  imprisonmentMinDays: Person -> Int
+  imprisonmentMaxDays: Person -> Int
+  fineMinEuros: Person -> Int
+  fineMaxEuros: Person -> Int
+}
+
+theory T:V {
+  !p in Person:
+    liableArt401(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) & CausedDeath(p) & ~Premeditation(p).
+  !p in Person:
+    liableArt401(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) & CausedDeath(p) & Premeditation(p).
+
+  !p in Person:
+    liableArt400(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) &
+      (CausesIncurableIllness(p) | CausesIncapacityMoreThanFourMonths(p) | CausesTotalLossOrganUse(p) | CausesSevereMutilation(p)) &
+      ~CausedDeath(p).
+
+  !p in Person:
+    liableArt399(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) &
+      CausesIllnessOrIncapacity(p) &
+      ~(
+        CausesIncurableIllness(p) | CausesIncapacityMoreThanFourMonths(p) | CausesTotalLossOrganUse(p) | CausesSevereMutilation(p) | CausedDeath(p)
+      ).
+
+  !p in Person:
+    liableArt398(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) &
+      ~CausesIllnessOrIncapacity(p) &
+      ~CausesTotalLossOrganUse(p) &
+      ~CausesSevereMutilation(p) &
+      ~CausesIncurableIllness(p) &
+      ~CausesIncapacityMoreThanFourMonths(p) &
+      ~CausedDeath(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 8 <=> liableArt398(p) & ~Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 180 <=> liableArt398(p) & ~Premeditation(p).
+  !p in Person:
+    fineMinEuros(p) = 26 <=> liableArt398(p) & ~Premeditation(p).
+  !p in Person:...
+
+--- Syntax validation ---
+OK (vocabulary+theory present, IDP parse OK)
+
+--- Semantic validation ---
+OK (theory satisfiable)
+
+
+======================================================================
+  KB COMPILATION SUCCESS
+======================================================================
+
+--- Final KB ---
+vocabulary V {
+  type Person
+
+  IntentionallyInflictsWoundsOrBlows: Person -> Bool
+  CausedDeath: Person -> Bool
+  CausesIncurableIllness: Person -> Bool
+  CausesIncapacityMoreThanFourMonths: Person -> Bool
+  CausesTotalLossOrganUse: Person -> Bool
+  CausesSevereMutilation: Person -> Bool
+  CausesIllnessOrIncapacity: Person -> Bool
+  Premeditation: Person -> Bool
+
+  liableArt398: Person -> Bool
+  liableArt399: Person -> Bool
+  liableArt400: Person -> Bool
+  liableArt401: Person -> Bool
+
+  imprisonmentMinDays: Person -> Int
+  imprisonmentMaxDays: Person -> Int
+  fineMinEuros: Person -> Int
+  fineMaxEuros: Person -> Int
+}
+
+theory T:V {
+  !p in Person:
+    liableArt401(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) & CausedDeath(p) & ~Premeditation(p).
+  !p in Person:
+    liableArt401(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) & CausedDeath(p) & Premeditation(p).
+
+  !p in Person:
+    liableArt400(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) &
+      (CausesIncurableIllness(p) | CausesIncapacityMoreThanFourMonths(p) | CausesTotalLossOrganUse(p) | CausesSevereMutilation(p)) &
+      ~CausedDeath(p).
+
+  !p in Person:
+    liableArt399(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) &
+      CausesIllnessOrIncapacity(p) &
+      ~(
+        CausesIncurableIllness(p) | CausesIncapacityMoreThanFourMonths(p) | CausesTotalLossOrganUse(p) | CausesSevereMutilation(p) | CausedDeath(p)
+      ).
+
+  !p in Person:
+    liableArt398(p) <=> 
+      IntentionallyInflictsWoundsOrBlows(p) &
+      ~CausesIllnessOrIncapacity(p) &
+      ~CausesTotalLossOrganUse(p) &
+      ~CausesSevereMutilation(p) &
+      ~CausesIncurableIllness(p) &
+      ~CausesIncapacityMoreThanFourMonths(p) &
+      ~CausedDeath(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 8 <=> liableArt398(p) & ~Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 180 <=> liableArt398(p) & ~Premeditation(p).
+  !p in Person:
+    fineMinEuros(p) = 26 <=> liableArt398(p) & ~Premeditation(p).
+  !p in Person:
+    fineMaxEuros(p) = 100 <=> liableArt398(p) & ~Premeditation(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 30 <=> liableArt398(p) & Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 365 <=> liableArt398(p) & Premeditation(p).
+  !p in Person:
+    fineMinEuros(p) = 50 <=> liableArt398(p) & Premeditation(p).
+  !p in Person:
+    fineMaxEuros(p) = 200 <=> liableArt398(p) & Premeditation(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 60 <=> liableArt399(p) & ~Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 730 <=> liableArt399(p) & ~Premeditation(p).
+  !p in Person:
+    fineMinEuros(p) = 50 <=> liableArt399(p) & ~Premeditation(p).
+  !p in Person:
+    fineMaxEuros(p) = 200 <=> liableArt399(p) & ~Premeditation(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 180 <=> liableArt399(p) & Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 1095 <=> liableArt399(p) & Premeditation(p).
+  !p in Person:
+    fineMinEuros(p) = 100 <=> liableArt399(p) & Premeditation(p).
+  !p in Person:
+    fineMaxEuros(p) = 500 <=> liableArt399(p) & Premeditation(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 730 <=> liableArt400(p) & ~Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 1825 <=> liableArt400(p) & ~Premeditation(p).
+  !p in Person:
+    fineMinEuros(p) = 200 <=> liableArt400(p) & ~Premeditation(p).
+  !p in Person:
+    fineMaxEuros(p) = 500 <=> liableArt400(p) & ~Premeditation(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 1825 <=> liableArt400(p) & Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 3650 <=> liableArt400(p) & Premeditation(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 1825 <=> liableArt401(p) & ~Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 3650 <=> liableArt401(p) & ~Premeditation(p).
+
+  !p in Person:
+    imprisonmentMinDays(p) = 3650 <=> liableArt401(p) & Premeditation(p).
+  !p in Person:
+    imprisonmentMaxDays(p) = 5475 <=> liableArt401(p) & Premeditation(p).
+}
+
+
+======================================================================
+  QUESTION: Is Tom liable under Article 398?
+======================================================================
+
+--- Raw extracted (case) ---
+{
+  "facts": [
+    "IntentionallyInflictsWoundsOrBlows(tom).",
+    "not Premeditation(tom).",
+    "CausesIllnessOrIncapacity(tom).",
+    "not CausesIncapacityMoreThanFourMonths(tom).",
+    "not CausedDeath(tom).",
+    "not CausesIncurableIllness(tom).",
+    "not CausesSevereMutilation(tom).",
+    "not CausesTotalLossOrganUse(tom)."
+  ]
+}
+
+--- Raw extracted (query) ---
+{
+  "type": "predicate",
+  "predicate": "liableArt398",
+  "mode": "boolean",
+  "args": [
+    "tom"
+  ],
+  "explain": false
+}
+
+--- Case (normalized) ---
+{
+  "facts": [
+    "IntentionallyInflictsWoundsOrBlows(tom).",
+    "not Premeditation(tom).",
+    "CausesIllnessOrIncapacity(tom).",
+    "not CausesIncapacityMoreThanFourMonths(tom).",
+    "not CausedDeath(tom).",
+    "not CausesIncurableIllness(tom).",
+    "not CausesSevereMutilation(tom).",
+    "not CausesTotalLossOrganUse(tom)."
+  ],
+  "entities": {
+    "Person": [
+      "tom",
+      "lars",
+      "he"
+    ]
+  }
+}
+
+--- Query (normalized) ---
+{
+  "type": "predicate",
+  "predicate": "liableArt398",
+  "mode": "boolean",
+  "args": [
+    "tom"
+  ],
+  "explain": false
+}
+
+--- Symbolic result ---
+{
+  "atom": "liableArt398(x0)",
+  "constraint": "? x0 in Person: __sel0(x0) & liableArt398(x0)",
+  "possible": false,
+  "certain": false
+}
+
+--- Prediction ---
+{
+  "mode": "boolean",
+  "label": "contradicted"
+}
+
+
+======================================================================
+  QUESTION: Is Tom liable under Article 399?
+======================================================================
+
+--- Raw extracted (case) ---
+{
+  "facts": [
+    "IntentionallyInflictsWoundsOrBlows(tom).",
+    "not Premeditation(tom).",
+    "CausesIllnessOrIncapacity(tom).",
+    "not CausesIncapacityMoreThanFourMonths(tom).",
+    "not CausedDeath(tom).",
+    "not CausesIncurableIllness(tom).",
+    "not CausesSevereMutilation(tom).",
+    "not CausesTotalLossOrganUse(tom)."
+  ]
+}
+
+--- Raw extracted (query) ---
+{
+  "type": "predicate",
+  "predicate": "liableArt399",
+  "mode": "boolean",
+  "args": [
+    "tom"
+  ],
+  "explain": false
+}
+
+--- Case (normalized) ---
+{
+  "facts": [
+    "IntentionallyInflictsWoundsOrBlows(tom).",
+    "not Premeditation(tom).",
+    "CausesIllnessOrIncapacity(tom).",
+    "not CausesIncapacityMoreThanFourMonths(tom).",
+    "not CausedDeath(tom).",
+    "not CausesIncurableIllness(tom).",
+    "not CausesSevereMutilation(tom).",
+    "not CausesTotalLossOrganUse(tom)."
+  ],
+  "entities": {
+    "Person": [
+      "tom",
+      "lars",
+      "he"
+    ]
+  }
+}
+
+--- Query (normalized) ---
+{
+  "type": "predicate",
+  "predicate": "liableArt399",
+  "mode": "boolean",
+  "args": [
+    "tom"
+  ],
+  "explain": false
+}
+
+--- Symbolic result ---
+{
+  "atom": "liableArt399(x0)",
+  "constraint": "? x0 in Person: __sel0(x0) & liableArt399(x0)",
+  "possible": false,
+  "certain": false
+}
+
+--- Prediction ---
+{
+  "mode": "boolean",
+  "label": "contradicted"
+}
+
+
+======================================================================
+  QUESTION: Is Lars liable under Article 398?
+======================================================================
+
+--- Raw extracted (case) ---
+{
+  "facts": [
+    "IntentionallyInflictsWoundsOrBlows(tom).",
+    "not Premeditation(tom).",
+    "CausesIllnessOrIncapacity(tom).",
+    "not CausesIncapacityMoreThanFourMonths(tom).",
+    "not CausedDeath(tom).",
+    "not CausesIncurableIllness(tom).",
+    "not CausesSevereMutilation(tom).",
+    "not CausesTotalLossOrganUse(tom)."
+  ],
+  "entities": {
+    "Person": [
+      "lars"
+    ]
+  }
+}
+
+--- Raw extracted (query) ---
+{
+  "type": "predicate",
+  "predicate": "liableArt398",
+  "mode": "boolean",
+  "args": [
+    "lars"
+  ],
+  "explain": false
+}
+
+--- Case (normalized) ---
+{
+  "facts": [
+    "IntentionallyInflictsWoundsOrBlows(tom).",
+    "not Premeditation(tom).",
+    "CausesIllnessOrIncapacity(tom).",
+    "not CausesIncapacityMoreThanFourMonths(tom).",
+    "not CausedDeath(tom).",
+    "not CausesIncurableIllness(tom).",
+    "not CausesSevereMutilation(tom).",
+    "not CausesTotalLossOrganUse(tom)."
+  ],
+  "entities": {
+    "Person": [
+      "lars"
+    ]
+  }
+}
+
+--- Query (normalized) ---
+{
+  "type": "predicate",
+  "predicate": "liableArt398",
+  "mode": "boolean",
+  "args": [
+    "lars"
+  ],
+  "explain": false
+}
+
+--- Symbolic reasoning failed (ERROR) ---
+Error: line 128 - colStart 14 - colEnd 18 => Symbol not in vocabulary: lars
+

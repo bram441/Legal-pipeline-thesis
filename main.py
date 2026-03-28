@@ -2,8 +2,13 @@ import argparse
 import io
 import os
 import sys
+from pathlib import Path
 
 from dotenv import load_dotenv
+
+# Load .env from project root so it works when run from any directory
+_PROJECT_ROOT = Path(__file__).resolve().parent
+load_dotenv(_PROJECT_ROOT / ".env")
 
 # Use UTF-8 for stdout/stderr on Windows to avoid UnicodeEncodeError from IDP/Z3 output
 if sys.platform == "win32" and hasattr(sys.stdout, "fileno"):
@@ -17,10 +22,12 @@ if sys.platform == "win32" and hasattr(sys.stdout, "fileno"):
 
 from debug import status_log
 from pipeline.app.pipeline import answer_legal_prompt
+from pipeline.extraction.extractor import extract_case_only, ExtractionError
 from pipeline.io.text_runs import load_text_run, write_text_results
 from pipeline.io.json_runs import load_json_run, write_json_results, write_score
 from pipeline.eval.scoring import score_question
 from pipeline.kb.cache import get_or_compile_kb
+from pipeline.utils.run_trace import trace_enabled
 from pipeline.translation.translator import translate_to_english, TranslationError
 from pipeline.utils.unicode_sanitize import sanitize_for_output
 
@@ -57,17 +64,28 @@ def run_text_mode(run_dir, provider, translate=True):
     out_lines.append(case_text)
     out_lines.append("")
 
+    pre_extracted_case = None
+    try:
+        status_log("Case", "Extracting case once for all questions")
+        pre_extracted_case = extract_case_only(case_text, kb_schema=kb_schema, provider=provider)
+    except ExtractionError as e:
+        print("Case extraction failed:", e)
+        return
+
     for i, q in enumerate(questions):
         out_lines.append("---")
         out_lines.append("Q: " + q)
 
         status_log("Question", "Processing {} of {}".format(i + 1, len(questions)))
+        trace_path = os.path.join(run_dir, "run_trace.txt") if trace_enabled() else None
         result = answer_legal_prompt(
             case_text,
             q,
             base_kb_text=kb_text,
             extractor_provider=provider,
             kb_schema=kb_schema,
+            trace_path=trace_path,
+            pre_extracted_case=pre_extracted_case,
         )
 
         if result.get("error_stage"):
@@ -127,18 +145,29 @@ def run_json_mode(run_dir, provider, translate=True):
         "items": [],
     }
 
+    pre_extracted_case = None
+    try:
+        status_log("Case", "Extracting case once for all questions")
+        pre_extracted_case = extract_case_only(case_text, kb_schema=kb_schema, provider=provider)
+    except ExtractionError as e:
+        print("Case extraction failed:", e)
+        return
+
     for i, q in enumerate(questions):
         qid = q.get("id")
         qtext = q.get("text", "")
         expected = q.get("expected")
 
         status_log("Question", "Processing {} of {}".format(i + 1, len(questions)))
+        trace_path = os.path.join(run_dir, "run_trace.txt") if trace_enabled() else None
         result = answer_legal_prompt(
             case_text,
             qtext,
             base_kb_text=kb_text,
             extractor_provider=provider,
             kb_schema=kb_schema,
+            trace_path=trace_path,
+            pre_extracted_case=pre_extracted_case,
         )
 
         item = {
@@ -180,13 +209,18 @@ def main():
     parser.add_argument("--no-translate", action="store_true", help="Skip translation to English (input already in English)")
     args = parser.parse_args()
 
+    # Resolve run path: relative paths are from project root so it works from any cwd
+    run_path = Path(args.run)
+    if not run_path.is_absolute():
+        run_path = _PROJECT_ROOT / run_path
+    run_dir = str(run_path.resolve())
+
     translate = not args.no_translate
     if args.mode == "text":
-        run_text_mode(args.run, args.provider, translate=translate)
+        run_text_mode(run_dir, args.provider, translate=translate)
     else:
-        run_json_mode(args.run, args.provider, translate=translate)
+        run_json_mode(run_dir, args.provider, translate=translate)
 
 
 if __name__ == "__main__":
-    load_dotenv()
     main()
