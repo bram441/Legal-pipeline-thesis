@@ -26,7 +26,7 @@ def translate_to_english(text, model=None):
     client = OpenAI(api_key=api_key)
     chosen_model = model or os.getenv("OPENAI_MODEL") or "gpt-4.1-mini"
 
-    user_prompt = render_prompt("translate_to_english.txt", text=(text or "").strip())
+    user_prompt = render_prompt("translation/translate_to_english.txt", text=(text or "").strip())
 
     try:
         resp = client.chat.completions.create(

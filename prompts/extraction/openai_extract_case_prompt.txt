@@ -3,6 +3,7 @@ Rules:
 - Output JSON shape: {"facts": ["..."]}
 - Use lowercase identifiers (snake_case) for constants. Use concrete person/entity names from the case text (e.g. jan, marie, pieter), never type or role names (e.g. offender, person, victim).
 - IMPORTANT: Use ONLY predicate/function symbol NAMES from KB_SCHEMA. Copy EXACTLY (character-for-character).
+- Naming style: identifiers should be short camelCase legal concepts (e.g. causesIllnessOrIncapacity), not full sentences. If the schema already has long names, copy them exactly; never invent a new long phrase as a symbol name.
 - Do NOT use synonyms or alternative phrasings: if the schema has "intentionalCausesWoundsOrBlows" you must write that exact name, not "inflictedWoundsOrBlows" or "causesWounds". The reasoning engine matches by symbol name only.
 - Case text may be in any language; map to the schema symbols.
 - Extract ALL expressible facts; do NOT drop facts because they seem irrelevant.

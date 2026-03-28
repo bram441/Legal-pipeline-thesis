@@ -7,7 +7,7 @@ It is meant to reduce cognitive load while you iterate.
 
 `main.py` (demo runner)
   -> `pipeline/app/pipeline.py::answer_legal_prompt(...)`
-     1) **Extraction prompt** built from `prompts/extraction_debug_prompt.txt` (for result metadata; actual extraction uses separate prompts)
+     1) **Extraction prompt** built from `prompts/extraction/extraction_debug_prompt.txt` (for result metadata; actual extraction uses `prompts/extraction/openai_extract_*` prompts)
      2) **Extraction** via `pipeline/extraction/extractor.py` (case) and `pipeline/extraction/openai_extractor.py` (LLM calls)
      3) **Validation & normalization** via `pipeline/validation/fo_validation.py`
         - schema-driven symbol/arity checks use `kb_schema.json` from `pipeline/kb/schema.py`

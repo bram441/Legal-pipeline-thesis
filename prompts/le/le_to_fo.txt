@@ -30,6 +30,7 @@ B) Predicates
   ❌ Wrong:              Negligent(Person, Thing)
   ❌ Wrong:              Negligent(Person) -> Bool
   ❌ Wrong:              Negligent: Person
+- Use short camelCase names for one concept each (e.g. causesIllnessOrIncapacity). Do not encode full statutory sentences as a single identifier; split ideas and combine them in rules.
 
 C) Functions (only if needed)
 - Functions MUST be declared using ":" and "-> ReturnType".

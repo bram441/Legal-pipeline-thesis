@@ -106,7 +106,7 @@ Outputs:
 
 ## Prompts
 
-All LLM prompts live in `/prompts`.
+All LLM prompts live under `/prompts` in subfolders (`kb/`, `le/`, `extraction/`, `translation/`, `nl/`); see `pipeline/utils/prompt_loader.py`.
 
 Goals:
 - No prompt strings embedded in Python
