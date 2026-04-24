@@ -1,7 +1,7 @@
 import json
 import os
 
-from pipeline.utils.prompt_loader import render_prompt
+from pipeline.utils.prompt_loader import load_prompt, render_prompt
 
 
 class LLMExtractionError(Exception):
@@ -79,6 +79,11 @@ def _feedback_block(feedback):
     return "Validation feedback (schema-aware):\n" + str(feedback)
 
 
+def _lexical_world_knowledge_block() -> str:
+    """Shared kinship / multi-party lexical hints; edit prompts/extraction/world_knowledge_lexical.txt."""
+    return load_prompt("extraction/world_knowledge_lexical.txt").strip()
+
+
 def extract_case_only_openai(case_text, model, kb_schema=None, feedback=None):
     """Extract case facts only. Used by schema-aware feedback loop."""
     api_key = os.getenv("OPENAI_API_KEY")
@@ -98,6 +103,7 @@ def extract_case_only_openai(case_text, model, kb_schema=None, feedback=None):
         kb_schema_json=kb_schema_json,
         case_text=str(case_text),
         feedback_block=_feedback_block(feedback),
+        world_knowledge_lexical=_lexical_world_knowledge_block(),
     )
 
     resp = client.chat.completions.create(
@@ -142,6 +148,7 @@ def extract_query_only_openai(user_question, model, kb_schema=None, feedback=Non
         kb_schema_json=kb_schema_json,
         user_question=str(user_question),
         feedback_block=_feedback_block(feedback),
+        world_knowledge_lexical=_lexical_world_knowledge_block(),
     )
 
     resp = client.chat.completions.create(

@@ -8,6 +8,7 @@ from pipeline.extraction.openai_extractor import (
     extract_query_only_openai,
     LLMExtractionError,
 )
+from pipeline.extraction.query_role_resolve import apply_role_arg_consistency
 from pipeline.validation.fo_validation import (
     normalize_and_validate_case,
     normalize_and_validate_query,
@@ -115,19 +116,70 @@ def _check_entity_consistency(user_question, query_obj, case, case_text=None, kb
             status_log("Query", "Entity overwrite: question asks about '{}', using args ['{}']".format(asked, asked))
 
 
+def _arity_mismatch_repair_hint(error_msg, previous_output, kb_schema):
+    """Extra guidance when boolean query.args length does not match predicate arity."""
+    if not kb_schema or "Predicate arity mismatch" not in error_msg:
+        return ""
+
+    m = re.search(r"Predicate arity mismatch for ([^:]+): expected (\d+)", error_msg)
+    if not m:
+        return ""
+
+    pred_raw = m.group(1).strip()
+    expected = int(m.group(2))
+
+    def _norm_name(s):
+        return (s or "").lower().replace("_", "")
+
+    sig = None
+    canonical = pred_raw
+    for p in kb_schema.get("predicates", []) or []:
+        n = p.get("name")
+        if not n:
+            continue
+        if n == pred_raw or _norm_name(n) == _norm_name(pred_raw):
+            sig = p
+            canonical = n
+            break
+    if not sig:
+        return ""
+
+    types = sig.get("args") or []
+    got = []
+    if isinstance(previous_output, dict):
+        q = previous_output.get("query")
+        if isinstance(q, dict) and isinstance(q.get("args"), list):
+            got = q.get("args")
+
+    lines = [
+        "",
+        "REMEDIATION (predicate arity):",
+        "- In KB_SCHEMA, `" + canonical + "` has " + str(expected) + " domain argument(s): " + ", ".join(types) + ".",
+        "- For type=\"predicate\" and mode=\"boolean\", query.args must be a JSON array of exactly "
+        + str(expected)
+        + " string(s), each a lowercase entity name that already appears in case.facts or case.entities.",
+        "- Your previous query.args was: " + json.dumps(got, ensure_ascii=False) + " (length " + str(len(got)) + ").",
+        "- Do not use schema type names (Person, Company) as args. Prefer the named person from the case (e.g. ahmed, anna).",
+    ]
+    return "\n".join(lines)
+
+
 def _schema_feedback_message(error, previous_output, kb_schema=None):
     """Build schema-aware feedback for LLM repair."""
+    err_s = str(error)
     msg = (
         "Your previous output did not pass schema validation.\n"
-        "Error: " + str(error) + "\n"
+        "Error: " + err_s + "\n"
         "Previous output: " + json.dumps(previous_output, ensure_ascii=False, indent=2)
     )
-    if kb_schema and "Unknown symbol" in str(error):
+    if kb_schema and "Unknown symbol" in err_s:
         preds = [p.get("name") for p in kb_schema.get("predicates", []) if p.get("name")]
         funs = [f.get("name") for f in kb_schema.get("functions", []) if f.get("name")]
         valid = sorted(set(preds + funs))
         if valid:
             msg += "\n\nValid symbols (use EXACT names, case-sensitive): " + ", ".join(valid)
+    if kb_schema:
+        msg += _arity_mismatch_repair_hint(err_s, previous_output, kb_schema)
     return msg
 
 
@@ -204,6 +256,11 @@ def extract_case_and_query(case_text, user_question, kb_schema=None, provider="a
 
         try:
             status_log("Query", "Validating")
+            if apply_role_arg_consistency(user_question, query_obj, case):
+                status_log(
+                    "Query",
+                    "Adjusted query.args using case facts for role-based question (see query_role_resolve)",
+                )
             _check_entity_consistency(user_question, query_obj, case, case_text=case_text, kb_schema=kb_schema)
             query = normalize_and_validate_query(query_obj, case, kb_schema=kb_schema)
             break
@@ -282,6 +339,11 @@ def extract_query_only(user_question, case, kb_schema=None, provider="auto", mod
 
         try:
             status_log("Query", "Validating")
+            if apply_role_arg_consistency(user_question, query_obj, case):
+                status_log(
+                    "Query",
+                    "Adjusted query.args using case facts for role-based question (see query_role_resolve)",
+                )
             _check_entity_consistency(user_question, query_obj, case, case_text=case_text, kb_schema=kb_schema)
             query = normalize_and_validate_query(query_obj, case, kb_schema=kb_schema)
             return query

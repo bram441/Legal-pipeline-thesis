@@ -43,15 +43,26 @@ def _build_minimal_structure(kb_text):
     """Build a minimal structure so the theory can be checked for satisfiability.
     Each domain type gets one dummy element (ASCII-only to avoid encoding issues).
     Predicates/functions are left open (IDP will propagate or expand as needed).
+
+    Uses a distinct constant name per type (elem_TypeName). Reusing ``x`` for every
+    ``Type := {x}`` can trigger IDP errors like duplicate 'x' constructor for a type
+    when the vocabulary also declares typed constants.
     """
-    types = get_all_types_from_kb(kb_text)
-    if not types:
+    raw = get_all_types_from_kb(kb_text)
+    if not raw:
         return None
+
+    seen = set()
+    types = []
+    for t in raw:
+        if t and t not in seen:
+            seen.add(t)
+            types.append(t)
 
     lines = []
     for t in types:
-        if t:
-            lines.append("  " + t + " := {x}.")
+        elem = "elem_" + t
+        lines.append("  " + t + " := {" + elem + "}.")
     body = "\n".join(lines)
     return f"""structure S:V {{
 {body}

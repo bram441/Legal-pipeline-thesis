@@ -1,0 +1,13 @@
+General lexical hints (English and common paraphrases). Use them only to choose **which symbols from KB_SCHEMA** apply to **which named entities** — never invent predicate names.
+
+Kinship and household (map only if the schema actually lists such symbols):
+- Words like mother, father, parent, mom, dad, son, daughter, child, children, minor children, sibling, brother, sister, spouse, husband, wife, partner often refer to **binary** relations in KBs (e.g. ParentOf, ChildOf, MarriedTo) or **unary** role facts on a named person. Prefer the schema’s exact arity: unary predicates take one constant; binary predicates take two, in the order the schema declares.
+- “Leaves behind children / descendants / heirs” may correspond to predicates such as Descendant, Heir, ChildOf, or similar **only if they appear in KB_SCHEMA**. If the case names the children, introduce **one constant per named or clearly distinct child** (e.g. child1, child2) and attach the facts the text supports.
+
+Life status and roles (multi-party narratives):
+- Phrases like died, passed away, deceased (as a fact about someone), survivor, still alive, the estate of X usually involve **different named people**. Map each predicate to the **entity the case text attributes that property to**. Do not attach a predicate that describes the decedent to the survivor’s constant, or the reverse, unless the case explicitly says so.
+
+Inheritance-flavoured wording (still schema-driven):
+- Heir, inheritance, estate, beneficiary, legator often indicate **who receives** vs **who died** or **what is settled** — again, use only KB_SCHEMA symbols and distinct constants per person the case names.
+
+Remember: these bullets are **not** extra vocabulary. If a concept does not appear in KB_SCHEMA, omit it or express only what the schema allows.

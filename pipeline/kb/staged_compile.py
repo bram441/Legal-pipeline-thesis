@@ -7,7 +7,7 @@ Two-phase KB compilation (VERUS-LM style): vocabulary first, then theory only.
 - ``PIPELINE_KB_TWO_PHASE=1`` with ``PIPELINE_USE_LE=1``: law → LE first, then source =
   Logical English (``le/le_vocab_only.txt``, ``le/le_theory_only.txt``).
 
-Repair loops still use full KB + repair prompts (unchanged).
+Repair loops use full KB + symbolic vs semantic repair prompts (see compiler.py).
 """
 
 from __future__ import annotations

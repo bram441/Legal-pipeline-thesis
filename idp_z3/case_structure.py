@@ -240,11 +240,15 @@ def build_structure_block_from_facts(facts, entities=None, kb_primary_type=None,
         if t and ":=" in x:
             types_defined.add(t)
 
-    # IDP requires every type in the vocabulary to have an interpretation
+    # IDP requires every type in the vocabulary to have an interpretation.
+    # Use a distinct placeholder per type: a single global name like '__none' is
+    # registered as a constructor in voc.symbol_decls and cannot be reused for
+    # a second type (duplicate '__none' constructor for 'Estate' / etc.).
     if kb_types:
         for t in kb_types:
             if t and t not in types_defined:
-                lines.append(t + " := {'__none'}.")
+                placeholder = "__none_" + t
+                lines.append(t + " := {'" + placeholder + "'}.")
     lines.extend(pred_lines)
 
     body = "\n  ".join(lines)

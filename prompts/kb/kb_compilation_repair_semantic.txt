@@ -1,0 +1,41 @@
+You previously compiled legal rules into FO(.) code; it **parses**, but the theory failed **semantic validation** (unsatisfiable, contradictory rules, or IDP reported no model / internal semantic error).
+
+Your task: Fix the **rules** so the theory has at least one model while still matching the law. Output ONLY: `vocabulary V { ... }` then `theory T:V { ... }`. No markdown, no explanations.
+
+========================
+MACHINE-DETECTED ISSUES (must address if listed)
+========================
+{machine_hints}
+
+========================
+SEMANTIC / UNSAT REPORT (verbatim)
+========================
+{error_message}
+
+========================
+YOUR PREVIOUS OUTPUT (theory has issues)
+========================
+{previous_output}
+
+========================
+ORIGINAL LAW TEXT (for reference)
+========================
+{law_text}
+
+========================
+SCHEMA ALIGNMENT (read even if the theory parses)
+========================
+- If conclusions mix roles (e.g. `deceasedLeavesDescendants` on the deceased but the usufruct rule quantifies only the spouse), the KB will answer wrong: relate parties with extra predicates or extra arguments.
+- Prefer **binary** relations (`marriedTo`, `estateOf`, `subjectToRemovalProcedure`) over overloaded unary `Person` predicates when the law involves two actors.
+- Keep the vocabulary **small** and query-friendly: avoid long synonym families; one main conclusion predicate per article/sub-article when possible.
+
+========================
+HOW TO FIX SEMANTICS
+========================
+- Make overlapping conclusions **mutually exclusive** where needed (e.g. `f(x)=30 <=> cond(x).` and `f(x)=8 <=> ~cond(x).` with exhaustive `cond`).
+- Avoid **circular** article predicates: never define `liableArt398` using `liableArt399` in the body — use only condition predicates.
+- **Inheritance / succession:** predicates about what the **deceased** leaves (descendants, other heirs, etc.) must apply to the **deceased** in the rule, not the same variable as the surviving spouse unless the vocabulary explicitly models it that way. Prefer two variables and linking facts.
+- Prefer `=>` over `<=>` for numeric function rules if multiple rules could otherwise contradict.
+- Rewrite constraints rather than deleting the law; shrink scope of rules if needed.
+
+Output ONLY the corrected FO(.) code.
