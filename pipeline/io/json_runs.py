@@ -9,7 +9,8 @@ def load_json_run(run_dir):
     Loads a JSON-based run folder containing run.json.
 
     Returns:
-      dict parsed from JSON (must include law.text, case.text, questions[])
+      dict parsed from JSON. ``law`` may use ``text`` and/or ``path`` (project-root-relative
+      path to a law file; resolved in ``main.run_json_mode``).
     """
     path = os.path.join(run_dir, "run.json")
     with open(path, "r", encoding="utf-8") as f:

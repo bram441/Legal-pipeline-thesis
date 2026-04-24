@@ -2,6 +2,25 @@ import os
 
 from pipeline.utils.prompt_loader import render_prompt
 from pipeline.kb.exceptions import LawCompilationError
+from pipeline.kb.repair_hints import build_machine_repair_hints
+
+
+def _kb_repair_prompt_path(error_message: str) -> str:
+    """Pick repair template: semantic (theory/model) vs symbolic (parse/structure)."""
+    e = (error_message or "").lower()
+    semantic_markers = (
+        "unsatisfiable",
+        "no model exists",
+        "conflicting assignments",
+        "conflicting formulas",
+        "kb theory is unsatisfiable",
+        "theory is unsatisfiable",
+        "rules led to an inconsistency",
+        "ordinal must be",
+    )
+    if any(m in e for m in semantic_markers):
+        return "kb/kb_compilation_repair_semantic.txt"
+    return "kb/kb_compilation_repair_symbolic.txt"
 
 # Re-export for: from pipeline.kb.compiler import LawCompilationError
 __all__ = ["compile_law_to_kb_fo", "LawCompilationError"]
@@ -32,7 +51,8 @@ def compile_law_to_kb_fo(law_text, model=None, repair_feedback=None):
     - PIPELINE_USE_LE=1, PIPELINE_KB_TWO_PHASE=0: law → LE → single-shot FO (le_to_fo.txt).
     - PIPELINE_USE_LE=1, PIPELINE_KB_TWO_PHASE=1: law → LE → vocab → theory (le/*_only.txt).
 
-    If repair_feedback is set, uses kb_compilation_repair*.txt with full previous output.
+    If repair_feedback is set, uses kb_compilation_repair_symbolic.txt (parse/syntax) or
+    kb_compilation_repair_semantic.txt (unsat / semantic check), plus machine-detected hints.
     """
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
@@ -53,17 +73,15 @@ def compile_law_to_kb_fo(law_text, model=None, repair_feedback=None):
 
     if repair_feedback:
         err = repair_feedback.get("error_message", "") or ""
-        is_unsat = any(
-            s in err for s in ("unsatisfiable", "Conflicting", "rules led to an inconsistency")
-        )
-        prompt_name = (
-            "kb/kb_compilation_repair_unsat.txt" if is_unsat else "kb/kb_compilation_repair.txt"
-        )
+        prev = repair_feedback.get("previous_output", "") or ""
+        prompt_name = _kb_repair_prompt_path(err)
+        machine_hints = build_machine_repair_hints(err, prev)
         user_prompt = render_prompt(
             prompt_name,
             law_text=(law_text or "").strip(),
             error_message=repair_feedback["error_message"],
-            previous_output=repair_feedback["previous_output"],
+            previous_output=prev,
+            machine_hints=machine_hints,
         )
         try:
             resp = client.chat.completions.create(

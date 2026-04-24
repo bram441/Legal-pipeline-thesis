@@ -179,6 +179,42 @@ def normalize_and_validate_case(raw_case, kb_schema=None):
                     )
                 )
 
+    # Mutually exclusive succession branches on the same person (typically the deceased):
+    # Art. 4.17-style KBs often have one predicate per paragraph; asserting two branches
+    # makes the case inconsistent and breaks reasoning.
+    def _norm_pred_branch(name):
+        return re.sub(r"_", "", (name or "").lower())
+
+    _EXCLUSIVE_SUCCESSION_BRANCHES = frozenset(
+        {
+            "deceasedleavesdescendants",
+            "deceasedleavesrelativesascendingorclosecollateral",
+            "deceasedleavesascendantsorcollateral",
+            "deceasedleavesotherheirsornoheirs",
+        }
+    )
+    unary_pos_by_arg = {}
+    for ln in normalized_facts:
+        mpos = _pos_atom.match(ln.strip())
+        if not mpos or "=" in ln:
+            continue
+        pred_n = _norm_pred_branch(mpos.group(1))
+        ak = _args_key(mpos.group(2))
+        if len(ak) != 1:
+            continue
+        ent = ak[0]
+        unary_pos_by_arg.setdefault(ent, set()).add(pred_n)
+    for ent, preds in unary_pos_by_arg.items():
+        hit = preds & _EXCLUSIVE_SUCCESSION_BRANCHES
+        if len(hit) > 1:
+            raise ValueError(
+                "Case facts assert incompatible succession branches for the same person ({}): {}. "
+                "Only one branch of Art. 4.17-style classification should apply; keep the one that "
+                "matches the case (e.g. descendants vs other heirs).".format(
+                    ent, ", ".join(sorted(hit))
+                )
+            )
+
     deduped = normalized_facts
 
     out = {"facts": deduped}
@@ -322,7 +358,20 @@ def normalize_and_validate_query(raw_query, case, kb_schema=None):
 
         arity = len(sig.get("args", []))
         if mode == "boolean" and len(args_norm) != arity:
-            raise ValueError("Predicate arity mismatch for " + predicate + ": expected " + str(arity) + " args")
+            arg_types = ", ".join(sig.get("args") or []) or "(types not listed)"
+            raise ValueError(
+                "Predicate arity mismatch for "
+                + predicate
+                + ": expected "
+                + str(arity)
+                + " arg(s) ["
+                + arg_types
+                + "] for mode=\"boolean\", got "
+                + str(len(args_norm))
+                + " non-empty arg(s) "
+                + repr(args_norm)
+                + ". List one case constant per position (order matches KB_SCHEMA), each must appear in case facts or entities; use [] only if arity is 0."
+            )
         if mode == "set" and len(args_norm) != 0:
             raise ValueError("set mode requires args=[]")
 

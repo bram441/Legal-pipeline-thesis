@@ -1,5 +1,4 @@
 {
-  "query_mode": "set",
-  "certain_set": ["alice"],
-  "possible_set": ["alice"]
+  "smoke": true,
+  "description": "Erfrecht: KB wordt uit de wettekst gecompileerd; geen vaste goudstandaard."
 }

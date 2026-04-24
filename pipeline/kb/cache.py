@@ -4,7 +4,7 @@ import re
 from debug import status_log
 from pipeline.kb.compiler import compile_law_to_kb_fo
 from pipeline.kb.exceptions import LawCompilationError
-from pipeline.kb.schema import extract_schema_from_kb_fo, load_kb_schema, save_kb_schema
+from pipeline.kb.schema import _VOCAB_RE, extract_schema_from_kb_fo, load_kb_schema, save_kb_schema
 from pipeline.kb.semantic_check import check_kb_semantic, KBSemanticError
 from pipeline.utils.run_trace import trace_enabled, RunTraceWriter
 
@@ -26,6 +26,86 @@ def _validate_kb_fo_text(kb_text):
     return s
 
 
+def _fix_vocab_markdown_bullet_merges(kb_text):
+    """
+    LLMs often paste markdown bullets into FO: `pred1: Bool   *pred2: ...` on one line.
+    IDP then parses `*` as a type constructor and fails (Expected '->' at ... *pred2).
+    Split into two declarations. Repeat to unwrap chains.
+    """
+    lines = kb_text.splitlines()
+    out = []
+    # After Bool / Int / Real, spurious `* nextName` (LLM often omits space: `Bool*foo`)
+    pat_simple = re.compile(
+        r"^(\s*)([A-Za-z_]\w*)\s*:\s*(Bool|Int|Real)\s*\*\s*([A-Za-z_]\w*)(.*)$"
+    )
+    # After `... -> Bool`, same bullet mistake
+    pat_arrow_bool = re.compile(
+        r"^(\s*)([A-Za-z_]\w*)\s*:\s*"
+        r"((?:[A-Za-z_]\w*(?:\s*\*\s*[A-Za-z_]\w*)*)\s*->\s*Bool)\s*\*\s*"
+        r"([A-Za-z_]\w*)(.*)$"
+    )
+    for line in lines:
+        m = pat_simple.match(line)
+        if not m:
+            m = pat_arrow_bool.match(line)
+        if m:
+            indent, first, typ_or_sig, second, rest = (
+                m.group(1),
+                m.group(2),
+                m.group(3),
+                m.group(4),
+                m.group(5),
+            )
+            rest = rest.strip()
+            out.append(indent + first + ": " + typ_or_sig)
+            if rest.startswith(":"):
+                out.append(indent + "  " + second + rest)
+            else:
+                out.append(indent + "  " + second + ": Bool" + ((" " + rest) if rest else ""))
+        else:
+            out.append(line)
+    return "\n".join(out)
+
+
+_CO_DOMAIN_TYPES = frozenset({"Bool", "Int", "Real"})
+
+
+def _normalize_vocab_curried_domain(kb_text: str) -> str:
+    """
+    LLMs often declare binary (or n-ary) predicates as curried arrows:
+      foo: Person -> Goods -> Bool
+    IDP FO(.) expects a product domain:
+      foo: Person * Goods -> Bool
+    """
+    m = _VOCAB_RE.search(kb_text or "")
+    if not m:
+        return kb_text
+    inner = m.group(1)
+    out_lines: list[str] = []
+    for raw in inner.splitlines():
+        stripped = raw.strip()
+        if not stripped or stripped.startswith("//") or stripped.startswith("#"):
+            out_lines.append(raw)
+            continue
+        if re.match(r"^\s*type\s+", raw, re.IGNORECASE):
+            out_lines.append(raw)
+            continue
+        sm = re.match(r"^(\s*)([A-Za-z_]\w*)\s*:\s*(.+)$", raw.rstrip())
+        if not sm:
+            out_lines.append(raw)
+            continue
+        indent, sym, rhs = sm.group(1), sm.group(2), sm.group(3).strip()
+        parts = re.split(r"\s*->\s*", rhs)
+        if len(parts) >= 3 and parts[-1] in _CO_DOMAIN_TYPES:
+            domain = " * ".join(parts[:-1])
+            out_lines.append(indent + sym + ": " + domain + " -> " + parts[-1])
+        else:
+            out_lines.append(raw)
+    new_inner = "\n".join(out_lines)
+    start, end = m.span(1)
+    return kb_text[:start] + new_inner + kb_text[end:]
+
+
 def _sanitize_common_llm_syntax(kb_text):
     s = kb_text
     s = re.sub(r'!\s*([A-Za-z_]\w*)\s*\[\s*Party\s*\]\s*:', r'! \1 in Party:', s)
@@ -38,6 +118,12 @@ def _sanitize_common_llm_syntax(kb_text):
     s = re.sub(r'\b->\s*real\b', ' -> Real', s)
     # Equivalence: IDP expects <=> , not <-> (Prolog/math style)
     s = re.sub(r'<->', '<=>', s)
+    # Markdown bullets merged between vocabulary lines (see _fix_vocab_markdown_bullet_merges)
+    prev = None
+    while prev != s:
+        prev = s
+        s = _fix_vocab_markdown_bullet_merges(s)
+    s = _normalize_vocab_curried_domain(s)
     return s
 
 
@@ -76,10 +162,18 @@ def _use_le_enabled():
         return False
 
 
-def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.log", max_repair_attempts=6, cache_subdir=None):
+def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.log", max_repair_attempts=8, cache_subdir=None):
     """Compile or load KB. When cache_subdir is set (e.g. 'translated'), use run_dir/cache_subdir/ for cache.
     When PIPELINE_USE_LE=1, appends 'le' to cache path so LE and non-LE KBs are cached separately.
-    When PIPELINE_TRACE=1, writes all steps to run_dir/run_trace.txt for debugging."""
+    When PIPELINE_TRACE=1, writes all steps to run_dir/run_trace.txt for debugging.
+    Override attempt count with env ``PIPELINE_KB_MAX_REPAIR_ATTEMPTS`` (integer >= 1)."""
+    env_attempts = os.getenv("PIPELINE_KB_MAX_REPAIR_ATTEMPTS")
+    if env_attempts:
+        try:
+            max_repair_attempts = max(1, int(env_attempts.strip()))
+        except ValueError:
+            pass
+
     base_run_dir = run_dir
     trace_path = os.path.join(base_run_dir, "run_trace.txt") if trace_enabled() else None
 
@@ -109,11 +203,18 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
         with open(kb_path, "r", encoding="utf-8") as f:
             cached_kb = f.read()
         try:
-            kb_text = _fix_sentence_equivalence(cached_kb)
+            kb_text = _sanitize_common_llm_syntax(cached_kb)
+            kb_text = _fix_sentence_equivalence(kb_text)
             if kb_text != cached_kb:
                 with open(kb_path, "w", encoding="utf-8") as f:
                     f.write(kb_text.strip() + "\n")
             kb_text = _validate_kb_fo_text(kb_text)
+            try:
+                from pipeline.kb.kb_lint import lint_kb_fo_text
+
+                lint_kb_fo_text(kb_text)
+            except Exception as lint_exc:
+                raise KBCacheError("KB lint: " + str(lint_exc)) from lint_exc
             _idp_parse_check(kb_text)
             check_kb_semantic(kb_text)
             if os.path.exists(schema_path):
@@ -183,6 +284,12 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
             kb_text = _fix_sentence_equivalence(kb_text)
             if trace:
                 trace.log("After sanitization", kb_text[:2000] + ("..." if len(kb_text) > 2000 else ""))
+            try:
+                from pipeline.kb.kb_lint import lint_kb_fo_text
+
+                lint_kb_fo_text(kb_text)
+            except Exception as lint_exc:
+                raise KBCacheError("KB lint: " + str(lint_exc)) from lint_exc
             kb_text = _validate_kb_fo_text(kb_text)
             _idp_parse_check(kb_text)
             if trace:

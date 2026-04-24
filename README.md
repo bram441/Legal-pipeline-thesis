@@ -126,7 +126,7 @@ Goals:
 | on | off | Law → LE → single-shot FO (`le/le_to_fo.txt`) |
 | on | on | Law → LE → vocab → theory (`le/le_*_only.txt`), fallback `le_to_fo` |
 
-Repair after validation failure always uses full KB + `kb/kb_compilation_repair*.txt`.
+Repair after validation failure always uses full KB + `kb/kb_compilation_repair_symbolic.txt` (parse/syntax) or `kb/kb_compilation_repair_semantic.txt` (unsat / semantic check), with machine-detected hints (e.g. stray `*`) appended.
 
 To **recompile** and compare modes on the same run, remove the cached `kb.fo` (and optionally `kb_schema.json`) under that run’s `translated/le/` or `translated/` folder, or use a fresh run directory.
 

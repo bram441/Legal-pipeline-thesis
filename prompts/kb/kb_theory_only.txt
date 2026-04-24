@@ -28,6 +28,8 @@ THEORY RULES
 - Define each article conclusion predicate with <=> using ONLY condition predicates (never reference another liableArt*/punishedArt* in the body — no circularity).
 - For punishment ranges: prefer (condition) => function(p) = N .  over <=> when multiple articles could otherwise constrain the same function (implication avoids contradictions).
 - Do not use constants in the theory; quantify variables.
+- Inheritance / succession: predicates that describe what the **deceased** leaves (e.g. descendants, other heirs) must take the **deceased person** as their argument, not the surviving spouse. The surviving spouse is a different individual — use two variables (e.g. `s` for spouse, `d` for deceased) and link them with predicates from the vocabulary (e.g. marriage, estate) instead of reusing one variable for both roles.
+- No `let`, no programming-style binders — only `!` / `?` and the connectives listed above.
 - See full style in the law text: encode each article's conditions and consequences.
 
 ========================

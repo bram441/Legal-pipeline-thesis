@@ -1,0 +1,44 @@
+You previously compiled legal rules into FO(.) code, but IDP-Z3 rejected it: **syntax / parse / shape** (not yet a satisfiability check, or the failure was structural).
+
+Your task: Fix the errors and output corrected FO(.) code. Output format: `vocabulary V { ... }` then `theory T:V { ... }` only. No `structure` blocks.
+
+========================
+MACHINE-DETECTED ISSUES (must address if listed)
+========================
+{machine_hints}
+
+========================
+ERROR REPORT (verbatim from the toolchain)
+========================
+{error_message}
+
+========================
+YOUR PREVIOUS OUTPUT (has errors)
+========================
+{previous_output}
+
+========================
+ORIGINAL LAW TEXT (for reference)
+========================
+{law_text}
+
+========================
+SCHEMA / SYMBOL ALIGNMENT (not only parse)
+========================
+- Every symbol called in `theory T:V` must be declared in `vocabulary V` with the same name and arity.
+- Prefer a **small** vocabulary: only predicates/functions needed for the law; one clear Bool **conclusion** predicate per article where the law asks yes/no questions.
+- Multi-party rules (e.g. surviving spouse + deceased): use **distinct variables or types** (Person, Estate, …) — do not overload one unary `Person` predicate for facts that belong to different roles unless the law is explicitly unary on one actor.
+
+========================
+SYMBOLIC / SYNTAX RULES (FO(.))
+========================
+- Equivalence: use "<=>" NOT "<->" (IDP requires <=>).
+- Predicate declarations: `name: Type -> Bool` or `name: T1 * T2 -> Bool` — NOT `name(Type): Bool`.
+- Product type `*` must appear **between types** with spaces (e.g. `Person * Good -> Bool`). Never `Bool*NextPred` on one line — that is a markdown bullet merge, not FO.
+- If the error shows `*SomeName` right after `Bool` on the same line: split into TWO lines; remove the spurious `*`.
+- Quantifiers: `! x in Type:` and `? x in Type:` only — not `forall` / `exists`, not `in Type*`.
+- Theory: each formula ends with `.` ; balanced `{ }`.
+- Built-in types: `Bool`, `Int`, `Real` (capitalized).
+- No ternary in rules: no `? :`, no `*else` — use separate guarded rules.
+
+Output ONLY the corrected FO(.) code. No explanations, no markdown fences, no prose outside the two blocks.

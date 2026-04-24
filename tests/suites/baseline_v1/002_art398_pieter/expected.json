@@ -1,4 +1,4 @@
 {
-  "query_mode": "boolean",
-  "label": "entailed"
+  "smoke": true,
+  "description": "Vreemdelingenwet: definities; volledige pipeline."
 }

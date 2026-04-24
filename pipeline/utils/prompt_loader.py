@@ -9,7 +9,7 @@ PROMPTS_DIR = Path(__file__).resolve().parents[2] / "prompts"
 # Subfolders under prompts/ (paths are relative to PROMPTS_DIR, use forward slashes):
 #   kb/           — law → FO compilation and repair (syntax, UNSAT, etc.)
 #   le/           — Logical English: law_to_le, le_to_fo
-#   extraction/   — case/query extraction, debug templates
+#   extraction/   — case/query extraction, world_knowledge_lexical.txt, debug templates
 #   translation/  — e.g. translate_to_english
 #   nl/           — natural-language paraphrase for explanations
 #

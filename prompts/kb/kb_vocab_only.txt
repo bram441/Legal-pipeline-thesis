@@ -25,6 +25,8 @@ RULES (same as full KB compilation)
 - Short camelCase identifiers; one concept per symbol.
 - Declare every symbol needed later for rules: condition predicates (facts from cases), one Bool conclusion predicate per liability/punishment article (e.g. liableArt398, liableArt399), and numeric functions for sentencing/fines if applicable.
 - Mutually exclusive article predicates will be DEFINED in step 2; here you only DECLARE their names and signatures.
+- Prefer **relational** types/predicates when the law involves two parties (e.g. `Person * Person -> Bool`, `Estate`) instead of overloading many unary `Person` predicates for different roles.
+- Do NOT use `let`, markdown, or `*` between declarations on one line.
 
 ========================
 TASK

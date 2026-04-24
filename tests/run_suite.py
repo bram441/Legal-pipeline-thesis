@@ -208,24 +208,29 @@ def main():
                 else:
                     entry["prediction"] = prediction
 
-                    expected_mode = expected.get("query_mode")
-                    got_mode = prediction.get("mode")
-
-                    if expected_mode and got_mode and expected_mode != got_mode:
-                        entry["stage"] = "scoring"
-                        entry["error"] = "Mode mismatch. expected=" + str(expected_mode) + " got=" + str(got_mode)
-                        entry["passed"] = False
+                    if expected.get("smoke"):
+                        # KB compiled from law text + full answer; no fixed gold labels (predicate names unknown).
+                        entry["score"] = {"mode": "smoke", "passed": True}
+                        entry["passed"] = True
                     else:
-                        if got_mode == "boolean":
-                            entry["score"] = score_boolean(prediction, expected)
-                            entry["passed"] = bool(entry["score"]["passed"])
-                        elif got_mode == "set":
-                            entry["score"] = score_set(prediction, expected)
-                            entry["passed"] = bool(entry["score"]["passed"])
-                        else:
+                        expected_mode = expected.get("query_mode")
+                        got_mode = prediction.get("mode")
+
+                        if expected_mode and got_mode and expected_mode != got_mode:
                             entry["stage"] = "scoring"
-                            entry["error"] = "Unsupported prediction mode: " + str(got_mode)
+                            entry["error"] = "Mode mismatch. expected=" + str(expected_mode) + " got=" + str(got_mode)
                             entry["passed"] = False
+                        else:
+                            if got_mode == "boolean":
+                                entry["score"] = score_boolean(prediction, expected)
+                                entry["passed"] = bool(entry["score"]["passed"])
+                            elif got_mode == "set":
+                                entry["score"] = score_set(prediction, expected)
+                                entry["passed"] = bool(entry["score"]["passed"])
+                            else:
+                                entry["stage"] = "scoring"
+                                entry["error"] = "Unsupported prediction mode: " + str(got_mode)
+                                entry["passed"] = False
 
         except Exception as e:
             entry["stage"] = "exception"

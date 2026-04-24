@@ -3,3 +3,8 @@
 __pycache__
 ui/.cache
 ui/run
+example_laws
+results
+inputs
+tests  
+tests/suites

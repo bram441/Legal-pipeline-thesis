@@ -116,7 +116,15 @@ def run_text_mode(run_dir, provider, translate=True, cli_kb_strategy=None):
 def run_json_mode(run_dir, provider, translate=True, cli_kb_strategy=None):
     run_obj = load_json_run(run_dir)
 
-    law_text = (run_obj.get("law") or {}).get("text", "")
+    law_obj = run_obj.get("law") or {}
+    law_text = (law_obj.get("text") or "").strip()
+    law_path = law_obj.get("path")
+    if not law_text and law_path:
+        lp = (_PROJECT_ROOT / str(law_path).replace("\\", "/")).resolve()
+        if not lp.is_file():
+            print("Law file not found:", lp)
+            return
+        law_text = lp.read_text(encoding="utf-8")
     case_text = (run_obj.get("case") or {}).get("text", "")
     questions = run_obj.get("questions") or []
 

@@ -119,6 +119,9 @@ def _predicate_to_phrase_negative(predicate, args):
         phrase = f"does not satisfy {pred}"
 
     if entity_cap:
+        # Avoid "X is does not satisfy ..." (phrase already starts with "does not" for generic predicates)
+        if phrase.startswith("does not"):
+            return f"{entity_cap} {phrase}"
         return f"{entity_cap} is {phrase}"
     return phrase
 

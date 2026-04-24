@@ -1,68 +1,31 @@
 #!/usr/bin/env python
 """
-Run the same JSON benchmark four times — once per KB compilation strategy — in separate
-folders so you can diff results.json / score.json side by side.
+Compare all four KB strategies on a single JSON run.
 
-Usage (from project root):
+This is a thin wrapper around the same helpers as ``run_evaluation.py``.
+For multiple runs + reports, prefer:
 
-  python scripts/compare_kb_strategies.py --run inputs/json/run_003
-
-Output layout (default):
-
-  inputs/json/run_003/kb_strategy_compare/
-    direct_single/run.json results.json score.json ...
-    direct_two_phase/...
-    le_single/...
-    le_two_phase/...
-
-Each folder is an independent run directory (its own KB cache under translated/le/...).
+  python scripts/run_evaluation.py --runs <folder> --strategies all
 """
 
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import shutil
-import subprocess
 import sys
 from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parents[1]
-
 if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
-from pipeline.kb.compile_strategy import STRATEGY_CHOICES
-
-
-def _copy_run_json(src_run_dir: Path, dest_dir: Path) -> None:
-    dest_dir.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(src_run_dir / "run.json", dest_dir / "run.json")
-
-
-def _run_main_json(run_dir: Path, strategy: str, no_translate: bool) -> int:
-    cmd = [
-        sys.executable,
-        str(_ROOT / "main.py"),
-        "--mode",
-        "json",
-        "--run",
-        str(run_dir),
-        "--kb-strategy",
-        strategy,
-    ]
-    if no_translate:
-        cmd.append("--no-translate")
-    return subprocess.call(cmd, cwd=str(_ROOT))
-
-
-def _read_score(path: Path) -> dict | None:
-    if not path.is_file():
-        return None
-    try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
-        return None
+_es_path = Path(__file__).resolve().parent / "eval_support.py"
+_spec = importlib.util.spec_from_file_location("eval_support", _es_path)
+eval_support = importlib.util.module_from_spec(_spec)
+assert _spec.loader is not None
+_spec.loader.exec_module(eval_support)
 
 
 def main() -> int:
@@ -108,18 +71,18 @@ def main() -> int:
 
     results_summary: list[dict] = []
 
-    for strategy in STRATEGY_CHOICES:
+    for strategy in eval_support.STRATEGY_CHOICES:
         sub = out_base / strategy
         print("\n=== Strategy:", strategy, "->", sub, "===\n")
-        _copy_run_json(src, sub)
-        code = _run_main_json(sub, strategy, args.no_translate)
+        eval_support.copy_run_json(src, sub)
+        code = eval_support.run_main_json(sub, strategy, args.no_translate)
         if code != 0:
             print("Run failed with exit code", code, file=sys.stderr)
             results_summary.append(
                 {"strategy": strategy, "path": str(sub), "ok": False, "exit_code": code}
             )
             continue
-        sc = _read_score(sub / "score.json")
+        sc = eval_support.read_score(sub / "score.json")
         row: dict = {"strategy": strategy, "path": str(sub), "ok": True, "exit_code": 0}
         if sc:
             row["accuracy"] = sc.get("accuracy")
