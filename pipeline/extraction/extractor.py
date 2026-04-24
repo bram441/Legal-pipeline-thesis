@@ -249,6 +249,7 @@ def extract_case_and_query(case_text, user_question, kb_schema=None, provider="a
                 user_question,
                 model=chosen_model,
                 kb_schema=kb_schema,
+                case=case,
                 feedback=query_feedback,
             )
         except LLMExtractionError as e:
@@ -332,6 +333,7 @@ def extract_query_only(user_question, case, kb_schema=None, provider="auto", mod
                 user_question,
                 model=chosen_model,
                 kb_schema=kb_schema,
+                case=case,
                 feedback=query_feedback,
             )
         except LLMExtractionError as e:

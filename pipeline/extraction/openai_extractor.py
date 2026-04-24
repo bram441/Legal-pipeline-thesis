@@ -47,9 +47,16 @@ def _response_format_schema():
                     "case": {
                         "type": "object",
                         "additionalProperties": False,
-                        "required": ["facts"],
+                        "required": ["facts", "entities"],
                         "properties": {
                             "facts": {"type": "array", "items": {"type": "string"}},
+                            "entities": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "array",
+                                    "items": {"type": "string"},
+                                },
+                            },
                         },
                     },
                     "query": {
@@ -119,8 +126,17 @@ def extract_case_only_openai(case_text, model, kb_schema=None, feedback=None):
                 "schema": {
                     "type": "object",
                     "additionalProperties": False,
-                    "required": ["facts"],
-                    "properties": {"facts": {"type": "array", "items": {"type": "string"}}},
+                    "required": ["facts", "entities"],
+                    "properties": {
+                        "facts": {"type": "array", "items": {"type": "string"}},
+                        "entities": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "array",
+                                "items": {"type": "string"},
+                            },
+                        },
+                    },
                 },
             },
         },
@@ -129,7 +145,7 @@ def extract_case_only_openai(case_text, model, kb_schema=None, feedback=None):
     return json.loads(resp.choices[0].message.content)
 
 
-def extract_query_only_openai(user_question, model, kb_schema=None, feedback=None):
+def extract_query_only_openai(user_question, model, kb_schema=None, case=None, feedback=None):
     """Extract query only. Used by schema-aware feedback loop."""
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
@@ -142,11 +158,16 @@ def extract_query_only_openai(user_question, model, kb_schema=None, feedback=Non
 
     client = OpenAI(api_key=api_key)
     kb_schema_json = json.dumps(kb_schema or {}, ensure_ascii=False, indent=2)
+    case_obj = case or {}
+    case_facts_json = json.dumps((case_obj.get("facts") or []), ensure_ascii=False, indent=2)
+    case_entities_json = json.dumps((case_obj.get("entities") or {}), ensure_ascii=False, indent=2)
 
     query_user = render_prompt(
         "extraction/openai_extract_query_prompt.txt",
         kb_schema_json=kb_schema_json,
         user_question=str(user_question),
+        case_facts_json=case_facts_json,
+        case_entities_json=case_entities_json,
         feedback_block=_feedback_block(feedback),
         world_knowledge_lexical=_lexical_world_knowledge_block(),
     )
@@ -170,7 +191,19 @@ def extract_case_and_query_openai(case_text, user_question, model, kb_schema=Non
     query_fb = query_feedback if query_feedback is not None else feedback
 
     case_obj = extract_case_only_openai(case_text, model, kb_schema=kb_schema, feedback=case_fb)
-    query_obj = extract_query_only_openai(user_question, model, kb_schema=kb_schema, feedback=query_fb)
+    query_obj = extract_query_only_openai(
+        user_question,
+        model,
+        kb_schema=kb_schema,
+        case=case_obj,
+        feedback=query_fb,
+    )
 
-    combined = {"case": {"facts": case_obj.get("facts", [])}, "query": query_obj}
+    combined = {
+        "case": {
+            "facts": case_obj.get("facts", []),
+            "entities": case_obj.get("entities", {}),
+        },
+        "query": query_obj,
+    }
     return json.dumps(combined, ensure_ascii=False)
