@@ -20,6 +20,12 @@ Rules:
 Lexical / common-sense hints (optional; schema still wins):
 {world_knowledge_lexical}
 
+NORMALIZED CASE FACTS (must align query args with these constants):
+{case_facts_json}
+
+NORMALIZED CASE ENTITIES (preferred source for query args):
+{case_entities_json}
+
 KB_SCHEMA (hard contract):
 {kb_schema_json}
 

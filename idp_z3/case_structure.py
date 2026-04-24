@@ -38,6 +38,9 @@ _bool_is_line = re.compile(
     r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*\((.*)\)\s+is\s+(true|false)\s*\.\s*$",
     re.IGNORECASE
 )
+_func_assign_line = re.compile(
+    r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*\((.*)\)\s*=\s*([^\.]+)\s*\.\s*$"
+)
 _bad_star_call = re.compile(r"[A-Za-z_][A-Za-z0-9_]*\s*\*\s*\(")
 _number = re.compile(r"^-?\d+(\.\d+)?$")
 
@@ -66,6 +69,15 @@ def _mk_set(elems):
     return "{" + ",".join(xs) + "}"
 
 
+def _to_idp_value(token):
+    s = str(token).strip()
+    if not s:
+        return s
+    if s.lower() in ("true", "false"):
+        return s.lower()
+    return _to_idp_elem(s)
+
+
 def _split_args(arg_blob):
     parts = []
     for p in arg_blob.split(","):
@@ -86,6 +98,7 @@ def build_structure_block_from_facts(facts, entities=None, kb_primary_type=None,
     passthrough = []
     pos_atoms = []
     neg_atoms = []
+    func_assignments = {}
 
     def _handle_bool(pred, args, val, original_line):
         if not args:
@@ -126,6 +139,18 @@ def build_structure_block_from_facts(facts, entities=None, kb_primary_type=None,
             _handle_bool(pred, args, val, s)
             continue
 
+        mf = _func_assign_line.match(s)
+        if mf:
+            fun = mf.group(1)
+            args = _split_args(mf.group(2))
+            rhs = _to_idp_value(mf.group(3))
+            if not args:
+                raise ValueError("Empty argument list in function assignment: " + s)
+            if not rhs:
+                raise ValueError("Empty right-hand side in function assignment: " + s)
+            func_assignments.setdefault(fun, set()).add((tuple(args), rhs))
+            continue
+
         mneg = _neg_atom_line.match(s)
         if mneg:
             pred = mneg.group(1)
@@ -161,6 +186,12 @@ def build_structure_block_from_facts(facts, entities=None, kb_primary_type=None,
         constants.update(args)
         neg.setdefault(pred, set()).add(_tup_key(args))
 
+    for _fun, pairs in func_assignments.items():
+        for arg_tup, rhs in pairs:
+            constants.update(arg_tup)
+            if rhs.startswith("'") and rhs.endswith("'"):
+                constants.add(rhs)
+
     for pred in list(ext.keys()):
         if pred in neg:
             ext[pred] = ext[pred] - neg[pred]
@@ -170,9 +201,15 @@ def build_structure_block_from_facts(facts, entities=None, kb_primary_type=None,
         if pred not in ext:
             ext[pred] = set()
 
-    # Close world for condition predicates: predicates in the KB but not in facts get extension {} (false).
-    # Skip conclusion predicates (derived by theory) - see _is_conclusion_predicate().
-    if kb_predicate_names:
+    # Close world only when explicitly enabled:
+    # predicates in the KB but not in facts get extension {} (false),
+    # except conclusion predicates (derived by theory).
+    close_world = (os.getenv("CASE_CLOSE_WORLD_PREDICATES", "") or "").strip().lower() in (
+        "1",
+        "true",
+        "yes",
+    )
+    if close_world and kb_predicate_names:
         for pred in kb_predicate_names:
             if not pred or pred in ext:
                 continue
@@ -223,6 +260,21 @@ def build_structure_block_from_facts(facts, entities=None, kb_primary_type=None,
             tuple_strs = sorted(set(tuple_strs))
             pred_lines.append(pred + " := {" + ",".join(tuple_strs) + "}.")
 
+    # Build function interpretation lines
+    function_lines = []
+    for fun in sorted(func_assignments.keys()):
+        pairs = sorted(func_assignments[fun], key=lambda p: (p[0], p[1]))
+        if not pairs:
+            continue
+        map_items = []
+        for arg_tup, rhs in pairs:
+            if len(arg_tup) == 1:
+                left = arg_tup[0]
+            else:
+                left = "(" + ",".join(arg_tup) + ")"
+            map_items.append(left + " -> " + rhs)
+        function_lines.append(fun + " := {" + ",".join(map_items) + "}.")
+
     # Assemble structure lines (IMPORTANT: define lines BEFORE appending)
     lines = []
     types_defined = set()
@@ -250,6 +302,7 @@ def build_structure_block_from_facts(facts, entities=None, kb_primary_type=None,
                 placeholder = "__none_" + t
                 lines.append(t + " := {'" + placeholder + "'}.")
     lines.extend(pred_lines)
+    lines.extend(function_lines)
 
     body = "\n  ".join(lines)
     return f"""
@@ -287,6 +340,15 @@ def extract_constants_from_facts(facts):
         if mbi:
             args = _split_args(mbi.group(2))
             constants.update(args)
+            continue
+
+        mf = _func_assign_line.match(s)
+        if mf:
+            args = _split_args(mf.group(2))
+            constants.update(args)
+            rhs = _to_idp_value(mf.group(3))
+            if rhs.startswith("'") and rhs.endswith("'"):
+                constants.add(rhs)
             continue
 
         m = _atom_line.match(s)
