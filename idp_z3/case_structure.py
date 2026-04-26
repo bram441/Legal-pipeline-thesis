@@ -219,27 +219,35 @@ def build_structure_block_from_facts(facts, entities=None, kb_primary_type=None,
 
     # --- Domain: prefer constants from facts to avoid unsatisfiability. When sentence
     # functions (imprisonmentMinDays etc.) apply to persons with no condition facts,
-    # they stay undefined and can make the theory UNSAT. Restrict Person to those
-    # appearing in facts; add query-relevant entities only if already in facts.
+    # they stay undefined and can make the theory UNSAT.
+    #
+    # IMPORTANT:
+    # - The first KB type is not always the runtime domain for predicate arguments
+    #   (e.g. first type may be "Vreemdeling", while predicates use "Persoon").
+    # - Therefore, when typed entities are provided, seed domain per entity type.
     domain_type = kb_primary_type if kb_primary_type else None
     constants_from_facts = set(constants)  # persons in predicate args
+    inferred_domain_lines = []
     if isinstance(entities, dict):
         for t_name, t_vals in entities.items():
-            if isinstance(t_name, str) and isinstance(t_vals, list) and t_vals:
-                if not domain_type:
-                    domain_type = t_name
-                # Only include entities that appear in facts (avoids UNSAT for sentence functions)
-                for v in t_vals:
-                    if isinstance(v, str) and v.strip():
-                        e = _to_idp_elem(v.strip())
-                        if e in constants_from_facts:
-                            constants.add(e)
-                break
+            if not (isinstance(t_name, str) and isinstance(t_vals, list) and t_vals):
+                continue
+            vals = []
+            for v in t_vals:
+                if isinstance(v, str) and v.strip():
+                    e = _to_idp_elem(v.strip())
+                    # Keep current conservative behavior: only entities grounded in facts.
+                    if e in constants_from_facts:
+                        vals.append(e)
+                        constants.add(e)
+            if vals:
+                inferred_domain_lines.append((t_name, t_name + " := " + _mk_set(sorted(vals)) + "."))
+        if inferred_domain_lines:
+            domain_type = None
     # If no entities dict, constants come from facts only (no filtering needed)
 
-    inferred_domain_line = None
     if domain_type and constants:
-        inferred_domain_line = domain_type + " := " + _mk_set(sorted(constants)) + "."
+        inferred_domain_lines.append((domain_type, domain_type + " := " + _mk_set(sorted(constants)) + "."))
 
     # Build predicate extension lines
     pred_lines = []
@@ -280,11 +288,11 @@ def build_structure_block_from_facts(facts, entities=None, kb_primary_type=None,
     types_defined = set()
 
     # Only add inferred domain if caller didn't already provide a domain line of that type
-    if inferred_domain_line and domain_type:
-        has_domain = any(x.strip().startswith(domain_type) and ":=" in x for x in passthrough)
+    for d_type, d_line in inferred_domain_lines:
+        has_domain = any(x.strip().startswith(d_type) and ":=" in x for x in passthrough)
         if not has_domain:
-            lines.append(inferred_domain_line)
-            types_defined.add(domain_type)
+            lines.append(d_line)
+            types_defined.add(d_type)
 
     lines.extend(passthrough)
     for x in passthrough:
@@ -292,15 +300,13 @@ def build_structure_block_from_facts(facts, entities=None, kb_primary_type=None,
         if t and ":=" in x:
             types_defined.add(t)
 
-    # IDP requires every type in the vocabulary to have an interpretation.
-    # Use a distinct placeholder per type: a single global name like '__none' is
-    # registered as a constructor in voc.symbol_decls and cannot be reused for
-    # a second type (duplicate '__none' constructor for 'Estate' / etc.).
+    # Provide explicit interpretations for remaining KB types using empty domains.
+    # This avoids introducing synthetic constructor symbols while still satisfying
+    # IDP's requirement that declared types are interpreted in the structure.
     if kb_types:
         for t in kb_types:
             if t and t not in types_defined:
-                placeholder = "__none_" + t
-                lines.append(t + " := {'" + placeholder + "'}.")
+                lines.append(t + " := {}.")
     lines.extend(pred_lines)
     lines.extend(function_lines)
 

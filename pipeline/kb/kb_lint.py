@@ -112,6 +112,45 @@ def _lint_duplicate_vocab_signatures(vocab_body: str) -> List[str]:
     return issues
 
 
+def _lint_malformed_vocab_lines(vocab_body: str) -> List[str]:
+    """Catch common malformed declaration lines before parser step."""
+    issues: List[str] = []
+    declared_types: Set[str] = set()
+    for raw in vocab_body.splitlines():
+        line = raw.strip()
+        if not line or line.startswith("//") or line.startswith("#"):
+            continue
+        mt = _TYPE_RE.match(line)
+        if mt:
+            declared_types.add(mt.group(1))
+
+    for i, raw in enumerate(vocab_body.splitlines(), 1):
+        line = raw.strip()
+        if not line or line.startswith("//") or line.startswith("#"):
+            continue
+        if _TYPE_RE.match(line) or _SIG_RE.match(line):
+            continue
+
+        # Bare type-like line: "Person"
+        if re.match(r"^[A-Za-z_]\w*$", line):
+            issues.append(
+                "Vocabulary line %d looks like a bare type/symbol %r. Use `type %s` for types or "
+                "`name: Type -> Bool` for predicates." % (i, line, line)
+            )
+            continue
+
+        # Shorthand declaration without return type: "foo: Person"
+        ms = re.match(r"^([A-Za-z_]\w*)\s*:\s*([A-Za-z_]\w*)\s*$", line)
+        if ms:
+            sym, rhs = ms.group(1), ms.group(2)
+            if rhs in declared_types:
+                issues.append(
+                    "Vocabulary line %d uses shorthand %r. Add explicit return type, e.g. `%s: %s -> Bool`."
+                    % (i, line, sym, rhs)
+                )
+    return issues
+
+
 def _collect_declared_names(vocab_body: str) -> Set[str]:
     names: Set[str] = set()
     for raw in vocab_body.splitlines():
@@ -164,6 +203,7 @@ def lint_kb_fo_text(kb_text: str) -> None:
     if vb is not None:
         issues.extend(_lint_vocab_stray_asterisk(vb))
         issues.extend(_lint_duplicate_vocab_signatures(vb))
+        issues.extend(_lint_malformed_vocab_lines(vb))
 
     th = _theory_body(kb_text)
     if th is not None:

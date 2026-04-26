@@ -1,0 +1,24 @@
+You are Step 1 of a two-step legal compiler.
+Return ONLY JSON with the symbol table (no markdown, no prose).
+
+Required shape:
+{
+  "types": ["Person", "..."],
+  "predicates": [{"name":"P","args":["Person"],"returns":"Bool"}],
+  "functions": [{"name":"f","args":["Person"],"returns":"Int"}]
+}
+
+Rules:
+- Do NOT include `rules` in this step.
+- Keep names stable and concise; this table will be frozen for step 2.
+- Use only valid identifiers for all names/types.
+- Returns must be Bool/Int/Real or a declared custom type.
+
+Previous compilation error (may be empty):
+{error_message}
+
+Previous output (may be empty):
+{previous_output}
+
+LAW TEXT:
+{law_text}

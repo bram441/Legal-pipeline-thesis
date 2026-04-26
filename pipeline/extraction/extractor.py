@@ -1,12 +1,20 @@
 import json
 import os
 import re
+from contextlib import contextmanager
 
 from debug import status_log
 from pipeline.extraction.openai_extractor import (
     extract_case_only_openai,
     extract_query_only_openai,
+    extract_case_ir_only_openai,
+    extract_query_ir_only_openai,
     LLMExtractionError,
+)
+from pipeline.extraction.json_ir import (
+    normalize_case_ir,
+    normalize_query_ir,
+    ExtractionIRValidationError,
 )
 from pipeline.extraction.query_role_resolve import apply_role_arg_consistency
 from pipeline.validation.fo_validation import (
@@ -20,12 +28,116 @@ class ExtractionError(Exception):
     pass
 
 
+EXTRACTION_BACKEND_CHOICES = ("legacy", "json_ir")
+
+
 # Words that are not entity names when they appear in "Is X ..." patterns
 _QUESTION_STOPWORDS = frozenset({
     "the", "what", "who", "which", "how", "why", "when", "where", "does", "did",
     "is", "are", "was", "were", "can", "could", "article", "art", "belgian",
     "law", "case", "facts", "sentence", "minimum", "maximum", "prison", "fine",
 })
+
+
+def _symbol_tokens(name):
+    s = str(name or "").strip()
+    if not s:
+        return []
+    s = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", s)
+    s = s.replace("_", " ").replace("-", " ")
+    toks = [t.lower() for t in s.split() if t.strip()]
+    stop = {"the", "a", "an", "of", "to", "on", "in", "and", "or", "for", "has", "have", "is"}
+    return [t for t in toks if t not in stop]
+
+
+def _question_tokens(text):
+    s = str(text or "").strip().lower()
+    if not s:
+        return set()
+    s = re.sub(r"[^a-z0-9_ ]+", " ", s)
+    toks = [t for t in s.split() if len(t) >= 3]
+    stop = {
+        "the", "and", "for", "with", "from", "that", "this", "have", "has", "had",
+        "does", "did", "what", "which", "when", "where", "why", "who", "according",
+        "article", "under", "into", "onto", "about", "your", "their",
+    }
+    out = set()
+    for t in toks:
+        if t in stop:
+            continue
+        out.add(t)
+        if t.endswith("s") and len(t) > 3:
+            out.add(t[:-1])
+    return out
+
+
+def _best_schema_predicate_match(pred_name, kb_schema, user_question=None):
+    """Return best canonical predicate name for pred_name, or None."""
+    if not pred_name or not kb_schema:
+        return None
+
+    def _norm_name(s):
+        return (s or "").lower().replace("_", "")
+
+    candidates = [p.get("name") for p in (kb_schema.get("predicates") or []) if p.get("name")]
+    if not candidates:
+        return None
+
+    for n in candidates:
+        if n == pred_name or _norm_name(n) == _norm_name(pred_name):
+            return n
+
+    q = set(_symbol_tokens(pred_name))
+    q_question = _question_tokens(user_question)
+    if not q:
+        return None
+    best_name = None
+    best_score = 0.0
+    for n in candidates:
+        t = set(_symbol_tokens(n))
+        if not t:
+            continue
+        inter = len(q & t)
+        if inter == 0:
+            continue
+        score_name = (2.0 * inter) / float(len(q) + len(t))
+        score = score_name
+        if q_question:
+            inter_q = len(q_question & t)
+            score_q = inter_q / float(max(1, len(t)))
+            # Keep predicted-name similarity primary; use question grounding as tie-breaker.
+            score = (0.75 * score_name) + (0.25 * score_q)
+        if score > best_score:
+            best_score = score
+            best_name = n
+
+    if best_name and best_score >= 0.60:
+        return best_name
+    return None
+
+
+def _predicate_question_score(pred_name, user_question):
+    t = set(_symbol_tokens(pred_name))
+    q = _question_tokens(user_question)
+    if not t or not q:
+        return 0.0
+    score = len(t & q) / float(len(t))
+
+    # Reward predicates that encode the legal effect words the question asks about.
+    if "usufruct" in q and "usufruct" in t:
+        score += 0.18
+    if "estate" in q and "estate" in t:
+        score += 0.12
+    if "entire" in q and "entire" in t:
+        score += 0.08
+    if "right" in q and "right" in t:
+        score += 0.06
+
+    # Penalize overly generic status predicates when the question targets an entitlement.
+    if pred_name.startswith("Is") and ("usufruct" in q or "estate" in q):
+        score -= 0.20
+
+    return score
 
 
 def _entity_asked_about_in_question(question):
@@ -112,8 +224,132 @@ def _check_entity_consistency(user_question, query_obj, case, case_text=None, kb
             return
         args_lower = [str(a).strip().lower() for a in args if a]
         if args_lower and asked not in args_lower:
-            query_obj["args"] = [asked]
-            status_log("Query", "Entity overwrite: question asks about '{}', using args ['{}']".format(asked, asked))
+            # Keep arity-safe behavior: force unary predicates to [asked], but for n-ary
+            # predicates only replace the first slot and preserve/pad remaining slots.
+            pred_name = str(query_obj.get("predicate") or "").strip()
+            expected = None
+            if kb_schema and pred_name:
+                matched = _best_schema_predicate_match(pred_name, kb_schema, user_question=user_question)
+                if matched:
+                    query_obj["predicate"] = matched
+                    for p in (kb_schema.get("predicates") or []):
+                        if p.get("name") == matched:
+                            expected = len(p.get("args") or [])
+                            break
+
+            if expected == 1:
+                query_obj["args"] = [asked]
+                status_log("Query", "Entity overwrite: question asks about '{}', using args ['{}']".format(asked, asked))
+            elif expected and expected > 1:
+                kept = [str(a).strip().lower() for a in args if str(a).strip()]
+                if not kept:
+                    kept = [asked]
+                else:
+                    kept[0] = asked
+                # Do not force-fill non-primary argument positions with the asked entity;
+                # those positions may require non-Person types (Estate, Date, ...).
+                query_obj["args"] = kept[:expected]
+                status_log("Query", "Entity overwrite: aligned args to arity {} with primary entity '{}'".format(expected, asked))
+
+
+def _coerce_query_args_to_schema(query_obj, case, kb_schema, user_question=None):
+    """Deterministic fallback: make predicate boolean args arity/schema consistent."""
+    if not isinstance(query_obj, dict) or not kb_schema:
+        return False
+    if str(query_obj.get("type") or "").strip().lower() != "predicate":
+        return False
+
+    mode = str(query_obj.get("mode") or "").strip().lower()
+    pred_name = str(query_obj.get("predicate") or "").strip()
+    if not pred_name:
+        return False
+
+    sig = None
+    canonical = pred_name
+    matched = _best_schema_predicate_match(pred_name, kb_schema, user_question=user_question)
+    if matched:
+        canonical = matched
+        for p in (kb_schema.get("predicates") or []):
+            if p.get("name") == matched:
+                sig = p
+                break
+    # If we already have a valid canonical symbol but question semantics clearly prefer
+    # another schema predicate, switch to the better-matching one.
+    if user_question and sig and (kb_schema.get("predicates") or []):
+        cur_q_score = _predicate_question_score(canonical, user_question)
+        best_q_name = None
+        best_q_score = cur_q_score
+        for p in (kb_schema.get("predicates") or []):
+            n = p.get("name")
+            if not n:
+                continue
+            s = _predicate_question_score(n, user_question)
+            if s > best_q_score:
+                best_q_score = s
+                best_q_name = n
+        if best_q_name and best_q_score >= 0.45 and (best_q_score - cur_q_score) >= 0.20:
+            canonical = best_q_name
+            for p in (kb_schema.get("predicates") or []):
+                if p.get("name") == best_q_name:
+                    sig = p
+                    break
+    if not sig:
+        return False
+    if mode != "boolean":
+        if canonical != pred_name:
+            query_obj["predicate"] = canonical
+            return True
+        return False
+
+    expected_types = list(sig.get("args") or [])
+    expected = len(expected_types)
+    if expected == 0:
+        if query_obj.get("args") != []:
+            query_obj["args"] = []
+            query_obj["predicate"] = canonical
+            return True
+        return False
+
+    current = []
+    for a in (query_obj.get("args") or []):
+        s = str(a).strip().lower()
+        if s:
+            current.append(s)
+
+    fact_entities = set(_entities_from_case(case))
+    typed_entities = {}
+    for t, vals in (case.get("entities") or {}).items():
+        if isinstance(t, str) and isinstance(vals, list):
+            cleaned = [str(v).strip().lower() for v in vals if isinstance(v, str) and str(v).strip()]
+            # Prefer constants that are grounded in facts.
+            grounded = [v for v in cleaned if v in fact_entities]
+            fallback = [v for v in cleaned if v not in fact_entities]
+            typed_entities[t] = grounded + fallback
+    out = list(current[:expected])
+    for i in range(expected):
+        t = expected_types[i] if i < len(expected_types) else ""
+        candidates = list(typed_entities.get(t, []))
+        if i < len(out):
+            # If the current arg is not grounded in facts but a grounded candidate exists,
+            # prefer the grounded one to avoid out-of-domain constants downstream.
+            if out[i] not in fact_entities and candidates:
+                out[i] = candidates[0]
+            if not candidates:
+                out[i] = "?"
+            continue
+        if candidates:
+            out.append(candidates[0])
+        else:
+            out.append("?")
+
+    if len(out) != expected or any(not x for x in out):
+        return False
+
+    changed = (out != current) or (canonical != pred_name)
+    if changed:
+        query_obj["predicate"] = canonical
+        query_obj["args"] = out
+    return changed
 
 
 def _arity_mismatch_repair_hint(error_msg, previous_output, kb_schema):
@@ -191,6 +427,32 @@ def _auto_provider():
     return "openai"
 
 
+def _extraction_backend():
+    v = (os.getenv("PIPELINE_EXTRACTION_BACKEND", "") or "").strip().lower()
+    if v in {"json_ir", "legacy"}:
+        return v
+    return "legacy"
+
+
+@contextmanager
+def extraction_backend_env_override(backend: str | None):
+    if backend is None:
+        yield
+        return
+    if backend not in EXTRACTION_BACKEND_CHOICES:
+        raise ValueError("Unknown extraction backend: " + str(backend))
+    key = "PIPELINE_EXTRACTION_BACKEND"
+    saved = os.environ.get(key)
+    try:
+        os.environ[key] = backend
+        yield
+    finally:
+        if saved is None:
+            os.environ.pop(key, None)
+        else:
+            os.environ[key] = saved
+
+
 def extract_case_and_query(case_text, user_question, kb_schema=None, provider="auto", model=None, max_retries=6):
     """Extract raw {case, query} JSON using the configured provider.
 
@@ -206,6 +468,8 @@ def extract_case_and_query(case_text, user_question, kb_schema=None, provider="a
 
     chosen_model = model or os.getenv("OPENAI_MODEL") or "gpt-4.1-mini"
 
+    use_json_ir = (_extraction_backend() == "json_ir")
+
     # --- Phase 1: Case extraction with feedback loop ---
     case_feedback = None
     case_obj = None
@@ -216,14 +480,27 @@ def extract_case_and_query(case_text, user_question, kb_schema=None, provider="a
         else:
             status_log("Case", "Repair attempt {}".format(case_attempt))
         try:
-            case_obj = extract_case_only_openai(
-                case_text,
-                model=chosen_model,
-                kb_schema=kb_schema,
-                feedback=case_feedback,
-            )
+            if use_json_ir:
+                case_ir = extract_case_ir_only_openai(
+                    case_text,
+                    model=chosen_model,
+                    kb_schema=kb_schema,
+                    feedback=case_feedback,
+                )
+                case_obj = normalize_case_ir(case_ir, kb_schema=kb_schema)
+            else:
+                case_obj = extract_case_only_openai(
+                    case_text,
+                    model=chosen_model,
+                    kb_schema=kb_schema,
+                    feedback=case_feedback,
+                )
         except LLMExtractionError as e:
             raise ExtractionError(str(e))
+        except ExtractionIRValidationError as e:
+            last_case_error = e
+            case_feedback = _schema_feedback_message(e, case_obj or {}, kb_schema)
+            continue
 
         try:
             status_log("Case", "Validating")
@@ -245,24 +522,39 @@ def extract_case_and_query(case_text, user_question, kb_schema=None, provider="a
         else:
             status_log("Query", "Repair attempt {}".format(query_attempt))
         try:
-            query_obj = extract_query_only_openai(
-                user_question,
-                model=chosen_model,
-                kb_schema=kb_schema,
-                case=case,
-                feedback=query_feedback,
-            )
+            if use_json_ir:
+                query_ir = extract_query_ir_only_openai(
+                    user_question,
+                    model=chosen_model,
+                    kb_schema=kb_schema,
+                    case=case,
+                    feedback=query_feedback,
+                )
+                query_obj = normalize_query_ir(query_ir, case, kb_schema, user_question)
+            else:
+                query_obj = extract_query_only_openai(
+                    user_question,
+                    model=chosen_model,
+                    kb_schema=kb_schema,
+                    case=case,
+                    feedback=query_feedback,
+                )
         except LLMExtractionError as e:
             raise ExtractionError(str(e))
+        except ExtractionIRValidationError as e:
+            last_query_error = e
+            query_feedback = _schema_feedback_message(e, query_obj or {}, kb_schema)
+            continue
 
         try:
             status_log("Query", "Validating")
-            if apply_role_arg_consistency(user_question, query_obj, case):
+            if apply_role_arg_consistency(user_question, query_obj, case, kb_schema=kb_schema):
                 status_log(
                     "Query",
                     "Adjusted query.args using case facts for role-based question (see query_role_resolve)",
                 )
             _check_entity_consistency(user_question, query_obj, case, case_text=case_text, kb_schema=kb_schema)
+            _coerce_query_args_to_schema(query_obj, case, kb_schema, user_question=user_question)
             query = normalize_and_validate_query(query_obj, case, kb_schema=kb_schema)
             break
         except ValueError as e:
@@ -282,6 +574,7 @@ def extract_case_only(case_text, kb_schema=None, provider="auto", model=None, ma
         raise ExtractionError("Unsupported provider: " + str(provider))
 
     chosen_model = model or os.getenv("OPENAI_MODEL") or "gpt-4.1-mini"
+    use_json_ir = (_extraction_backend() == "json_ir")
     case_feedback = None
     case_obj = None
     last_case_error = None
@@ -291,14 +584,27 @@ def extract_case_only(case_text, kb_schema=None, provider="auto", model=None, ma
         else:
             status_log("Case", "Repair attempt {}".format(case_attempt))
         try:
-            case_obj = extract_case_only_openai(
-                case_text,
-                model=chosen_model,
-                kb_schema=kb_schema,
-                feedback=case_feedback,
-            )
+            if use_json_ir:
+                case_ir = extract_case_ir_only_openai(
+                    case_text,
+                    model=chosen_model,
+                    kb_schema=kb_schema,
+                    feedback=case_feedback,
+                )
+                case_obj = normalize_case_ir(case_ir, kb_schema=kb_schema)
+            else:
+                case_obj = extract_case_only_openai(
+                    case_text,
+                    model=chosen_model,
+                    kb_schema=kb_schema,
+                    feedback=case_feedback,
+                )
         except LLMExtractionError as e:
             raise ExtractionError(str(e))
+        except ExtractionIRValidationError as e:
+            last_case_error = e
+            case_feedback = _schema_feedback_message(e, case_obj or {}, kb_schema)
+            continue
 
         try:
             status_log("Case", "Validating")
@@ -320,6 +626,7 @@ def extract_query_only(user_question, case, kb_schema=None, provider="auto", mod
         raise ExtractionError("Unsupported provider: " + str(provider))
 
     chosen_model = model or os.getenv("OPENAI_MODEL") or "gpt-4.1-mini"
+    use_json_ir = (_extraction_backend() == "json_ir")
     query_feedback = None
     query_obj = None
     last_query_error = None
@@ -329,24 +636,39 @@ def extract_query_only(user_question, case, kb_schema=None, provider="auto", mod
         else:
             status_log("Query", "Repair attempt {}".format(query_attempt))
         try:
-            query_obj = extract_query_only_openai(
-                user_question,
-                model=chosen_model,
-                kb_schema=kb_schema,
-                case=case,
-                feedback=query_feedback,
-            )
+            if use_json_ir:
+                query_ir = extract_query_ir_only_openai(
+                    user_question,
+                    model=chosen_model,
+                    kb_schema=kb_schema,
+                    case=case,
+                    feedback=query_feedback,
+                )
+                query_obj = normalize_query_ir(query_ir, case, kb_schema, user_question)
+            else:
+                query_obj = extract_query_only_openai(
+                    user_question,
+                    model=chosen_model,
+                    kb_schema=kb_schema,
+                    case=case,
+                    feedback=query_feedback,
+                )
         except LLMExtractionError as e:
             raise ExtractionError(str(e))
+        except ExtractionIRValidationError as e:
+            last_query_error = e
+            query_feedback = _schema_feedback_message(e, query_obj or {}, kb_schema)
+            continue
 
         try:
             status_log("Query", "Validating")
-            if apply_role_arg_consistency(user_question, query_obj, case):
+            if apply_role_arg_consistency(user_question, query_obj, case, kb_schema=kb_schema):
                 status_log(
                     "Query",
                     "Adjusted query.args using case facts for role-based question (see query_role_resolve)",
                 )
             _check_entity_consistency(user_question, query_obj, case, case_text=case_text, kb_schema=kb_schema)
+            _coerce_query_args_to_schema(query_obj, case, kb_schema, user_question=user_question)
             query = normalize_and_validate_query(query_obj, case, kb_schema=kb_schema)
             return query
         except ValueError as e:

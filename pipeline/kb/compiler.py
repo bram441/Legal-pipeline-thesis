@@ -1,13 +1,26 @@
 import os
+import json
 
 from pipeline.utils.prompt_loader import render_prompt
 from pipeline.kb.exceptions import LawCompilationError
+from pipeline.kb.compile_backend import get_kb_backend_from_env
+from pipeline.kb.json_ir import JSONIRCompilationError, parse_json_ir, render_json_ir_to_fo
 from pipeline.kb.repair_hints import build_machine_repair_hints
 
 
 def _kb_repair_prompt_path(error_message: str) -> str:
-    """Pick repair template: semantic (theory/model) vs symbolic (parse/structure)."""
+    """Pick repair template: syntax (parse/lint), semantic (theory/model), symbolic fallback."""
     e = (error_message or "").lower()
+    syntax_markers = (
+        "idp failed to parse",
+        "expected",
+        "kb lint",
+        "schema extraction failed",
+        "missing 'vocabulary v'",
+        "missing 'theory t:v'",
+    )
+    if any(m in e for m in syntax_markers):
+        return "kb/kb_compilation_repair_syntax.txt"
     semantic_markers = (
         "unsatisfiable",
         "no model exists",
@@ -42,6 +55,104 @@ def _compile_direct_kb_single_call(law_text, client, chosen_model):
     return (resp.choices[0].message.content or "").strip()
 
 
+def _json_chat_object(client, chosen_model, system_content, user_prompt):
+    try:
+        req = {
+            "model": chosen_model,
+            "messages": [
+                {"role": "system", "content": system_content},
+                {"role": "user", "content": user_prompt},
+            ],
+        }
+        # Prefer strict JSON object output when model/API supports it.
+        try:
+            resp = client.chat.completions.create(
+                **req,
+                response_format={"type": "json_object"},
+            )
+        except TypeError:
+            resp = client.chat.completions.create(**req)
+        except Exception as fmt_exc:
+            # Some models reject response_format; fall back to normal call.
+            msg = str(fmt_exc).lower()
+            if "response_format" in msg or "json_object" in msg:
+                resp = client.chat.completions.create(**req)
+            else:
+                raise
+    except Exception as e:
+        raise LawCompilationError("OpenAI call failed: " + str(e)) from e
+    raw = (resp.choices[0].message.content or "").strip()
+    try:
+        return parse_json_ir(raw)
+    except JSONIRCompilationError as e:
+        raise LawCompilationError("JSON IR validation failed: " + str(e)) from e
+
+
+def _compile_json_ir_two_step(source_text, client, chosen_model, *, repair_feedback=None):
+    src = (source_text or "").strip()
+    err = (repair_feedback or {}).get("error_message", "")
+    prev = (repair_feedback or {}).get("previous_output", "")
+
+    symbols_prompt = render_prompt(
+        "kb/kb_compilation_json_ir_symbols.txt",
+        law_text=src,
+        error_message=err,
+        previous_output=prev,
+    )
+    symbols_obj = _json_chat_object(
+        client,
+        chosen_model,
+        "You produce ONLY JSON symbol tables for legal FO(.) compilation.",
+        symbols_prompt,
+    )
+
+    symbol_table = {
+        "types": symbols_obj.get("types", []),
+        "predicates": symbols_obj.get("predicates", []),
+        "functions": symbols_obj.get("functions", []),
+    }
+    if not isinstance(symbol_table["types"], list):
+        raise LawCompilationError("JSON IR symbols phase returned invalid 'types'.")
+    if not isinstance(symbol_table["predicates"], list):
+        raise LawCompilationError("JSON IR symbols phase returned invalid 'predicates'.")
+    if not isinstance(symbol_table["functions"], list):
+        raise LawCompilationError("JSON IR symbols phase returned invalid 'functions'.")
+
+    rules_prompt_name = (
+        "kb/kb_compilation_json_ir_rules_repair.txt"
+        if repair_feedback
+        else "kb/kb_compilation_json_ir_rules.txt"
+    )
+    rules_prompt = render_prompt(
+        rules_prompt_name,
+        law_text=src,
+        symbol_table_json=json.dumps(symbol_table, ensure_ascii=False, indent=2),
+        error_message=err,
+        previous_output=prev,
+    )
+    rules_obj = _json_chat_object(
+        client,
+        chosen_model,
+        "You produce ONLY JSON FO(.) rules over a fixed symbol table.",
+        rules_prompt,
+    )
+    rules = rules_obj.get("rules")
+    if not isinstance(rules, list):
+        raise LawCompilationError("JSON IR rules phase returned invalid 'rules'.")
+
+    try:
+        return render_json_ir_to_fo(
+            {
+                "types": symbol_table["types"],
+                "predicates": symbol_table["predicates"],
+                "functions": symbol_table["functions"],
+                "rules": rules,
+            }
+        )
+    except JSONIRCompilationError as e:
+        raise LawCompilationError("JSON IR validation failed: " + str(e)) from e
+
+
 def compile_law_to_kb_fo(law_text, model=None, repair_feedback=None):
     """Compile natural-language law text into FO(.) (vocabulary + theory only).
 
@@ -71,7 +182,16 @@ def compile_law_to_kb_fo(law_text, model=None, repair_feedback=None):
     chosen_model = model or os.getenv("OPENAI_MODEL") or "gpt-4.1-mini"
     sys_msg = "You compile legal rules into FO(.) code for IDP-Z3."
 
+    kb_backend = get_kb_backend_from_env()
+
     if repair_feedback:
+        if kb_backend == "json_ir":
+            return _compile_json_ir_two_step(
+                law_text,
+                client,
+                chosen_model,
+                repair_feedback=repair_feedback,
+            )
         err = repair_feedback.get("error_message", "") or ""
         prev = repair_feedback.get("previous_output", "") or ""
         prompt_name = _kb_repair_prompt_path(err)
@@ -113,7 +233,9 @@ def compile_law_to_kb_fo(law_text, model=None, repair_feedback=None):
             except Exception as e:
                 raise LawCompilationError("Logical English layer failed: " + str(e)) from e
 
-            if two_ph:
+            if kb_backend == "json_ir":
+                text = _compile_json_ir_two_step(le_text, client, chosen_model)
+            elif two_ph:
                 text = compile_two_phase(
                     le_text,
                     client,
@@ -128,6 +250,8 @@ def compile_law_to_kb_fo(law_text, model=None, repair_feedback=None):
                     text = le_to_fo(le_text, client, chosen_model)
                 except Exception as e:
                     raise LawCompilationError("Logical English layer failed: " + str(e)) from e
+        elif kb_backend == "json_ir":
+            text = _compile_json_ir_two_step(law_text, client, chosen_model)
         elif two_ph:
             text = compile_two_phase(
                 law_text,

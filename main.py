@@ -1,4 +1,5 @@
 import argparse
+from contextlib import ExitStack
 import io
 import os
 import sys
@@ -22,18 +23,51 @@ if sys.platform == "win32" and hasattr(sys.stdout, "fileno"):
 
 from debug import status_log
 from pipeline.app.pipeline import answer_legal_prompt
-from pipeline.extraction.extractor import extract_case_only, ExtractionError
+from pipeline.extraction.extractor import (
+    extract_case_only,
+    ExtractionError,
+    extraction_backend_env_override,
+    EXTRACTION_BACKEND_CHOICES,
+)
 from pipeline.io.text_runs import load_text_run, write_text_results
 from pipeline.io.json_runs import load_json_run, write_json_results, write_score, merge_json_run_file
 from pipeline.eval.scoring import score_question
 from pipeline.kb.cache import get_or_compile_kb
+from pipeline.kb.compile_backend import KB_BACKEND_CHOICES, get_kb_backend_from_env, kb_backend_env_override
 from pipeline.kb.compile_strategy import kb_run_context, strategy_to_flags, STRATEGY_CHOICES
 from pipeline.utils.run_trace import trace_enabled
 from pipeline.translation.translator import translate_to_english, TranslationError
 from pipeline.utils.unicode_sanitize import sanitize_for_output
 
 
-def run_text_mode(run_dir, provider, translate=True, cli_kb_strategy=None):
+def _resolve_backends(cli_pipeline_backend=None, cli_kb_backend=None):
+    """
+    Unified backend mode:
+      - pipeline_backend=legacy -> kb=legacy_fo, extraction=legacy
+      - pipeline_backend=json_ir -> kb=json_ir, extraction=json_ir
+    """
+    if cli_pipeline_backend is None:
+        return cli_kb_backend, None
+    if cli_pipeline_backend == "legacy":
+        return "legacy_fo", "legacy"
+    if cli_pipeline_backend == "json_ir":
+        return "json_ir", "json_ir"
+    raise ValueError("Unknown pipeline backend: " + str(cli_pipeline_backend))
+
+
+def _effective_pipeline_backend_label(cli_pipeline_backend, resolved_kb_backend, resolved_extraction_backend):
+    if cli_pipeline_backend in ("legacy", "json_ir"):
+        return cli_pipeline_backend
+    # If both were explicitly resolved together by other means, infer a clean label.
+    if resolved_kb_backend == "legacy_fo" and resolved_extraction_backend == "legacy":
+        return "legacy"
+    if resolved_kb_backend == "json_ir" and resolved_extraction_backend == "json_ir":
+        return "json_ir"
+    # Environment/default/manual mix (still useful to expose explicitly).
+    return "mixed"
+
+
+def run_text_mode(run_dir, provider, translate=True, cli_kb_strategy=None, cli_kb_backend=None, cli_pipeline_backend=None):
     payload = load_text_run(run_dir)
 
     law_text = payload["law_text"]
@@ -53,13 +87,27 @@ def run_text_mode(run_dir, provider, translate=True, cli_kb_strategy=None):
             print("Translation failed:", e)
             return
 
-    with ctx:
+    resolved_kb_backend, resolved_extraction_backend = _resolve_backends(
+        cli_pipeline_backend=cli_pipeline_backend,
+        cli_kb_backend=cli_kb_backend,
+    )
+    pipeline_backend_label = _effective_pipeline_backend_label(
+        cli_pipeline_backend, resolved_kb_backend, resolved_extraction_backend
+    )
+
+    with ExitStack() as stack:
+        stack.enter_context(ctx)
+        stack.enter_context(kb_backend_env_override(resolved_kb_backend))
+        stack.enter_context(extraction_backend_env_override(resolved_extraction_backend))
         status_log("KB", "Loading or compiling knowledge base")
         kb_text, kb_schema = get_or_compile_kb(run_dir, law_text, cache_subdir="translated" if translate else None)
+        backend_label = get_kb_backend_from_env()
 
     out_lines = []
     out_lines.append("=== KB COMPILE STRATEGY ===")
     out_lines.append(strategy_label + " (use_le=" + str(ul) + ", two_phase=" + str(tp) + ")")
+    out_lines.append("KB backend: " + backend_label)
+    out_lines.append("Pipeline backend mode: " + pipeline_backend_label)
     out_lines.append("")
     out_lines.append("=== LAW (plain text input) ===")
     out_lines.append(law_text)
@@ -113,7 +161,7 @@ def run_text_mode(run_dir, provider, translate=True, cli_kb_strategy=None):
     print("Wrote:", os.path.join(run_dir, "results.txt"))
 
 
-def run_json_mode(run_dir, provider, translate=True, cli_kb_strategy=None):
+def run_json_mode(run_dir, provider, translate=True, cli_kb_strategy=None, cli_kb_backend=None, cli_pipeline_backend=None):
     run_obj = load_json_run(run_dir)
 
     law_obj = run_obj.get("law") or {}
@@ -145,9 +193,21 @@ def run_json_mode(run_dir, provider, translate=True, cli_kb_strategy=None):
             print("Translation failed:", e)
             return
 
-    with ctx:
+    resolved_kb_backend, resolved_extraction_backend = _resolve_backends(
+        cli_pipeline_backend=cli_pipeline_backend,
+        cli_kb_backend=cli_kb_backend,
+    )
+    pipeline_backend_label = _effective_pipeline_backend_label(
+        cli_pipeline_backend, resolved_kb_backend, resolved_extraction_backend
+    )
+
+    with ExitStack() as stack:
+        stack.enter_context(ctx)
+        stack.enter_context(kb_backend_env_override(resolved_kb_backend))
+        stack.enter_context(extraction_backend_env_override(resolved_extraction_backend))
         status_log("KB", "Loading or compiling knowledge base")
         kb_text, kb_schema = get_or_compile_kb(run_dir, law_text, cache_subdir="translated" if translate else None)
+        backend_label = get_kb_backend_from_env()
 
     results = {
         "id": run_obj.get("id"),
@@ -155,6 +215,8 @@ def run_json_mode(run_dir, provider, translate=True, cli_kb_strategy=None):
         "kb_used": {"fo": kb_text},
         "case": {"text": case_text},
         "kb_compile_strategy": strategy_label,
+        "kb_compile_backend": backend_label,
+        "pipeline_backend_mode": pipeline_backend_label,
         "kb_compile_flags": {"use_le": ul, "two_phase": tp},
         "questions": [],
     }
@@ -165,6 +227,7 @@ def run_json_mode(run_dir, provider, translate=True, cli_kb_strategy=None):
         "correct": 0,
         "items": [],
         "kb_compile_strategy": strategy_label,
+        "pipeline_backend_mode": pipeline_backend_label,
     }
 
     pre_extracted_case = None
@@ -223,6 +286,8 @@ def run_json_mode(run_dir, provider, translate=True, cli_kb_strategy=None):
         run_dir,
         {
             "kb_compile_strategy": strategy_label,
+            "kb_compile_backend": backend_label,
+            "pipeline_backend_mode": pipeline_backend_label,
             "kb_compile_flags": {"use_le": ul, "two_phase": tp},
         },
     )
@@ -230,6 +295,8 @@ def run_json_mode(run_dir, provider, translate=True, cli_kb_strategy=None):
     print("Wrote:", os.path.join(run_dir, "results.json"))
     print("Wrote:", os.path.join(run_dir, "score.json"))
     print("KB strategy:", strategy_label, "(use_le=" + str(ul) + ", two_phase=" + str(tp) + ")")
+    print("KB backend:", backend_label)
+    print("Pipeline backend mode:", pipeline_backend_label)
 
 
 def main():
@@ -246,10 +313,26 @@ def main():
         + ", ".join(STRATEGY_CHOICES)
         + ". Overrides run.json and .env for this process during the run.",
     )
+    parser.add_argument(
+        "--kb-backend",
+        metavar="NAME",
+        default=None,
+        help="KB compiler backend: one of " + ", ".join(KB_BACKEND_CHOICES) + ".",
+    )
+    parser.add_argument(
+        "--pipeline-backend",
+        metavar="NAME",
+        default=None,
+        help="Unified pipeline backend: 'legacy' (legacy KB + legacy extraction) or 'json_ir' (JSON-IR KB + JSON-IR extraction).",
+    )
     args = parser.parse_args()
 
     if args.kb_strategy is not None and args.kb_strategy not in STRATEGY_CHOICES:
         parser.error("--kb-strategy must be one of: " + ", ".join(STRATEGY_CHOICES))
+    if args.kb_backend is not None and args.kb_backend not in KB_BACKEND_CHOICES:
+        parser.error("--kb-backend must be one of: " + ", ".join(KB_BACKEND_CHOICES))
+    if args.pipeline_backend is not None and args.pipeline_backend not in ("legacy", "json_ir"):
+        parser.error("--pipeline-backend must be one of: legacy, json_ir")
 
     run_path = Path(args.run)
     if not run_path.is_absolute():
@@ -258,9 +341,23 @@ def main():
 
     translate = not args.no_translate
     if args.mode == "text":
-        run_text_mode(run_dir, args.provider, translate=translate, cli_kb_strategy=args.kb_strategy)
+        run_text_mode(
+            run_dir,
+            args.provider,
+            translate=translate,
+            cli_kb_strategy=args.kb_strategy,
+            cli_kb_backend=args.kb_backend,
+            cli_pipeline_backend=args.pipeline_backend,
+        )
     else:
-        run_json_mode(run_dir, args.provider, translate=translate, cli_kb_strategy=args.kb_strategy)
+        run_json_mode(
+            run_dir,
+            args.provider,
+            translate=translate,
+            cli_kb_strategy=args.kb_strategy,
+            cli_kb_backend=args.kb_backend,
+            cli_pipeline_backend=args.pipeline_backend,
+        )
 
 
 if __name__ == "__main__":

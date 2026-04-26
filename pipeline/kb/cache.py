@@ -2,6 +2,7 @@ import os
 import re
 
 from debug import status_log
+from pipeline.kb.compile_backend import get_kb_backend_from_env
 from pipeline.kb.compiler import compile_law_to_kb_fo
 from pipeline.kb.exceptions import LawCompilationError
 from pipeline.kb.schema import _VOCAB_RE, extract_schema_from_kb_fo, load_kb_schema, save_kb_schema
@@ -68,6 +69,61 @@ def _fix_vocab_markdown_bullet_merges(kb_text):
 
 
 _CO_DOMAIN_TYPES = frozenset({"Bool", "Int", "Real"})
+_BUILTIN_TYPE_NAMES = frozenset({"Bool", "Int", "Real"})
+_RESERVED_SYMBOL_NAMES = frozenset({"true", "false", "not"})
+
+
+def _normalize_vocab_declaration_shape(kb_text: str) -> str:
+    """
+    Fix common malformed vocabulary declaration lines:
+    - bare type names: `Person` -> `type Person`
+    - shorthand unary bool predicates: `foo: Person` -> `foo: Person -> Bool`
+    """
+    m = _VOCAB_RE.search(kb_text or "")
+    if not m:
+        return kb_text
+    inner = m.group(1)
+    lines = inner.splitlines()
+
+    declared_types = set()
+    for raw in lines:
+        mt = re.match(r"^\s*type\s+([A-Za-z_]\w*)\s*$", raw.strip(), re.IGNORECASE)
+        if mt:
+            declared_types.add(mt.group(1))
+
+    out_lines: list[str] = []
+    for raw in lines:
+        stripped = raw.strip()
+        if not stripped or stripped.startswith("//") or stripped.startswith("#"):
+            out_lines.append(raw)
+            continue
+        if re.match(r"^\s*type\s+[A-Za-z_]\w*\s*$", stripped, re.IGNORECASE):
+            out_lines.append(raw)
+            continue
+
+        # Bare type line (e.g. "Person") inside vocab block.
+        mbare = re.match(r"^(\s*)([A-Za-z_]\w*)\s*$", raw)
+        if mbare:
+            indent, name = mbare.group(1), mbare.group(2)
+            # Conservative: only auto-promote PascalCase-ish names as types.
+            if name[:1].isupper():
+                out_lines.append(indent + "type " + name)
+                declared_types.add(name)
+                continue
+
+        # Shorthand declaration "pred: Type" (often intended Bool predicate).
+        msh = re.match(r"^(\s*)([A-Za-z_]\w*)\s*:\s*([A-Za-z_]\w*)\s*$", raw)
+        if msh:
+            indent, sym, rhs = msh.group(1), msh.group(2), msh.group(3)
+            if rhs in declared_types or rhs in ("Bool", "Int", "Real"):
+                out_lines.append(indent + sym + ": " + rhs + " -> Bool")
+                continue
+
+        out_lines.append(raw)
+
+    new_inner = "\n".join(out_lines)
+    start, end = m.span(1)
+    return kb_text[:start] + new_inner + kb_text[end:]
 
 
 def _normalize_vocab_curried_domain(kb_text: str) -> str:
@@ -106,8 +162,378 @@ def _normalize_vocab_curried_domain(kb_text: str) -> str:
     return kb_text[:start] + new_inner + kb_text[end:]
 
 
+def _drop_builtin_type_declarations(kb_text: str) -> str:
+    """Remove invalid user-declared built-in types (Bool/Int/Real)."""
+    m = _VOCAB_RE.search(kb_text or "")
+    if not m:
+        return kb_text
+    inner = m.group(1)
+    out_lines: list[str] = []
+    for raw in inner.splitlines():
+        mt = re.match(r"^\s*type\s+([A-Za-z_]\w*)\s*$", raw.strip(), re.IGNORECASE)
+        if mt and mt.group(1) in _BUILTIN_TYPE_NAMES:
+            continue
+        out_lines.append(raw)
+    start, end = m.span(1)
+    return kb_text[:start] + "\n".join(out_lines) + kb_text[end:]
+
+
+def _dedupe_vocab_declarations(kb_text: str) -> str:
+    """Drop exact duplicate type/signature lines in vocabulary."""
+    m = _VOCAB_RE.search(kb_text or "")
+    if not m:
+        return kb_text
+    inner = m.group(1)
+    seen_types = set()
+    seen_sigs = set()
+    out_lines: list[str] = []
+    for raw in inner.splitlines():
+        stripped = raw.strip()
+        if not stripped or stripped.startswith("//") or stripped.startswith("#"):
+            out_lines.append(raw)
+            continue
+        mt = re.match(r"^\s*type\s+([A-Za-z_]\w*)\s*$", stripped, re.IGNORECASE)
+        if mt:
+            t = mt.group(1)
+            if t in seen_types:
+                continue
+            seen_types.add(t)
+            out_lines.append(raw)
+            continue
+        ms = re.match(r"^\s*([A-Za-z_]\w*)\s*:\s*(.+?)\s*$", stripped)
+        if ms:
+            sig = ms.group(1) + ":" + ms.group(2)
+            if sig in seen_sigs:
+                continue
+            seen_sigs.add(sig)
+            out_lines.append(raw)
+            continue
+        out_lines.append(raw)
+    start, end = m.span(1)
+    return kb_text[:start] + "\n".join(out_lines) + kb_text[end:]
+
+
+def _drop_reserved_symbol_declarations(kb_text: str) -> str:
+    """Remove declarations that collide with FO reserved literals/operators."""
+    m = _VOCAB_RE.search(kb_text or "")
+    if not m:
+        return kb_text
+    inner = m.group(1)
+    out_lines: list[str] = []
+    for raw in inner.splitlines():
+        stripped = raw.strip()
+        ms = re.match(r"^([A-Za-z_]\w*)\s*:\s*", stripped)
+        if ms and ms.group(1).lower() in _RESERVED_SYMBOL_NAMES:
+            continue
+        out_lines.append(raw)
+    start, end = m.span(1)
+    return kb_text[:start] + "\n".join(out_lines) + kb_text[end:]
+
+
+def _resolve_type_symbol_name_collisions(kb_text: str) -> str:
+    """
+    If a type name is also declared as predicate/function, rename the symbol and rewrite calls.
+    Example: type Judgment + Judgment: LegalAction -> Bool  => JudgmentPred.
+    """
+    m = _VOCAB_RE.search(kb_text or "")
+    if not m:
+        return kb_text
+    inner = m.group(1)
+    lines = inner.splitlines()
+    type_names = set()
+    for raw in lines:
+        mt = re.match(r"^\s*type\s+([A-Za-z_]\w*)\s*$", raw.strip(), re.IGNORECASE)
+        if mt:
+            type_names.add(mt.group(1))
+    rewrites = {}
+    out_lines = []
+    for raw in lines:
+        ms = re.match(r"^(\s*)([A-Za-z_]\w*)\s*:\s*(.+)$", raw.rstrip())
+        if not ms:
+            out_lines.append(raw)
+            continue
+        indent, name, sig = ms.group(1), ms.group(2), ms.group(3)
+        if name in type_names:
+            new_name = name + "Pred"
+            k = 2
+            while new_name in type_names or new_name in rewrites.values():
+                new_name = name + "Pred" + str(k)
+                k += 1
+            rewrites[name] = new_name
+            out_lines.append(indent + new_name + ": " + sig)
+        else:
+            out_lines.append(raw)
+    if not rewrites:
+        return kb_text
+    start, end = m.span(1)
+    s = kb_text[:start] + "\n".join(out_lines) + kb_text[end:]
+    for old, new in rewrites.items():
+        s = re.sub(r"\b" + re.escape(old) + r"\s*\(", new + "(", s)
+    return s
+
+
+def _coerce_numeric_calls_in_boolean_context(kb_text: str) -> str:
+    """
+    Rewrite bare Int/Real function calls used as booleans in rule conditions.
+    Example: (... & NumberOfYears(x)) => ...  -> (... & (NumberOfYears(x) ~= 0)) => ...
+    """
+    vm = _VOCAB_RE.search(kb_text or "")
+    tm = re.search(r"\btheory\s+T\s*:\s*V\s*\{", kb_text or "", re.IGNORECASE | re.DOTALL)
+    if not vm or not tm:
+        return kb_text
+    vocab_inner = vm.group(1)
+    start = kb_text.find("{", tm.start())
+    if start < 0:
+        return kb_text
+    depth = 0
+    end = -1
+    for i in range(start, len(kb_text)):
+        ch = kb_text[i]
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                end = i
+                break
+    if end < 0:
+        return kb_text
+    theory_inner = kb_text[start + 1 : end]
+
+    numeric_funcs = set()
+    for raw in vocab_inner.splitlines():
+        ms = re.match(r"^\s*([A-Za-z_]\w*)\s*:\s*(.+?)\s*->\s*([A-Za-z_]\w*)\s*$", raw.strip())
+        if not ms:
+            continue
+        name = ms.group(1)
+        ret = ms.group(3)
+        if ret in ("Int", "Real"):
+            numeric_funcs.add(name)
+
+    for name in sorted(numeric_funcs, key=len, reverse=True):
+        # ... & name(x)      => ... & (name(x) ~= 0)
+        theory_inner = re.sub(
+            r"([&\|\(]\s*)" + re.escape(name) + r"\(([^()]*)\)(?!\s*(?:=|~=|=<|>=|<|>))",
+            r"\1(" + name + r"(\2) ~= 0)",
+            theory_inner,
+        )
+        # ... & ~name(x)     => ... & (name(x) = 0)
+        theory_inner = re.sub(
+            r"([&\|\(]\s*)~\s*" + re.escape(name) + r"\(([^()]*)\)(?!\s*(?:=|~=|=<|>=|<|>))",
+            r"\1(" + name + r"(\2) = 0)",
+            theory_inner,
+        )
+
+    return kb_text[: start + 1] + theory_inner + kb_text[end:]
+
+
+def _auto_declare_undeclared_theory_calls(kb_text: str) -> str:
+    """Add missing predicate declarations for symbols called in theory but absent from vocabulary."""
+    vm = _VOCAB_RE.search(kb_text or "")
+    tm = re.search(r"\btheory\s+T\s*:\s*V\s*\{(.*?)\}\s*$", kb_text or "", re.IGNORECASE | re.DOTALL)
+    if not vm or not tm:
+        return kb_text
+
+    vocab_inner = vm.group(1)
+    theory_inner = tm.group(1)
+
+    decl_names = set()
+    for raw in vocab_inner.splitlines():
+        m = re.match(r"^\s*([A-Za-z_]\w*)\s*:\s*", raw.strip())
+        if m:
+            decl_names.add(m.group(1))
+
+    # Collect variable typing from quantifier headers: !x in Person, y in Good:
+    var_types: dict[str, str] = {}
+    for qh in re.finditer(r"[!?]\s*([^:\n]+):", theory_inner):
+        header = qh.group(1)
+        for v, t in re.findall(r"([A-Za-z_]\w*)\s+in\s+([A-Za-z_]\w*)", header):
+            var_types[v] = t
+
+    def _iter_calls(text: str):
+        i = 0
+        n = len(text)
+        while i < n:
+            m = re.search(r"\b([A-Za-z_]\w*)\s*\(", text[i:])
+            if not m:
+                break
+            name = m.group(1)
+            open_i = i + m.end() - 1
+            j = open_i + 1
+            depth = 1
+            in_str = False
+            esc = False
+            while j < n:
+                ch = text[j]
+                if in_str:
+                    if esc:
+                        esc = False
+                    elif ch == "\\":
+                        esc = True
+                    elif ch == '"':
+                        in_str = False
+                else:
+                    if ch == '"':
+                        in_str = True
+                    elif ch == "(":
+                        depth += 1
+                    elif ch == ")":
+                        depth -= 1
+                        if depth == 0:
+                            break
+                j += 1
+            if j >= n:
+                i = open_i + 1
+                continue
+            arg_blob = text[open_i + 1 : j]
+            # Split by top-level commas only.
+            args = []
+            buf = []
+            dep2 = 0
+            in_s2 = False
+            esc2 = False
+            for ch in arg_blob:
+                if in_s2:
+                    buf.append(ch)
+                    if esc2:
+                        esc2 = False
+                    elif ch == "\\":
+                        esc2 = True
+                    elif ch == '"':
+                        in_s2 = False
+                    continue
+                if ch == '"':
+                    in_s2 = True
+                    buf.append(ch)
+                    continue
+                if ch == "(":
+                    dep2 += 1
+                    buf.append(ch)
+                    continue
+                if ch == ")":
+                    dep2 = max(0, dep2 - 1)
+                    buf.append(ch)
+                    continue
+                if ch == "," and dep2 == 0:
+                    a = "".join(buf).strip()
+                    if a:
+                        args.append(a)
+                    buf = []
+                    continue
+                buf.append(ch)
+            tail = "".join(buf).strip()
+            if tail:
+                args.append(tail)
+            yield name, args
+            i = j + 1
+
+    new_decls: list[str] = []
+    seen_new = set()
+    for name, args_raw in _iter_calls(theory_inner):
+        if name in decl_names or name in seen_new:
+            continue
+        if not args_raw:
+            continue
+        arg_types = []
+        for a in args_raw:
+            arg_types.append(var_types.get(a, "Person"))
+        new_decls.append("  " + name + ": " + " * ".join(arg_types) + " -> Bool")
+        seen_new.add(name)
+
+    # Fallback: symbol-like bare identifiers in theory that may not appear as name(...)
+    # but still trigger undeclared-symbol lint downstream.
+    type_names = set(re.findall(r"^\s*type\s+([A-Za-z_]\w*)\s*$", vocab_inner, flags=re.MULTILINE))
+    reserved = {
+        "vocabulary", "theory", "type", "true", "false", "and", "or", "not",
+        "in", "forall", "exists", "Bool", "Int", "Real"
+    }
+    token_candidates = set(re.findall(r"\b([A-Za-z_]\w*)\b", theory_inner))
+    for tok in sorted(token_candidates):
+        if tok in reserved or tok in type_names or tok in decl_names or tok in seen_new:
+            continue
+        if tok in var_types:
+            continue
+        # Heuristic: prefer predicate-like names (Pascal/camel-ish), skip tiny tokens.
+        if len(tok) < 3:
+            continue
+        if not (tok[0].isupper() or any(c.isupper() for c in tok[1:])):
+            continue
+        new_decls.append("  " + tok + ": Person -> Bool")
+        seen_new.add(tok)
+
+    if not new_decls:
+        return kb_text
+
+    start, end = vm.span(1)
+    new_inner = vocab_inner.rstrip() + ("\n" if vocab_inner.strip() else "") + "\n".join(new_decls) + "\n"
+    return kb_text[:start] + new_inner + kb_text[end:]
+
+
 def _sanitize_common_llm_syntax(kb_text):
     s = kb_text
+    # Common non-FO operators from JSON/Prolog-like output.
+    s = s.replace("&&", " & ")
+    s = s.replace("||", " | ")
+    s = s.replace("!=", " ~= ")
+    # Typed quantifiers in many generated theories: "forall x:Person, y:Type (body)."
+    def _rewrite_forall(m):
+        vars_part = m.group(1)
+        body = m.group(2).strip()
+        pairs = re.findall(r"([A-Za-z_]\w*)\s*:\s*([A-Za-z_]\w*)", vars_part)
+        if not pairs:
+            pairs = re.findall(r"([A-Za-z_]\w*)\s+in\s+([A-Za-z_]\w*)", vars_part)
+        if not pairs:
+            return m.group(0)
+        q = ", ".join(v + " in " + t for v, t in pairs)
+        return "! " + q + ": " + body + "."
+
+    def _rewrite_exists(m):
+        vars_part = m.group(1)
+        body = m.group(2).strip()
+        pairs = re.findall(r"([A-Za-z_]\w*)\s*:\s*([A-Za-z_]\w*)", vars_part)
+        if not pairs:
+            pairs = re.findall(r"([A-Za-z_]\w*)\s+in\s+([A-Za-z_]\w*)", vars_part)
+        if not pairs:
+            return m.group(0)
+        q = ", ".join(v + " in " + t for v, t in pairs)
+        return "? " + q + ": " + body
+
+    s = re.sub(
+        r"\bforall\s+([A-Za-z_]\w*\s*:\s*[A-Za-z_]\w*(?:\s*,\s*[A-Za-z_]\w*\s*:\s*[A-Za-z_]\w*)*)\s*\(\s*(.*?)\s*\)\s*\.",
+        _rewrite_forall,
+        s,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+    s = re.sub(
+        r"\bexists\s+([A-Za-z_]\w*\s*:\s*[A-Za-z_]\w*(?:\s*,\s*[A-Za-z_]\w*\s*:\s*[A-Za-z_]\w*)*)\s*\(\s*(.*?)\s*\)",
+        _rewrite_exists,
+        s,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+    # Handle FO-like quantifier keyword variants used by LLMs: "Exists x in T:"
+    s = re.sub(r"\bexists\s+([A-Za-z_]\w*)\s+in\s+([A-Za-z_]\w*)\s*:", r"? \1 in \2:", s, flags=re.IGNORECASE)
+    s = re.sub(r"\bforall\s+([A-Za-z_]\w*)\s+in\s+([A-Za-z_]\w*)\s*:", r"! \1 in \2:", s, flags=re.IGNORECASE)
+    # Corrupted quantifier tokenization like: exists(d *in Person:
+    s = re.sub(r"\bexists\s*\(\s*([A-Za-z_]\w*)\s*\*\s*in\s+([A-Za-z_]\w*)\s*:", r"? \1 in \2:", s, flags=re.IGNORECASE)
+    s = re.sub(r"\bforall\s*\(\s*([A-Za-z_]\w*)\s*\*\s*in\s+([A-Za-z_]\w*)\s*:", r"! \1 in \2:", s, flags=re.IGNORECASE)
+    # Expand grouped quantifier heads: "!x,y in Person" -> "! x in Person, y in Person"
+    def _expand_grouped_quant(m):
+        q = m.group(1)
+        vars_blob = m.group(2)
+        typ = m.group(3)
+        vars_ = [v.strip() for v in vars_blob.split(",") if v.strip()]
+        if len(vars_) <= 1:
+            return m.group(0)
+        expanded = ", ".join(v + " in " + typ for v in vars_)
+        return q + " " + expanded
+
+    s = re.sub(r"([!?])\s*([A-Za-z_]\w*(?:\s*,\s*[A-Za-z_]\w*)+)\s+in\s+([A-Za-z_]\w*)", _expand_grouped_quant, s)
+    # Negation token from C-style formulas: "!P(x)" -> "~P(x)" (keep quantifier ! intact).
+    s = re.sub(r"!\s*([A-Za-z_]\w*\s*\()", r"~\1", s)
+    # Corrupted implication tokens occasionally produced by models.
+    s = re.sub(r"[-–—]\s*\*+\s*>", " => ", s)
+    s = s.replace("->>", " => ")
+    s = s.replace("==>", " => ")
     s = re.sub(r'!\s*([A-Za-z_]\w*)\s*\[\s*Party\s*\]\s*:', r'! \1 in Party:', s)
     s = re.sub(r'\bforall\s+([A-Za-z_]\w*)\s+in\s+Party\s*:', r'! \1 in Party:', s, flags=re.IGNORECASE)
     # LLM often outputs "theory T: V" (space after colon); IDP expects "theory T:V"
@@ -118,12 +544,29 @@ def _sanitize_common_llm_syntax(kb_text):
     s = re.sub(r'\b->\s*real\b', ' -> Real', s)
     # Equivalence: IDP expects <=> , not <-> (Prolog/math style)
     s = re.sub(r'<->', '<=>', s)
+    # IDP uses =< for "less or equal"; many LLMs emit <=.
+    s = re.sub(r'(?<![<>=!])<=', '=<', s)
+    # Guard against common tautology artifacts in non-ordered custom types.
+    # Example seen in generated KBs: (LegalActionFilingDate(x) =< LegalActionFilingDate(x))
+    # which can trigger parse/type failures when Date is not comparable.
+    s = re.sub(
+        r"\(\s*([A-Za-z_]\w*\([^()]*\))\s*(=<|>=|<|>)\s*\1\s*\)",
+        "true",
+        s,
+    )
     # Markdown bullets merged between vocabulary lines (see _fix_vocab_markdown_bullet_merges)
     prev = None
     while prev != s:
         prev = s
         s = _fix_vocab_markdown_bullet_merges(s)
+    s = _drop_builtin_type_declarations(s)
+    s = _drop_reserved_symbol_declarations(s)
+    s = _normalize_vocab_declaration_shape(s)
     s = _normalize_vocab_curried_domain(s)
+    s = _dedupe_vocab_declarations(s)
+    s = _resolve_type_symbol_name_collisions(s)
+    s = _coerce_numeric_calls_in_boolean_context(s)
+    s = _auto_declare_undeclared_theory_calls(s)
     return s
 
 
@@ -177,9 +620,12 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
     base_run_dir = run_dir
     trace_path = os.path.join(base_run_dir, "run_trace.txt") if trace_enabled() else None
 
+    kb_backend = get_kb_backend_from_env()
     parts = []
     if cache_subdir:
         parts.append(cache_subdir)
+    if kb_backend != "legacy_fo":
+        parts.append(kb_backend)
     if _use_le_enabled():
         parts.append("le")
     if parts:
@@ -197,6 +643,7 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
         trace.section("RUN TRACE")
         trace.log("Run dir", base_run_dir)
         trace.log("Cache subdir (effective)", run_dir)
+        trace.log("KB compiler backend", kb_backend)
 
     if os.path.exists(kb_path):
         status_log("KB", "Loading from cache")
@@ -264,6 +711,15 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
         try:
             raw_kb_text = compile_law_to_kb_fo(law_text, model=model, repair_feedback=repair_feedback)
         except LawCompilationError as e:
+            # JSON-IR backend can fail before FO text exists; feed error back into repair loop.
+            if "JSON IR validation failed" in str(e) and attempt < max_repair_attempts - 1:
+                repair_feedback = {
+                    "error_message": str(e),
+                    "previous_output": (repair_feedback or {}).get("previous_output", ""),
+                }
+                if trace:
+                    trace.log_error("LLM/JSON-IR validation failed", e)
+                continue
             if trace:
                 trace.log_error("LLM call failed", e)
                 trace.close()
