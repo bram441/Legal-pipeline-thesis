@@ -1,0 +1,48 @@
+You previously compiled legal rules into FO(.) code, but IDP-Z3 rejected it with a parse/lint/shape error.
+
+Your task is SYNTAX REPAIR ONLY.
+- Keep legal meaning as close as possible to the previous output.
+- Do not redesign ontology unless required to satisfy syntax/declared-symbol consistency.
+- Output ONLY: `vocabulary V { ... }` then `theory T:V { ... }`.
+- No markdown, no explanations, no `structure`.
+
+========================
+MACHINE-DETECTED ISSUES
+========================
+{machine_hints}
+
+========================
+ERROR REPORT
+========================
+{error_message}
+
+========================
+PREVIOUS OUTPUT
+========================
+{previous_output}
+
+========================
+ORIGINAL LAW TEXT (REFERENCE)
+========================
+{law_text}
+
+========================
+MANDATORY SYNTAX AUTOCHECKS
+========================
+1) Vocabulary declarations:
+- Type declarations: `type Name`
+- Predicate/function: `name: T1 * T2 -> Bool|Int|Real|CustomType`
+- NEVER output `name: Type` alone for predicates; use `name: Type -> Bool`
+- NEVER output bare `Person` / `Estate` line; use `type Person` / `type Estate`
+
+2) Theory block:
+- Use only `!` / `?` quantifiers with `in Type`
+- Use only `& | ~ => <=>`
+- Every top-level formula ends with `.`
+- No `let`, no `*else`, no `?:`, no `sum *`
+
+3) Symbol consistency:
+- Every symbol called in theory must be declared in vocabulary with matching arity
+- Remove or declare any undeclared symbol
+
+Output only corrected FO(.) code.

@@ -6,6 +6,7 @@ from idp_z3.case_structure import _to_idp_elem
 from idp_z3.case_structure import extract_constants_from_facts
 
 _sig_line = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.+?)\s*->\s*Bool\s*$")
+_QUERY_WILDCARDS = frozenset({"?", "_", "*", "any"})
 
 def _unquote_idp_atom(x):
     s = str(x).strip()
@@ -101,11 +102,16 @@ def _build_selection_constraint(predicate, arg_types, args):
     extra_struct = []
 
     var_names = []
+    constrained_positions = []
     for i, t in enumerate(arg_types):
         sel = "__sel" + str(i)
         var = "x" + str(i)
-        sel_names.append(sel)
         var_names.append(var)
+        raw_arg = str(args[i]).strip().lower() if i < len(args) else ""
+        if raw_arg in _QUERY_WILDCARDS:
+            continue
+        sel_names.append(sel)
+        constrained_positions.append(i)
         extra_vocab.append(sel + ": " + t + " -> Bool")
         extra_struct.append(sel + " := {" + _to_idp_elem(args[i]) + "}.")
 
@@ -120,8 +126,8 @@ def _build_selection_constraint(predicate, arg_types, args):
 
     # Body: __sel0(x0) & ... & pred(x0,...)
     sel_conds = []
-    for i in range(len(var_names)):
-        sel_conds.append(sel_names[i] + "(" + var_names[i] + ")")
+    for sel_idx, arg_idx in enumerate(constrained_positions):
+        sel_conds.append(sel_names[sel_idx] + "(" + var_names[arg_idx] + ")")
 
     atom = predicate + "(" + ",".join(var_names) + ")"
     body = " & ".join(sel_conds + [atom])

@@ -8,6 +8,7 @@ Run from project root:
 import hashlib
 import os
 import sys
+from contextlib import ExitStack
 
 # Ensure project root is on path
 _root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -25,10 +26,15 @@ import streamlit as st
 
 from debug import status_log
 from pipeline.app.pipeline import answer_legal_prompt
-from pipeline.extraction.extractor import extract_case_only, ExtractionError
+from pipeline.extraction.extractor import (
+    extract_case_only,
+    ExtractionError,
+    extraction_backend_env_override,
+)
 from pipeline.io.text_runs import write_text_run
 from pipeline.kb.cache import get_or_compile_kb
 from pipeline.kb.compile_strategy import kb_run_context, strategy_to_flags, STRATEGY_CHOICES
+from pipeline.kb.compile_backend import kb_backend_env_override
 from pipeline.utils.run_trace import trace_enabled
 from pipeline.translation.translator import translate_to_english, TranslationError
 from pipeline.rendering.explanations import explain_on_demand
@@ -56,6 +62,7 @@ def run_pipeline(
     provider="auto",
     force_recompile=False,
     kb_strategy=None,
+    pipeline_backend=None,
 ):
     law_text = _normalize_text(law_text)
     case_text = _normalize_text(case_text)
@@ -90,38 +97,51 @@ def run_pipeline(
                 except OSError:
                     pass
 
+    if pipeline_backend == "legacy":
+        kb_backend = "legacy_fo"
+        extraction_backend = "legacy"
+    elif pipeline_backend == "json_ir":
+        kb_backend = "json_ir"
+        extraction_backend = "json_ir"
+    else:
+        kb_backend = None
+        extraction_backend = None
+
     ctx, strategy_label = kb_run_context(cli_strategy=kb_strategy, run_json=None, mode="text")
 
     status_log("KB", "Loading or compiling knowledge base")
     try:
-        with ctx:
+        with ExitStack() as stack:
+            stack.enter_context(ctx)
+            stack.enter_context(kb_backend_env_override(kb_backend))
+            stack.enter_context(extraction_backend_env_override(extraction_backend))
             kb_text, kb_schema = get_or_compile_kb(
                 run_path, law_text, cache_subdir="translated" if translate else None
             )
+
+            pre_extracted_case = None
+            try:
+                status_log("Case", "Extracting case once for all questions")
+                pre_extracted_case = extract_case_only(case_text, kb_schema=kb_schema, provider=provider)
+            except ExtractionError as e:
+                return None, None, f"Case extraction failed: {e}", None
+
+            results = []
+            for i, q in enumerate(questions):
+                status_log("Question", f"Processing {i + 1} of {len(questions)}")
+                trace_path = os.path.join(run_path, "run_trace.txt") if trace_enabled() else None
+                result = answer_legal_prompt(
+                    case_text,
+                    q,
+                    base_kb_text=kb_text,
+                    extractor_provider=provider,
+                    kb_schema=kb_schema,
+                    trace_path=trace_path,
+                    pre_extracted_case=pre_extracted_case,
+                )
+                results.append({"question": q, "result": result})
     except Exception as e:
         return None, None, f"KB compilation failed: {e}", None
-
-    pre_extracted_case = None
-    try:
-        status_log("Case", "Extracting case once for all questions")
-        pre_extracted_case = extract_case_only(case_text, kb_schema=kb_schema, provider=provider)
-    except ExtractionError as e:
-        return None, None, f"Case extraction failed: {e}", None
-
-    results = []
-    for i, q in enumerate(questions):
-        status_log("Question", f"Processing {i + 1} of {len(questions)}")
-        trace_path = os.path.join(run_path, "run_trace.txt") if trace_enabled() else None
-        result = answer_legal_prompt(
-            case_text,
-            q,
-            base_kb_text=kb_text,
-            extractor_provider=provider,
-            kb_schema=kb_schema,
-            trace_path=trace_path,
-            pre_extracted_case=pre_extracted_case,
-        )
-        results.append({"question": q, "result": result})
 
     return results, kb_text, None, strategy_label
 
@@ -141,6 +161,12 @@ def main():
         "le_single (law→LE→FO), le_two_phase (law→LE→vocab→theory). "
         "First option uses PIPELINE_USE_LE and PIPELINE_KB_TWO_PHASE from .env."
     )
+    pipeline_backend_options = ["(from environment / .env)", "legacy", "json_ir"]
+    pipeline_backend_help = (
+        "Unified backend mode. 'legacy' runs legacy KB + legacy extraction. "
+        "'json_ir' runs JSON-IR KB + JSON-IR extraction. "
+        "First option keeps environment defaults."
+    )
 
     with st.sidebar:
         st.header("Settings")
@@ -148,6 +174,10 @@ def main():
         provider = st.selectbox("LLM provider", ["auto", "openai"], index=0)
         kb_strategy_choice = st.selectbox("KB compile strategy", strategy_options, index=0, help=strategy_help)
         kb_strategy_ui = None if kb_strategy_choice.startswith("(") else kb_strategy_choice
+        pipeline_backend_choice = st.selectbox(
+            "Pipeline backend", pipeline_backend_options, index=0, help=pipeline_backend_help
+        )
+        pipeline_backend_ui = None if pipeline_backend_choice.startswith("(") else pipeline_backend_choice
         force_recompile = st.checkbox(
             "Force recompile KB",
             value=False,
@@ -181,6 +211,7 @@ def main():
                 provider=provider,
                 force_recompile=force_recompile,
                 kb_strategy=kb_strategy_ui,
+                pipeline_backend=pipeline_backend_ui,
             )
 
         if err:

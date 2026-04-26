@@ -7,6 +7,7 @@ _neg_atom = re.compile(r"^\s*(?:not|~|¬)\s+([A-Za-z_][A-Za-z0-9_]*)\s*\((.*)\)\
 _pos_atom = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*\((.*)\)\s*\.\s*$")
 _bad_star_call = re.compile(r"[A-Za-z_][A-Za-z0-9_]*\s*\*\s*\(")
 _bool_assign_false = re.compile(r"^\s*[A-Za-z_][A-Za-z0-9_]*\s*\([^)]*\)\s*=\s*(?:false|False)\s*\.\s*$")
+_QUERY_WILDCARDS = frozenset({"?", "_", "*", "any"})
 
 
 def _norm_str_list(xs, field_name):
@@ -91,6 +92,12 @@ def _validate_fact_args(line, args_str):
         a = part.strip().strip("'\"").lower()
         if not a:
             continue
+        if a == "_":
+            raise ValueError(
+                "Invalid wildcard argument '_' in case fact. "
+                "Use concrete entity names only (e.g. 'anna', 'bert'). "
+                "Fix: " + line
+            )
         if a in _INVALID_ARG_EXACT or any(a.startswith(p) for p in _INVALID_ARG_PREFIXES):
             raise ValueError(
                 "Invalid argument in case fact: negation applies to the predicate, not the entity. "
@@ -222,7 +229,25 @@ def normalize_and_validate_case(raw_case, kb_schema=None):
     # Entities are optional and used for domain seeding in the symbolic layer.
     ents = raw_case.get("entities")
     if isinstance(ents, dict):
-        out["entities"] = ents
+        if kb_schema:
+            # Canonicalize entity type keys to schema type names (case-insensitive).
+            type_lookup = {}
+            for t in (kb_schema.get("types") or []):
+                if isinstance(t, str) and t.strip():
+                    key = t.strip().lower()
+                    if key not in type_lookup:
+                        type_lookup[key] = t.strip()
+            canon_ents = {}
+            for t_name, vals in ents.items():
+                if not isinstance(vals, list):
+                    continue
+                k = str(t_name).strip()
+                t_canon = type_lookup.get(k.lower(), k)
+                canon_ents.setdefault(t_canon, [])
+                canon_ents[t_canon].extend(vals)
+            out["entities"] = canon_ents
+        else:
+            out["entities"] = ents
 
     return out
 
@@ -330,6 +355,9 @@ def normalize_and_validate_query(raw_query, case, kb_schema=None):
             raise ValueError("query.args must contain strings")
         a2 = a.strip().lower()
         if a2:
+            if a2 in _QUERY_WILDCARDS:
+                args_norm.append("?")
+                continue
             if schema_type_names and a2 in schema_type_names:
                 raise ValueError(
                     "query.args must be concrete entity names from the case (e.g. 'jan', 'pieter'), "
@@ -375,11 +403,57 @@ def normalize_and_validate_query(raw_query, case, kb_schema=None):
         if mode == "set" and len(args_norm) != 0:
             raise ValueError("set mode requires args=[]")
 
+        # Type-aware entity validation for boolean queries.
+        # If the case declares entities for expected type T at position i,
+        # query.args[i] must be one of those entities.
+        if mode == "boolean" and isinstance(case, dict):
+            type_to_entities = {}
+            for t_name, vals in (case.get("entities") or {}).items():
+                if isinstance(vals, list):
+                    type_to_entities[str(t_name).strip()] = {
+                        str(v).strip().lower()
+                        for v in vals
+                        if isinstance(v, str) and str(v).strip()
+                    }
+            for i, expected_t in enumerate(sig.get("args") or []):
+                ents_of_type = type_to_entities.get(expected_t)
+                if ents_of_type:
+                    if i >= len(args_norm):
+                        got = None
+                    else:
+                        got = args_norm[i]
+                    if got == "?":
+                        continue
+                    if got not in ents_of_type:
+                        raise ValueError(
+                            "Query argument type mismatch for {} at position {}: expected an entity of type {} "
+                            "from case.entities, got {}. Candidate entities: {}.".format(
+                                predicate,
+                                i,
+                                expected_t,
+                                got,
+                                ", ".join(sorted(ents_of_type)) or "(none)",
+                            )
+                        )
+                else:
+                    got = args_norm[i] if i < len(args_norm) else None
+                    if got == "?":
+                        continue
+                    # No declared entity for this required type: force repair to pick a query
+                    # that is answerable with available case entities/facts.
+                    raise ValueError(
+                        "No entities declared for required query argument type '{}' (predicate {}, position {}). "
+                        "Use a predicate/query grounding that is supported by available case entities."
+                        .format(expected_t, predicate, i)
+                    )
+
     # Semantic check: query args (entities) must appear in case (facts or case.entities)
     if args_norm and case:
         case_entities = _case_entity_set(case)
         if case_entities:
             for a in args_norm:
+                if a == "?":
+                    continue
                 if a not in case_entities:
                     raise ValueError(
                         "Query entity '{}' not in case. Case entities: {}.".format(

@@ -1,23 +1,8 @@
 {
   "id": "run_002",
-  "total": 2,
-  "correct": 2,
-  "items": [
-    {
-      "match": true,
-      "expected": true,
-      "got": true,
-      "id": "q1",
-      "text": "Is Pieter liable under Article 398?"
-    },
-    {
-      "match": true,
-      "expected": 8,
-      "got": "8",
-      "raw_range": "8",
-      "id": "q3",
-      "text": "What is the minimum prison sentence for Pieter?"
-    }
-  ],
-  "accuracy": 1.0
+  "total": 0,
+  "correct": 0,
+  "items": [],
+  "kb_compile_strategy": "le_two_phase",
+  "accuracy": null
 }

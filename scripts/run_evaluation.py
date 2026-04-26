@@ -47,6 +47,7 @@ read_score = eval_support.read_score
 run_main_json = eval_support.run_main_json
 work_dir_name = eval_support.work_dir_name
 classify_failure = eval_support.classify_failure
+from pipeline.kb.compile_backend import KB_BACKEND_CHOICES
 
 
 def _write_markdown(path: Path, matrix: dict) -> None:
@@ -223,6 +224,16 @@ def main() -> int:
         help="Report folder (default: results/reports/evaluation_<timestamp>)",
     )
     p.add_argument("--no-translate", action="store_true", help="Pass --no-translate to main.py")
+    p.add_argument(
+        "--kb-backend",
+        default="legacy_fo",
+        help="KB compiler backend: one of " + ", ".join(KB_BACKEND_CHOICES) + ".",
+    )
+    p.add_argument(
+        "--pipeline-backend",
+        default=None,
+        help="Unified pipeline backend: 'legacy' or 'json_ir' (sets KB+extraction together).",
+    )
     p.add_argument("--clean", action="store_true", help="Remove output-dir if it exists before run")
     p.add_argument(
         "--excel",
@@ -230,6 +241,12 @@ def main() -> int:
         help="Also write summary.xlsx (requires: pip install openpyxl)",
     )
     args = p.parse_args()
+    if args.kb_backend not in KB_BACKEND_CHOICES:
+        print("--kb-backend must be one of: " + ", ".join(KB_BACKEND_CHOICES), file=sys.stderr)
+        return 1
+    if args.pipeline_backend is not None and args.pipeline_backend not in ("legacy", "json_ir"):
+        print("--pipeline-backend must be one of: legacy, json_ir", file=sys.stderr)
+        return 1
 
     runs_dir = Path(args.runs_dir)
     if not runs_dir.is_absolute():
@@ -271,6 +288,9 @@ def main() -> int:
     print("Runs directory:", runs_dir)
     print("Runs:", ", ".join(run_ids))
     print("Strategies:", ", ".join(strategies))
+    print("KB backend:", args.kb_backend)
+    if args.pipeline_backend:
+        print("Pipeline backend:", args.pipeline_backend)
     print("Output:", out)
     print()
 
@@ -283,7 +303,13 @@ def main() -> int:
                 wdir = work_root / work_dir_name(src, strategy)
                 print("===", rid, "+", strategy, "->", wdir.name, "===")
                 copy_run_json(src, wdir)
-                code = run_main_json(wdir, strategy, args.no_translate)
+                code = run_main_json(
+                    wdir,
+                    strategy,
+                    args.no_translate,
+                    kb_backend=args.kb_backend,
+                    pipeline_backend=args.pipeline_backend,
+                )
                 sc = read_score(wdir / "score.json")
                 if code != 0:
                     exit_ok = False

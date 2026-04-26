@@ -23,7 +23,13 @@ def copy_run_json(src_run_dir: Path, dest_dir: Path) -> None:
     shutil.copy2(src_run_dir / "run.json", dest_dir / "run.json")
 
 
-def run_main_json(run_dir: Path, strategy: str, no_translate: bool) -> int:
+def run_main_json(
+    run_dir: Path,
+    strategy: str,
+    no_translate: bool,
+    kb_backend: str | None = None,
+    pipeline_backend: str | None = None,
+) -> int:
     cmd = [
         sys.executable,
         str(_ROOT / "main.py"),
@@ -36,6 +42,10 @@ def run_main_json(run_dir: Path, strategy: str, no_translate: bool) -> int:
     ]
     if no_translate:
         cmd.append("--no-translate")
+    if kb_backend:
+        cmd.extend(["--kb-backend", kb_backend])
+    if pipeline_backend:
+        cmd.extend(["--pipeline-backend", pipeline_backend])
     return subprocess.call(cmd, cwd=str(_ROOT))
 
 

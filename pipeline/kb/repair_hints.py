@@ -42,11 +42,29 @@ def build_machine_repair_hints(error_message: str, previous_output: str) -> str:
             "KB static lint failed — fix every issue listed in the error report (undeclared symbols, "
             "`let`, stray `*`, duplicate signatures). Do not resubmit the same broken patterns."
         )
+    if "bare type/symbol" in eml or "shorthand" in eml:
+        hints.append(
+            "Vocabulary declaration shape is invalid. Use `type T` for types and `p: T -> Bool` for "
+            "unary predicates (never `p: T` alone)."
+        )
+    if "missing 'vocabulary v'" in eml or "missing 'theory t:v'" in eml:
+        hints.append(
+            "Output exactly two blocks in order: `vocabulary V { ... }` then `theory T:V { ... }`."
+        )
 
     if re.search(r"\blet\b", prev, re.IGNORECASE):
         hints.append(
             "AUTOCHECK: previous output contains `let` — IDP FO has no let-bindings. "
             "Rewrite using `!` / `?` quantifiers and separate formulas."
+        )
+    if re.search(r"^\s*[A-Za-z_]\w*\s*$", prev, re.MULTILINE):
+        hints.append(
+            "AUTOCHECK: found bare identifier line(s) in vocabulary. Prefix type lines with `type`."
+        )
+    if re.search(r"^\s*[A-Za-z_]\w*\s*:\s*[A-Za-z_]\w*\s*$", prev, re.MULTILINE):
+        hints.append(
+            "AUTOCHECK: found shorthand declaration `name: Type`. Expand to `name: Type -> Bool` "
+            "or declare a proper function return type."
         )
 
     if "undeclared symbol" in eml or "theory calls undeclared" in eml:

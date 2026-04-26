@@ -15,5 +15,12 @@
         "value": true
       }
     }
-  ]
+  ],
+  "kb_compile_strategy": "le_two_phase",
+  "kb_compile_backend": "json_ir",
+  "kb_compile_flags": {
+    "use_le": true,
+    "two_phase": true
+  },
+  "pipeline_backend_mode": "json_ir"
 }

@@ -7,7 +7,10 @@
 C:\Users\bramd\Documents\VUB\Master Thesis\Legal-pipeline\inputs\json\run_003
 
 --- Cache subdir (effective) ---
-C:\Users\bramd\Documents\VUB\Master Thesis\Legal-pipeline\inputs\json\run_003\translated
+C:\Users\bramd\Documents\VUB\Master Thesis\Legal-pipeline\inputs\json\run_003\json_ir
+
+--- KB compiler backend ---
+json_ir
 
 
 ======================================================================
@@ -15,261 +18,98 @@ C:\Users\bramd\Documents\VUB\Master Thesis\Legal-pipeline\inputs\json\run_003\tr
 ======================================================================
 
 --- Law text ---
-SECTION II. - INTENTIONAL KILLING, NOT CALLED MANSLAUGHTER, AND INTENTIONAL INFLICTING OF BODILY INJURY.
+HOOFDSTUK 1. Kleine vennootschappen.
 
-Art. 398. Whoever intentionally inflicts wounds or blows shall be punished with imprisonment from eight days to six months and a fine of twenty-six [euro] to one hundred [euro], or with one of these penalties alone.
-If the offender acted with premeditation, he shall be sentenced to imprisonment from one month to one year and a fine of fifty [euro] to two hundred [euro].
+ Art. 1:24. par. 1. Kleine vennootschappen zijn vennootschappen met rechtspersoonlijkheid die op balansdatum van het laatst afgesloten boekjaar, niet meer dan één van de volgende criteria overschrijden:
+ - jaargemiddelde van het aantal werknemers: 50;
+ - [2 jaarlijkse netto-omzet als bedoeld in artikel 1:26/1]2, exclusief de belasting over de toegevoegde waarde: [1 11.250.000]1 euro;
+ - balanstotaal: [1 6.000.000]1 euro.
+ par. 2. Wanneer meer dan één van de in paragraaf 1 bedoelde criteria worden overschreden of niet meer worden overschreden, heeft dit slechts gevolgen wanneer dit zich gedurende twee achtereenvolgende boekjaren voordoet. De gevolgen gaan in dat geval in vanaf het boekjaar dat volgt op het boekjaar gedurende hetwelk meer dan één van de criteria voor de tweede keer werden overschreden of niet meer werden overschreden.
+ par. 3. Voor vennootschappen die met hun bedrijf starten, worden voor de toepassing van de in paragraaf 1 vermelde criteria, deze cijfers bij het begin van het boekjaar te goeder trouw geschat. Indien uit deze schatting blijkt dat meer dan één van de criteria zullen worden overschreden gedurende het eerste boekjaar, moet daarmee voor dat eerste boekjaar meteen rekening worden gehouden.
+ par. 4. Heeft het boekjaar uitzonderlijk een duur van minder of meer dan twaalf maanden, waarbij deze duur niet langer kan zijn dan vierentwintig maanden min één kalenderdag, dan wordt het bedrag van de [2 netto-omzet]2 exclusief de belasting over de toegevoegde waarde bedoeld in paragraaf 1, vermenigvuldigd met een breuk waarvan de noemer twaalf is en de teller het aantal maanden van het betrokken boekjaar, waarbij elke begonnen maand voor een volle maand wordt geteld.
+ par. 5. Het gemiddeld aantal tewerkgestelde werknemers, bedoeld in paragraaf 1, is het gemiddelde van het aantal werknemers uitgedrukt in voltijdse equivalenten dat is geregistreerd in de DIMONA-databank overeenkomstig het koninklijk besluit van 5 november 2002 tot invoering van een onmiddellijke aangifte van tewerkstelling, met toepassing van artikel 38 van de wet van 26 juli 1996 tot modernisering van de sociale zekerheid en tot vrijwaring van de leefbaarheid van de wettelijke pensioenstelsels, per einde van elke maand van het boekjaar, of indien de tewerkstelling niet behoort tot het toepassingsgebied van dit koninklijk besluit, het gemiddelde aantal tewerkgestelde werknemers uitgedrukt in voltijdse equivalenten van de in het algemene personeelsregister of een gelijkwaardig document ingeschreven werknemers per einde van elke maand van het beschouwde boekjaar.
+ Het aantal werknemers uitgedrukt in voltijdse equivalenten is gelijk aan het arbeidsvolume uitgedrukt in voltijds tewerkgestelde equivalenten, te berekenen voor de deeltijdse werknemers op basis van het contractueel aantal te presteren uren, gerelateerd ten opzichte van de normale arbeidsduur van een vergelijkbare voltijdse werknemer.
+ Wanneer de opbrengsten die voortspruiten uit het gewoon bedrijf van een vennootschap voor meer dan de helft bestaan uit opbrengsten die niet aan de omschrijving beantwoorden van de post [2 netto-omzet]2, dan wordt voor de toepassing van paragraaf 1 onder [2 netto-omzet]2 verstaan: het totaal van de bedrijfs- en financiële opbrengsten met uitsluiting van de niet-recurrente opbrengsten.
+ Het in paragraaf 1 bedoelde balanstotaal is de totale boekwaarde van de activa zoals ze blijkt uit het balansschema dat vastgesteld is bij koninklijk besluit genomen ter uitvoering van artikel 3:1, par. 1. [2 ...]2
+ par. 6. Als de vennootschap met één of meer andere vennootschappen is verbonden als bedoeld in artikel 1:20, worden de criteria inzake [2 netto-omzet]2 en balanstotaal bedoeld in paragraaf 1 berekend op geconsolideerde basis. Wat het criterium aantal werknemers betreft, wordt het aantal werknemers, berekend volgens de bepalingen van paragraaf 5, dat elk van de betrokken verbonden vennootschappen jaarlijks gemiddeld tewerkstelt, opgeteld.
+ Indien, bij de berekening van de in paragraaf 1 genoemde grensbedragen, de in het koninklijk besluit genomen ter uitvoering van artikel 3:30, par. 1, bedoelde verrekeningen en elke daaruit voortvloeiende weglating niet worden verricht, dan worden deze grensbedragen betreffende het balanstotaal en de netto-omzet vermeerderd met twintig procent.
+ par. 7. Paragraaf 6 is niet van toepassing op andere vennootschappen dan moedervennootschappen als bedoeld in artikel 1:15, (1), behalve indien dergelijke vennootschappen zijn opgericht met als enig doel de verslaggeving van bepaalde informatie te ontwijken.
+ Voor de toepassing van deze paragraaf en paragraaf 6 worden vennootschappen die een consortium vormen als bedoeld in artikel 1:19, gelijkgesteld met een moedervennootschap.
+ par. 8. De Koning kan de in paragraaf 1 vermelde cijfers en de wijze waarop ze worden berekend, wijzigen. Deze koninklijke besluiten worden genomen na overleg in de Ministerraad en na advies van de Centrale Raad voor het Bedrijfsleven. Voor de wijziging van paragraaf 5, eerste en tweede lid, wordt bovendien het advies van de Nationale Arbeidsraad gevraagd.
+ ----------
+ (1)<W 2024-03-28/60, art. 147, 019; Inwerkingtreding : 08-04-2024>
+ (2)<W 2024-12-02/04, art. 3, 024; Inwerkingtreding : 30-12-2024>
 
-Art. 399. If the blows or wounds result in illness or incapacity to perform personal labor, the offender shall be punished with imprisonment from two months to two years and a fine of fifty [euro] to two hundred [euro].
-The offender shall be punished with imprisonment from six months to three years and a fine of one hundred [euro] to five hundred [euro], if he acted with premeditation.
-
-Art. 400. The penalty shall be imprisonment from two years to five years and a fine of two hundred [euro] to five hundred [euro], if the blows or wounds result in a disease that appears incurable, incapacity to perform personal labor for more than four months, the complete loss of use of an organ, or a severe disfigurement.
-The penalty shall be imprisonment from five years to ten years if the offender acted with premeditation.
-
-Art. 401. When the blows or wounds are inflicted intentionally, but without the intent to kill, and yet cause death, the offender shall be punished with imprisonment from five years to ten years.
-He shall be punished with imprisonment from ten years to fifteen years if he commits those acts of violence with premeditation.
+ Art. 1:25. par. 1. Onder "microvennootschappen" wordt verstaan, kleine vennootschappen met rechtspersoonlijkheid die geen dochtervennootschap of moedervennootschap zijn en die op balansdatum van het laatst afgesloten boekjaar niet meer dan één der volgende criteria overschrijden:
+ - jaargemiddelde van het aantal werknemers: 10;
+ - [2 jaarlijkse netto-omzet bedoeld in artikel 1:26/1]2, exclusief de belasting over de toegevoegde waarde: [1 900.000]1 euro;
+ - balanstotaal: [1 450.000]1 euro.
+ par. 2. Artikel 1:24, par. 2 tot 5 en par. 8, is van toepassing.
+ ----------
+ (1)<W 2024-03-28/60, art. 148, 019; Inwerkingtreding : 08-04-2024>
+ (2)<W 2024-12-02/07, art. 4, 024; Inwerkingtreding : 30-12-2024>
 
 --- LLM response (raw) ---
 vocabulary V {
-  type Person
-  intentionallyInflictsWoundsOrBlows: Person -> Bool
-  actsWithPremeditation: Person -> Bool
-  causesIllnessOrIncapacity: Person -> Bool
-  causesSevereHarm: Person -> Bool
-  causesDeath: Person -> Bool
-  punishedArt398: Person -> Bool
-  punishedArt399: Person -> Bool
-  punishedArt400: Person -> Bool
-  punishedArt401: Person -> Bool
-  imprisonmentMinDays: Person -> Int
-  imprisonmentMaxDays: Person -> Int
-  fineMinEuro: Person -> Int
-  fineMaxEuro: Person -> Int
+  type Vennootschap
+  type Boekjaar
+  type Maand
+  IsKleineVennootschap: Vennootschap * Boekjaar -> Bool
+  IsMicroVennootschap: Vennootschap * Boekjaar -> Bool
+  IsMoederVennootschap: Vennootschap -> Bool
+  IsDochterVennootschap: Vennootschap -> Bool
+  IsConsortiumVennootschap: Vennootschap -> Bool
+  HasBoekjaar: Person * Person -> Bool
+  JaargemiddeldeAantalWerknemers: Vennootschap * Boekjaar -> Int
+  JaarlijkseNettoOmzet: Vennootschap * Boekjaar -> Real
+  Balanstotaal: Vennootschap * Boekjaar -> Real
+  BalansDatumVan: Vennootschap -> Boekjaar
+  DuurVanBoekjaarInMaanden: Boekjaar -> Int
+  HeeftEenLangereDuurDan12Maanden: Boekjaar -> Bool
 }
 
 theory T:V {
-  ! p in Person:
-    punishedArt398(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt399(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt400(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt401(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~actsWithPremeditation(p) &
-      causesDeath(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 30 <=>
-      punishedArt398(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 365 <=>
-      punishedArt398(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 50 <=>
-      punishedArt398(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMaxEuro(p) = 200 <=>
-      punishedArt398(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 8 <=>
-      punishedArt398(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 183 <=>
-      punishedArt398(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 26 <=>
-      punishedArt398(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMaxEuro(p) = 100 <=>
-      punishedArt398(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 60 <=>
-      punishedArt399(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 730 <=>
-      punishedArt399(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 50 <=>
-      punishedArt399(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMaxEuro(p) = 200 <=>
-      punishedArt399(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 180 <=>
-      punishedArt399(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 1095 <=>
-      punishedArt399(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 100 <=>
-      punishedArt399(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMaxEuro(p) = 500 <=>
-      punishedArt399(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 730 <=>
-      punishedArt400(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 1825 <=>
-      punishedArt400(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 200 <=>
-      punishedArt400(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMaxEuro(p) = 500 <=>
-      punishedArt400(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 1825 <=>
-      punishedArt400(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 3650 <=>
-      punishedArt400(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 0 <=>
-      punishedArt400(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMaxEuro(p) = 0 <=>
-      punishedArt400(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 1825 <=>
-      punishedArt401(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 3650 <=>
-      punishedArt401(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 3650 <=>
-      punishedArt401(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 5475 <=>
-      punishedArt401(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 0 <=>
-      punishedArt398(p) & actsWithPremeditation(p) = false &
-      punishedArt399(p) & actsWithPremeditation(p) = false &
-      punishedArt400(p) & actsWithPremeditation(p) = false &
-      punishedArt401(p) = false.
-
-  ! p in Person:
-    fineMaxEuro(p) = 0 <=>
-      punishedArt398(p) & actsWithPremeditation(p) = false &
-      punishedArt399(p) & actsWithPremeditation(p) = false &
-      punishedArt400(p) & actsWithPremeditation(p) = false &
-      punishedArt401(p) = false.
+  ! v in Vennootschap, b in Boekjaar: (BalansDatumVan(v) & HasBoekjaar(v,b)) => (IsKleineVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (JaargemiddeldeAantalWerknemers(v,b)) => (IsKleineVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (JaarlijkseNettoOmzet(v,b)) => (IsKleineVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (Balanstotaal(v,b)) => (IsKleineVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (IsKleineVennootschap(v,b)) => (IsMicroVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (IsMoederVennootschap(v)) => (IsMicroVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (IsDochterVennootschap(v)) => (IsMicroVennootschap(v,b)).
+  ! v in Vennootschap: (IsConsortiumVennootschap(v)) => (IsMoederVennootschap(v)).
 }
 
 --- After sanitization ---
 vocabulary V {
-  type Person
-  intentionallyInflictsWoundsOrBlows: Person -> Bool
-  actsWithPremeditation: Person -> Bool
-  causesIllnessOrIncapacity: Person -> Bool
-  causesSevereHarm: Person -> Bool
-  causesDeath: Person -> Bool
-  punishedArt398: Person -> Bool
-  punishedArt399: Person -> Bool
-  punishedArt400: Person -> Bool
-  punishedArt401: Person -> Bool
-  imprisonmentMinDays: Person -> Int
-  imprisonmentMaxDays: Person -> Int
-  fineMinEuro: Person -> Int
-  fineMaxEuro: Person -> Int
-}
+  type Vennootschap
+  type Boekjaar
+  type Maand
+  IsKleineVennootschap: Vennootschap * Boekjaar -> Bool
+  IsMicroVennootschap: Vennootschap * Boekjaar -> Bool
+  IsMoederVennootschap: Vennootschap -> Bool
+  IsDochterVennootschap: Vennootschap -> Bool
+  IsConsortiumVennootschap: Vennootschap -> Bool
+  HasBoekjaar: Person * Person -> Bool
+  JaargemiddeldeAantalWerknemers: Vennootschap * Boekjaar -> Int
+  JaarlijkseNettoOmzet: Vennootschap * Boekjaar -> Real
+  Balanstotaal: Vennootschap * Boekjaar -> Real
+  BalansDatumVan: Vennootschap -> Boekjaar
+  DuurVanBoekjaarInMaanden: Boekjaar -> Int
+  HeeftEenLangereDuurDan12Maanden: Boekjaar -> Bool}
 
 theory T:V {
-  ! p in Person:
-    punishedArt398(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt399(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt400(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt401(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~actsWithPremeditation(p) &
-      causesDeath(p).
-
-  ! p in Person:
-    (punishedArt398(p) & actsWithPremeditation(p)) => imprisonmentMinDays(p) = 30.
-  ! p in Person:
-    (punishedArt398(p) & actsWithPremeditation(p)) => imprisonmentMaxDays(p) = 365.
-  ! p in Person:
-    (punishedArt398(p) & actsWithPremeditation(p)) => fineMinEuro(p) = 50.
-  ! p in Person:
-    (punishedArt398(p) & actsWithPremeditation(p)) => fineMaxEuro(p) = 200.
-  ! p in Person:
-    (punishedArt398(p) & ~actsWithPremeditation(p)) => imprisonmentMinDays(p) = 8.
-  ! p in Person:
-    (punishedArt398(p) & ~actsWithPremeditation(p)) => imprisonmentMaxDays(p) = 183.
-  ! p in Person:
-    (punishedArt398(p) & ~actsWithPremeditation(p)) => fineMinEuro(p) = 26.
-  ! p in Person:
-    (punishedArt398(p) & ~actsWithPremeditation(p)) => fineMaxEuro(p) = 100.
-  ! p in Person:
-    (punishedArt399(p) & ~actsWithPremeditation(p))...
-
---- Syntax validation ---
-OK (vocabulary+theory present, IDP parse OK)
+  ! v in Vennootschap, b in Boekjaar: (BalansDatumVan(v) & HasBoekjaar(v,b)) => (IsKleineVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (JaargemiddeldeAantalWerknemers(v,b)) => (IsKleineVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (JaarlijkseNettoOmzet(v,b)) => (IsKleineVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (Balanstotaal(v,b)) => (IsKleineVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (IsKleineVennootschap(v,b)) => (IsMicroVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (IsMoederVennootschap(v)) => (IsMicroVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (IsDochterVennootschap(v)) => (IsMicroVennootschap(v,b)).
+  ! v in Vennootschap: (IsConsortiumVennootschap(v)) => (IsMoederVennootschap(v)).
+}
 
 --- Validation failed (ERROR) ---
-Article predicates (e.g. liableArt398, punishedArt399) must be defined using ONLY condition predicates (e.g. IntentionallyInflictsWoundsOrBlows, CausesIllnessOrIncapacity). Do NOT reference another article predicate in the body (e.g. ~liableArt399(x) or ~punishedArt398(x))—that causes circularity and 'no model exists'. Define each article predicate with conditions only.
+IDP failed to parse compiled KB: Error: line 10 - colStart 16 - colEnd 22 => Undeclared symbol name: "Person"
 
 
 ======================================================================
@@ -277,325 +117,125 @@ Article predicates (e.g. liableArt398, punishedArt399) must be defined using ONL
 ======================================================================
 
 --- Law text ---
-SECTION II. - INTENTIONAL KILLING, NOT CALLED MANSLAUGHTER, AND INTENTIONAL INFLICTING OF BODILY INJURY.
+HOOFDSTUK 1. Kleine vennootschappen.
 
-Art. 398. Whoever intentionally inflicts wounds or blows shall be punished with imprisonment from eight days to six months and a fine of twenty-six [euro] to one hundred [euro], or with one of these penalties alone.
-If the offender acted with premeditation, he shall be sentenced to imprisonment from one month to one year and a fine of fifty [euro] to two hundred [euro].
+ Art. 1:24. par. 1. Kleine vennootschappen zijn vennootschappen met rechtspersoonlijkheid die op balansdatum van het laatst afgesloten boekjaar, niet meer dan één van de volgende criteria overschrijden:
+ - jaargemiddelde van het aantal werknemers: 50;
+ - [2 jaarlijkse netto-omzet als bedoeld in artikel 1:26/1]2, exclusief de belasting over de toegevoegde waarde: [1 11.250.000]1 euro;
+ - balanstotaal: [1 6.000.000]1 euro.
+ par. 2. Wanneer meer dan één van de in paragraaf 1 bedoelde criteria worden overschreden of niet meer worden overschreden, heeft dit slechts gevolgen wanneer dit zich gedurende twee achtereenvolgende boekjaren voordoet. De gevolgen gaan in dat geval in vanaf het boekjaar dat volgt op het boekjaar gedurende hetwelk meer dan één van de criteria voor de tweede keer werden overschreden of niet meer werden overschreden.
+ par. 3. Voor vennootschappen die met hun bedrijf starten, worden voor de toepassing van de in paragraaf 1 vermelde criteria, deze cijfers bij het begin van het boekjaar te goeder trouw geschat. Indien uit deze schatting blijkt dat meer dan één van de criteria zullen worden overschreden gedurende het eerste boekjaar, moet daarmee voor dat eerste boekjaar meteen rekening worden gehouden.
+ par. 4. Heeft het boekjaar uitzonderlijk een duur van minder of meer dan twaalf maanden, waarbij deze duur niet langer kan zijn dan vierentwintig maanden min één kalenderdag, dan wordt het bedrag van de [2 netto-omzet]2 exclusief de belasting over de toegevoegde waarde bedoeld in paragraaf 1, vermenigvuldigd met een breuk waarvan de noemer twaalf is en de teller het aantal maanden van het betrokken boekjaar, waarbij elke begonnen maand voor een volle maand wordt geteld.
+ par. 5. Het gemiddeld aantal tewerkgestelde werknemers, bedoeld in paragraaf 1, is het gemiddelde van het aantal werknemers uitgedrukt in voltijdse equivalenten dat is geregistreerd in de DIMONA-databank overeenkomstig het koninklijk besluit van 5 november 2002 tot invoering van een onmiddellijke aangifte van tewerkstelling, met toepassing van artikel 38 van de wet van 26 juli 1996 tot modernisering van de sociale zekerheid en tot vrijwaring van de leefbaarheid van de wettelijke pensioenstelsels, per einde van elke maand van het boekjaar, of indien de tewerkstelling niet behoort tot het toepassingsgebied van dit koninklijk besluit, het gemiddelde aantal tewerkgestelde werknemers uitgedrukt in voltijdse equivalenten van de in het algemene personeelsregister of een gelijkwaardig document ingeschreven werknemers per einde van elke maand van het beschouwde boekjaar.
+ Het aantal werknemers uitgedrukt in voltijdse equivalenten is gelijk aan het arbeidsvolume uitgedrukt in voltijds tewerkgestelde equivalenten, te berekenen voor de deeltijdse werknemers op basis van het contractueel aantal te presteren uren, gerelateerd ten opzichte van de normale arbeidsduur van een vergelijkbare voltijdse werknemer.
+ Wanneer de opbrengsten die voortspruiten uit het gewoon bedrijf van een vennootschap voor meer dan de helft bestaan uit opbrengsten die niet aan de omschrijving beantwoorden van de post [2 netto-omzet]2, dan wordt voor de toepassing van paragraaf 1 onder [2 netto-omzet]2 verstaan: het totaal van de bedrijfs- en financiële opbrengsten met uitsluiting van de niet-recurrente opbrengsten.
+ Het in paragraaf 1 bedoelde balanstotaal is de totale boekwaarde van de activa zoals ze blijkt uit het balansschema dat vastgesteld is bij koninklijk besluit genomen ter uitvoering van artikel 3:1, par. 1. [2 ...]2
+ par. 6. Als de vennootschap met één of meer andere vennootschappen is verbonden als bedoeld in artikel 1:20, worden de criteria inzake [2 netto-omzet]2 en balanstotaal bedoeld in paragraaf 1 berekend op geconsolideerde basis. Wat het criterium aantal werknemers betreft, wordt het aantal werknemers, berekend volgens de bepalingen van paragraaf 5, dat elk van de betrokken verbonden vennootschappen jaarlijks gemiddeld tewerkstelt, opgeteld.
+ Indien, bij de berekening van de in paragraaf 1 genoemde grensbedragen, de in het koninklijk besluit genomen ter uitvoering van artikel 3:30, par. 1, bedoelde verrekeningen en elke daaruit voortvloeiende weglating niet worden verricht, dan worden deze grensbedragen betreffende het balanstotaal en de netto-omzet vermeerderd met twintig procent.
+ par. 7. Paragraaf 6 is niet van toepassing op andere vennootschappen dan moedervennootschappen als bedoeld in artikel 1:15, (1), behalve indien dergelijke vennootschappen zijn opgericht met als enig doel de verslaggeving van bepaalde informatie te ontwijken.
+ Voor de toepassing van deze paragraaf en paragraaf 6 worden vennootschappen die een consortium vormen als bedoeld in artikel 1:19, gelijkgesteld met een moedervennootschap.
+ par. 8. De Koning kan de in paragraaf 1 vermelde cijfers en de wijze waarop ze worden berekend, wijzigen. Deze koninklijke besluiten worden genomen na overleg in de Ministerraad en na advies van de Centrale Raad voor het Bedrijfsleven. Voor de wijziging van paragraaf 5, eerste en tweede lid, wordt bovendien het advies van de Nationale Arbeidsraad gevraagd.
+ ----------
+ (1)<W 2024-03-28/60, art. 147, 019; Inwerkingtreding : 08-04-2024>
+ (2)<W 2024-12-02/04, art. 3, 024; Inwerkingtreding : 30-12-2024>
 
-Art. 399. If the blows or wounds result in illness or incapacity to perform personal labor, the offender shall be punished with imprisonment from two months to two years and a fine of fifty [euro] to two hundred [euro].
-The offender shall be punished with imprisonment from six months to three years and a fine of one hundred [euro] to five hundred [euro], if he acted with premeditation.
-
-Art. 400. The penalty shall be imprisonment from two years to five years and a fine of two hundred [euro] to five hundred [euro], if the blows or wounds result in a disease that appears incurable, incapacity to perform personal labor for more than four months, the complete loss of use of an organ, or a severe disfigurement.
-The penalty shall be imprisonment from five years to ten years if the offender acted with premeditation.
-
-Art. 401. When the blows or wounds are inflicted intentionally, but without the intent to kill, and yet cause death, the offender shall be punished with imprisonment from five years to ten years.
-He shall be punished with imprisonment from ten years to fifteen years if he commits those acts of violence with premeditation.
+ Art. 1:25. par. 1. Onder "microvennootschappen" wordt verstaan, kleine vennootschappen met rechtspersoonlijkheid die geen dochtervennootschap of moedervennootschap zijn en die op balansdatum van het laatst afgesloten boekjaar niet meer dan één der volgende criteria overschrijden:
+ - jaargemiddelde van het aantal werknemers: 10;
+ - [2 jaarlijkse netto-omzet bedoeld in artikel 1:26/1]2, exclusief de belasting over de toegevoegde waarde: [1 900.000]1 euro;
+ - balanstotaal: [1 450.000]1 euro.
+ par. 2. Artikel 1:24, par. 2 tot 5 en par. 8, is van toepassing.
+ ----------
+ (1)<W 2024-03-28/60, art. 148, 019; Inwerkingtreding : 08-04-2024>
+ (2)<W 2024-12-02/07, art. 4, 024; Inwerkingtreding : 30-12-2024>
 
 --- Repair feedback (from previous attempt) ---
-Article predicates (e.g. liableArt398, punishedArt399) must be defined using ONLY condition predicates (e.g. IntentionallyInflictsWoundsOrBlows, CausesIllnessOrIncapacity). Do NOT reference another article predicate in the body (e.g. ~liableArt399(x) or ~punishedArt398(x))—that causes circularity and 'no model exists'. Define each article predicate with conditions only.
+IDP failed to parse compiled KB: Error: line 10 - colStart 16 - colEnd 22 => Undeclared symbol name: "Person"
 
 --- Previous output (sent to repair prompt) ---
 vocabulary V {
-  type Person
-  intentionallyInflictsWoundsOrBlows: Person -> Bool
-  actsWithPremeditation: Person -> Bool
-  causesIllnessOrIncapacity: Person -> Bool
-  causesSevereHarm: Person -> Bool
-  causesDeath: Person -> Bool
-  punishedArt398: Person -> Bool
-  punishedArt399: Person -> Bool
-  punishedArt400: Person -> Bool
-  punishedArt401: Person -> Bool
-  imprisonmentMinDays: Person -> Int
-  imprisonmentMaxDays: Person -> Int
-  fineMinEuro: Person -> Int
-  fineMaxEuro: Person -> Int
+  type Vennootschap
+  type Boekjaar
+  type Maand
+  IsKleineVennootschap: Vennootschap * Boekjaar -> Bool
+  IsMicroVennootschap: Vennootschap * Boekjaar -> Bool
+  IsMoederVennootschap: Vennootschap -> Bool
+  IsDochterVennootschap: Vennootschap -> Bool
+  IsConsortiumVennootschap: Vennootschap -> Bool
+  HasBoekjaar: Person * Person -> Bool
+  JaargemiddeldeAantalWerknemers: Vennootschap * Boekjaar -> Int
+  JaarlijkseNettoOmzet: Vennootschap * Boekjaar -> Real
+  Balanstotaal: Vennootschap * Boekjaar -> Real
+  BalansDatumVan: Vennootschap -> Boekjaar
+  DuurVanBoekjaarInMaanden: Boekjaar -> Int
+  HeeftEenLangereDuurDan12Maanden: Boekjaar -> Bool
 }
 
 theory T:V {
-  ! p in Person:
-    punishedArt398(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt399(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt400(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt401(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~actsWithPremeditation(p) &
-      causesDeath(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 30 <=>
-      punishedArt398(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 365 <=>
-      punishedArt398(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 50 <=>
-      punishedArt398(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMaxEuro(p) = 200 <=>
-      punishedArt398(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 8 <=>
-      punishedArt398(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 183 <=>
-      punishedArt398(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 26 <=>
-      punishedArt398(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMaxEuro(p) = 100 <=>
-      punishedArt398(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 60 <=>
-      punishedArt399(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 730 <=>
-      punishedArt399(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 50 <=>
-      punishedArt399(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMaxEuro(p) = 200 <=>
-      punishedArt399(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 180 <=>
-      punishedArt399(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 1095 <=>
-      punishedArt399(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 100 <=>
-      punishedArt399(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMaxEuro(p) = 500 <=>
-      punishedArt399(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 730 <=>
-      punishedArt400(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 1825 <=>
-      punishedArt400(p) & ~act...
+  ! v in Vennootschap, b in Boekjaar: (BalansDatumVan(v) & HasBoekjaar(v,b)) => (IsKleineVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (JaargemiddeldeAantalWerknemers(v,b)) => (IsKleineVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (JaarlijkseNettoOmzet(v,b)) => (IsKleineVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (Balanstotaal(v,b)) => (IsKleineVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (IsKleineVennootschap(v,b)) => (IsMicroVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (IsMoederVennootschap(v)) => (IsMicroVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (IsDochterVennootschap(v)) => (IsMicroVennootschap(v,b)).
+  ! v in Vennootschap: (IsConsortiumVennootschap(v)) => (IsMoederVennootschap(v)).
+}
 
 --- LLM response (raw) ---
 vocabulary V {
-  type Person
-  intentionallyInflictsWoundsOrBlows: Person -> Bool
-  actsWithPremeditation: Person -> Bool
-  causesIllnessOrIncapacity: Person -> Bool
-  causesSevereHarm: Person -> Bool
-  causesDeath: Person -> Bool
-  punishedArt398: Person -> Bool
-  punishedArt399: Person -> Bool
-  punishedArt400: Person -> Bool
-  punishedArt401: Person -> Bool
-  imprisonmentMinDays: Person -> Int
-  imprisonmentMaxDays: Person -> Int
-  fineMinEuro: Person -> Int
-  fineMaxEuro: Person -> Int
+  type Vennootschap
+  type Boekjaar
+  type Maand
+  IsKleineVennootschap: Vennootschap * Boekjaar -> Bool
+  IsMicroVennootschap: Vennootschap * Boekjaar -> Bool
+  IsMoederVennootschap: Vennootschap -> Bool
+  IsDochterVennootschap: Vennootschap -> Bool
+  IsConsortiumVennootschap: Vennootschap -> Bool
+  HasBoekjaar: Vennootschap * Boekjaar -> Bool
+  HeeftEenLangereDuurDan12Maanden: Boekjaar -> Bool
+  JaargemiddeldeAantalWerknemers: Vennootschap * Boekjaar -> Int
+  JaarlijkseNettoOmzet: Vennootschap * Boekjaar -> Real
+  Balanstotaal: Vennootschap * Boekjaar -> Real
+  BalansDatumVan: Vennootschap -> Boekjaar
+  DuurVanBoekjaarInMaanden: Boekjaar -> Int
 }
 
 theory T:V {
-  ! p in Person:
-    punishedArt398(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt399(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt400(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt401(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesDeath(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 30 <=> punishedArt398(p) & actsWithPremeditation(p).
-  ! p in Person:
-    imprisonmentMaxDays(p) = 365 <=> punishedArt398(p) & actsWithPremeditation(p).
-  ! p in Person:
-    fineMinEuro(p) = 50 <=> punishedArt398(p) & actsWithPremeditation(p).
-  ! p in Person:
-    fineMaxEuro(p) = 200 <=> punishedArt398(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 8 <=> punishedArt398(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    imprisonmentMaxDays(p) = 183 <=> punishedArt398(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    fineMinEuro(p) = 26 <=> punishedArt398(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    fineMaxEuro(p) = 100 <=> punishedArt398(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 60 <=> punishedArt399(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    imprisonmentMaxDays(p) = 730 <=> punishedArt399(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    fineMinEuro(p) = 50 <=> punishedArt399(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    fineMaxEuro(p) = 200 <=> punishedArt399(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 180 <=> punishedArt399(p) & actsWithPremeditation(p).
-  ! p in Person:
-    imprisonmentMaxDays(p) = 1095 <=> punishedArt399(p) & actsWithPremeditation(p).
-  ! p in Person:
-    fineMinEuro(p) = 100 <=> punishedArt399(p) & actsWithPremeditation(p).
-  ! p in Person:
-    fineMaxEuro(p) = 500 <=> punishedArt399(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 730 <=> punishedArt400(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    imprisonmentMaxDays(p) = 1825 <=> punishedArt400(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    fineMinEuro(p) = 200 <=> punishedArt400(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    fineMaxEuro(p) = 500 <=> punishedArt400(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 1825 <=> punishedArt400(p) & actsWithPremeditation(p).
-  ! p in Person:
-    imprisonmentMaxDays(p) = 3650 <=> punishedArt400(p) & actsWithPremeditation(p).
-  ! p in Person:
-    fineMinEuro(p) = 0 <=> punishedArt400(p) & actsWithPremeditation(p).
-  ! p in Person:
-    fineMaxEuro(p) = 0 <=> punishedArt400(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 1825 <=> punishedArt401(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    imprisonmentMaxDays(p) = 3650 <=> punishedArt401(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    imprisonmentMinDays(p) = 3650 <=> punishedArt401(p) & actsWithPremeditation(p).
-  ! p in Person:
-    imprisonmentMaxDays(p) = 5475 <=> punishedArt401(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 0 <=> 
-    ~punishedArt398(p) & ~punishedArt399(p) & ~punishedArt400(p) & ~punishedArt401(p).
-
-  ! p in Person:
-    fineMaxEuro(p) = 0 <=> 
-    ~punishedArt398(p) & ~punishedArt399(p) & ~punishedArt400(p) & ~punishedArt401(p).
+  ! v in Vennootschap, b in Boekjaar: (BalansDatumVan(v) & HasBoekjaar(v,b) & JaargemiddeldeAantalWerknemers(v,b) & JaarlijkseNettoOmzet(v,b) & Balanstotaal(v,b)) => (IsKleineVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (IsKleineVennootschap(v,b)) => (IsMicroVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (IsMoederVennootschap(v)) => (IsMicroVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (IsDochterVennootschap(v)) => (IsMicroVennootschap(v,b)).
+  ! v in Vennootschap: (IsConsortiumVennootschap(v)) => (IsMoederVennootschap(v)).
 }
 
 --- After sanitization ---
 vocabulary V {
-  type Person
-  intentionallyInflictsWoundsOrBlows: Person -> Bool
-  actsWithPremeditation: Person -> Bool
-  causesIllnessOrIncapacity: Person -> Bool
-  causesSevereHarm: Person -> Bool
-  causesDeath: Person -> Bool
-  punishedArt398: Person -> Bool
-  punishedArt399: Person -> Bool
-  punishedArt400: Person -> Bool
-  punishedArt401: Person -> Bool
-  imprisonmentMinDays: Person -> Int
-  imprisonmentMaxDays: Person -> Int
-  fineMinEuro: Person -> Int
-  fineMaxEuro: Person -> Int
-}
+  type Vennootschap
+  type Boekjaar
+  type Maand
+  IsKleineVennootschap: Vennootschap * Boekjaar -> Bool
+  IsMicroVennootschap: Vennootschap * Boekjaar -> Bool
+  IsMoederVennootschap: Vennootschap -> Bool
+  IsDochterVennootschap: Vennootschap -> Bool
+  IsConsortiumVennootschap: Vennootschap -> Bool
+  HasBoekjaar: Vennootschap * Boekjaar -> Bool
+  HeeftEenLangereDuurDan12Maanden: Boekjaar -> Bool
+  JaargemiddeldeAantalWerknemers: Vennootschap * Boekjaar -> Int
+  JaarlijkseNettoOmzet: Vennootschap * Boekjaar -> Real
+  Balanstotaal: Vennootschap * Boekjaar -> Real
+  BalansDatumVan: Vennootschap -> Boekjaar
+  DuurVanBoekjaarInMaanden: Boekjaar -> Int}
 
 theory T:V {
-  ! p in Person:
-    punishedArt398(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt399(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt400(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt401(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesDeath(p).
-
-  ! p in Person:
-    (punishedArt398(p) & actsWithPremeditation(p)) => imprisonmentMinDays(p) = 30.
-  ! p in Person:
-    (punishedArt398(p) & actsWithPremeditation(p)) => imprisonmentMaxDays(p) = 365.
-  ! p in Person:
-    (punishedArt398(p) & actsWithPremeditation(p)) => fineMinEuro(p) = 50.
-  ! p in Person:
-    (punishedArt398(p) & actsWithPremeditation(p)) => fineMaxEuro(p) = 200.
-  ! p in Person:
-    (punishedArt398(p) & ~actsWithPremeditation(p)) => imprisonmentMinDays(p) = 8.
-  ! p in Person:
-    (punishedArt398(p) & ~actsWithPremeditation(p)) => imprisonmentMaxDays(p) = 183.
-  ! p in Person:
-    (punishedArt398(p) & ~actsWithPremeditation(p)) => fineMinEuro(p) = 26.
-  ! p in Person:
-    (punishedArt398(p) & ~actsWithPremeditation(p)) => fineMaxEuro(p) = 100.
-  ! p in Person:
-    (punishedArt399(p) & ~actsWithPremeditation(p)) => imprisonmentMinDays(p) = 60.
- ...
-
---- Syntax validation ---
-OK (vocabulary+theory present, IDP parse OK)
+  ! v in Vennootschap, b in Boekjaar: (BalansDatumVan(v) & HasBoekjaar(v,b) & JaargemiddeldeAantalWerknemers(v,b) & JaarlijkseNettoOmzet(v,b) & Balanstotaal(v,b)) => (IsKleineVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (IsKleineVennootschap(v,b)) => (IsMicroVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (IsMoederVennootschap(v)) => (IsMicroVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (IsDochterVennootschap(v)) => (IsMicroVennootschap(v,b)).
+  ! v in Vennootschap: (IsConsortiumVennootschap(v)) => (IsMoederVennootschap(v)).
+}
 
 --- Validation failed (ERROR) ---
-Article predicates (e.g. liableArt398, punishedArt399) must be defined using ONLY condition predicates (e.g. IntentionallyInflictsWoundsOrBlows, CausesIllnessOrIncapacity). Do NOT reference another article predicate in the body (e.g. ~liableArt399(x) or ~punishedArt398(x))—that causes circularity and 'no model exists'. Define each article predicate with conditions only.
+IDP failed to parse compiled KB: Error: line 19 - colStart 40 - colEnd 57 => 𝔹 value expected (Boekjaar found: BalansDatumVan(v) )
 
 
 ======================================================================
@@ -603,1164 +243,117 @@ Article predicates (e.g. liableArt398, punishedArt399) must be defined using ONL
 ======================================================================
 
 --- Law text ---
-SECTION II. - INTENTIONAL KILLING, NOT CALLED MANSLAUGHTER, AND INTENTIONAL INFLICTING OF BODILY INJURY.
+HOOFDSTUK 1. Kleine vennootschappen.
 
-Art. 398. Whoever intentionally inflicts wounds or blows shall be punished with imprisonment from eight days to six months and a fine of twenty-six [euro] to one hundred [euro], or with one of these penalties alone.
-If the offender acted with premeditation, he shall be sentenced to imprisonment from one month to one year and a fine of fifty [euro] to two hundred [euro].
+ Art. 1:24. par. 1. Kleine vennootschappen zijn vennootschappen met rechtspersoonlijkheid die op balansdatum van het laatst afgesloten boekjaar, niet meer dan één van de volgende criteria overschrijden:
+ - jaargemiddelde van het aantal werknemers: 50;
+ - [2 jaarlijkse netto-omzet als bedoeld in artikel 1:26/1]2, exclusief de belasting over de toegevoegde waarde: [1 11.250.000]1 euro;
+ - balanstotaal: [1 6.000.000]1 euro.
+ par. 2. Wanneer meer dan één van de in paragraaf 1 bedoelde criteria worden overschreden of niet meer worden overschreden, heeft dit slechts gevolgen wanneer dit zich gedurende twee achtereenvolgende boekjaren voordoet. De gevolgen gaan in dat geval in vanaf het boekjaar dat volgt op het boekjaar gedurende hetwelk meer dan één van de criteria voor de tweede keer werden overschreden of niet meer werden overschreden.
+ par. 3. Voor vennootschappen die met hun bedrijf starten, worden voor de toepassing van de in paragraaf 1 vermelde criteria, deze cijfers bij het begin van het boekjaar te goeder trouw geschat. Indien uit deze schatting blijkt dat meer dan één van de criteria zullen worden overschreden gedurende het eerste boekjaar, moet daarmee voor dat eerste boekjaar meteen rekening worden gehouden.
+ par. 4. Heeft het boekjaar uitzonderlijk een duur van minder of meer dan twaalf maanden, waarbij deze duur niet langer kan zijn dan vierentwintig maanden min één kalenderdag, dan wordt het bedrag van de [2 netto-omzet]2 exclusief de belasting over de toegevoegde waarde bedoeld in paragraaf 1, vermenigvuldigd met een breuk waarvan de noemer twaalf is en de teller het aantal maanden van het betrokken boekjaar, waarbij elke begonnen maand voor een volle maand wordt geteld.
+ par. 5. Het gemiddeld aantal tewerkgestelde werknemers, bedoeld in paragraaf 1, is het gemiddelde van het aantal werknemers uitgedrukt in voltijdse equivalenten dat is geregistreerd in de DIMONA-databank overeenkomstig het koninklijk besluit van 5 november 2002 tot invoering van een onmiddellijke aangifte van tewerkstelling, met toepassing van artikel 38 van de wet van 26 juli 1996 tot modernisering van de sociale zekerheid en tot vrijwaring van de leefbaarheid van de wettelijke pensioenstelsels, per einde van elke maand van het boekjaar, of indien de tewerkstelling niet behoort tot het toepassingsgebied van dit koninklijk besluit, het gemiddelde aantal tewerkgestelde werknemers uitgedrukt in voltijdse equivalenten van de in het algemene personeelsregister of een gelijkwaardig document ingeschreven werknemers per einde van elke maand van het beschouwde boekjaar.
+ Het aantal werknemers uitgedrukt in voltijdse equivalenten is gelijk aan het arbeidsvolume uitgedrukt in voltijds tewerkgestelde equivalenten, te berekenen voor de deeltijdse werknemers op basis van het contractueel aantal te presteren uren, gerelateerd ten opzichte van de normale arbeidsduur van een vergelijkbare voltijdse werknemer.
+ Wanneer de opbrengsten die voortspruiten uit het gewoon bedrijf van een vennootschap voor meer dan de helft bestaan uit opbrengsten die niet aan de omschrijving beantwoorden van de post [2 netto-omzet]2, dan wordt voor de toepassing van paragraaf 1 onder [2 netto-omzet]2 verstaan: het totaal van de bedrijfs- en financiële opbrengsten met uitsluiting van de niet-recurrente opbrengsten.
+ Het in paragraaf 1 bedoelde balanstotaal is de totale boekwaarde van de activa zoals ze blijkt uit het balansschema dat vastgesteld is bij koninklijk besluit genomen ter uitvoering van artikel 3:1, par. 1. [2 ...]2
+ par. 6. Als de vennootschap met één of meer andere vennootschappen is verbonden als bedoeld in artikel 1:20, worden de criteria inzake [2 netto-omzet]2 en balanstotaal bedoeld in paragraaf 1 berekend op geconsolideerde basis. Wat het criterium aantal werknemers betreft, wordt het aantal werknemers, berekend volgens de bepalingen van paragraaf 5, dat elk van de betrokken verbonden vennootschappen jaarlijks gemiddeld tewerkstelt, opgeteld.
+ Indien, bij de berekening van de in paragraaf 1 genoemde grensbedragen, de in het koninklijk besluit genomen ter uitvoering van artikel 3:30, par. 1, bedoelde verrekeningen en elke daaruit voortvloeiende weglating niet worden verricht, dan worden deze grensbedragen betreffende het balanstotaal en de netto-omzet vermeerderd met twintig procent.
+ par. 7. Paragraaf 6 is niet van toepassing op andere vennootschappen dan moedervennootschappen als bedoeld in artikel 1:15, (1), behalve indien dergelijke vennootschappen zijn opgericht met als enig doel de verslaggeving van bepaalde informatie te ontwijken.
+ Voor de toepassing van deze paragraaf en paragraaf 6 worden vennootschappen die een consortium vormen als bedoeld in artikel 1:19, gelijkgesteld met een moedervennootschap.
+ par. 8. De Koning kan de in paragraaf 1 vermelde cijfers en de wijze waarop ze worden berekend, wijzigen. Deze koninklijke besluiten worden genomen na overleg in de Ministerraad en na advies van de Centrale Raad voor het Bedrijfsleven. Voor de wijziging van paragraaf 5, eerste en tweede lid, wordt bovendien het advies van de Nationale Arbeidsraad gevraagd.
+ ----------
+ (1)<W 2024-03-28/60, art. 147, 019; Inwerkingtreding : 08-04-2024>
+ (2)<W 2024-12-02/04, art. 3, 024; Inwerkingtreding : 30-12-2024>
 
-Art. 399. If the blows or wounds result in illness or incapacity to perform personal labor, the offender shall be punished with imprisonment from two months to two years and a fine of fifty [euro] to two hundred [euro].
-The offender shall be punished with imprisonment from six months to three years and a fine of one hundred [euro] to five hundred [euro], if he acted with premeditation.
-
-Art. 400. The penalty shall be imprisonment from two years to five years and a fine of two hundred [euro] to five hundred [euro], if the blows or wounds result in a disease that appears incurable, incapacity to perform personal labor for more than four months, the complete loss of use of an organ, or a severe disfigurement.
-The penalty shall be imprisonment from five years to ten years if the offender acted with premeditation.
-
-Art. 401. When the blows or wounds are inflicted intentionally, but without the intent to kill, and yet cause death, the offender shall be punished with imprisonment from five years to ten years.
-He shall be punished with imprisonment from ten years to fifteen years if he commits those acts of violence with premeditation.
+ Art. 1:25. par. 1. Onder "microvennootschappen" wordt verstaan, kleine vennootschappen met rechtspersoonlijkheid die geen dochtervennootschap of moedervennootschap zijn en die op balansdatum van het laatst afgesloten boekjaar niet meer dan één der volgende criteria overschrijden:
+ - jaargemiddelde van het aantal werknemers: 10;
+ - [2 jaarlijkse netto-omzet bedoeld in artikel 1:26/1]2, exclusief de belasting over de toegevoegde waarde: [1 900.000]1 euro;
+ - balanstotaal: [1 450.000]1 euro.
+ par. 2. Artikel 1:24, par. 2 tot 5 en par. 8, is van toepassing.
+ ----------
+ (1)<W 2024-03-28/60, art. 148, 019; Inwerkingtreding : 08-04-2024>
+ (2)<W 2024-12-02/07, art. 4, 024; Inwerkingtreding : 30-12-2024>
 
 --- Repair feedback (from previous attempt) ---
-Article predicates (e.g. liableArt398, punishedArt399) must be defined using ONLY condition predicates (e.g. IntentionallyInflictsWoundsOrBlows, CausesIllnessOrIncapacity). Do NOT reference another article predicate in the body (e.g. ~liableArt399(x) or ~punishedArt398(x))—that causes circularity and 'no model exists'. Define each article predicate with conditions only.
+IDP failed to parse compiled KB: Error: line 19 - colStart 40 - colEnd 57 => 𝔹 value expected (Boekjaar found: BalansDatumVan(v) )
 
 --- Previous output (sent to repair prompt) ---
 vocabulary V {
-  type Person
-  intentionallyInflictsWoundsOrBlows: Person -> Bool
-  actsWithPremeditation: Person -> Bool
-  causesIllnessOrIncapacity: Person -> Bool
-  causesSevereHarm: Person -> Bool
-  causesDeath: Person -> Bool
-  punishedArt398: Person -> Bool
-  punishedArt399: Person -> Bool
-  punishedArt400: Person -> Bool
-  punishedArt401: Person -> Bool
-  imprisonmentMinDays: Person -> Int
-  imprisonmentMaxDays: Person -> Int
-  fineMinEuro: Person -> Int
-  fineMaxEuro: Person -> Int
+  type Vennootschap
+  type Boekjaar
+  type Maand
+  IsKleineVennootschap: Vennootschap * Boekjaar -> Bool
+  IsMicroVennootschap: Vennootschap * Boekjaar -> Bool
+  IsMoederVennootschap: Vennootschap -> Bool
+  IsDochterVennootschap: Vennootschap -> Bool
+  IsConsortiumVennootschap: Vennootschap -> Bool
+  HasBoekjaar: Vennootschap * Boekjaar -> Bool
+  HeeftEenLangereDuurDan12Maanden: Boekjaar -> Bool
+  JaargemiddeldeAantalWerknemers: Vennootschap * Boekjaar -> Int
+  JaarlijkseNettoOmzet: Vennootschap * Boekjaar -> Real
+  Balanstotaal: Vennootschap * Boekjaar -> Real
+  BalansDatumVan: Vennootschap -> Boekjaar
+  DuurVanBoekjaarInMaanden: Boekjaar -> Int
 }
 
 theory T:V {
-  ! p in Person:
-    punishedArt398(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt399(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt400(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt401(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesDeath(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 30 <=> punishedArt398(p) & actsWithPremeditation(p).
-  ! p in Person:
-    imprisonmentMaxDays(p) = 365 <=> punishedArt398(p) & actsWithPremeditation(p).
-  ! p in Person:
-    fineMinEuro(p) = 50 <=> punishedArt398(p) & actsWithPremeditation(p).
-  ! p in Person:
-    fineMaxEuro(p) = 200 <=> punishedArt398(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 8 <=> punishedArt398(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    imprisonmentMaxDays(p) = 183 <=> punishedArt398(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    fineMinEuro(p) = 26 <=> punishedArt398(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    fineMaxEuro(p) = 100 <=> punishedArt398(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 60 <=> punishedArt399(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    imprisonmentMaxDays(p) = 730 <=> punishedArt399(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    fineMinEuro(p) = 50 <=> punishedArt399(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    fineMaxEuro(p) = 200 <=> punishedArt399(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 180 <=> punishedArt399(p) & actsWithPremeditation(p).
-  ! p in Person:
-    imprisonmentMaxDays(p) = 1095 <=> punishedArt399(p) & actsWithPremeditation(p).
-  ! p in Person:
-    fineMinEuro(p) = 100 <=> punishedArt399(p) & actsWithPremeditation(p).
-  ! p in Person:
-    fineMaxEuro(p) = 500 <=> punishedArt399(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 730 <=> punishedArt400(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    imprisonmentMaxDays(p) = 1825 <=> punishedArt400(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    fineMinEuro(p) = 200 <=> punishedArt400(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    fineMaxEuro(p) = 5...
+  ! v in Vennootschap, b in Boekjaar: (BalansDatumVan(v) & HasBoekjaar(v,b) & JaargemiddeldeAantalWerknemers(v,b) & JaarlijkseNettoOmzet(v,b) & Balanstotaal(v,b)) => (IsKleineVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (IsKleineVennootschap(v,b)) => (IsMicroVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (IsMoederVennootschap(v)) => (IsMicroVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (IsDochterVennootschap(v)) => (IsMicroVennootschap(v,b)).
+  ! v in Vennootschap: (IsConsortiumVennootschap(v)) => (IsMoederVennootschap(v)).
+}
 
 --- LLM response (raw) ---
 vocabulary V {
-  type Person
-  intentionallyInflictsWoundsOrBlows: Person -> Bool
-  actsWithPremeditation: Person -> Bool
-  causesIllnessOrIncapacity: Person -> Bool
-  causesSevereHarm: Person -> Bool
-  causesDeath: Person -> Bool
-  punishedArt398: Person -> Bool
-  punishedArt399: Person -> Bool
-  punishedArt400: Person -> Bool
-  punishedArt401: Person -> Bool
-  imprisonmentMinDays: Person -> Int
-  imprisonmentMaxDays: Person -> Int
-  fineMinEuro: Person -> Int
-  fineMaxEuro: Person -> Int
+  type Vennootschap
+  type Boekjaar
+  IsKleineVennootschap: Vennootschap * Boekjaar -> Bool
+  IsMicroVennootschap: Vennootschap * Boekjaar -> Bool
+  IsMoederVennootschap: Vennootschap -> Bool
+  IsDochterVennootschap: Vennootschap -> Bool
+  IsConsortiumVennootschap: Vennootschap -> Bool
+  HasBoekjaar: Vennootschap * Boekjaar -> Bool
+  HeeftEenLangereDuurDan12Maanden: Boekjaar -> Bool
+  JaargemiddeldeAantalWerknemers: Vennootschap * Boekjaar -> Int
+  JaarlijkseNettoOmzet: Vennootschap * Boekjaar -> Real
+  Balanstotaal: Vennootschap * Boekjaar -> Real
+  BalansDatumVan: Vennootschap -> Boekjaar
+  DuurVanBoekjaarInMaanden: Boekjaar -> Int
 }
 
 theory T:V {
-  ! p in Person:
-    punishedArt398(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt399(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt400(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt401(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesDeath(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 30 <=>
-      punishedArt398(p) & actsWithPremeditation(p).
-  ! p in Person:
-    imprisonmentMaxDays(p) = 365 <=>
-      punishedArt398(p) & actsWithPremeditation(p).
-  ! p in Person:
-    fineMinEuro(p) = 50 <=>
-      punishedArt398(p) & actsWithPremeditation(p).
-  ! p in Person:
-    fineMaxEuro(p) = 200 <=>
-      punishedArt398(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 8 <=>
-      punishedArt398(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    imprisonmentMaxDays(p) = 183 <=>
-      punishedArt398(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    fineMinEuro(p) = 26 <=>
-      punishedArt398(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    fineMaxEuro(p) = 100 <=>
-      punishedArt398(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 60 <=>
-      punishedArt399(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    imprisonmentMaxDays(p) = 730 <=>
-      punishedArt399(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    fineMinEuro(p) = 50 <=>
-      punishedArt399(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    fineMaxEuro(p) = 200 <=>
-      punishedArt399(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 180 <=>
-      punishedArt399(p) & actsWithPremeditation(p).
-  ! p in Person:
-    imprisonmentMaxDays(p) = 1095 <=>
-      punishedArt399(p) & actsWithPremeditation(p).
-  ! p in Person:
-    fineMinEuro(p) = 100 <=>
-      punishedArt399(p) & actsWithPremeditation(p).
-  ! p in Person:
-    fineMaxEuro(p) = 500 <=>
-      punishedArt399(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 730 <=>
-      punishedArt400(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    imprisonmentMaxDays(p) = 1825 <=>
-      punishedArt400(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    fineMinEuro(p) = 200 <=>
-      punishedArt400(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    fineMaxEuro(p) = 500 <=>
-      punishedArt400(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 1825 <=>
-      punishedArt400(p) & actsWithPremeditation(p).
-  ! p in Person:
-    imprisonmentMaxDays(p) = 3650 <=>
-      punishedArt400(p) & actsWithPremeditation(p).
-  ! p in Person:
-    fineMinEuro(p) = 0 <=>
-      punishedArt400(p) & actsWithPremeditation(p).
-  ! p in Person:
-    fineMaxEuro(p) = 0 <=>
-      punishedArt400(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 1825 <=>
-      punishedArt401(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    imprisonmentMaxDays(p) = 3650 <=>
-      punishedArt401(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    imprisonmentMinDays(p) = 3650 <=>
-      punishedArt401(p) & actsWithPremeditation(p).
-  ! p in Person:
-    imprisonmentMaxDays(p) = 5475 <=>
-      punishedArt401(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 0 <=>
-      ~punishedArt398(p) & ~punishedArt399(p) & ~punishedArt400(p) & ~punishedArt401(p).
-
-  ! p in Person:
-    fineMaxEuro(p) = 0 <=>
-      ~punishedArt398(p) & ~punishedArt399(p) & ~punishedArt400(p) & ~punishedArt401(p).
+  ! v in Vennootschap, b in Boekjaar: (HasBoekjaar(v,b)) => (IsKleineVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (IsKleineVennootschap(v,b)) => (IsMicroVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (IsMoederVennootschap(v)) => (IsMicroVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (IsDochterVennootschap(v)) => (IsMicroVennootschap(v,b)).
+  ! v in Vennootschap: (IsConsortiumVennootschap(v)) => (IsMoederVennootschap(v)).
 }
 
 --- After sanitization ---
 vocabulary V {
-  type Person
-  intentionallyInflictsWoundsOrBlows: Person -> Bool
-  actsWithPremeditation: Person -> Bool
-  causesIllnessOrIncapacity: Person -> Bool
-  causesSevereHarm: Person -> Bool
-  causesDeath: Person -> Bool
-  punishedArt398: Person -> Bool
-  punishedArt399: Person -> Bool
-  punishedArt400: Person -> Bool
-  punishedArt401: Person -> Bool
-  imprisonmentMinDays: Person -> Int
-  imprisonmentMaxDays: Person -> Int
-  fineMinEuro: Person -> Int
-  fineMaxEuro: Person -> Int
-}
+  type Vennootschap
+  type Boekjaar
+  IsKleineVennootschap: Vennootschap * Boekjaar -> Bool
+  IsMicroVennootschap: Vennootschap * Boekjaar -> Bool
+  IsMoederVennootschap: Vennootschap -> Bool
+  IsDochterVennootschap: Vennootschap -> Bool
+  IsConsortiumVennootschap: Vennootschap -> Bool
+  HasBoekjaar: Vennootschap * Boekjaar -> Bool
+  HeeftEenLangereDuurDan12Maanden: Boekjaar -> Bool
+  JaargemiddeldeAantalWerknemers: Vennootschap * Boekjaar -> Int
+  JaarlijkseNettoOmzet: Vennootschap * Boekjaar -> Real
+  Balanstotaal: Vennootschap * Boekjaar -> Real
+  BalansDatumVan: Vennootschap -> Boekjaar
+  DuurVanBoekjaarInMaanden: Boekjaar -> Int}
 
 theory T:V {
-  ! p in Person:
-    punishedArt398(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt399(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt400(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt401(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesDeath(p).
-
-  ! p in Person:
-    (punishedArt398(p) & actsWithPremeditation(p)) => imprisonmentMinDays(p) = 30.
-  ! p in Person:
-    (punishedArt398(p) & actsWithPremeditation(p)) => imprisonmentMaxDays(p) = 365.
-  ! p in Person:
-    (punishedArt398(p) & actsWithPremeditation(p)) => fineMinEuro(p) = 50.
-  ! p in Person:
-    (punishedArt398(p) & actsWithPremeditation(p)) => fineMaxEuro(p) = 200.
-  ! p in Person:
-    (punishedArt398(p) & ~actsWithPremeditation(p)) => imprisonmentMinDays(p) = 8.
-  ! p in Person:
-    (punishedArt398(p) & ~actsWithPremeditation(p)) => imprisonmentMaxDays(p) = 183.
-  ! p in Person:
-    (punishedArt398(p) & ~actsWithPremeditation(p)) => fineMinEuro(p) = 26.
-  ! p in Person:
-    (punishedArt398(p) & ~actsWithPremeditation(p)) => fineMaxEuro(p) = 100.
-  ! p in Person:
-    (punishedArt399(p) & ~actsWithPremeditation(p)) => imprisonmentMinDays(p) = 60.
- ...
-
---- Syntax validation ---
-OK (vocabulary+theory present, IDP parse OK)
-
---- Validation failed (ERROR) ---
-Article predicates (e.g. liableArt398, punishedArt399) must be defined using ONLY condition predicates (e.g. IntentionallyInflictsWoundsOrBlows, CausesIllnessOrIncapacity). Do NOT reference another article predicate in the body (e.g. ~liableArt399(x) or ~punishedArt398(x))—that causes circularity and 'no model exists'. Define each article predicate with conditions only.
-
-
-======================================================================
-  KB COMPILATION - Attempt 4
-======================================================================
-
---- Law text ---
-SECTION II. - INTENTIONAL KILLING, NOT CALLED MANSLAUGHTER, AND INTENTIONAL INFLICTING OF BODILY INJURY.
-
-Art. 398. Whoever intentionally inflicts wounds or blows shall be punished with imprisonment from eight days to six months and a fine of twenty-six [euro] to one hundred [euro], or with one of these penalties alone.
-If the offender acted with premeditation, he shall be sentenced to imprisonment from one month to one year and a fine of fifty [euro] to two hundred [euro].
-
-Art. 399. If the blows or wounds result in illness or incapacity to perform personal labor, the offender shall be punished with imprisonment from two months to two years and a fine of fifty [euro] to two hundred [euro].
-The offender shall be punished with imprisonment from six months to three years and a fine of one hundred [euro] to five hundred [euro], if he acted with premeditation.
-
-Art. 400. The penalty shall be imprisonment from two years to five years and a fine of two hundred [euro] to five hundred [euro], if the blows or wounds result in a disease that appears incurable, incapacity to perform personal labor for more than four months, the complete loss of use of an organ, or a severe disfigurement.
-The penalty shall be imprisonment from five years to ten years if the offender acted with premeditation.
-
-Art. 401. When the blows or wounds are inflicted intentionally, but without the intent to kill, and yet cause death, the offender shall be punished with imprisonment from five years to ten years.
-He shall be punished with imprisonment from ten years to fifteen years if he commits those acts of violence with premeditation.
-
---- Repair feedback (from previous attempt) ---
-Article predicates (e.g. liableArt398, punishedArt399) must be defined using ONLY condition predicates (e.g. IntentionallyInflictsWoundsOrBlows, CausesIllnessOrIncapacity). Do NOT reference another article predicate in the body (e.g. ~liableArt399(x) or ~punishedArt398(x))—that causes circularity and 'no model exists'. Define each article predicate with conditions only.
-
---- Previous output (sent to repair prompt) ---
-vocabulary V {
-  type Person
-  intentionallyInflictsWoundsOrBlows: Person -> Bool
-  actsWithPremeditation: Person -> Bool
-  causesIllnessOrIncapacity: Person -> Bool
-  causesSevereHarm: Person -> Bool
-  causesDeath: Person -> Bool
-  punishedArt398: Person -> Bool
-  punishedArt399: Person -> Bool
-  punishedArt400: Person -> Bool
-  punishedArt401: Person -> Bool
-  imprisonmentMinDays: Person -> Int
-  imprisonmentMaxDays: Person -> Int
-  fineMinEuro: Person -> Int
-  fineMaxEuro: Person -> Int
+  ! v in Vennootschap, b in Boekjaar: (HasBoekjaar(v,b)) => (IsKleineVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (IsKleineVennootschap(v,b)) => (IsMicroVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (IsMoederVennootschap(v)) => (IsMicroVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (IsDochterVennootschap(v)) => (IsMicroVennootschap(v,b)).
+  ! v in Vennootschap: (IsConsortiumVennootschap(v)) => (IsMoederVennootschap(v)).
 }
-
-theory T:V {
-  ! p in Person:
-    punishedArt398(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt399(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt400(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt401(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesDeath(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 30 <=>
-      punishedArt398(p) & actsWithPremeditation(p).
-  ! p in Person:
-    imprisonmentMaxDays(p) = 365 <=>
-      punishedArt398(p) & actsWithPremeditation(p).
-  ! p in Person:
-    fineMinEuro(p) = 50 <=>
-      punishedArt398(p) & actsWithPremeditation(p).
-  ! p in Person:
-    fineMaxEuro(p) = 200 <=>
-      punishedArt398(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 8 <=>
-      punishedArt398(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    imprisonmentMaxDays(p) = 183 <=>
-      punishedArt398(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    fineMinEuro(p) = 26 <=>
-      punishedArt398(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    fineMaxEuro(p) = 100 <=>
-      punishedArt398(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 60 <=>
-      punishedArt399(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    imprisonmentMaxDays(p) = 730 <=>
-      punishedArt399(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    fineMinEuro(p) = 50 <=>
-      punishedArt399(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    fineMaxEuro(p) = 200 <=>
-      punishedArt399(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 180 <=>
-      punishedArt399(p) & actsWithPremeditation(p).
-  ! p in Person:
-    imprisonmentMaxDays(p) = 1095 <=>
-      punishedArt399(p) & actsWithPremeditation(p).
-  ! p in Person:
-    fineMinEuro(p) = 100 <=>
-      punishedArt399(p) & actsWithPremeditation(p).
-  ! p in Person:
-    fineMaxEuro(p) = 500 <=>
-      punishedArt399(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 730 <=>
-      punishedArt400(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    imprisonmentMaxDays(p) = 1825 <=>
-      punishedArt400(p) & ~actsWithPremeditation(p).
-  ! p in Person:
-    fin...
-
---- LLM response (raw) ---
-vocabulary V {
-  type Person
-  intentionallyInflictsWoundsOrBlows: Person -> Bool
-  actsWithPremeditation: Person -> Bool
-  causesIllnessOrIncapacity: Person -> Bool
-  causesSevereHarm: Person -> Bool
-  causesDeath: Person -> Bool
-  punishedArt398: Person -> Bool
-  punishedArt399: Person -> Bool
-  punishedArt400: Person -> Bool
-  punishedArt401: Person -> Bool
-  imprisonmentMinDays: Person -> Int
-  imprisonmentMaxDays: Person -> Int
-  fineMinEuro: Person -> Int
-  fineMaxEuro: Person -> Int
-}
-
-theory T:V {
-  ! p in Person:
-    punishedArt398(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt399(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt400(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt401(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesDeath(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 30 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p) &
-      actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 365 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p) &
-      actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 50 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p) &
-      actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMaxEuro(p) = 200 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p) &
-      actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 8 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p) &
-      ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 183 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p) &
-      ~actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 26 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p) &
-      ~actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMaxEuro(p) = 100 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p) &
-      ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 60 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p) &
-      ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 730 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p) &
-      ~actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 50 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p) &
-      ~actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMaxEuro(p) = 200 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p) &
-      ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 180 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p) &
-      actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 1095 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p) &
-      actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 100 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p) &
-      actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMaxEuro(p) = 500 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p) &
-      actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 730 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesSevereHarm(p) &
-      ~causesDeath(p) &
-      ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 1825 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesSevereHarm(p) &
-      ~causesDeath(p) &
-      ~actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 200 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesSevereHarm(p) &
-      ~causesDeath(p) &
-      ~actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMaxEuro(p) = 500 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesSevereHarm(p) &
-      ~causesDeath(p) &
-      ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 1825 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesSevereHarm(p) &
-      ~causesDeath(p) &
-      actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 3650 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesSevereHarm(p) &
-      ~causesDeath(p) &
-      actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 0 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesSevereHarm(p) &
-      ~causesDeath(p) &
-      actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMaxEuro(p) = 0 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesSevereHarm(p) &
-      ~causesDeath(p) &
-      actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 1825 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesDeath(p) &
-      ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 3650 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesDeath(p) &
-      ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 3650 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesDeath(p) &
-      actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 5475 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesDeath(p) &
-      actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 0 <=>
-      ~intentionallyInflictsWoundsOrBlows(p) |
-      (~punishedArt398(p) & ~punishedArt399(p) & ~punishedArt400(p) & ~punishedArt401(p)).
-
-  ! p in Person:
-    fineMaxEuro(p) = 0 <=>
-      ~intentionallyInflictsWoundsOrBlows(p) |
-      (~punishedArt398(p) & ~punishedArt399(p) & ~punishedArt400(p) & ~punishedArt401(p)).
-}
-
---- After sanitization ---
-vocabulary V {
-  type Person
-  intentionallyInflictsWoundsOrBlows: Person -> Bool
-  actsWithPremeditation: Person -> Bool
-  causesIllnessOrIncapacity: Person -> Bool
-  causesSevereHarm: Person -> Bool
-  causesDeath: Person -> Bool
-  punishedArt398: Person -> Bool
-  punishedArt399: Person -> Bool
-  punishedArt400: Person -> Bool
-  punishedArt401: Person -> Bool
-  imprisonmentMinDays: Person -> Int
-  imprisonmentMaxDays: Person -> Int
-  fineMinEuro: Person -> Int
-  fineMaxEuro: Person -> Int
-}
-
-theory T:V {
-  ! p in Person:
-    punishedArt398(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt399(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt400(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt401(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesDeath(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 30 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p) &
-      actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 365 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p) &
-      actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 50 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p) &
-      actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMaxEuro(p) = 200 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p) &
-      actsWithPremeditation(p).
-...
-
---- Syntax validation ---
-OK (vocabulary+theory present, IDP parse OK)
-
---- Validation failed (ERROR) ---
-Article predicates (e.g. liableArt398, punishedArt399) must be defined using ONLY condition predicates (e.g. IntentionallyInflictsWoundsOrBlows, CausesIllnessOrIncapacity). Do NOT reference another article predicate in the body (e.g. ~liableArt399(x) or ~punishedArt398(x))—that causes circularity and 'no model exists'. Define each article predicate with conditions only.
-
-
-======================================================================
-  KB COMPILATION - Attempt 5
-======================================================================
-
---- Law text ---
-SECTION II. - INTENTIONAL KILLING, NOT CALLED MANSLAUGHTER, AND INTENTIONAL INFLICTING OF BODILY INJURY.
-
-Art. 398. Whoever intentionally inflicts wounds or blows shall be punished with imprisonment from eight days to six months and a fine of twenty-six [euro] to one hundred [euro], or with one of these penalties alone.
-If the offender acted with premeditation, he shall be sentenced to imprisonment from one month to one year and a fine of fifty [euro] to two hundred [euro].
-
-Art. 399. If the blows or wounds result in illness or incapacity to perform personal labor, the offender shall be punished with imprisonment from two months to two years and a fine of fifty [euro] to two hundred [euro].
-The offender shall be punished with imprisonment from six months to three years and a fine of one hundred [euro] to five hundred [euro], if he acted with premeditation.
-
-Art. 400. The penalty shall be imprisonment from two years to five years and a fine of two hundred [euro] to five hundred [euro], if the blows or wounds result in a disease that appears incurable, incapacity to perform personal labor for more than four months, the complete loss of use of an organ, or a severe disfigurement.
-The penalty shall be imprisonment from five years to ten years if the offender acted with premeditation.
-
-Art. 401. When the blows or wounds are inflicted intentionally, but without the intent to kill, and yet cause death, the offender shall be punished with imprisonment from five years to ten years.
-He shall be punished with imprisonment from ten years to fifteen years if he commits those acts of violence with premeditation.
-
---- Repair feedback (from previous attempt) ---
-Article predicates (e.g. liableArt398, punishedArt399) must be defined using ONLY condition predicates (e.g. IntentionallyInflictsWoundsOrBlows, CausesIllnessOrIncapacity). Do NOT reference another article predicate in the body (e.g. ~liableArt399(x) or ~punishedArt398(x))—that causes circularity and 'no model exists'. Define each article predicate with conditions only.
-
---- Previous output (sent to repair prompt) ---
-vocabulary V {
-  type Person
-  intentionallyInflictsWoundsOrBlows: Person -> Bool
-  actsWithPremeditation: Person -> Bool
-  causesIllnessOrIncapacity: Person -> Bool
-  causesSevereHarm: Person -> Bool
-  causesDeath: Person -> Bool
-  punishedArt398: Person -> Bool
-  punishedArt399: Person -> Bool
-  punishedArt400: Person -> Bool
-  punishedArt401: Person -> Bool
-  imprisonmentMinDays: Person -> Int
-  imprisonmentMaxDays: Person -> Int
-  fineMinEuro: Person -> Int
-  fineMaxEuro: Person -> Int
-}
-
-theory T:V {
-  ! p in Person:
-    punishedArt398(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt399(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt400(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt401(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesDeath(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 30 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p) &
-      actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 365 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p) &
-      actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 50 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p) &
-      actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMaxEuro(p) = 200 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p) &
-      actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 8 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p) &
-      ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 183 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p) &
-      ~actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 26 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p) &
-      ~actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMaxEuro(p) = 100 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p) &
-      ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 60 <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesIllness...
-
---- LLM response (raw) ---
-vocabulary V {
-  type Person
-  intentionallyInflictsWoundsOrBlows: Person -> Bool
-  actsWithPremeditation: Person -> Bool
-  causesIllnessOrIncapacity: Person -> Bool
-  causesSevereHarm: Person -> Bool
-  causesDeath: Person -> Bool
-  punishedArt398: Person -> Bool
-  punishedArt399: Person -> Bool
-  punishedArt400: Person -> Bool
-  punishedArt401: Person -> Bool
-  imprisonmentMinDays: Person -> Int
-  imprisonmentMaxDays: Person -> Int
-  fineMinEuro: Person -> Int
-  fineMaxEuro: Person -> Int
-}
-
-theory T:V {
-  ! p in Person:
-    punishedArt398(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt399(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt400(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt401(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesDeath(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 30 <=>
-      punishedArt398(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 365 <=>
-      punishedArt398(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 50 <=>
-      punishedArt398(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMaxEuro(p) = 200 <=>
-      punishedArt398(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 8 <=>
-      punishedArt398(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 183 <=>
-      punishedArt398(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 26 <=>
-      punishedArt398(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMaxEuro(p) = 100 <=>
-      punishedArt398(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 60 <=>
-      punishedArt399(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 730 <=>
-      punishedArt399(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 50 <=>
-      punishedArt399(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMaxEuro(p) = 200 <=>
-      punishedArt399(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 180 <=>
-      punishedArt399(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 1095 <=>
-      punishedArt399(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 100 <=>
-      punishedArt399(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMaxEuro(p) = 500 <=>
-      punishedArt399(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 730 <=>
-      punishedArt400(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 1825 <=>
-      punishedArt400(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 200 <=>
-      punishedArt400(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMaxEuro(p) = 500 <=>
-      punishedArt400(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 1825 <=>
-      punishedArt400(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 3650 <=>
-      punishedArt400(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 0 <=>
-      punishedArt400(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMaxEuro(p) = 0 <=>
-      punishedArt400(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 1825 <=>
-      punishedArt401(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 3650 <=>
-      punishedArt401(p) & ~actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMinDays(p) = 3650 <=>
-      punishedArt401(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    imprisonmentMaxDays(p) = 5475 <=>
-      punishedArt401(p) & actsWithPremeditation(p).
-
-  ! p in Person:
-    fineMinEuro(p) = 0 <=>
-      ~intentionallyInflictsWoundsOrBlows(p).
-
-  ! p in Person:
-    fineMaxEuro(p) = 0 <=>
-      ~intentionallyInflictsWoundsOrBlows(p).
-}
-
---- After sanitization ---
-vocabulary V {
-  type Person
-  intentionallyInflictsWoundsOrBlows: Person -> Bool
-  actsWithPremeditation: Person -> Bool
-  causesIllnessOrIncapacity: Person -> Bool
-  causesSevereHarm: Person -> Bool
-  causesDeath: Person -> Bool
-  punishedArt398: Person -> Bool
-  punishedArt399: Person -> Bool
-  punishedArt400: Person -> Bool
-  punishedArt401: Person -> Bool
-  imprisonmentMinDays: Person -> Int
-  imprisonmentMaxDays: Person -> Int
-  fineMinEuro: Person -> Int
-  fineMaxEuro: Person -> Int
-}
-
-theory T:V {
-  ! p in Person:
-    punishedArt398(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt399(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt400(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt401(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesDeath(p).
-
-  ! p in Person:
-    (punishedArt398(p) & actsWithPremeditation(p)) => imprisonmentMinDays(p) = 30.
-  ! p in Person:
-    (punishedArt398(p) & actsWithPremeditation(p)) => imprisonmentMaxDays(p) = 365.
-  ! p in Person:
-    (punishedArt398(p) & actsWithPremeditation(p)) => fineMinEuro(p) = 50.
-  ! p in Person:
-    (punishedArt398(p) & actsWithPremeditation(p)) => fineMaxEuro(p) = 200.
-  ! p in Person:
-    (punishedArt398(p) & ~actsWithPremeditation(p)) => imprisonmentMinDays(p) = 8.
-  ! p in Person:
-    (punishedArt398(p) & ~actsWithPremeditation(p)) => imprisonmentMaxDays(p) = 183.
-  ! p in Person:
-    (punishedArt398(p) & ~actsWithPremeditation(p)) => fineMinEuro(p) = 26.
-  ! p in Person:
-    (punishedArt398(p) & ~actsWithPremeditation(p)) => fineMaxEuro(p) = 100.
-  ! p in Person:
-    (punishedArt399(p) & ~actsWithPremeditation(p)) => imprisonmentMinDays(p) = 60.
- ...
 
 --- Syntax validation ---
 OK (vocabulary+theory present, IDP parse OK)
@@ -1775,133 +368,63 @@ OK (theory satisfiable)
 
 --- Final KB ---
 vocabulary V {
-  type Person
-  intentionallyInflictsWoundsOrBlows: Person -> Bool
-  actsWithPremeditation: Person -> Bool
-  causesIllnessOrIncapacity: Person -> Bool
-  causesSevereHarm: Person -> Bool
-  causesDeath: Person -> Bool
-  punishedArt398: Person -> Bool
-  punishedArt399: Person -> Bool
-  punishedArt400: Person -> Bool
-  punishedArt401: Person -> Bool
-  imprisonmentMinDays: Person -> Int
-  imprisonmentMaxDays: Person -> Int
-  fineMinEuro: Person -> Int
-  fineMaxEuro: Person -> Int
-}
+  type Vennootschap
+  type Boekjaar
+  IsKleineVennootschap: Vennootschap * Boekjaar -> Bool
+  IsMicroVennootschap: Vennootschap * Boekjaar -> Bool
+  IsMoederVennootschap: Vennootschap -> Bool
+  IsDochterVennootschap: Vennootschap -> Bool
+  IsConsortiumVennootschap: Vennootschap -> Bool
+  HasBoekjaar: Vennootschap * Boekjaar -> Bool
+  HeeftEenLangereDuurDan12Maanden: Boekjaar -> Bool
+  JaargemiddeldeAantalWerknemers: Vennootschap * Boekjaar -> Int
+  JaarlijkseNettoOmzet: Vennootschap * Boekjaar -> Real
+  Balanstotaal: Vennootschap * Boekjaar -> Real
+  BalansDatumVan: Vennootschap -> Boekjaar
+  DuurVanBoekjaarInMaanden: Boekjaar -> Int}
 
 theory T:V {
-  ! p in Person:
-    punishedArt398(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      ~causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt399(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesIllnessOrIncapacity(p) &
-      ~causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt400(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesSevereHarm(p) &
-      ~causesDeath(p).
-
-  ! p in Person:
-    punishedArt401(p) <=>
-      intentionallyInflictsWoundsOrBlows(p) &
-      causesDeath(p).
-
-  ! p in Person:
-    (punishedArt398(p) & actsWithPremeditation(p)) => imprisonmentMinDays(p) = 30.
-  ! p in Person:
-    (punishedArt398(p) & actsWithPremeditation(p)) => imprisonmentMaxDays(p) = 365.
-  ! p in Person:
-    (punishedArt398(p) & actsWithPremeditation(p)) => fineMinEuro(p) = 50.
-  ! p in Person:
-    (punishedArt398(p) & actsWithPremeditation(p)) => fineMaxEuro(p) = 200.
-  ! p in Person:
-    (punishedArt398(p) & ~actsWithPremeditation(p)) => imprisonmentMinDays(p) = 8.
-  ! p in Person:
-    (punishedArt398(p) & ~actsWithPremeditation(p)) => imprisonmentMaxDays(p) = 183.
-  ! p in Person:
-    (punishedArt398(p) & ~actsWithPremeditation(p)) => fineMinEuro(p) = 26.
-  ! p in Person:
-    (punishedArt398(p) & ~actsWithPremeditation(p)) => fineMaxEuro(p) = 100.
-  ! p in Person:
-    (punishedArt399(p) & ~actsWithPremeditation(p)) => imprisonmentMinDays(p) = 60.
-  ! p in Person:
-    (punishedArt399(p) & ~actsWithPremeditation(p)) => imprisonmentMaxDays(p) = 730.
-  ! p in Person:
-    (punishedArt399(p) & ~actsWithPremeditation(p)) => fineMinEuro(p) = 50.
-  ! p in Person:
-    (punishedArt399(p) & ~actsWithPremeditation(p)) => fineMaxEuro(p) = 200.
-  ! p in Person:
-    (punishedArt399(p) & actsWithPremeditation(p)) => imprisonmentMinDays(p) = 180.
-  ! p in Person:
-    (punishedArt399(p) & actsWithPremeditation(p)) => imprisonmentMaxDays(p) = 1095.
-  ! p in Person:
-    (punishedArt399(p) & actsWithPremeditation(p)) => fineMinEuro(p) = 100.
-  ! p in Person:
-    (punishedArt399(p) & actsWithPremeditation(p)) => fineMaxEuro(p) = 500.
-  ! p in Person:
-    (punishedArt400(p) & ~actsWithPremeditation(p)) => imprisonmentMinDays(p) = 730.
-  ! p in Person:
-    (punishedArt400(p) & ~actsWithPremeditation(p)) => imprisonmentMaxDays(p) = 1825.
-  ! p in Person:
-    (punishedArt400(p) & ~actsWithPremeditation(p)) => fineMinEuro(p) = 200.
-  ! p in Person:
-    (punishedArt400(p) & ~actsWithPremeditation(p)) => fineMaxEuro(p) = 500.
-  ! p in Person:
-    (punishedArt400(p) & actsWithPremeditation(p)) => imprisonmentMinDays(p) = 1825.
-  ! p in Person:
-    (punishedArt400(p) & actsWithPremeditation(p)) => imprisonmentMaxDays(p) = 3650.
-  ! p in Person:
-    (punishedArt400(p) & actsWithPremeditation(p)) => fineMinEuro(p) = 0.
-  ! p in Person:
-    (punishedArt400(p) & actsWithPremeditation(p)) => fineMaxEuro(p) = 0.
-  ! p in Person:
-    (punishedArt401(p) & ~actsWithPremeditation(p)) => imprisonmentMinDays(p) = 1825.
-  ! p in Person:
-    (punishedArt401(p) & ~actsWithPremeditation(p)) => imprisonmentMaxDays(p) = 3650.
-  ! p in Person:
-    (punishedArt401(p) & actsWithPremeditation(p)) => imprisonmentMinDays(p) = 3650.
-  ! p in Person:
-    (punishedArt401(p) & actsWithPremeditation(p)) => imprisonmentMaxDays(p) = 5475.
-  ! p in Person:
-    (~intentionallyInflictsWoundsOrBlows(p)) => fineMinEuro(p) = 0.
-  ! p in Person:
-    (~intentionallyInflictsWoundsOrBlows(p)) => fineMaxEuro(p) = 0.
+  ! v in Vennootschap, b in Boekjaar: (HasBoekjaar(v,b)) => (IsKleineVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (IsKleineVennootschap(v,b)) => (IsMicroVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (IsMoederVennootschap(v)) => (IsMicroVennootschap(v,b)).
+  ! v in Vennootschap, b in Boekjaar: (IsDochterVennootschap(v)) => (IsMicroVennootschap(v,b)).
+  ! v in Vennootschap: (IsConsortiumVennootschap(v)) => (IsMoederVennootschap(v)).
 }
 
 
 ======================================================================
-  QUESTION: Is Jan liable under Article 398?
+  QUESTION: Is NV Delta een microvennootschap in de zin van artikel 1:25?
 ======================================================================
 
 --- Raw extracted (case) ---
 {
   "facts": [
-    "actsWithPremeditation(jan).",
-    "intentionallyInflictsWoundsOrBlows(jan).",
-    "causesIllnessOrIncapacity(jan).",
-    "not causesSevereHarm(jan).",
-    "not causesDeath(jan)."
-  ]
+    "HasBoekjaar(nvDelta, laatstAfgeslotenBoekjaar).",
+    "JaargemiddeldeAantalWerknemers(nvDelta, laatstAfgeslotenBoekjaar) = 9.",
+    "JaarlijkseNettoOmzet(nvDelta, laatstAfgeslotenBoekjaar) = 800000.",
+    "Balanstotaal(nvDelta, laatstAfgeslotenBoekjaar) = 400000.",
+    "not IsMoederVennootschap(nvDelta).",
+    "not IsDochterVennootschap(nvDelta)."
+  ],
+  "entities": {
+    "Vennootschap": [
+      "nvDelta",
+      "nv"
+    ],
+    "Boekjaar": [
+      "laatstAfgeslotenBoekjaar"
+    ]
+  }
 }
 
 --- Raw extracted (query) ---
 {
   "type": "predicate",
-  "predicate": "punishedArt398",
+  "predicate": "IsMicroVennootschap",
   "mode": "boolean",
   "args": [
-    "jan"
+    "nvdelta",
+    "laatstafgeslotenboekjaar"
   ],
   "explain": false
 }
@@ -1909,16 +432,20 @@ theory T:V {
 --- Case (normalized) ---
 {
   "facts": [
-    "actsWithPremeditation(jan).",
-    "intentionallyInflictsWoundsOrBlows(jan).",
-    "causesIllnessOrIncapacity(jan).",
-    "not causesSevereHarm(jan).",
-    "not causesDeath(jan)."
+    "HasBoekjaar(nvDelta, laatstAfgeslotenBoekjaar).",
+    "JaargemiddeldeAantalWerknemers(nvDelta, laatstAfgeslotenBoekjaar) = 9.",
+    "JaarlijkseNettoOmzet(nvDelta, laatstAfgeslotenBoekjaar) = 800000.",
+    "Balanstotaal(nvDelta, laatstAfgeslotenBoekjaar) = 400000.",
+    "not IsMoederVennootschap(nvDelta).",
+    "not IsDochterVennootschap(nvDelta)."
   ],
   "entities": {
-    "Person": [
-      "jan",
-      "marie"
+    "Vennootschap": [
+      "nvDelta",
+      "nv"
+    ],
+    "Boekjaar": [
+      "laatstAfgeslotenBoekjaar"
     ]
   }
 }
@@ -1926,87 +453,19 @@ theory T:V {
 --- Query (normalized) ---
 {
   "type": "predicate",
-  "predicate": "punishedArt398",
+  "predicate": "IsMicroVennootschap",
   "mode": "boolean",
   "args": [
-    "jan"
+    "nvdelta",
+    "laatstafgeslotenboekjaar"
   ],
   "explain": false
 }
 
 --- Symbolic result ---
 {
-  "atom": "punishedArt398(x0)",
-  "constraint": "? x0 in Person: __sel0(x0) & punishedArt398(x0)",
-  "possible": false,
-  "certain": false
-}
-
---- Prediction ---
-{
-  "mode": "boolean",
-  "label": "contradicted"
-}
-
-
-======================================================================
-  QUESTION: Is Jan liable under Article 399?
-======================================================================
-
---- Raw extracted (case) ---
-{
-  "facts": [
-    "actsWithPremeditation(jan).",
-    "intentionallyInflictsWoundsOrBlows(jan).",
-    "causesIllnessOrIncapacity(jan).",
-    "not causesSevereHarm(jan).",
-    "not causesDeath(jan)."
-  ]
-}
-
---- Raw extracted (query) ---
-{
-  "type": "predicate",
-  "predicate": "punishedArt399",
-  "mode": "boolean",
-  "args": [
-    "jan"
-  ],
-  "explain": false
-}
-
---- Case (normalized) ---
-{
-  "facts": [
-    "actsWithPremeditation(jan).",
-    "intentionallyInflictsWoundsOrBlows(jan).",
-    "causesIllnessOrIncapacity(jan).",
-    "not causesSevereHarm(jan).",
-    "not causesDeath(jan)."
-  ],
-  "entities": {
-    "Person": [
-      "jan",
-      "marie"
-    ]
-  }
-}
-
---- Query (normalized) ---
-{
-  "type": "predicate",
-  "predicate": "punishedArt399",
-  "mode": "boolean",
-  "args": [
-    "jan"
-  ],
-  "explain": false
-}
-
---- Symbolic result ---
-{
-  "atom": "punishedArt399(x0)",
-  "constraint": "? x0 in Person: __sel0(x0) & punishedArt399(x0)",
+  "atom": "IsMicroVennootschap(x0,x1)",
+  "constraint": "? x0 in Vennootschap, x1 in Boekjaar: __sel0(x0) & __sel1(x1) & IsMicroVennootschap(x0,x1)",
   "possible": true,
   "certain": true
 }
@@ -2015,76 +474,5 @@ theory T:V {
 {
   "mode": "boolean",
   "label": "entailed"
-}
-
-
-======================================================================
-  QUESTION: What is the minimum prison sentence for Jan?
-======================================================================
-
---- Raw extracted (case) ---
-{
-  "facts": [
-    "actsWithPremeditation(jan).",
-    "intentionallyInflictsWoundsOrBlows(jan).",
-    "causesIllnessOrIncapacity(jan).",
-    "not causesSevereHarm(jan).",
-    "not causesDeath(jan)."
-  ]
-}
-
---- Raw extracted (query) ---
-{
-  "type": "intent",
-  "explain": false,
-  "predicate": "",
-  "mode": "set",
-  "args": [],
-  "intent": "get_range",
-  "symbol": "imprisonmentMinDays",
-  "entity": "jan"
-}
-
---- Case (normalized) ---
-{
-  "facts": [
-    "actsWithPremeditation(jan).",
-    "intentionallyInflictsWoundsOrBlows(jan).",
-    "causesIllnessOrIncapacity(jan).",
-    "not causesSevereHarm(jan).",
-    "not causesDeath(jan)."
-  ],
-  "entities": {
-    "Person": [
-      "jan",
-      "marie"
-    ]
-  }
-}
-
---- Query (normalized) ---
-{
-  "type": "intent",
-  "explain": false,
-  "predicate": "",
-  "mode": "set",
-  "args": [],
-  "intent": "get_range",
-  "symbol": "imprisonmentMinDays",
-  "entity": "jan"
-}
-
---- Symbolic result ---
-{
-  "symbol": "imprisonmentMinDays",
-  "range": "180",
-  "entity": "jan"
-}
-
---- Prediction ---
-{
-  "mode": "set",
-  "certain_set": [],
-  "possible_set": []
 }
 

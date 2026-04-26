@@ -33,6 +33,63 @@ def _query_schema():
     }
 
 
+def _case_ir_schema():
+    return {
+        "type": "json_schema",
+        "json_schema": {
+            "name": "case_ir",
+            "schema": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["entities", "assertions"],
+                "properties": {
+                    "entities": {
+                        "type": "object",
+                        "additionalProperties": {"type": "array", "items": {"type": "string"}},
+                    },
+                    "assertions": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": False,
+                            "required": ["symbol", "args", "negated"],
+                            "properties": {
+                                "symbol": {"type": "string"},
+                                "args": {"type": "array", "items": {"type": "string"}},
+                                "negated": {"type": "boolean"},
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    }
+
+
+def _query_ir_schema():
+    return {
+        "type": "json_schema",
+        "json_schema": {
+            "name": "query_ir",
+            "schema": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["kind", "predicate_hint", "mode", "args", "intent", "symbol_hint", "entity_hint", "explain"],
+                "properties": {
+                    "kind": {"type": "string", "enum": ["predicate", "intent"]},
+                    "predicate_hint": {"type": "string"},
+                    "mode": {"type": "string", "enum": ["set", "boolean"]},
+                    "args": {"type": "array", "items": {"type": "string"}},
+                    "intent": {"type": "string"},
+                    "symbol_hint": {"type": "string"},
+                    "entity_hint": {"type": "string"},
+                    "explain": {"type": "boolean"},
+                },
+            },
+        },
+    }
+
+
 def _response_format_schema():
     """Full case+query schema for backward compatibility."""
     return {
@@ -142,6 +199,67 @@ def extract_case_only_openai(case_text, model, kb_schema=None, feedback=None):
         },
     )
 
+    return json.loads(resp.choices[0].message.content)
+
+
+def extract_case_ir_only_openai(case_text, model, kb_schema=None, feedback=None):
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise LLMExtractionError("Missing OPENAI_API_KEY environment variable")
+    try:
+        from openai import OpenAI
+    except Exception as e:
+        raise LLMExtractionError("OpenAI SDK not installed or not importable: " + str(e))
+    client = OpenAI(api_key=api_key)
+    kb_schema_json = json.dumps(kb_schema or {}, ensure_ascii=False, indent=2)
+    user_msg = render_prompt(
+        "extraction/openai_extract_case_json_ir_prompt.txt",
+        kb_schema_json=kb_schema_json,
+        case_text=str(case_text),
+        feedback_block=_feedback_block(feedback),
+        world_knowledge_lexical=_lexical_world_knowledge_block(),
+    )
+    resp = client.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": "Extract case IR only."},
+            {"role": "user", "content": user_msg},
+        ],
+        response_format=_case_ir_schema(),
+    )
+    return json.loads(resp.choices[0].message.content)
+
+
+def extract_query_ir_only_openai(user_question, model, kb_schema=None, case=None, feedback=None):
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise LLMExtractionError("Missing OPENAI_API_KEY environment variable")
+    try:
+        from openai import OpenAI
+    except Exception as e:
+        raise LLMExtractionError("OpenAI SDK not installed or not importable: " + str(e))
+    client = OpenAI(api_key=api_key)
+    kb_schema_json = json.dumps(kb_schema or {}, ensure_ascii=False, indent=2)
+    case_obj = case or {}
+    case_facts_json = json.dumps((case_obj.get("facts") or []), ensure_ascii=False, indent=2)
+    case_entities_json = json.dumps((case_obj.get("entities") or {}), ensure_ascii=False, indent=2)
+    user_msg = render_prompt(
+        "extraction/openai_extract_query_json_ir_prompt.txt",
+        kb_schema_json=kb_schema_json,
+        user_question=str(user_question),
+        case_facts_json=case_facts_json,
+        case_entities_json=case_entities_json,
+        feedback_block=_feedback_block(feedback),
+        world_knowledge_lexical=_lexical_world_knowledge_block(),
+    )
+    resp = client.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": "Extract query IR only."},
+            {"role": "user", "content": user_msg},
+        ],
+        response_format=_query_ir_schema(),
+    )
     return json.loads(resp.choices[0].message.content)
 
 
