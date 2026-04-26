@@ -20,10 +20,14 @@ Inputs:
 - `question_text` (plain text)
 
 Pipeline:
-1. **KB compilation (LLM)**: `law_text` → FO(.) KB (`kb.fo`)
+1. **KB compilation (LLM + Python hardening)**: `law_text` → FO(.) KB (`kb.fo`)
 2. **Schema extraction (parser)**: `kb.fo` → `kb_schema.json` (types, predicates, functions)
-3. **Case extraction (LLM, schema-driven)**: `case_text` → `{ facts, entities }`
-4. **Query extraction (LLM, schema-driven)**: `question_text` → normalized query object (predicate-mode queries are normalized into intents)
+3. **Case extraction**:
+   - `legacy` backend: LLM returns `{facts, entities}`
+   - `json_ir` backend: LLM returns structured case IR, Python deterministically renders facts
+4. **Query extraction**:
+   - `legacy` backend: LLM returns query object directly
+   - `json_ir` backend: LLM returns query IR (`predicate_hint`, `mode`, `args`, ...), Python resolves canonical predicate/args
 5. **Strict validation**:
    - Unknown symbol → hard error
    - Arity/type mismatch → hard error
@@ -62,11 +66,13 @@ Outputs:
   - `get_or_compile_kb(run_dir, law_text, model)` loads cached KB/schema or compiles anew
 
 ### `pipeline/extraction/`
-**Schema-driven extraction**
+**Schema-driven extraction (legacy + JSON-IR backends)**
 - `extractor.py`
-  - provider routing, retries, and feedback loops (if enabled)
+  - provider routing, retries, repair feedback loops, backend selection
 - `openai_extractor.py`
-  - OpenAI-specific calls for case extraction and query extraction
+  - OpenAI-specific calls for legacy and JSON-IR extraction schemas
+- `json_ir.py`
+  - deterministic normalization from extraction IR → validated case/query objects
 
 ### `pipeline/validation/`
 **Strict schema-driven validation**
@@ -130,9 +136,28 @@ Repair after validation failure always uses full KB + `kb/kb_compilation_repair_
 
 To **recompile** and compare modes on the same run, remove the cached `kb.fo` (and optionally `kb_schema.json`) under that run’s `translated/le/` or `translated/` folder, or use a fresh run directory.
 
+## Backend modes
+
+You can now run the pipeline in one unified mode:
+
+- `legacy`: legacy KB compiler + legacy extraction
+- `json_ir`: JSON-IR KB compiler + JSON-IR extraction
+
+CLI:
+```text
+python main.py --mode json --run inputs/json/run_001 --pipeline-backend json_ir
+```
+
+Evaluation:
+```text
+python scripts/run_evaluation.py --runs all --pipeline-backend json_ir
+```
+
+`--kb-backend` is still supported for backward compatibility, but `--pipeline-backend` is the preferred switch.
+
 **Optional `run.json` fields (JSON runs)**  
 - `kb_compile_strategy`: one of `direct_single`, `direct_two_phase`, `le_single`, `le_two_phase`. Used when you do not pass `--kb-strategy` on the CLI.  
-- After each successful JSON run, `run.json` is merged with `kb_compile_strategy` and `kb_compile_flags` reflecting what was actually used.
+- After each successful JSON run, `run.json` is merged with `kb_compile_strategy`, `kb_compile_flags`, `kb_compile_backend`, and `pipeline_backend_mode`.
 
 **CLI override**  
 ```text
