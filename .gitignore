@@ -2,9 +2,12 @@
 .env
 __pycache__
 ui/.cache
+.cache
+**/.cache/
 ui/run
 example_laws
 results
 inputs
 tests  
 tests/suites
+docs/VERUS-LM_COMPARISON.md
