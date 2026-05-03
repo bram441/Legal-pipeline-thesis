@@ -231,8 +231,8 @@ def main() -> int:
     )
     p.add_argument(
         "--pipeline-backend",
-        default=None,
-        help="Unified pipeline backend: 'legacy' or 'json_ir' (sets KB+extraction together).",
+        default="json_ir",
+        help="Unified pipeline backend: 'legacy' or 'json_ir' (sets KB+extraction together). Default: json_ir.",
     )
     p.add_argument("--clean", action="store_true", help="Remove output-dir if it exists before run")
     p.add_argument(

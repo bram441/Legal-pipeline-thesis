@@ -18,7 +18,7 @@ _Q_STOP = frozenset({
 
 
 def _explicit_name_in_question(question: Optional[str]) -> Optional[str]:
-    """If the question names a person (English patterns), return that name; else None."""
+    """If the question names a person (English or Dutch legal-question starters), return that name; else None."""
     if not question or not isinstance(question, str):
         return None
     q = question.strip()
@@ -26,6 +26,8 @@ def _explicit_name_in_question(question: Optional[str]) -> Optional[str]:
         r"\b(?:Is|Are|Does|Did|Was|Were)\s+([A-Z][a-zA-Z]+)\b",
         r"\b(?:for|about)\s+([A-Z][a-zA-Z]+)\b",
         r"\b([A-Z][a-zA-Z]+)\s+(?:liable|punishable|eligible|qualifies)\b",
+        # Dutch: common matrix question openers before a proper name (inheritance / civil).
+        r"^\s*(?:Heeft|Verkrijgt|Krijgt|Krijgen|Is|Zijn|Was|Ware|Kan|Kunnen|Moet|Moeten|Had|Hadden|Wordt|Worden|Valt|Vallen|Zal|Zullen)\s+([A-Z][a-zA-Z]+)\b",
     ]
     for pat in patterns:
         m = re.search(pat, q)

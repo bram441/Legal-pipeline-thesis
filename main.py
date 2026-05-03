@@ -28,6 +28,7 @@ from pipeline.extraction.extractor import (
     ExtractionError,
     extraction_backend_env_override,
     EXTRACTION_BACKEND_CHOICES,
+    get_extraction_backend_from_env,
 )
 from pipeline.io.text_runs import load_text_run, write_text_results
 from pipeline.io.json_runs import load_json_run, write_json_results, write_score, merge_json_run_file
@@ -45,9 +46,17 @@ def _resolve_backends(cli_pipeline_backend=None, cli_kb_backend=None):
     Unified backend mode:
       - pipeline_backend=legacy -> kb=legacy_fo, extraction=legacy
       - pipeline_backend=json_ir -> kb=json_ir, extraction=json_ir
+    When pipeline is unset and --kb-backend is unset, KB and extraction follow
+    environment (defaults: both json_ir; set PIPELINE_*_BACKEND to override).
     """
     if cli_pipeline_backend is None:
-        return cli_kb_backend, None
+        if cli_kb_backend is None:
+            return get_kb_backend_from_env(), get_extraction_backend_from_env()
+        if cli_kb_backend == "legacy_fo":
+            return "legacy_fo", "legacy"
+        if cli_kb_backend == "json_ir":
+            return "json_ir", "json_ir"
+        raise ValueError("Unknown kb backend: " + str(cli_kb_backend))
     if cli_pipeline_backend == "legacy":
         return "legacy_fo", "legacy"
     if cli_pipeline_backend == "json_ir":
@@ -225,6 +234,7 @@ def run_json_mode(run_dir, provider, translate=True, cli_kb_strategy=None, cli_k
         "id": run_obj.get("id"),
         "total": 0,
         "correct": 0,
+        "inconclusive": 0,
         "items": [],
         "kb_compile_strategy": strategy_label,
         "pipeline_backend_mode": pipeline_backend_label,
@@ -269,13 +279,17 @@ def run_json_mode(run_dir, provider, translate=True, cli_kb_strategy=None, cli_k
             score_item["text"] = qtext
 
             score["total"] += 1
-            if score_item.get("match"):
+            if score_item.get("match") is None:
+                score["inconclusive"] += 1
+            elif score_item.get("match"):
                 score["correct"] += 1
 
             score["items"].append(score_item)
 
-    if score["total"] > 0:
-        score["accuracy"] = score["correct"] / score["total"]
+    decisive = score["total"] - score["inconclusive"]
+    score["decisive"] = decisive
+    if decisive > 0:
+        score["accuracy"] = score["correct"] / decisive
     else:
         score["accuracy"] = None
 
@@ -317,13 +331,17 @@ def main():
         "--kb-backend",
         metavar="NAME",
         default=None,
-        help="KB compiler backend: one of " + ", ".join(KB_BACKEND_CHOICES) + ".",
+        help="KB compiler backend: one of "
+        + ", ".join(KB_BACKEND_CHOICES)
+        + ". Default: from PIPELINE_KB_BACKEND or json_ir.",
     )
     parser.add_argument(
         "--pipeline-backend",
         metavar="NAME",
         default=None,
-        help="Unified pipeline backend: 'legacy' (legacy KB + legacy extraction) or 'json_ir' (JSON-IR KB + JSON-IR extraction).",
+        help="Unified pipeline backend: 'legacy' (legacy KB + legacy extraction) or "
+        "'json_ir' (JSON-IR KB + JSON-IR extraction). When omitted, KB and extraction "
+        "follow env (defaults: json_ir).",
     )
     args = parser.parse_args()
 

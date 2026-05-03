@@ -2,6 +2,7 @@ import json
 
 from debug import debug_log, status_log
 
+from pipeline.eval.boolean_belief import summarize_boolean_symbolic
 from pipeline.extraction.extractor import extract_case_and_query, extract_case_only, extract_query_only, ExtractionError
 from pipeline.symbolic.router import run_query
 from pipeline.rendering.answer_renderer import render_answer
@@ -22,19 +23,14 @@ def _build_prediction_summary(query, symbolic_result):
 
     # --- Boolean predicate query ---
     if mode == "boolean":
-        certain = bool(symbolic_result.get("certain"))
-        possible = bool(symbolic_result.get("possible"))
-
-        if certain:
-            label = "entailed"
-        elif not possible:
-            label = "contradicted"
-        else:
-            label = "unknown"
-
+        summ = summarize_boolean_symbolic(symbolic_result)
+        label = summ["label"]
         return {
             "mode": "boolean",
             "label": label,
+            "belief_yes": summ["p_yes"],
+            "credence_yes_pct": summ["credence_yes_pct"],
+            "verdict_strength_pct": summ["verdict_strength_pct"],
         }
 
     # --- Set query ---

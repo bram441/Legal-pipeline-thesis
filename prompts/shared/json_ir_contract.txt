@@ -1,0 +1,24 @@
+GLOBAL JSON-IR CONTRACT (law-agnostic; same text for every statute and every case)
+
+1) Identifiers
+- Use lowercase ASCII names: anna, bert, estate_main, goods_1, fy_2023.
+- Do not use type names (Person, Estate, Company, …) as entity constants.
+
+2) KB rules phase — Boolean expressions only in `if` and `then`
+- Each expression inside `if` / `then` must be Boolean and use ONLY one of these shapes:
+  - Atom: {"pred":"Name","args":["x","y"],"negated":false}  (or "symbol" instead of "pred")
+  - AND / OR / NOT: {"and":[expr,...]}, {"or":[expr,...]}, {"not": expr}
+  - Numeric comparison: {"compare":{"left":TERM,"op":"<=","right":TERM}} or the equivalent flat object with keys left, op, right (supported ops are the usual arithmetic comparisons).
+- TERM (for compare left/right only): variable string, number, or {"func":"FunctionName","args":[...]} with arity from the symbol table.
+- NEVER place {"func":...,"args":...} as a top-level item in `if` or `then` lists — function calls are not Booleans. If you need a threshold, use `compare` or introduce a Bool helper predicate in the symbol table and assert that predicate with an atom.
+
+3) Case IR — entities must cover every constant you use
+- Under `entities`, list every KB type key you need; every constant that appears in `assertions` or `value_assertions` must appear under the matching type in `entities`.
+- If the law uses a type such as Estate / Good / RealEstate but the narrative refers to a single undifferentiated object, invent one constant for that type (e.g. estate_main) and reuse it in every assertion that requires that argument position.
+
+4) Query IR — fully grounded predicate args when possible
+- For kind "predicate", `args` must supply one string per argument of the chosen predicate (same order as KB_SCHEMA). Use concrete names from Normalized case entities (and facts) for each position.
+- Do not leave empty strings. Use "?" only when an argument is genuinely irrecoverable from the case; prefer adding a named entity under `entities` in the case (see §3) and then using that name here.
+
+5) Symbol discipline
+- Use only names declared in the provided KB_SCHEMA / SYMBOL_TABLE for the current step. Do not invent predicates, functions, or types not in that table.

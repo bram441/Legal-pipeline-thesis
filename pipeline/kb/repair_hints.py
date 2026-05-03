@@ -85,3 +85,44 @@ def build_machine_repair_hints(error_message: str, previous_output: str) -> str:
     return "You MUST fix all of the following (in addition to the error report):\n" + "\n".join(
         "- " + h for h in hints
     )
+
+
+def build_json_ir_compile_hints(error_message: str) -> str:
+    """Short bullets for JSON IR normalization/typecheck failures (rules phase repair)."""
+    em = (error_message or "").strip()
+    if not em:
+        return ""
+    el = em.lower()
+    out: list[str] = []
+
+    if "unsupported expression object" in el:
+        out.append(
+            "In `if` / `then` / nested `and`/`or`, each expression object must be ONLY one of: "
+            "atom `{\"pred\":\"P\",\"args\":[...],\"negated\":false}`, "
+            "`{\"and\":[ ... ]}`, `{\"or\":[ ... ]}`, `{\"not\": ... }`, "
+            "or comparison `{\"left\":...,\"op\":\"=<\",\"right\":...}`. "
+            "Remove keys such as `implies`, `when`, `forall`, `exists`, `iff` from inside `if`/`then` trees."
+        )
+    if "predicate must return bool" in el:
+        out.append(
+            "Every name used with `pred`/`symbol` in rules must be declared in SYMBOL_TABLE as a predicate "
+            "with `\"returns\":\"Bool\"`. If you meant a numeric value, use a `functions` entry and a `func` term instead."
+        )
+    if "unbound identifier" in el and "object rule" in el:
+        out.append(
+            "Every variable used inside an object rule must appear in the rule's `forall` (or nested quantifiers the renderer supports). "
+            "Either add `{\"var\":\"x\",\"type\":\"SomeType\"}` to `forall`, or use a string FO rule instead."
+        )
+    if "expects type" in el and "got" in el:
+        out.append(
+            "Predicate/function argument sorts must match SYMBOL_TABLE exactly. "
+            "Use variables of the declared arg type (or rewrite as a string rule if the model needs a looser FO encoding)."
+        )
+    if "unsupported term" in el or ("term object" in el and "func" in el):
+        out.append(
+            "Non-Boolean terms must be strings (vars/constants), numbers, or `{\"func\":\"F\",\"args\":[...]}` with `F` declared as a function."
+        )
+
+    if not out:
+        return ""
+    return "\n".join("- " + h for h in out)

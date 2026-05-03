@@ -15,6 +15,7 @@ from __future__ import annotations
 import os
 import re
 
+from pipeline.utils.openai_sampling import chat_completion_sampling_kwargs
 from pipeline.utils.prompt_loader import render_prompt
 from pipeline.kb.exceptions import LawCompilationError
 
@@ -108,6 +109,7 @@ def compile_two_phase(
                     {"role": "system", "content": system_message},
                     {"role": "user", "content": user},
                 ],
+                **chat_completion_sampling_kwargs(),
             )
         except Exception as e:
             raise LawCompilationError("OpenAI call failed (vocabulary phase): " + str(e)) from e
@@ -153,6 +155,7 @@ def compile_two_phase(
                     {"role": "system", "content": system_message},
                     {"role": "user", "content": user},
                 ],
+                **chat_completion_sampling_kwargs(),
             )
         except Exception as e:
             raise LawCompilationError("OpenAI call failed (theory phase): " + str(e)) from e

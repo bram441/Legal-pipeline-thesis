@@ -75,7 +75,9 @@ def main() -> int:
         sub = out_base / strategy
         print("\n=== Strategy:", strategy, "->", sub, "===\n")
         eval_support.copy_run_json(src, sub)
-        code = eval_support.run_main_json(sub, strategy, args.no_translate)
+        code = eval_support.run_main_json(
+            sub, strategy, args.no_translate, pipeline_backend="json_ir"
+        )
         if code != 0:
             print("Run failed with exit code", code, file=sys.stderr)
             results_summary.append(

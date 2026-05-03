@@ -217,31 +217,52 @@ def build_structure_block_from_facts(facts, entities=None, kb_primary_type=None,
                 continue
             ext[pred] = set()
 
-    # --- Domain: prefer constants from facts to avoid unsatisfiability. When sentence
-    # functions (imprisonmentMinDays etc.) apply to persons with no condition facts,
-    # they stay undefined and can make the theory UNSAT.
+    # --- Domain: IDP requires every constant used in queries / __sel constraints to appear
+    # in the structure interpretation for its type. Typed `case.entities` are authoritative:
+    # list all of them in the corresponding type domain even when `case.facts` is empty or
+    # does not mention a name (otherwise: Symbol not in vocabulary).
+    #
+    # Fact-only constants (e.g. a person appearing only in facts, not in entities.Person)
+    # are merged into the KB primary type domain, excluding values explicitly listed under
+    # other entity types (so an Estate individual listed under entities.Estate is not copied
+    # onto Person when Person is primary).
     #
     # IMPORTANT:
     # - The first KB type is not always the runtime domain for predicate arguments
     #   (e.g. first type may be "Vreemdeling", while predicates use "Persoon").
     # - Therefore, when typed entities are provided, seed domain per entity type.
     domain_type = kb_primary_type if kb_primary_type else None
-    constants_from_facts = set(constants)  # persons in predicate args
+    constants_from_facts = set(constants)  # constants appearing in fact literals
+    non_primary_entity_values = set()
+    if isinstance(entities, dict) and kb_primary_type:
+        for tn, tvs in entities.items():
+            if tn == kb_primary_type:
+                continue
+            if not (isinstance(tn, str) and isinstance(tvs, list)):
+                continue
+            for v in tvs:
+                if isinstance(v, str) and v.strip():
+                    non_primary_entity_values.add(_to_idp_elem(v.strip()))
+    primary_constants = set()
+    if kb_primary_type:
+        primary_constants = {c for c in constants_from_facts if c not in non_primary_entity_values}
+
     inferred_domain_lines = []
     if isinstance(entities, dict):
         for t_name, t_vals in entities.items():
             if not (isinstance(t_name, str) and isinstance(t_vals, list) and t_vals):
                 continue
-            vals = []
+            vs = set()
             for v in t_vals:
                 if isinstance(v, str) and v.strip():
                     e = _to_idp_elem(v.strip())
-                    # Keep current conservative behavior: only entities grounded in facts.
-                    if e in constants_from_facts:
-                        vals.append(e)
-                        constants.add(e)
+                    vs.add(e)
+                    constants.add(e)
+            if t_name == kb_primary_type and primary_constants:
+                vs |= primary_constants
+            vals = sorted(vs)
             if vals:
-                inferred_domain_lines.append((t_name, t_name + " := " + _mk_set(sorted(vals)) + "."))
+                inferred_domain_lines.append((t_name, t_name + " := " + _mk_set(vals) + "."))
         if inferred_domain_lines:
             domain_type = None
     # If no entities dict, constants come from facts only (no filtering needed)

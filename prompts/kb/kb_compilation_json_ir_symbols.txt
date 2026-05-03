@@ -1,18 +1,35 @@
 You are Step 1 of a two-step legal compiler.
-Return ONLY JSON with the symbol table (no markdown, no prose).
+Return ONLY JSON with the symbol table. No markdown. No prose.
+
+{json_ir_contract}
 
 Required shape:
 {
-  "types": ["Person", "..."],
-  "predicates": [{"name":"P","args":["Person"],"returns":"Bool"}],
-  "functions": [{"name":"f","args":["Person"],"returns":"Int"}]
+  "types": ["Person", "Company", "FinancialYear"],
+  "predicates": [
+    {"name":"ObservableFact","args":["Person"],"returns":"Bool","kind":"observable","description":"short meaning"},
+    {"name":"LegalConclusion","args":["Person"],"returns":"Bool","kind":"derived","description":"short meaning"}
+  ],
+  "functions": [
+    {"name":"EmployeeCount","args":["Company","FinancialYear"],"returns":"Int","kind":"observable","description":"short meaning"}
+  ]
 }
+
+Allowed predicate/function `kind` values:
+- observable: facts directly extractable from a case
+- derived: legal conclusions the solver should infer
+- helper: intermediate derived helper concepts
 
 Rules:
 - Do NOT include `rules` in this step.
-- Keep names stable and concise; this table will be frozen for step 2.
-- Use only valid identifiers for all names/types.
+- Keep names stable, concise, valid identifiers.
+- Predicates must return Bool.
+- Functions should be used for numeric/custom values such as employee count, turnover, balance sheet total, age, date, status, or mapped relationships.
 - Returns must be Bool/Int/Real or a declared custom type.
+- Prefer relational predicates for multi-party legal relations. Do not collapse spouse/deceased/company/year relations into ambiguous unary predicates.
+- For company-law thresholds, include numeric observable functions and Bool helper predicates for threshold results.
+- For legal definitions, include explicit derived/conclusion predicates. Do not use observable predicates as final legal conclusions.
+- Avoid modeling legal statuses such as `Foreigner` as a type when the status is a conclusion about a person. Prefer `IsForeigner: Person -> Bool` with kind `derived`.
 
 Previous compilation error (may be empty):
 {error_message}

@@ -10,6 +10,7 @@ PROMPTS_DIR = Path(__file__).resolve().parents[2] / "prompts"
 #   kb/           — law → FO compilation and repair (syntax, UNSAT, etc.)
 #   le/           — Logical English: law_to_le, le_to_fo
 #   extraction/   — case/query extraction, world_knowledge_lexical.txt, debug templates
+#   shared/       — law-agnostic fragments included via {json_ir_contract} in JSON-IR prompts
 #   translation/  — e.g. translate_to_english
 #   nl/           — natural-language paraphrase for explanations
 #
@@ -26,6 +27,11 @@ def load_prompt(relative_path: str) -> str:
     if not path.exists():
         raise PromptError(f"Prompt file not found: {path}")
     return path.read_text(encoding="utf-8")
+
+
+def load_json_ir_contract() -> str:
+    """Law-agnostic JSON-IR rules shared across KB compilation and case/query extraction."""
+    return load_prompt("shared/json_ir_contract.txt").strip()
 
 
 _PLACEHOLDER_RE = re.compile(r"{([a-zA-Z_][a-zA-Z0-9_]*)}")

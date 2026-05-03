@@ -1,5 +1,6 @@
 import os
 
+from pipeline.utils.openai_sampling import chat_completion_sampling_kwargs
 from pipeline.utils.prompt_loader import load_prompt, render_prompt
 
 
@@ -60,6 +61,7 @@ def paraphrase_liability_explanation(rule_line, fact_lines, conclusion_line, mod
                 {"role": "system", "content": system},
                 {"role": "user", "content": user},
             ],
+            **chat_completion_sampling_kwargs(),
         )
     except Exception as e:
         raise NLExplanationError("OpenAI call failed: " + str(e))
@@ -113,6 +115,7 @@ def paraphrase_range_explanation(rules_block, facts_block, result_line, model=No
                 {"role": "system", "content": system},
                 {"role": "user", "content": user},
             ],
+            **chat_completion_sampling_kwargs(),
         )
     except Exception as e:
         raise NLExplanationError("OpenAI call failed: " + str(e))

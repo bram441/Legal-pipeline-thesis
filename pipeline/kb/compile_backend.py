@@ -9,12 +9,14 @@ KB_BACKEND_CHOICES = ("legacy_fo", "json_ir")
 
 
 def get_kb_backend_from_env() -> str:
-    raw = (os.getenv("PIPELINE_KB_BACKEND") or "legacy_fo").strip().lower()
+    raw = (os.getenv("PIPELINE_KB_BACKEND") or "").strip().lower()
+    if not raw:
+        return "json_ir"
     if raw in ("fo", "legacy", "legacy_fo"):
         return "legacy_fo"
     if raw in ("json", "json_ir"):
         return "json_ir"
-    return "legacy_fo"
+    return "json_ir"
 
 
 @contextmanager

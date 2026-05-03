@@ -12,9 +12,10 @@ from pipeline.extraction.openai_extractor import (
     LLMExtractionError,
 )
 from pipeline.extraction.json_ir import (
+    ExtractionIRValidationError,
+    _PLACEHOLDERS as _EXTRACTION_PLACEHOLDERS,
     normalize_case_ir,
     normalize_query_ir,
-    ExtractionIRValidationError,
 )
 from pipeline.extraction.query_role_resolve import apply_role_arg_consistency
 from pipeline.validation.fo_validation import (
@@ -29,6 +30,49 @@ class ExtractionError(Exception):
 
 
 EXTRACTION_BACKEND_CHOICES = ("legacy", "json_ir")
+
+# Default individuals when a predicate needs a sort the case did not list under entities.
+# Aligns with prompts/shared/json_ir_contract.txt (single undifferentiated estate / goods).
+_DEFAULT_ENTITY_BY_SCHEMA_TYPE = {
+    "Estate": "estate_main",
+    "Good": "goods_main",
+    "RealEstate": "residence_main",
+    "HouseholdFurniture": "furniture_main",
+}
+
+
+def _default_entity_for_schema_type(typ: str) -> str | None:
+    t = str(typ or "").strip()
+    return _DEFAULT_ENTITY_BY_SCHEMA_TYPE.get(t)
+
+
+def _entity_values_for_other_types(case: dict, skip_type: str) -> set[str]:
+    """Lowercase names already assigned to another KB type in case.entities."""
+    out: set[str] = set()
+    for t2, vs in (case.get("entities") or {}).items():
+        if t2 == skip_type:
+            continue
+        if not isinstance(vs, list):
+            continue
+        for v in vs:
+            s = str(v).strip().lower()
+            if s:
+                out.add(s)
+    return out
+
+
+def _merge_entity_under_type(case: dict, typ: str, name: str) -> None:
+    if not typ or not name:
+        return
+    n = str(name).strip().lower()
+    if not n:
+        return
+    ents = case.setdefault("entities", {})
+    if typ not in ents or not isinstance(ents[typ], list):
+        ents[typ] = []
+    if n not in {str(v).strip().lower() for v in ents[typ]}:
+        ents[typ].append(n)
+        ents[typ] = sorted(set(str(v).strip().lower() for v in ents[typ] if str(v).strip()))
 
 
 # Words that are not entity names when they appear in "Is X ..." patterns
@@ -325,24 +369,46 @@ def _coerce_query_args_to_schema(query_obj, case, kb_schema, user_question=None)
             grounded = [v for v in cleaned if v in fact_entities]
             fallback = [v for v in cleaned if v not in fact_entities]
             typed_entities[t] = grounded + fallback
-    out = list(current[:expected])
+    out: list[str] = []
     for i in range(expected):
-        t = expected_types[i] if i < len(expected_types) else ""
-        candidates = list(typed_entities.get(t, []))
-        if i < len(out):
-            # If the current arg is not grounded in facts but a grounded candidate exists,
-            # prefer the grounded one to avoid out-of-domain constants downstream.
-            if out[i] not in fact_entities and candidates:
-                out[i] = candidates[0]
-            if not candidates:
-                out[i] = "?"
-            continue
-        if candidates:
-            out.append(candidates[0])
-        else:
-            out.append("?")
+        t_key = str(expected_types[i]).strip() if i < len(expected_types) else ""
+        candidates = list(typed_entities.get(t_key, []))
+        cur_s = str(current[i]).strip().lower() if i < len(current) else ""
+        is_ph = (not cur_s) or (cur_s in _EXTRACTION_PLACEHOLDERS)
 
-    if len(out) != expected or any(not x for x in out):
+        if candidates:
+            norm_c = [str(c).strip().lower() for c in candidates]
+            if cur_s and not is_ph and cur_s not in fact_entities:
+                # typed_entities orders grounded-in-facts first; prefer that bucket when cur is not grounded.
+                chosen = str(candidates[0]).strip().lower()
+            elif cur_s and not is_ph and cur_s in norm_c:
+                chosen = cur_s
+            else:
+                chosen = str(candidates[0]).strip().lower()
+        else:
+            blocked = _entity_values_for_other_types(case, t_key)
+            if cur_s and not is_ph and cur_s not in blocked:
+                chosen = cur_s
+                _merge_entity_under_type(case, t_key, chosen)
+            elif cur_s and not is_ph and cur_s in blocked:
+                d = _default_entity_for_schema_type(t_key)
+                if d:
+                    chosen = d
+                    _merge_entity_under_type(case, t_key, d)
+                else:
+                    chosen = "?"
+            else:
+                d = _default_entity_for_schema_type(t_key)
+                if d:
+                    chosen = d
+                    _merge_entity_under_type(case, t_key, d)
+                else:
+                    chosen = "?"
+        out.append(chosen)
+
+    if len(out) != expected:
+        return False
+    if any((not str(x or "").strip()) or str(x).strip().lower() in _EXTRACTION_PLACEHOLDERS for x in out):
         return False
 
     changed = (out != current) or (canonical != pred_name)
@@ -427,11 +493,24 @@ def _auto_provider():
     return "openai"
 
 
-def _extraction_backend():
-    v = (os.getenv("PIPELINE_EXTRACTION_BACKEND", "") or "").strip().lower()
+def get_extraction_backend_from_env() -> str:
+    """Resolve extraction backend from env.
+
+    If ``PIPELINE_EXTRACTION_BACKEND`` is unset, pair with the KB backend from
+    ``PIPELINE_KB_BACKEND`` (default json_ir) so a legacy-only KB .env does not
+    silently mix with JSON-IR extraction.
+    """
+    from pipeline.kb.compile_backend import get_kb_backend_from_env
+
+    v = (os.getenv("PIPELINE_EXTRACTION_BACKEND") or "").strip().lower()
     if v in {"json_ir", "legacy"}:
         return v
-    return "legacy"
+    kb = get_kb_backend_from_env()
+    return "json_ir" if kb == "json_ir" else "legacy"
+
+
+def _extraction_backend():
+    return get_extraction_backend_from_env()
 
 
 @contextmanager
