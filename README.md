@@ -28,10 +28,11 @@ Pipeline:
 4. **Query extraction**:
    - `legacy` backend: LLM returns query object directly
    - `json_ir` backend: LLM returns query IR (`predicate_hint`, `mode`, `args`, ...), Python resolves canonical predicate/args
-5. **Strict validation**:
+5. **Strict validation + repair loop**:
    - Unknown symbol → hard error
    - Arity/type mismatch → hard error
    - Invalid FO(.) syntax → hard error
+   - Validation failures are fed back to the LLM for bounded retries
 6. **Domain seeding**:
    - Uses `case.entities` keyed by KB types (e.g., `"Person": ["alice","bob"]`)
    - No hard-coded `"Party"` type in code
@@ -136,9 +137,9 @@ Repair after validation failure always uses full KB + `kb/kb_compilation_repair_
 
 To **recompile** and compare modes on the same run, remove the cached `kb.fo` (and optionally `kb_schema.json`) under that run’s `translated/le/` or `translated/` folder, or use a fresh run directory.
 
-## Backend modes
+## Backend modes (recommended)
 
-You can now run the pipeline in one unified mode:
+Use one unified mode switch for the whole stack:
 
 - `legacy`: legacy KB compiler + legacy extraction
 - `json_ir`: JSON-IR KB compiler + JSON-IR extraction
@@ -153,7 +154,7 @@ Evaluation:
 python scripts/run_evaluation.py --runs all --pipeline-backend json_ir
 ```
 
-`--kb-backend` is still supported for backward compatibility, but `--pipeline-backend` is the preferred switch.
+`--kb-backend` is still supported for backward compatibility and experiments, but `--pipeline-backend` is the preferred switch.
 
 **Optional `run.json` fields (JSON runs)**  
 - `kb_compile_strategy`: one of `direct_single`, `direct_two_phase`, `le_single`, `le_two_phase`. Used when you do not pass `--kb-strategy` on the CLI.  

@@ -2,6 +2,7 @@
 
 import os
 
+from pipeline.utils.openai_sampling import chat_completion_sampling_kwargs
 from pipeline.utils.prompt_loader import render_prompt
 
 
@@ -35,6 +36,7 @@ def translate_to_english(text, model=None):
                 {"role": "system", "content": "You translate legal and case text to English. Output only the translation."},
                 {"role": "user", "content": user_prompt},
             ],
+            **chat_completion_sampling_kwargs(),
         )
     except Exception as e:
         raise TranslationError("Translation failed: " + str(e))

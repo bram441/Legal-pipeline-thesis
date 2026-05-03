@@ -709,7 +709,7 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
             status_log("KB", "Repair attempt {}".format(attempt))
 
         try:
-            raw_kb_text = compile_law_to_kb_fo(law_text, model=model, repair_feedback=repair_feedback)
+            raw_kb_text, ir_kb_schema = compile_law_to_kb_fo(law_text, model=model, repair_feedback=repair_feedback)
         except LawCompilationError as e:
             # JSON-IR backend can fail before FO text exists; feed error back into repair loop.
             if "JSON IR validation failed" in str(e) and attempt < max_repair_attempts - 1:
@@ -736,8 +736,13 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
 
         try:
             status_log("KB", "Checking syntax validity")
-            kb_text = _sanitize_common_llm_syntax(raw_kb_text)
-            kb_text = _fix_sentence_equivalence(kb_text)
+            if get_kb_backend_from_env() == "json_ir":
+                kb_text = raw_kb_text.strip()
+                if not kb_text.endswith("\n"):
+                    kb_text = kb_text + "\n"
+            else:
+                kb_text = _sanitize_common_llm_syntax(raw_kb_text)
+                kb_text = _fix_sentence_equivalence(kb_text)
             if trace:
                 trace.log("After sanitization", kb_text[:2000] + ("..." if len(kb_text) > 2000 else ""))
             try:
@@ -750,7 +755,10 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
             _idp_parse_check(kb_text)
             if trace:
                 trace.log("Syntax validation", "OK (vocabulary+theory present, IDP parse OK)")
-            kb_schema = extract_schema_from_kb_fo(kb_text)
+            if ir_kb_schema is not None:
+                kb_schema = ir_kb_schema
+            else:
+                kb_schema = extract_schema_from_kb_fo(kb_text)
             status_log("KB", "Checking semantic validity (satisfiability)")
             check_kb_semantic(kb_text)
             if trace:

@@ -1,2 +1,0 @@
-OBSOLETE — semantic repair now uses `kb_compilation_repair_semantic.txt`.
-See `pipeline/kb/compiler.py` and `kb_compilation_repair_semantic.txt`.

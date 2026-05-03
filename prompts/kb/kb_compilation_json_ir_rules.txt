@@ -1,26 +1,46 @@
 You are Step 2 of a two-step legal compiler.
-Return ONLY JSON with FO(.) rules over the frozen symbol table.
+Return ONLY JSON with rules over the frozen symbol table. No markdown. No prose.
 
-Required shape:
+{json_ir_contract}
+
+Preferred object rule shape:
 {
   "rules": [
     {
       "forall": [{"var":"x","type":"Person"}],
-      "if": [{"pred":"Cond","args":["x"]}],
-      "then": [{"pred":"Conclusion","args":["x"]}]
+      "if": [{"pred":"ObservableFact","args":["x"]}],
+      "then": [{"pred":"LegalConclusion","args":["x"]}],
+      "operator": "implies"
     }
   ]
 }
 
+For legal definitions, use `operator: "iff"` when the law says a concept applies exactly when conditions hold.
+The renderer interprets this as: conclusion <=> conditions.
+
+Boolean expression shapes accepted in `if` and `then` (each list item must be Bool):
+- Atom: {"pred":"Name","args":["x","y"],"negated":false}
+- AND: {"and":[expr1, expr2]}
+- OR: {"or":[expr1, expr2]}
+- NOT: {"not": expr}
+- Comparison (function calls ONLY inside left/right): {"left":{"func":"EmployeeCount","args":["c","fy"]},"op":"<=","right":10}
+
+Term shapes (only inside comparison left/right, or as predicate args where the signature expects a non-Bool sort):
+- variable/constant string: "x", "c", "fy"
+- number: 10, 11250000
+- function call: {"func":"AnnualNetTurnover","args":["c","fy"]}
+
 CRITICAL:
 - Use ONLY symbols from SYMBOL_TABLE below.
-- Do NOT invent or rename any symbol.
-- Prefer object rules as shown above (renderer converts to FO deterministically).
+- Do NOT invent, rename, or change arity of any symbol.
+- Every atom/function call must use exactly the number of args declared in SYMBOL_TABLE.
+- Do not use raw FO syntax unless absolutely necessary. Object rules are strongly preferred.
+- Never count Booleans using arithmetic or `sum`.
+- For “more than one of A, B, C”, expand pairwise: (A and B) or (A and C) or (B and C).
+- For “at most one of A, B, C is exceeded”, define a helper predicate such as ExceedsMoreThanOneCriterion using pairwise OR, then negate that helper in the conclusion rule.
 - `forall` may be empty.
-- `if` may be empty (means true).
-- `then` must contain at least one atom.
-- Atom shape: {"pred":"Name","args":["x","y"],"neg":false}
-- You may still output string rules if needed, but object rules are strongly preferred.
+- `if` may be empty, meaning true.
+- `then` must contain at least one legal conclusion/helper atom or expression.
 
 SYMBOL_TABLE:
 {symbol_table_json}

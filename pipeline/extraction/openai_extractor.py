@@ -1,7 +1,8 @@
 import json
 import os
 
-from pipeline.utils.prompt_loader import load_prompt, render_prompt
+from pipeline.utils.openai_sampling import chat_completion_sampling_kwargs
+from pipeline.utils.prompt_loader import load_json_ir_contract, load_prompt, render_prompt
 
 
 class LLMExtractionError(Exception):
@@ -9,7 +10,11 @@ class LLMExtractionError(Exception):
 
 
 def _query_schema():
-    """Query-only schema for extract_query_only_openai."""
+    """Query-only schema for extract_query_only_openai.
+
+    OpenAI structured outputs reject many root-level ``oneOf`` shapes; use one flat
+    object and validate ``type``/``intent`` in Python (``normalize_and_validate_query``).
+    """
     return {
         "type": "json_schema",
         "json_schema": {
@@ -17,7 +22,16 @@ def _query_schema():
             "schema": {
                 "type": "object",
                 "additionalProperties": False,
-                "required": ["type", "explain", "predicate", "mode", "args", "intent", "symbol", "entity"],
+                "required": [
+                    "type",
+                    "explain",
+                    "predicate",
+                    "mode",
+                    "args",
+                    "intent",
+                    "symbol",
+                    "entity",
+                ],
                 "properties": {
                     "type": {"type": "string", "enum": ["predicate", "intent"]},
                     "explain": {"type": "boolean"},
@@ -41,7 +55,7 @@ def _case_ir_schema():
             "schema": {
                 "type": "object",
                 "additionalProperties": False,
-                "required": ["entities", "assertions"],
+                "required": ["entities", "assertions", "value_assertions"],
                 "properties": {
                     "entities": {
                         "type": "object",
@@ -60,6 +74,26 @@ def _case_ir_schema():
                             },
                         },
                     },
+                    "value_assertions": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": False,
+                            "required": ["symbol", "args", "value"],
+                            "properties": {
+                                "symbol": {"type": "string"},
+                                "args": {"type": "array", "items": {"type": "string"}},
+                                "value": {
+                                    "anyOf": [
+                                        {"type": "string"},
+                                        {"type": "number"},
+                                        {"type": "integer"},
+                                        {"type": "boolean"}
+                                    ]
+                                },
+                            },
+                        },
+                    },
                 },
             },
         },
@@ -67,6 +101,7 @@ def _case_ir_schema():
 
 
 def _query_ir_schema():
+    """Flat object schema (no ``oneOf``) for OpenAI structured output compatibility."""
     return {
         "type": "json_schema",
         "json_schema": {
@@ -74,7 +109,16 @@ def _query_ir_schema():
             "schema": {
                 "type": "object",
                 "additionalProperties": False,
-                "required": ["kind", "predicate_hint", "mode", "args", "intent", "symbol_hint", "entity_hint", "explain"],
+                "required": [
+                    "kind",
+                    "predicate_hint",
+                    "mode",
+                    "args",
+                    "intent",
+                    "symbol_hint",
+                    "entity_hint",
+                    "explain",
+                ],
                 "properties": {
                     "kind": {"type": "string", "enum": ["predicate", "intent"]},
                     "predicate_hint": {"type": "string"},
@@ -84,53 +128,6 @@ def _query_ir_schema():
                     "symbol_hint": {"type": "string"},
                     "entity_hint": {"type": "string"},
                     "explain": {"type": "boolean"},
-                },
-            },
-        },
-    }
-
-
-def _response_format_schema():
-    """Full case+query schema for backward compatibility."""
-    return {
-        "type": "json_schema",
-        "json_schema": {
-            "name": "case_query_extraction",
-            "schema": {
-                "type": "object",
-                "additionalProperties": False,
-                "required": ["case", "query"],
-                "properties": {
-                    "case": {
-                        "type": "object",
-                        "additionalProperties": False,
-                        "required": ["facts", "entities"],
-                        "properties": {
-                            "facts": {"type": "array", "items": {"type": "string"}},
-                            "entities": {
-                                "type": "object",
-                                "additionalProperties": {
-                                    "type": "array",
-                                    "items": {"type": "string"},
-                                },
-                            },
-                        },
-                    },
-                    "query": {
-                        "type": "object",
-                        "additionalProperties": False,
-                        "required": ["type", "explain", "predicate", "mode", "args", "intent", "symbol", "entity"],
-                        "properties": {
-                            "type": {"type": "string", "enum": ["predicate", "intent"]},
-                            "explain": {"type": "boolean"},
-                            "predicate": {"type": "string"},
-                            "mode": {"type": "string", "enum": ["set", "boolean"]},
-                            "args": {"type": "array", "items": {"type": "string"}},
-                            "intent": {"type": "string"},
-                            "symbol": {"type": "string"},
-                            "entity": {"type": "string"},
-                        },
-                    },
                 },
             },
         },
@@ -176,6 +173,7 @@ def extract_case_only_openai(case_text, model, kb_schema=None, feedback=None):
             {"role": "system", "content": "Extract case facts only."},
             {"role": "user", "content": case_user},
         ],
+        **chat_completion_sampling_kwargs(),
         response_format={
             "type": "json_schema",
             "json_schema": {
@@ -218,6 +216,7 @@ def extract_case_ir_only_openai(case_text, model, kb_schema=None, feedback=None)
         case_text=str(case_text),
         feedback_block=_feedback_block(feedback),
         world_knowledge_lexical=_lexical_world_knowledge_block(),
+        json_ir_contract=load_json_ir_contract(),
     )
     resp = client.chat.completions.create(
         model=model,
@@ -225,6 +224,7 @@ def extract_case_ir_only_openai(case_text, model, kb_schema=None, feedback=None)
             {"role": "system", "content": "Extract case IR only."},
             {"role": "user", "content": user_msg},
         ],
+        **chat_completion_sampling_kwargs(),
         response_format=_case_ir_schema(),
     )
     return json.loads(resp.choices[0].message.content)
@@ -251,6 +251,7 @@ def extract_query_ir_only_openai(user_question, model, kb_schema=None, case=None
         case_entities_json=case_entities_json,
         feedback_block=_feedback_block(feedback),
         world_knowledge_lexical=_lexical_world_knowledge_block(),
+        json_ir_contract=load_json_ir_contract(),
     )
     resp = client.chat.completions.create(
         model=model,
@@ -258,6 +259,7 @@ def extract_query_ir_only_openai(user_question, model, kb_schema=None, case=None
             {"role": "system", "content": "Extract query IR only."},
             {"role": "user", "content": user_msg},
         ],
+        **chat_completion_sampling_kwargs(),
         response_format=_query_ir_schema(),
     )
     return json.loads(resp.choices[0].message.content)
@@ -296,32 +298,10 @@ def extract_query_only_openai(user_question, model, kb_schema=None, case=None, f
             {"role": "system", "content": "Extract query only."},
             {"role": "user", "content": query_user},
         ],
+        **chat_completion_sampling_kwargs(),
         response_format=_query_schema(),
     )
 
     return json.loads(resp.choices[0].message.content)
 
 
-def extract_case_and_query_openai(case_text, user_question, model, kb_schema=None, feedback=None,
-                                  case_feedback=None, query_feedback=None):
-    """Extract case and query. Supports component-specific feedback for repair loops."""
-    case_fb = case_feedback if case_feedback is not None else feedback
-    query_fb = query_feedback if query_feedback is not None else feedback
-
-    case_obj = extract_case_only_openai(case_text, model, kb_schema=kb_schema, feedback=case_fb)
-    query_obj = extract_query_only_openai(
-        user_question,
-        model,
-        kb_schema=kb_schema,
-        case=case_obj,
-        feedback=query_fb,
-    )
-
-    combined = {
-        "case": {
-            "facts": case_obj.get("facts", []),
-            "entities": case_obj.get("entities", {}),
-        },
-        "query": query_obj,
-    }
-    return json.dumps(combined, ensure_ascii=False)

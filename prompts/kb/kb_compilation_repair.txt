@@ -1,4 +1,0 @@
-OBSOLETE — the pipeline now loads `kb_compilation_repair_symbolic.txt` (syntax/parse) or
-`kb_compilation_repair_semantic.txt` (unsat / semantic validation). See `pipeline/kb/compiler.py`.
-
-This file is kept so older notes that pointed here still lead you to the right place.

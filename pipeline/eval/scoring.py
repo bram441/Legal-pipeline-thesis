@@ -1,6 +1,9 @@
 # pipeline/eval/scoring.py
 
+import os
 import re
+
+from pipeline.eval.boolean_belief import summarize_boolean_symbolic
 
 
 def _normalize_range_for_compare(range_str, entity=None):
@@ -97,7 +100,6 @@ def score_question(expected, symbolic_result):
 
     if mode == "boolean":
         exp_val = bool(expected.get("value"))
-        got_val = bool(pred.get("certain"))
         target = expected.get("target")
         if target and pred.get("target") and str(target).lower() != str(pred.get("target")).lower():
             return {
@@ -106,6 +108,67 @@ def score_question(expected, symbolic_result):
                 "expected_target": target,
                 "got_target": pred.get("target"),
             }
-        return {"match": exp_val == got_val, "expected": exp_val, "got": got_val}
+
+        summ = summarize_boolean_symbolic(pred)
+        p_yes = float(summ["p_yes"])
+        label = summ["label"]
+
+        thr_raw = expected.get("belief_match_threshold")
+        if thr_raw is None:
+            thr_raw = (os.getenv("SCORE_BOOLEAN_BELIEF_THRESHOLD") or "").strip()
+        belief_threshold = None
+        if thr_raw not in (None, ""):
+            try:
+                belief_threshold = max(0.0, min(1.0, float(thr_raw)))
+            except ValueError:
+                belief_threshold = None
+
+        # Classical decisive answers
+        if label == "entailed":
+            got = True
+            match = exp_val is True
+            return {
+                "match": match,
+                "expected": exp_val,
+                "got": got,
+                "belief_yes": p_yes,
+                "credence_yes_pct": summ["credence_yes_pct"],
+                "verdict_strength_pct": summ["verdict_strength_pct"],
+                "epistemic_label": label,
+            }
+        if label == "contradicted":
+            got = False
+            match = exp_val is False
+            return {
+                "match": match,
+                "expected": exp_val,
+                "got": got,
+                "belief_yes": p_yes,
+                "credence_yes_pct": summ["credence_yes_pct"],
+                "verdict_strength_pct": summ["verdict_strength_pct"],
+                "epistemic_label": label,
+            }
+
+        # Open / unknown: do not map to got=False. Optionally score with a belief threshold.
+        out = {
+            "match": None,
+            "expected": exp_val,
+            "got": None,
+            "belief_yes": p_yes,
+            "credence_yes_pct": summ["credence_yes_pct"],
+            "verdict_strength_pct": summ["verdict_strength_pct"],
+            "epistemic_label": label,
+            "reason": "open: neither entailed nor contradicted",
+        }
+        if belief_threshold is not None:
+            if exp_val is True:
+                out["match"] = p_yes >= belief_threshold
+                out["got"] = p_yes >= 0.5
+            else:
+                out["match"] = (1.0 - p_yes) >= belief_threshold
+                out["got"] = p_yes < 0.5
+            out["belief_match_threshold"] = belief_threshold
+            out.pop("reason", None)
+        return out
 
     return {"match": False, "reason": "unsupported mode: " + str(mode)}

@@ -1,5 +1,6 @@
 # pipeline/rendering/answer_renderer.py
 
+from pipeline.eval.boolean_belief import summarize_boolean_symbolic
 from pipeline.rendering.explanations import explain_generic
 from pipeline.rendering.nl_answer import render_get_range_nl, render_set_nl, render_boolean_nl
 
@@ -75,7 +76,16 @@ def render_answer(case, query, sat, result, base_kb_text=None):
                 elif possible is False:
                     ans = "No. " + shown + " cannot hold given the law and case facts."
                 else:
-                    ans = "Unknown. " + shown + " is not determined by the law and case facts."
+                    b = summarize_boolean_symbolic(result)
+                    cred = b["credence_yes_pct"]
+                    ans = (
+                        "Unknown. "
+                        + shown
+                        + " is not logically forced either way by the current KB and facts. "
+                        + f"Configured credence toward Yes: {cred}% "
+                        + "(set PIPELINE_OPEN_WORLD_P_YES between 0 and 1; scoring can use "
+                        "belief_match_threshold on the gold item or SCORE_BOOLEAN_BELIEF_THRESHOLD)."
+                    )
 
             explanation = None
             if query.get("explain"):
