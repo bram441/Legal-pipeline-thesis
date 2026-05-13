@@ -573,8 +573,6 @@ def _typecheck_object_rule_before_render(raw_rule: dict, idx: int, symbol_sigs: 
     if not isinstance(q_raw, list):
         return
     quants = [_normalize_quant_entry(q, idx) for q in q_raw]
-    if not quants:
-        return
     env = {v: t for v, t in quants}
     if "formula" in raw_rule:
         t = _infer_expr_type(raw_rule["formula"], idx, symbol_sigs, env, "formula")
@@ -820,6 +818,76 @@ def normalize_json_ir(ir: dict) -> dict:
         "functions": [_symbol_to_json(d) for d in functions],
         "rules": rules,
     }
+
+
+def _walk_exprs_for_predicate_atoms(expr: Any, sink: set[str]) -> None:
+    """Collect predicate/symbol names used as Bool atoms in object-rule expressions."""
+    if isinstance(expr, list):
+        for x in expr:
+            _walk_exprs_for_predicate_atoms(x, sink)
+        return
+    if not isinstance(expr, dict):
+        return
+    if "pred" in expr or "symbol" in expr:
+        n = str(expr.get("pred") or expr.get("symbol") or "").strip()
+        if n:
+            sink.add(n)
+        return
+    if "not" in expr:
+        _walk_exprs_for_predicate_atoms(expr.get("not"), sink)
+        return
+    if "and" in expr:
+        for x in expr.get("and") or []:
+            _walk_exprs_for_predicate_atoms(x, sink)
+        return
+    if "or" in expr:
+        for x in expr.get("or") or []:
+            _walk_exprs_for_predicate_atoms(x, sink)
+        return
+    # compare / func terms: no Bool predicate head here
+
+
+def preflight_json_ir_rule_predicates(ir: dict) -> None:
+    """Fail fast when rules use a symbol as a Bool atom but the symbol table declares it as a function or non-Bool."""
+    preds_raw = ir.get("predicates") or []
+    funs_raw = ir.get("functions") or []
+    pred_returns: dict[str, str] = {}
+    fun_names: set[str] = set()
+    for p in preds_raw:
+        if not isinstance(p, dict):
+            continue
+        nm = str(p.get("name") or "").strip()
+        if not nm:
+            continue
+        pred_returns[nm] = str(p.get("returns") or "Bool").strip()
+    for f in funs_raw:
+        if isinstance(f, dict) and f.get("name"):
+            fun_names.add(str(f["name"]).strip())
+
+    used: set[str] = set()
+    for rule in ir.get("rules") or []:
+        if not isinstance(rule, dict):
+            continue
+        for key in ("if", "then", "formula"):
+            if key in rule:
+                _walk_exprs_for_predicate_atoms(rule[key], used)
+
+    for name in sorted(used):
+        if name in fun_names and name not in pred_returns:
+            raise JSONIRCompilationError(
+                "Rules use '"
+                + name
+                + "' as a Bool predicate atom, but the symbol table lists it only under functions. "
+                "Declare it under predicates with returns Bool, or use it only inside compare/terms."
+            )
+        if name in pred_returns and pred_returns[name].lower() != "bool":
+            raise JSONIRCompilationError(
+                "Rules use '"
+                + name
+                + "' as a Bool predicate, but the symbol table declares returns "
+                + pred_returns[name]
+                + ". Predicates used in rules must return Bool."
+            )
 
 
 def kb_schema_dict_from_normalized(norm: dict) -> dict:

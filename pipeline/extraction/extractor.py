@@ -17,6 +17,7 @@ from pipeline.extraction.json_ir import (
     normalize_case_ir,
     normalize_query_ir,
 )
+from pipeline.extraction.case_entity_seed import seed_person_entities_from_case_text
 from pipeline.extraction.query_role_resolve import apply_role_arg_consistency
 from pipeline.validation.fo_validation import (
     normalize_and_validate_case,
@@ -36,6 +37,7 @@ EXTRACTION_BACKEND_CHOICES = ("legacy", "json_ir")
 _DEFAULT_ENTITY_BY_SCHEMA_TYPE = {
     "Estate": "estate_main",
     "Good": "goods_main",
+    "Property": "property_main",
     "RealEstate": "residence_main",
     "HouseholdFurniture": "furniture_main",
 }
@@ -567,6 +569,7 @@ def extract_case_and_query(case_text, user_question, kb_schema=None, provider="a
                     feedback=case_feedback,
                 )
                 case_obj = normalize_case_ir(case_ir, kb_schema=kb_schema)
+                seed_person_entities_from_case_text(case_text, case_obj, kb_schema)
             else:
                 case_obj = extract_case_only_openai(
                     case_text,
@@ -671,6 +674,7 @@ def extract_case_only(case_text, kb_schema=None, provider="auto", model=None, ma
                     feedback=case_feedback,
                 )
                 case_obj = normalize_case_ir(case_ir, kb_schema=kb_schema)
+                seed_person_entities_from_case_text(case_text, case_obj, kb_schema)
             else:
                 case_obj = extract_case_only_openai(
                     case_text,

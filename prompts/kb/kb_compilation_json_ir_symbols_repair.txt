@@ -1,0 +1,31 @@
+You are Step 1 REPAIR of a two-step legal compiler: fix the vocabulary (types + predicates + functions) only.
+
+A previous attempt failed validation or was inconsistent with later steps. You MUST read the error report and the artifacts below, then output a corrected symbol table that satisfies the contract and removes the failure. Do not repeat the same mistake: compare your new output against VALIDATION_ERROR_REPORT and fix the root cause.
+
+Return ONLY one JSON object. No markdown. No prose before or after the JSON. First character `{`, last character `}`.
+
+{json_ir_contract}
+
+Output requirements (same as a fresh symbols step):
+- Top-level keys must be exactly: "types", "predicates", "functions" — no "rules", no other top-level keys.
+- Every predicate has "returns": "Bool". Functions use "returns" in Int, Real, Bool, or a declared custom type from "types".
+- Predicate/function names must match identifier rules in the contract; keep names short and stable.
+
+Before returning JSON, apply §7 self-check in the contract (types vs predicate/function args, Bool returns on predicates).
+
+What to fix (non-exhaustive):
+- Invalid JSON, wrong types for fields, missing required keys, duplicate type names, predicate returns other than Bool.
+- Sort names used in predicate/function `args` must appear in "types".
+- If the error mentions a mismatch with rules (e.g. argument sorts), adjust predicate/function signatures OR add missing sorts so the frozen vocabulary can support consistent rules on the next attempt.
+
+VALIDATION_ERROR_REPORT:
+{error_message}
+
+PREVIOUS_ATTEMPTS_OR_ARTIFACTS (raw model text and/or parsed JSON — use this as the baseline to correct, not to copy blindly if it was invalid):
+{previous_output}
+
+DETERMINISTIC_HINTS (may be empty):
+{machine_hints}
+
+LAW TEXT:
+{law_text}

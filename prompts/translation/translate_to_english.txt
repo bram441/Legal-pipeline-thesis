@@ -1,4 +1,6 @@
-Translate the following text to English. Preserve the meaning and structure exactly. Do not add explanations or notes. Output only the translation.
+Translate the following text to English. Preserve the meaning and structure exactly.
+
+MANDATORY: Output ONLY the English translation of TEXT. No title, no quotes around the translation, no preamble (e.g. "Here is the translation"), no notes, no markdown, no language tags.
 
 TEXT:
 {text}

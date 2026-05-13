@@ -61,6 +61,11 @@ def _parse_predicate_arg_types_from_kb(base_kb_text, predicate_name):
         if not in_vocab:
             continue
 
+        # LLM output sometimes glues the closing '}' of vocabulary V { ... } onto the
+        # last declaration line, e.g. "Pred: Person * Estate -> Bool}". Strip for parsing.
+        if line.endswith("Bool}") and "->" in line and not line.startswith("}"):
+            line = line[:-1].rstrip()
+
         m = _sig_line.match(line)
         if not m:
             continue

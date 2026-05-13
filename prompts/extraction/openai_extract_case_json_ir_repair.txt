@@ -1,0 +1,16 @@
+MANDATORY REPAIR MODE — NON-OPTIONAL
+Your previous case JSON failed strict validation. The pipeline will reject another invalid answer.
+
+PRIMARY ERROR REPORT (you MUST fix every issue described here; partial fixes fail):
+{validation_feedback}
+
+You MUST return corrected JSON that resolves EVERY point in PRIMARY ERROR REPORT above. The same report may also appear later in this message as "Validation feedback" — treat both as the same source of truth.
+
+Repair obligations (satisfy all that apply):
+- Unknown predicate/function/type: replace with a name that EXISTS in KB_SCHEMA with the same intended meaning, or remove the offending assertion if the case text does not support any valid symbol.
+- Wrong arity: set `args` length and order to match KB_SCHEMA for that symbol exactly.
+- Unknown or undeclared entity constant: add it under the correct sort in `entities`, OR remove/replace the assertion if the case text does not justify that constant.
+- Type/sort mismatch: move constants to the correct `entities` key or change the assertion to use constants of the sorts the predicate expects.
+- Illegal identifier (uppercase, spaces, type name used as constant): rename to lowercase ASCII per the contract and ensure the constant is declared under `entities`.
+
+Do not re-emit the same failing structure. After editing, mentally re-check: every constant in `assertions` / `value_assertions` appears under `entities`; every symbol is in KB_SCHEMA; every arity matches.

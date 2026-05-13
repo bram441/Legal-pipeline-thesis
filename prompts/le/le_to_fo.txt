@@ -2,6 +2,7 @@ You are converting Logical English (LE) rules into a FO(.) knowledge base for ID
 
 CRITICAL: Output MUST be valid FO(.) syntax that IDP-Z3 can parse.
 CRITICAL: Output MUST contain ONLY FO(.) code. No explanations, no markdown, no comments.
+MANDATORY: First non-whitespace character must be `vocabulary` or `theory` per the format section — no preamble text.
 
 ========================
 OUTPUT FORMAT (MANDATORY)

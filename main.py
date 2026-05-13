@@ -112,62 +112,62 @@ def run_text_mode(run_dir, provider, translate=True, cli_kb_strategy=None, cli_k
         kb_text, kb_schema = get_or_compile_kb(run_dir, law_text, cache_subdir="translated" if translate else None)
         backend_label = get_kb_backend_from_env()
 
-    out_lines = []
-    out_lines.append("=== KB COMPILE STRATEGY ===")
-    out_lines.append(strategy_label + " (use_le=" + str(ul) + ", two_phase=" + str(tp) + ")")
-    out_lines.append("KB backend: " + backend_label)
-    out_lines.append("Pipeline backend mode: " + pipeline_backend_label)
-    out_lines.append("")
-    out_lines.append("=== LAW (plain text input) ===")
-    out_lines.append(law_text)
-    out_lines.append("")
-    out_lines.append("=== KB USED (kb.fo) ===")
-    out_lines.append(kb_text)
-    out_lines.append("")
-    out_lines.append("=== CASE ===")
-    out_lines.append(case_text)
-    out_lines.append("")
+        out_lines = []
+        out_lines.append("=== KB COMPILE STRATEGY ===")
+        out_lines.append(strategy_label + " (use_le=" + str(ul) + ", two_phase=" + str(tp) + ")")
+        out_lines.append("KB backend: " + backend_label)
+        out_lines.append("Pipeline backend mode: " + pipeline_backend_label)
+        out_lines.append("")
+        out_lines.append("=== LAW (plain text input) ===")
+        out_lines.append(law_text)
+        out_lines.append("")
+        out_lines.append("=== KB USED (kb.fo) ===")
+        out_lines.append(kb_text)
+        out_lines.append("")
+        out_lines.append("=== CASE ===")
+        out_lines.append(case_text)
+        out_lines.append("")
 
-    pre_extracted_case = None
-    try:
-        status_log("Case", "Extracting case once for all questions")
-        pre_extracted_case = extract_case_only(case_text, kb_schema=kb_schema, provider=provider)
-    except ExtractionError as e:
-        print("Case extraction failed:", e)
-        return
+        pre_extracted_case = None
+        try:
+            status_log("Case", "Extracting case once for all questions")
+            pre_extracted_case = extract_case_only(case_text, kb_schema=kb_schema, provider=provider)
+        except ExtractionError as e:
+            print("Case extraction failed:", e)
+            return
 
-    for i, q in enumerate(questions):
-        out_lines.append("---")
-        out_lines.append("Q: " + q)
+        for i, q in enumerate(questions):
+            out_lines.append("---")
+            out_lines.append("Q: " + q)
 
-        status_log("Question", "Processing {} of {}".format(i + 1, len(questions)))
-        trace_path = os.path.join(run_dir, "run_trace.txt") if trace_enabled() else None
-        result = answer_legal_prompt(
-            case_text,
-            q,
-            base_kb_text=kb_text,
-            extractor_provider=provider,
-            kb_schema=kb_schema,
-            trace_path=trace_path,
-            pre_extracted_case=pre_extracted_case,
-        )
+            status_log("Question", "Processing {} of {}".format(i + 1, len(questions)))
+            trace_path = os.path.join(run_dir, "run_trace.txt") if trace_enabled() else None
+            result = answer_legal_prompt(
+                case_text,
+                q,
+                base_kb_text=kb_text,
+                extractor_provider=provider,
+                kb_schema=kb_schema,
+                trace_path=trace_path,
+                pre_extracted_case=pre_extracted_case,
+            )
 
-        if result.get("error_stage"):
-            out_lines.append("ERROR STAGE: " + sanitize_for_output(str(result.get("error_stage"))))
-            out_lines.append("ERROR: " + sanitize_for_output(str(result.get("error"))))
-            continue
+            if result.get("error_stage"):
+                out_lines.append("ERROR STAGE: " + sanitize_for_output(str(result.get("error_stage"))))
+                out_lines.append("ERROR: " + sanitize_for_output(str(result.get("error"))))
+                continue
 
-        out_lines.append("SAT? " + sanitize_for_output(str(result["sat"])))
-        out_lines.append("Case: " + sanitize_for_output(str(result["case"])))
-        out_lines.append("Query: " + sanitize_for_output(str(result["query"])))
-        out_lines.append("Answer: " + sanitize_for_output(str(result["natural_language"])))
-        if result.get("explanation"):
-            out_lines.append("Explanation:")
-            out_lines.append(sanitize_for_output(str(result["explanation"])))
+            out_lines.append("SAT? " + sanitize_for_output(str(result["sat"])))
+            out_lines.append("Case: " + sanitize_for_output(str(result["case"])))
+            out_lines.append("Query: " + sanitize_for_output(str(result["query"])))
+            out_lines.append("Answer: " + sanitize_for_output(str(result["natural_language"])))
+            if result.get("explanation"):
+                out_lines.append("Explanation:")
+                out_lines.append(sanitize_for_output(str(result["explanation"])))
 
-    results_text = "\n".join(out_lines) + "\n"
-    write_text_results(run_dir, results_text)
-    print("Wrote:", os.path.join(run_dir, "results.txt"))
+        results_text = "\n".join(out_lines) + "\n"
+        write_text_results(run_dir, results_text)
+        print("Wrote:", os.path.join(run_dir, "results.txt"))
 
 
 def run_json_mode(run_dir, provider, translate=True, cli_kb_strategy=None, cli_kb_backend=None, cli_pipeline_backend=None):
@@ -218,99 +218,99 @@ def run_json_mode(run_dir, provider, translate=True, cli_kb_strategy=None, cli_k
         kb_text, kb_schema = get_or_compile_kb(run_dir, law_text, cache_subdir="translated" if translate else None)
         backend_label = get_kb_backend_from_env()
 
-    results = {
-        "id": run_obj.get("id"),
-        "law": {"text": law_text},
-        "kb_used": {"fo": kb_text},
-        "case": {"text": case_text},
-        "kb_compile_strategy": strategy_label,
-        "kb_compile_backend": backend_label,
-        "pipeline_backend_mode": pipeline_backend_label,
-        "kb_compile_flags": {"use_le": ul, "two_phase": tp},
-        "questions": [],
-    }
-
-    score = {
-        "id": run_obj.get("id"),
-        "total": 0,
-        "correct": 0,
-        "inconclusive": 0,
-        "items": [],
-        "kb_compile_strategy": strategy_label,
-        "pipeline_backend_mode": pipeline_backend_label,
-    }
-
-    pre_extracted_case = None
-    try:
-        status_log("Case", "Extracting case once for all questions")
-        pre_extracted_case = extract_case_only(case_text, kb_schema=kb_schema, provider=provider)
-    except ExtractionError as e:
-        print("Case extraction failed:", e)
-        return
-
-    for i, q in enumerate(questions):
-        qid = q.get("id")
-        qtext = q.get("text", "")
-        expected = q.get("expected")
-
-        status_log("Question", "Processing {} of {}".format(i + 1, len(questions)))
-        trace_path = os.path.join(run_dir, "run_trace.txt") if trace_enabled() else None
-        result = answer_legal_prompt(
-            case_text,
-            qtext,
-            base_kb_text=kb_text,
-            extractor_provider=provider,
-            kb_schema=kb_schema,
-            trace_path=trace_path,
-            pre_extracted_case=pre_extracted_case,
-        )
-
-        item = {
-            "id": qid,
-            "text": qtext,
-            "expected": expected,
-            "pipeline": result,
-        }
-        results["questions"].append(item)
-
-        if expected is not None and not result.get("error_stage"):
-            score_item = score_question(expected, result.get("symbolic_result"))
-            score_item["id"] = qid
-            score_item["text"] = qtext
-
-            score["total"] += 1
-            if score_item.get("match") is None:
-                score["inconclusive"] += 1
-            elif score_item.get("match"):
-                score["correct"] += 1
-
-            score["items"].append(score_item)
-
-    decisive = score["total"] - score["inconclusive"]
-    score["decisive"] = decisive
-    if decisive > 0:
-        score["accuracy"] = score["correct"] / decisive
-    else:
-        score["accuracy"] = None
-
-    write_json_results(run_dir, results)
-    write_score(run_dir, score)
-
-    merge_json_run_file(
-        run_dir,
-        {
+        results = {
+            "id": run_obj.get("id"),
+            "law": {"text": law_text},
+            "kb_used": {"fo": kb_text},
+            "case": {"text": case_text},
             "kb_compile_strategy": strategy_label,
             "kb_compile_backend": backend_label,
             "pipeline_backend_mode": pipeline_backend_label,
             "kb_compile_flags": {"use_le": ul, "two_phase": tp},
-        },
-    )
+            "questions": [],
+        }
 
-    print("Wrote:", os.path.join(run_dir, "results.json"))
-    print("Wrote:", os.path.join(run_dir, "score.json"))
-    print("KB strategy:", strategy_label, "(use_le=" + str(ul) + ", two_phase=" + str(tp) + ")")
-    print("KB backend:", backend_label)
-    print("Pipeline backend mode:", pipeline_backend_label)
+        score = {
+            "id": run_obj.get("id"),
+            "total": 0,
+            "correct": 0,
+            "inconclusive": 0,
+            "items": [],
+            "kb_compile_strategy": strategy_label,
+            "pipeline_backend_mode": pipeline_backend_label,
+        }
+
+        pre_extracted_case = None
+        try:
+            status_log("Case", "Extracting case once for all questions")
+            pre_extracted_case = extract_case_only(case_text, kb_schema=kb_schema, provider=provider)
+        except ExtractionError as e:
+            print("Case extraction failed:", e)
+            return
+
+        for i, q in enumerate(questions):
+            qid = q.get("id")
+            qtext = q.get("text", "")
+            expected = q.get("expected")
+
+            status_log("Question", "Processing {} of {}".format(i + 1, len(questions)))
+            trace_path = os.path.join(run_dir, "run_trace.txt") if trace_enabled() else None
+            result = answer_legal_prompt(
+                case_text,
+                qtext,
+                base_kb_text=kb_text,
+                extractor_provider=provider,
+                kb_schema=kb_schema,
+                trace_path=trace_path,
+                pre_extracted_case=pre_extracted_case,
+            )
+
+            item = {
+                "id": qid,
+                "text": qtext,
+                "expected": expected,
+                "pipeline": result,
+            }
+            results["questions"].append(item)
+
+            if expected is not None and not result.get("error_stage"):
+                score_item = score_question(expected, result.get("symbolic_result"))
+                score_item["id"] = qid
+                score_item["text"] = qtext
+
+                score["total"] += 1
+                if score_item.get("match") is None:
+                    score["inconclusive"] += 1
+                elif score_item.get("match"):
+                    score["correct"] += 1
+
+                score["items"].append(score_item)
+
+        decisive = score["total"] - score["inconclusive"]
+        score["decisive"] = decisive
+        if decisive > 0:
+            score["accuracy"] = score["correct"] / decisive
+        else:
+            score["accuracy"] = None
+
+        write_json_results(run_dir, results)
+        write_score(run_dir, score)
+
+        merge_json_run_file(
+            run_dir,
+            {
+                "kb_compile_strategy": strategy_label,
+                "kb_compile_backend": backend_label,
+                "pipeline_backend_mode": pipeline_backend_label,
+                "kb_compile_flags": {"use_le": ul, "two_phase": tp},
+            },
+        )
+
+        print("Wrote:", os.path.join(run_dir, "results.json"))
+        print("Wrote:", os.path.join(run_dir, "score.json"))
+        print("KB strategy:", strategy_label, "(use_le=" + str(ul) + ", two_phase=" + str(tp) + ")")
+        print("KB backend:", backend_label)
+        print("Pipeline backend mode:", pipeline_backend_label)
 
 
 def main():

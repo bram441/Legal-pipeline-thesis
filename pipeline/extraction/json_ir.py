@@ -232,6 +232,7 @@ def _entities_by_type(case: dict, typ: str) -> list[str]:
 _DEFAULT_ENTITY_BY_SCHEMA_TYPE = {
     "Estate": "estate_main",
     "Good": "goods_main",
+    "Property": "property_main",
     "RealEstate": "residence_main",
     "HouseholdFurniture": "furniture_main",
 }
