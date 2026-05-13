@@ -1,46 +1,71 @@
-You are Step 2 of a two-step legal compiler.
-Return ONLY JSON with rules over the frozen symbol table. No markdown. No prose.
+You are Step 2 of a two-step legal compiler: rules only, over the frozen symbol table from Step 1.
+
+Return ONLY one JSON object. No markdown. No prose before or after the JSON. First character `{`, last character `}`.
 
 {json_ir_contract}
 
-Preferred object rule shape:
+Output shape (root object must contain only a "rules" array; placeholder names below are illustrative — every predicate/function name and arity MUST come from SYMBOL_TABLE below, not from this example):
 {
   "rules": [
     {
-      "forall": [{"var":"x","type":"Person"}],
-      "if": [{"pred":"ObservableFact","args":["x"]}],
-      "then": [{"pred":"LegalConclusion","args":["x"]}],
+      "forall": [{"var":"x","type":"Sort1"}],
+      "if": [{"pred":"obs_rel","args":["x"]}],
+      "then": [{"pred":"drv_rel","args":["x"]}],
       "operator": "implies"
     }
   ]
 }
 
-For legal definitions, use `operator: "iff"` when the law says a concept applies exactly when conditions hold.
-The renderer interprets this as: conclusion <=> conditions.
+Definitions vs implications (`operator`):
+- "implies": usual rule (antecedent => consequent). Example with placeholders: if the law says drv_rel whenever obs_rel, use operator "implies" with obs_rel in `if` and drv_rel in `then`.
+- "iff": legal equivalence (conclusion exactly when conditions). Example with placeholders:
+  { "forall": [{"var":"x","type":"Sort1"}], "if": [{"pred":"obs_rel","args":["x"]}], "then": [{"pred":"drv_rel","args":["x"]}], "operator": "iff" }
+  The renderer turns this into: (drv_rel(x)) <=> (obs_rel(x)).
 
-Boolean expression shapes accepted in `if` and `then` (each list item must be Bool):
-- Atom: {"pred":"Name","args":["x","y"],"negated":false}
-- AND: {"and":[expr1, expr2]}
-- OR: {"or":[expr1, expr2]}
-- NOT: {"not": expr}
-- Comparison (function calls ONLY inside left/right): {"left":{"func":"EmployeeCount","args":["c","fy"]},"op":"<=","right":10}
+Boolean expressions in `if` and `then` (each list item must evaluate to Bool):
 
-Term shapes (only inside comparison left/right, or as predicate args where the signature expects a non-Bool sort):
-- variable/constant string: "x", "c", "fy"
-- number: 10, 11250000
-- function call: {"func":"AnnualNetTurnover","args":["c","fy"]}
+1) Predicate atom (positive or negated call)
+   - Form: {"pred":"P","args":["x","y"], "negated": false}  (or "symbol" instead of "pred"; optional "neg" instead of "negated")
+   - "negated": true means: negate this single predicate call only (renderer emits ~P(...)).
+   - This is NOT the same as wrapping an arbitrary expression in logical NOT — use (2) for that.
 
-CRITICAL:
-- Use ONLY symbols from SYMBOL_TABLE below.
-- Do NOT invent, rename, or change arity of any symbol.
-- Every atom/function call must use exactly the number of args declared in SYMBOL_TABLE.
-- Do not use raw FO syntax unless absolutely necessary. Object rules are strongly preferred.
-- Never count Booleans using arithmetic or `sum`.
-- For “more than one of A, B, C”, expand pairwise: (A and B) or (A and C) or (B and C).
-- For “at most one of A, B, C is exceeded”, define a helper predicate such as ExceedsMoreThanOneCriterion using pairwise OR, then negate that helper in the conclusion rule.
-- `forall` may be empty.
-- `if` may be empty, meaning true.
-- `then` must contain at least one legal conclusion/helper atom or expression.
+2) Logical NOT of an arbitrary Boolean subexpression
+   - Form: {"not": <expr>}  where <expr> is any allowed Boolean expression.
+   - Example: {"not": {"pred":"p_gate","args":["x"]}}
+
+3) Conjunction / disjunction
+   - {"and": [expr1, expr2, ...]} — list must be non-empty.
+   - {"or": [expr1, expr2, ...]} — list must be non-empty.
+
+4) Numeric or term comparison (produces Bool)
+   - Form: {"left": TERM, "op": "<=", "right": TERM}  (or nested under "compare": { ... })
+   - TERM is: a quantified variable string, a number, or {"func":"F","args":[...]} with arity from SYMBOL_TABLE.
+   - Function calls appear ONLY as TERMs inside left/right (or as predicate arguments where the signature expects a non-Bool sort). Never put {"func":...} as a standalone element of `if` or `then` lists — that is not a Boolean.
+
+Hard constraints (violations cause compile failure — treat as mandatory):
+- You may ONLY use type, predicate, and function names that appear in SYMBOL_TABLE below. No invented aliases, no renamed symbols, no extra arity.
+- Every {"pred":...} and {"func":...} must use exactly the argument count declared in SYMBOL_TABLE for that symbol.
+- Every variable used in an atom must be listed in `forall` with a `type` that matches the corresponding parameter sort of that predicate (same spelling as in SYMBOL_TABLE).
+- After writing rules, mentally re-check: open SYMBOL_TABLE and confirm each name and arity you used.
+
+String rules vs object rules:
+- Prefer object-shaped rules as above. Raw FO strings in the `rules` array are only a legacy escape hatch and bypass some checks — use only when unavoidable.
+
+Counting / thresholds without illegal Boolean arithmetic:
+- Never count Booleans with arithmetic or sum().
+- “At least two of A, B, C hold” (three Bool atoms): expand explicitly, e.g.
+  {"or": [
+    {"and": [{"pred":"a_holds","args":["x"]}, {"pred":"b_holds","args":["x"]}]},
+    {"and": [{"pred":"a_holds","args":["x"]}, {"pred":"c_holds","args":["x"]}]},
+    {"and": [{"pred":"b_holds","args":["x"]}, {"pred":"c_holds","args":["x"]}]}
+  ]}
+  Replace a_holds/b_holds/c_holds with real predicate names from SYMBOL_TABLE.
+- “At most one threshold exceeded”: introduce a Bool helper predicate in SYMBOL_TABLE that is true when two or more exceed flags hold (built from OR of pairwise ANDs), then assert ~that helper in the conclusion rule.
+
+Quantifier / list conventions (must match the compiler):
+- `forall` must be a JSON list (may be empty []). Empty means: no universal quantifier prefix; every variable in atoms must still be justified by your rule shape (for typical laws, use non-empty forall when variables appear).
+- `if` may be [] — treated as true (trivial antecedent).
+- `then` must NOT be empty and must not reduce to only constant true — you need at least one real legal atom or expression in `then`.
 
 SYMBOL_TABLE:
 {symbol_table_json}

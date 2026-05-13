@@ -5,8 +5,82 @@ from pipeline.utils.openai_sampling import chat_completion_sampling_kwargs
 from pipeline.utils.prompt_loader import load_json_ir_contract, render_prompt
 from pipeline.kb.exceptions import LawCompilationError
 from pipeline.kb.compile_backend import get_kb_backend_from_env
-from pipeline.kb.json_ir import JSONIRCompilationError, parse_json_ir, render_json_ir_to_fo_and_schema
+from pipeline.kb.json_ir import (
+    JSONIRCompilationError,
+    parse_json_ir,
+    preflight_json_ir_rule_predicates,
+    render_json_ir_to_fo_and_schema,
+)
 from pipeline.kb.repair_hints import build_json_ir_compile_hints, build_machine_repair_hints
+
+# Short system-role guardrails; full spec lives in the rendered user prompts + json_ir_contract.
+_KB_JSON_IR_SYSTEM_SYMBOLS = (
+    "You are the KB vocabulary (symbols) phase of a legal FO(.) compiler.\n"
+    "Output must be exactly one JSON object: parseable by json.loads, first character `{`, last `}`.\n"
+    "No markdown, no code fences, no commentary, no explanation keys.\n"
+    "Declare only types, predicates (each returns Bool), and functions as specified in the user message — "
+    "do not output law rules in this step."
+)
+
+_KB_JSON_IR_SYSTEM_RULES = (
+    "You are the KB rules phase of a legal FO(.) compiler.\n"
+    "Output must be exactly one JSON object: parseable by json.loads, first character `{`, last `}`.\n"
+    "No markdown, no code fences, no commentary, no explanation keys.\n"
+    "Use only predicate, function, and type names and arities from the symbol table embedded in the user message; "
+    "do not invent, rename, or extend the vocabulary."
+)
+
+_JSON_IR_REPAIR_CONTEXT_MAX = 18000
+
+
+def _json_ir_repair_context(
+    *,
+    raw_symbols: str | None = None,
+    symbols_obj: dict | None = None,
+    symbol_table: dict | None = None,
+    raw_rules: str | None = None,
+    rules_obj: dict | None = None,
+    merged_ir: dict | None = None,
+) -> str:
+    """Human-readable bundle for repair prompts (size-capped)."""
+    blocks: list[str] = []
+
+    def _dump(label: str, obj: dict | None) -> None:
+        if obj is None:
+            return
+        try:
+            s = json.dumps(obj, ensure_ascii=False, indent=2)
+        except (TypeError, ValueError):
+            s = repr(obj)
+        blocks.append(label + "\n" + s)
+
+    if raw_symbols is not None and raw_symbols.strip():
+        rs = raw_symbols.strip()
+        if len(rs) > 12000:
+            rs = rs[:12000] + "\n... [truncated]"
+        blocks.append("=== RAW MODEL OUTPUT (symbols phase) ===\n" + rs)
+
+    if symbol_table is not None:
+        _dump("=== SYMBOL TABLE (types/predicates/functions) ===", symbol_table)
+    elif symbols_obj is not None:
+        _dump("=== PARSED SYMBOLS ROOT JSON ===", symbols_obj)
+
+    if raw_rules is not None and raw_rules.strip():
+        rr = raw_rules.strip()
+        if len(rr) > 12000:
+            rr = rr[:12000] + "\n... [truncated]"
+        blocks.append("=== RAW MODEL OUTPUT (rules phase) ===\n" + rr)
+
+    if rules_obj is not None:
+        _dump("=== PARSED RULES ROOT JSON ===", rules_obj)
+
+    if merged_ir is not None:
+        _dump("=== MERGED IR (symbols + rules before final validation) ===", merged_ir)
+
+    out = "\n\n".join(blocks).strip()
+    if len(out) > _JSON_IR_REPAIR_CONTEXT_MAX:
+        return out[:_JSON_IR_REPAIR_CONTEXT_MAX] + "\n... [truncated repair context]"
+    return out or "(no structured context captured; rely on error_message)"
 
 
 def _kb_repair_prompt_path(error_message: str) -> str:
@@ -86,9 +160,13 @@ def _json_chat_object(client, chosen_model, system_content, user_prompt):
         raise LawCompilationError("OpenAI call failed: " + str(e)) from e
     raw = (resp.choices[0].message.content or "").strip()
     try:
-        return parse_json_ir(raw)
+        return parse_json_ir(raw), raw
     except JSONIRCompilationError as e:
-        raise LawCompilationError("JSON IR validation failed: " + str(e)) from e
+        ctx = _json_ir_repair_context(raw_symbols=raw)
+        raise LawCompilationError(
+            "JSON IR validation failed: " + str(e),
+            repair_snapshot={"previous_output": ctx},
+        ) from e
 
 
 _KIND_ENUM = ["observable", "derived", "helper", "conclusion", "input", "unknown"]
@@ -181,7 +259,7 @@ def _kb_rules_response_format() -> dict:
 
 
 def _json_chat_kb_rules(client, chosen_model, system_content, user_prompt):
-    """Rules phase: prefer json_schema envelope; fall back to json_object."""
+    """Rules phase: prefer json_schema envelope; fall back to json_object. Returns (parsed_dict, raw_text)."""
     req = {
         "model": chosen_model,
         "messages": [
@@ -202,13 +280,17 @@ def _json_chat_kb_rules(client, chosen_model, system_content, user_prompt):
         raise LawCompilationError("OpenAI KB rules call failed: " + str(fmt_exc)) from fmt_exc
     raw = (resp.choices[0].message.content or "").strip()
     try:
-        return parse_json_ir(raw)
+        return parse_json_ir(raw), raw
     except JSONIRCompilationError as e:
-        raise LawCompilationError("JSON IR validation failed: " + str(e)) from e
+        ctx = _json_ir_repair_context(raw_rules=raw)
+        raise LawCompilationError(
+            "JSON IR validation failed: " + str(e),
+            repair_snapshot={"previous_output": ctx},
+        ) from e
 
 
 def _json_chat_kb_symbols(client, chosen_model, system_content, user_prompt):
-    """Symbols phase with json_schema when supported; else json_object."""
+    """Symbols phase with json_schema when supported; else json_object. Returns (parsed_dict, raw_text)."""
     req = {
         "model": chosen_model,
         "messages": [
@@ -229,9 +311,13 @@ def _json_chat_kb_symbols(client, chosen_model, system_content, user_prompt):
         raise LawCompilationError("OpenAI KB symbols call failed: " + str(fmt_exc)) from fmt_exc
     raw = (resp.choices[0].message.content or "").strip()
     try:
-        return parse_json_ir(raw)
+        return parse_json_ir(raw), raw
     except JSONIRCompilationError as e:
-        raise LawCompilationError("JSON IR validation failed: " + str(e)) from e
+        ctx = _json_ir_repair_context(raw_symbols=raw)
+        raise LawCompilationError(
+            "JSON IR validation failed: " + str(e),
+            repair_snapshot={"previous_output": ctx},
+        ) from e
 
 
 def _compile_json_ir_two_step(source_text, client, chosen_model, *, repair_feedback=None):
@@ -240,17 +326,28 @@ def _compile_json_ir_two_step(source_text, client, chosen_model, *, repair_feedb
     prev = (repair_feedback or {}).get("previous_output", "")
 
     _contract = load_json_ir_contract()
+    if repair_feedback:
+        symbols_prompt_name = "kb/kb_compilation_json_ir_symbols_repair.txt"
+        jh_sym = build_json_ir_compile_hints(err)
+        machine_symbols_hints = ""
+        if jh_sym.strip():
+            machine_symbols_hints = jh_sym.strip()
+    else:
+        symbols_prompt_name = "kb/kb_compilation_json_ir_symbols.txt"
+        machine_symbols_hints = ""
+
     symbols_prompt = render_prompt(
-        "kb/kb_compilation_json_ir_symbols.txt",
+        symbols_prompt_name,
         law_text=src,
         error_message=err,
         previous_output=prev,
+        machine_hints=machine_symbols_hints,
         json_ir_contract=_contract,
     )
-    symbols_obj = _json_chat_kb_symbols(
+    symbols_obj, raw_symbols = _json_chat_kb_symbols(
         client,
         chosen_model,
-        "You produce ONLY JSON symbol tables for legal FO(.) compilation.",
+        _KB_JSON_IR_SYSTEM_SYMBOLS,
         symbols_prompt,
     )
 
@@ -260,11 +357,23 @@ def _compile_json_ir_two_step(source_text, client, chosen_model, *, repair_feedb
         "functions": symbols_obj.get("functions", []),
     }
     if not isinstance(symbol_table["types"], list):
-        raise LawCompilationError("JSON IR symbols phase returned invalid 'types'.")
+        ctx = _json_ir_repair_context(symbols_obj=symbols_obj, raw_symbols=raw_symbols)
+        raise LawCompilationError(
+            "JSON IR symbols phase returned invalid 'types'.",
+            repair_snapshot={"previous_output": ctx},
+        )
     if not isinstance(symbol_table["predicates"], list):
-        raise LawCompilationError("JSON IR symbols phase returned invalid 'predicates'.")
+        ctx = _json_ir_repair_context(symbols_obj=symbols_obj, raw_symbols=raw_symbols)
+        raise LawCompilationError(
+            "JSON IR symbols phase returned invalid 'predicates'.",
+            repair_snapshot={"previous_output": ctx},
+        )
     if not isinstance(symbol_table["functions"], list):
-        raise LawCompilationError("JSON IR symbols phase returned invalid 'functions'.")
+        ctx = _json_ir_repair_context(symbols_obj=symbols_obj, raw_symbols=raw_symbols)
+        raise LawCompilationError(
+            "JSON IR symbols phase returned invalid 'functions'.",
+            repair_snapshot={"previous_output": ctx},
+        )
 
     if repair_feedback:
         rules_prompt_name = "kb/kb_compilation_json_ir_rules_repair.txt"
@@ -288,27 +397,47 @@ def _compile_json_ir_two_step(source_text, client, chosen_model, *, repair_feedb
             symbol_table_json=json.dumps(symbol_table, ensure_ascii=False, indent=2),
             json_ir_contract=_contract,
         )
-    rules_obj = _json_chat_kb_rules(
+    rules_obj, raw_rules = _json_chat_kb_rules(
         client,
         chosen_model,
-        "You produce ONLY JSON FO(.) rules over a fixed symbol table.",
+        _KB_JSON_IR_SYSTEM_RULES,
         rules_prompt,
     )
     rules = rules_obj.get("rules")
     if not isinstance(rules, list):
-        raise LawCompilationError("JSON IR rules phase returned invalid 'rules'.")
-
-    try:
-        return render_json_ir_to_fo_and_schema(
-            {
-                "types": symbol_table["types"],
-                "predicates": symbol_table["predicates"],
-                "functions": symbol_table["functions"],
-                "rules": rules,
-            }
+        ctx = _json_ir_repair_context(
+            symbol_table=symbol_table,
+            symbols_obj=symbols_obj,
+            raw_symbols=raw_symbols,
+            rules_obj=rules_obj,
+            raw_rules=raw_rules,
         )
+        raise LawCompilationError(
+            "JSON IR rules phase returned invalid 'rules'.",
+            repair_snapshot={"previous_output": ctx},
+        )
+
+    merged_ir = {
+        "types": symbol_table["types"],
+        "predicates": symbol_table["predicates"],
+        "functions": symbol_table["functions"],
+        "rules": rules,
+    }
+    try:
+        preflight_json_ir_rule_predicates(merged_ir)
+        return render_json_ir_to_fo_and_schema(merged_ir)
     except JSONIRCompilationError as e:
-        raise LawCompilationError("JSON IR validation failed: " + str(e)) from e
+        ctx = _json_ir_repair_context(
+            symbol_table=symbol_table,
+            raw_symbols=raw_symbols,
+            raw_rules=raw_rules,
+            rules_obj={"rules": rules},
+            merged_ir=merged_ir,
+        )
+        raise LawCompilationError(
+            "JSON IR validation failed: " + str(e),
+            repair_snapshot={"previous_output": ctx},
+        ) from e
 
 
 def compile_law_to_kb_fo(law_text, model=None, repair_feedback=None):

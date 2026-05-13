@@ -16,3 +16,5 @@ Result (exact – computed by the solver):
 {result_line}
 
 Task: Rewrite the result in plain language, briefly referring to the rule and facts. Stay within 2–4 sentences.
+
+MANDATORY: Plain language sentences only — no markdown fences, no JSON, no numbered lists unless mirroring the inputs.

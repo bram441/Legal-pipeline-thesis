@@ -122,6 +122,16 @@ def score_question(expected, symbolic_result):
                 belief_threshold = max(0.0, min(1.0, float(thr_raw)))
             except ValueError:
                 belief_threshold = None
+        if belief_threshold is None and (os.getenv("SCORE_TREAT_OPEN_WITH_BELIEF") or "").strip().lower() in (
+            "1",
+            "true",
+            "yes",
+        ):
+            thr2 = (os.getenv("SCORE_BOOLEAN_BELIEF_THRESHOLD") or "0.5").strip()
+            try:
+                belief_threshold = max(0.0, min(1.0, float(thr2)))
+            except ValueError:
+                belief_threshold = None
 
         # Classical decisive answers
         if label == "entailed":

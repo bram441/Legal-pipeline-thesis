@@ -1,35 +1,38 @@
-You are Step 1 of a two-step legal compiler.
-Return ONLY JSON with the symbol table. No markdown. No prose.
+You are Step 1 of a two-step legal compiler: vocabulary (types + predicates + functions) only.
+
+Return ONLY one JSON object. No markdown. No prose before or after the JSON. First character `{`, last character `}`.
 
 {json_ir_contract}
 
-Required shape:
+Illustrative shape (placeholder names only — choose names and sorts that fit the LAW TEXT, not these literals unless they truly apply):
 {
-  "types": ["Person", "Company", "FinancialYear"],
+  "types": ["Sort1", "Sort2"],
   "predicates": [
-    {"name":"ObservableFact","args":["Person"],"returns":"Bool","kind":"observable","description":"short meaning"},
-    {"name":"LegalConclusion","args":["Person"],"returns":"Bool","kind":"derived","description":"short meaning"}
+    {"name":"obs_rel","args":["Sort1"],"returns":"Bool","kind":"observable","description":"short meaning"},
+    {"name":"drv_rel","args":["Sort1"],"returns":"Bool","kind":"derived","description":"short meaning"}
   ],
   "functions": [
-    {"name":"EmployeeCount","args":["Company","FinancialYear"],"returns":"Int","kind":"observable","description":"short meaning"}
+    {"name":"metric_val","args":["Sort2","Sort1"],"returns":"Int","kind":"observable","description":"short meaning"}
   ]
 }
 
-Allowed predicate/function `kind` values:
-- observable: facts directly extractable from a case
-- derived: legal conclusions the solver should infer
-- helper: intermediate derived helper concepts
+Kind metadata (predicate and function objects): use only these literal strings — observable | derived | helper | conclusion | input | unknown. Any other string is invalid.
 
-Rules:
-- Do NOT include `rules` in this step.
-- Keep names stable, concise, valid identifiers.
-- Predicates must return Bool.
-- Functions should be used for numeric/custom values such as employee count, turnover, balance sheet total, age, date, status, or mapped relationships.
-- Returns must be Bool/Int/Real or a declared custom type.
-- Prefer relational predicates for multi-party legal relations. Do not collapse spouse/deceased/company/year relations into ambiguous unary predicates.
-- For company-law thresholds, include numeric observable functions and Bool helper predicates for threshold results.
-- For legal definitions, include explicit derived/conclusion predicates. Do not use observable predicates as final legal conclusions.
-- Avoid modeling legal statuses such as `Foreigner` as a type when the status is a conclusion about a person. Prefer `IsForeigner: Person -> Bool` with kind `derived`.
+Naming (predicates, functions, types):
+- Valid identifiers; prefer short snake_case for predicates and functions.
+- Max 40 characters per name. No spaces, no commas, no full sentences as a single name.
+- Predicates express truth (relations); every predicate must have "returns": "Bool".
+- Functions express computed or mapped values (counts, amounts, durations, codes, etc.); "returns" is Int, Real, Bool, or a declared custom type from "types". Use a function when the law needs a value inside arithmetic or comparisons; use a predicate when the law states a yes/no condition.
+
+Modeling rules:
+- Prefer n-ary predicates over vague unary shortcuts when several individuals or objects are legally linked.
+- When the law compares a numeric or scalar value to a bound (tax, sentencing, eligibility, deadlines, damages, etc.), expose the raw value as a function (or inputs) and express the threshold with `compare` in rules plus Bool helpers if needed — same pattern for any domain, not only company law.
+- For legal definitions, include explicit derived or conclusion predicates; do not treat final legal conclusions as observable case-input predicates.
+- Do not model a legal status as its own sort when it is really a property of an existing individual; use a predicate instead (e.g. prefer Is_status(Person)->Bool with kind derived, not a separate type "StatusX").
+
+This step must NOT include a "rules" key. Output keys are exactly: types, predicates, functions.
+
+Before returning JSON, apply §7 self-check in the contract (types vs predicate/function args, Bool returns on predicates, identifier rules).
 
 Previous compilation error (may be empty):
 {error_message}

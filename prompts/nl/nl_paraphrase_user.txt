@@ -8,3 +8,5 @@ Conclusion (exact):
 {conclusion_line}
 
 Task: Paraphrase the conclusion in plain language. Explain WHY the conclusion follows from the rule and facts. Do NOT contradict the Conclusion. If the Conclusion says the predicate holds, say so; if it says it does not hold, say so.
+
+MANDATORY: Reply with plain sentences only — no markdown, no bullet list unless the inputs already used bullets, no JSON.

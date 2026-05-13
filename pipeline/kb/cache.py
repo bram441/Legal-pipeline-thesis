@@ -711,14 +711,24 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
         try:
             raw_kb_text, ir_kb_schema = compile_law_to_kb_fo(law_text, model=model, repair_feedback=repair_feedback)
         except LawCompilationError as e:
-            # JSON-IR backend can fail before FO text exists; feed error back into repair loop.
-            if "JSON IR validation failed" in str(e) and attempt < max_repair_attempts - 1:
+            msg = str(e)
+            kb_b = get_kb_backend_from_env()
+            non_retryable = (
+                "Missing OPENAI_API_KEY" in msg
+                or "PIPELINE_KB_COMPILER must" in msg
+                or "OpenAI SDK not installed" in msg
+            )
+            snap = getattr(e, "repair_snapshot", None) or {}
+            prev_out = snap.get("previous_output") or ""
+            # json_ir: retry with repair_feedback for any compile-time LLM/validation failure
+            # (symbols, rules, merge), as long as we have a non-terminal attempt.
+            if kb_b == "json_ir" and not non_retryable and attempt < max_repair_attempts - 1:
                 repair_feedback = {
-                    "error_message": str(e),
-                    "previous_output": (repair_feedback or {}).get("previous_output", ""),
+                    "error_message": msg,
+                    "previous_output": prev_out,
                 }
                 if trace:
-                    trace.log_error("LLM/JSON-IR validation failed", e)
+                    trace.log_error("LawCompilationError (json_ir repair loop)", e)
                 continue
             if trace:
                 trace.log_error("LLM call failed", e)

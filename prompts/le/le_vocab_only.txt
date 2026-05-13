@@ -3,6 +3,7 @@ You are the FIRST step of a three-step KB build: law was already converted to Lo
 CRITICAL: Output MUST be valid FO(.) syntax.
 CRITICAL: Output MUST contain ONLY a single block: vocabulary V { ... }
 CRITICAL: Do NOT output theory T:V, markdown, or explanations.
+MANDATORY: First non-whitespace token must be `vocabulary` — no title line, no markdown.
 
 ========================
 OUTPUT FORMAT (MANDATORY)

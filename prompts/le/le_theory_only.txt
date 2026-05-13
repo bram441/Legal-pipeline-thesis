@@ -3,6 +3,7 @@ You are the LAST step of a three-step KB build: law → Logical English → (thi
 CRITICAL: Output MUST be valid FO(.) syntax.
 CRITICAL: Output MUST contain ONLY one block: theory T:V { ... }
 CRITICAL: Do NOT repeat or alter vocabulary V. Do NOT output markdown or explanations.
+MANDATORY: First non-whitespace token must be `theory` — no preamble.
 
 ========================
 OUTPUT FORMAT (MANDATORY)

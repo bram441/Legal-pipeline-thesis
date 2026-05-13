@@ -1,24 +1,48 @@
-GLOBAL JSON-IR CONTRACT (law-agnostic; same text for every statute and every case)
+GLOBAL JSON-IR CONTRACT (law-agnostic). Same text is injected into KB compilation and extraction prompts. Follow only the sections that apply to your current task (see §0).
 
-1) Identifiers
-- Use lowercase ASCII names: anna, bert, estate_main, goods_1, fy_2023.
-- Do not use type names (Person, Estate, Company, …) as entity constants.
+0) Which sections apply
+- KB Step 1 (symbols only): §6 output shape + §1 naming + §5 symbol discipline + §7 self-check. Do not output law rules here.
+- KB Step 2 (rules only): §1 + §2 + §5 + §6 + §7. Use only names and arities from the SYMBOL_TABLE / KB_SCHEMA provided in that message. Do not add, rename, or drop types/predicates/functions relative to Step 1.
+- Case IR extraction: §1 + §3 + §5 (and your task-specific schema).
+- Query IR extraction: §1 + §4 + §5 (and your task-specific schema).
+Cross-phase rule: later steps never contradict earlier frozen symbols. If a name is not in the table for this call, it must not appear.
+
+1) Identifiers (types, predicates, functions, entity constants)
+- Types, predicates, and functions: valid identifiers (letters, digits, underscore); prefer short snake_case for predicates/functions (e.g. is_eligible, max_sentence_days). Max length 40 characters per name. Do not use natural-language sentences or punctuation inside names.
+- Entity constants (case/query, not vocabulary types): lowercase ASCII, e.g. anna, estate_main, goods_1. Pattern: start with a letter, then [a-z0-9_]*, max length 40 unless the schema already uses longer legacy names.
+- Never use a vocabulary type name (declared in `types` / KB_SCHEMA) as an entity constant.
+- JSON output must be a single object: no markdown fences, no commentary before `{` or after `}`, no keys like "explanation" or "notes" unless the caller schema explicitly allows them.
 
 2) KB rules phase — Boolean expressions only in `if` and `then`
-- Each expression inside `if` / `then` must be Boolean and use ONLY one of these shapes:
-  - Atom: {"pred":"Name","args":["x","y"],"negated":false}  (or "symbol" instead of "pred")
-  - AND / OR / NOT: {"and":[expr,...]}, {"or":[expr,...]}, {"not": expr}
-  - Numeric comparison: {"compare":{"left":TERM,"op":"<=","right":TERM}} or the equivalent flat object with keys left, op, right (supported ops are the usual arithmetic comparisons).
-- TERM (for compare left/right only): variable string, number, or {"func":"FunctionName","args":[...]} with arity from the symbol table.
-- NEVER place {"func":...,"args":...} as a top-level item in `if` or `then` lists — function calls are not Booleans. If you need a threshold, use `compare` or introduce a Bool helper predicate in the symbol table and assert that predicate with an atom.
+- Each item in `if` / `then` lists must be a Boolean expression, using only:
+  - Atom: {"pred":"Name","args":[...],"negated":false}  (alias key "symbol" instead of "pred"; optional "neg" instead of "negated")
+    - "negated": true means: negate this single predicate call only (logical complement of that atom).
+    - This is different from {"not": expr}, which negates an arbitrary Boolean subexpression.
+  - {"and":[expr,...]}, {"or":[expr,...]}, {"not": expr}
+  - Compare: {"compare":{"left":TERM,"op":"<=","right":TERM}} or the same three fields as a flat object {"left":...,"op":"<=","right":...}. Use only supported comparison operators as in the KB compiler.
+- TERM (for compare left/right, and for non-Bool-valued positions if any): variable string, number, or {"func":"FunctionName","args":[...]} with arity from the symbol table.
+- NEVER put {"func":...} as a standalone list element in `if` or `then` — function calls are not Booleans. For thresholds, use `compare` and/or Bool helper predicates declared in the symbol table.
+- Generic `not` example: {"not": {"pred":"p_hold","args":["x"]}}  (outer expr is Bool).
+- Generic `compare` example: {"left": {"func":"f_metric","args":["x"]},"op":"<=","right": 100}
+
+7) Self-check before returning JSON (KB compilation)
+- Step 1: every sort in predicate/function `args` appears in `types`; every predicate has returns Bool; names match identifier rules in §1.
+- Step 2: every predicate/function used in rules exists in the symbol table with identical arity; every rule variable appears in `forall` with a type that matches each use; no standalone {"func":...} in `if`/`then` lists.
 
 3) Case IR — entities must cover every constant you use
-- Under `entities`, list every KB type key you need; every constant that appears in `assertions` or `value_assertions` must appear under the matching type in `entities`.
-- If the law uses a type such as Estate / Good / RealEstate but the narrative refers to a single undifferentiated object, invent one constant for that type (e.g. estate_main) and reuse it in every assertion that requires that argument position.
+- Under `entities`, include every KB sort key you need. Every constant that appears in `assertions` or `value_assertions` must appear under the correct sort in `entities`.
+- If the law uses several property-like sorts but the narrative is a single object, still invent one constant per sort position the law requires (e.g. one estate constant, one goods constant) and reuse it consistently.
+- FORCED self-check before return: collect every string in all `args` arrays; each must appear under `entities` for the sort required by KB_SCHEMA for that position; there must be zero undeclared or mis-sorted constants.
 
-4) Query IR — fully grounded predicate args when possible
-- For kind "predicate", `args` must supply one string per argument of the chosen predicate (same order as KB_SCHEMA). Use concrete names from Normalized case entities (and facts) for each position.
-- Do not leave empty strings. Use "?" only when an argument is genuinely irrecoverable from the case; prefer adding a named entity under `entities` in the case (see §3) and then using that name here.
+4) Query IR — grounded args and correct arity
+- For kind "predicate", `args` must have exactly as many entries as the chosen predicate has parameters in KB_SCHEMA, in the same order. Too few or too many arguments is invalid.
+- Use concrete entity constants from the normalized case when possible. Do not leave empty strings. Use "?" only when an argument is genuinely irrecoverable; prefer adding a named entity under `entities` in the case (§3) and then using it here.
+- FORCED (query extraction with provided case JSON): every entry in `args` other than the single literal "?" must be a string that appears in the supplied Normalized case entities payload (any sort bucket). Do not introduce new constants in the query object; do not rename or re-tokenize case constants.
+- FORCED: never use KB vocabulary type/sort names as `args` values; never use narrative placeholders when the case JSON already lists a concrete constant for that role.
 
 5) Symbol discipline
-- Use only names declared in the provided KB_SCHEMA / SYMBOL_TABLE for the current step. Do not invent predicates, functions, or types not in that table.
+- In each step, use only names declared in the symbol table / KB_SCHEMA attached to that same message. Do not invent predicates, functions, or types outside that table.
+
+6) KB Step 1-only output (when generating the vocabulary symbol table)
+- Return a JSON object with exactly these top-level keys: "types", "predicates", "functions". Do not include "rules". Do not add other top-level keys.
+- Predicate entries: "returns" must be "Bool". Function entries: "returns" must be one of Bool, Int, Real, or a type name listed in "types".

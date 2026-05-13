@@ -1,51 +1,58 @@
-You are Step 2 of a two-step legal compiler.
-Return ONLY JSON with rules over the frozen symbol table. No markdown. No prose.
+You are Step 2 REPAIR of a two-step legal compiler: fix the rules JSON only, over the frozen symbol table from Step 1.
+
+A previous compile or validation step failed. You MUST eliminate the failure: read the error report and the artifacts, then output a corrected `rules` array that validates against SYMBOL_TABLE and the contract. Do not ignore the error — resolve it.
+
+Return ONLY one JSON object. No markdown. No prose before or after the JSON. First character `{`, last character `}`.
 
 {json_ir_contract}
 
-Preferred object rule shape:
+Output shape (root object must contain only a "rules" array; placeholder names below are illustrative — every name and arity MUST come from SYMBOL_TABLE below):
 {
   "rules": [
     {
-      "forall": [{"var":"x","type":"Person"}],
-      "if": [{"pred":"ObservableFact","args":["x"]}],
-      "then": [{"pred":"LegalConclusion","args":["x"]}],
+      "forall": [{"var":"x","type":"Sort1"}],
+      "if": [{"pred":"obs_rel","args":["x"]}],
+      "then": [{"pred":"drv_rel","args":["x"]}],
       "operator": "implies"
     }
   ]
 }
 
-For legal definitions, use `operator: "iff"` when the law says a concept applies exactly when conditions hold.
-The renderer interprets this as: conclusion <=> conditions.
+Definitions vs implications (`operator`):
+- "implies": antecedent => consequent.
+- "iff": equivalence. Placeholder example:
+  { "forall": [{"var":"x","type":"Sort1"}], "if": [{"pred":"obs_rel","args":["x"]}], "then": [{"pred":"drv_rel","args":["x"]}], "operator": "iff" }
 
-Boolean expression shapes accepted in `if` and `then` (each list item must be Bool):
-- Atom: {"pred":"Name","args":["x","y"],"negated":false}
-- AND: {"and":[expr1, expr2]}
-- OR: {"or":[expr1, expr2]}
-- NOT: {"not": expr}
-- Comparison (function calls ONLY inside left/right): {"left":{"func":"EmployeeCount","args":["c","fy"]},"op":"<=","right":10}
+Boolean expressions in `if` and `then` (each list item must be Bool):
 
-Term shapes (only inside comparison left/right, or as predicate args where the signature expects a non-Bool sort):
-- variable/constant string: "x", "c", "fy"
-- number: 10, 11250000
-- function call: {"func":"AnnualNetTurnover","args":["c","fy"]}
+1) Predicate atom: {"pred":"P","args":[...], "negated": false} — "negated": true negates only this call (~P(...)). Optional keys: "neg" instead of "negated"; "symbol" instead of "pred".
 
-CRITICAL:
-- Use ONLY symbols from SYMBOL_TABLE below.
-- Do NOT invent, rename, or change arity of any symbol.
-- Every atom/function call must use exactly the number of args declared in SYMBOL_TABLE.
-- Do not use raw FO syntax unless absolutely necessary. Object rules are strongly preferred.
-- Never count Booleans using arithmetic or `sum`.
-- For “more than one of A, B, C”, expand pairwise: (A and B) or (A and C) or (B and C).
-- For “at most one of A, B, C is exceeded”, define a helper predicate such as ExceedsMoreThanOneCriterion using pairwise OR, then negate that helper in the conclusion rule.
-- `forall` may be empty.
-- `if` may be empty, meaning true.
-- `then` must contain at least one legal conclusion/helper atom or expression.
+2) Logical NOT of any Bool subexpression: {"not": <expr>} — use this to negate a whole subformula, not the same as "negated" on one atom.
+
+3) AND / OR: {"and":[...]} and {"or":[...]} with non-empty lists.
+
+4) Compare: {"left": TERM, "op": "<=", "right": TERM} (or under "compare"). TERM = variable, number, or {"func":...} only where allowed. Never use {"func":...} as a standalone list item in `if`/`then`.
+
+Hard constraints (mandatory — same as a fresh rules step):
+- ONLY symbols from SYMBOL_TABLE. Same arity as declared. Quantifier `type` must match predicate argument sorts for each variable position.
+- Before you finish, re-scan your JSON: for each atom, confirm the predicate name exists in SYMBOL_TABLE and `args` length matches; confirm each variable appears in `forall` with the correct type.
+
+String rules vs object rules:
+- Prefer object rules. Raw FO strings in `rules` are a legacy escape hatch — avoid unless unavoidable.
+
+Counting / thresholds (examples with generic names — substitute from SYMBOL_TABLE):
+- “At least two of A,B,C”: OR of three AND branches (pairwise), as in the non-repair rules prompt.
+- “At most one exceeded”: helper Bool predicate + negation pattern from the non-repair rules prompt.
+
+Quantifier / list conventions:
+- `forall` is a list (may be []).
+- `if` may be [] (true antecedent).
+- `then` must be non-empty and must not be only trivial true.
 
 VALIDATION_ERROR_REPORT (fix exactly this; may be empty on first repair):
 {error_message}
 
-PREVIOUS_RULES_JSON (your last rules-phase JSON output; rewrite — may be empty):
+PREVIOUS_OUTPUT_ARTIFACTS (raw model text and/or parsed JSON — may include symbols + rules + merged context from the failed attempt; repair from this, do not repeat the same mistake):
 {previous_output}
 
 DETERMINISTIC_HINTS (must satisfy in addition to the error report):
