@@ -1,12 +1,23 @@
-Rule (exact):
+Rule or rule fragment:
 {rule_line}
 
-Facts (exact):
+Facts:
 {facts_block}
 
-Conclusion (exact):
+Conclusion:
 {conclusion_line}
 
-Task: Paraphrase the conclusion in plain language. Explain WHY the conclusion follows from the rule and facts. Do NOT contradict the Conclusion. If the Conclusion says the predicate holds, say so; if it says it does not hold, say so.
+Task:
+Paraphrase the conclusion in plain language.
+Briefly explain why it follows, using only the rule and facts above.
+Do not contradict the conclusion.
+If the conclusion is positive, say that the legal result holds.
+If the conclusion is negative, say that the legal result does not hold.
+If the conclusion is unknown or not entailed, say that the provided rule and facts do not establish it.
 
-MANDATORY: Reply with plain sentences only — no markdown, no bullet list unless the inputs already used bullets, no JSON.
+MANDATORY OUTPUT:
+Plain sentences only.
+No markdown.
+No JSON.
+No bullet list unless the inputs already require one.
+

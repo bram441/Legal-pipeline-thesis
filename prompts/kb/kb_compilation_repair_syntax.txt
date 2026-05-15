@@ -1,56 +1,50 @@
-MANDATORY REPAIR — SYNTAX / PARSE / SHAPE
-You previously compiled legal rules into FO(.) code, but IDP-Z3 rejected it with a parse/lint/shape error. You MUST fix every issue in ERROR REPORT and MACHINE-DETECTED ISSUES below. A partial fix is a failed repair.
+You are repairing a legacy direct-FO(.) knowledge base that failed syntax validation.
 
-Your task is SYNTAX REPAIR ONLY.
-- Keep legal meaning as close as possible to the previous output.
-- Do not redesign ontology unless required to satisfy syntax/declared-symbol consistency.
-- Output ONLY: `vocabulary V { ... }` then `theory T:V { ... }`.
-- No markdown, no explanations, no `structure`.
+Your task:
+- Return corrected FO(.) code only.
+- Preserve the intended legal meaning as much as possible.
+- Fix syntax and parser errors.
+- Do not add explanations, markdown, or comments.
 
-========================
-MACHINE-DETECTED ISSUES
-========================
-{machine_hints}
+MANDATORY OUTPUT:
+Return exactly:
+1. vocabulary V { ... }
+2. theory T:V { ... }
 
-========================
-ERROR REPORT
-========================
+No text before, between, or after the two blocks except FO(.) code.
+
+================================================================================
+ERROR TO FIX
+================================================================================
+
 {error_message}
 
-========================
-PREVIOUS OUTPUT
-========================
+================================================================================
+REPAIR RULES
+================================================================================
+
+Fix all applicable syntax problems:
+- missing or extra braces;
+- missing periods after formulas;
+- invalid declaration syntax;
+- missing `type` keyword;
+- wrong predicate/function signature syntax;
+- undeclared symbols;
+- arity mismatches;
+- invalid quantifier syntax;
+- use of forall/exists instead of !/?;
+- Prolog syntax such as `:-`;
+- programming if/else, `*else`, ternary syntax, or local let binders;
+- raw natural-language text inside FO code;
+- markdown fences or comments;
+- merged declarations using `*` after Bool.
+
+Do not use concrete case constants in theory formulas.
+Every variable in theory must be quantified.
+Every symbol used in theory must be declared in vocabulary with the same arity.
+
+================================================================================
+PREVIOUS FO CODE
+================================================================================
+
 {previous_output}
-
-========================
-ORIGINAL LAW TEXT (REFERENCE)
-========================
-{law_text}
-
-========================
-MANDATORY SYNTAX AUTOCHECKS
-========================
-1) Vocabulary declarations:
-- Type declarations: `type Name`
-- Predicate/function: `name: T1 * T2 -> Bool|Int|Real|CustomType`
-- NEVER output `name: Type` alone for predicates; use `name: Type -> Bool`
-- NEVER output bare `Person` / `Estate` line; use `type Person` / `type Estate`
-
-2) Theory block:
-- Use only `!` / `?` quantifiers with `in Type`
-- Use only `& | ~ => <=>`
-- Every top-level formula ends with `.`
-- No `let`, no `*else`, no `?:`, no `sum *`
-
-3) Symbol consistency:
-- Every symbol called in theory must be declared in vocabulary with matching arity
-- Remove or declare any undeclared symbol
-- Every threshold_* or legal limit identifier used in the theory must be declared in vocabulary (typically `name: -> Int` or `name: Company -> Int`)
-
-4) Sort consistency (IDP type errors):
-- A variable quantified `in FinancialYear` (or Date) must not be passed where the signature expects Int/Real unless the parameter sort is that type
-- Use separate variables: e.g. `fy in FinancialYear` for calendar facts and `n in Int` for counts compared to thresholds
-
-FINAL CHECK: merged vocabulary+theory must parse in IDP; no stray prose; braces balanced.
-
-Output only corrected FO(.) code.

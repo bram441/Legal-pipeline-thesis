@@ -19,6 +19,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
+from pipeline.semantic.legal_question import domain_heuristics_enabled, question_asks_legal_conclusion
 from pipeline.extraction.query_role_resolve import apply_role_arg_consistency
 
 
@@ -187,6 +188,83 @@ def _symbol_kind(sig: dict | None) -> str:
     return str(sig.get("kind") or "unknown").strip().lower()
 
 
+def _derived_bool_predicates(kb_schema: dict) -> list[dict]:
+    out: list[dict] = []
+    for p in (kb_schema or {}).get("predicates") or []:
+        if not isinstance(p, dict) or not p.get("name"):
+            continue
+        if str(p.get("returns") or "Bool").strip().lower() != "bool":
+            continue
+        if str(p.get("kind") or "").lower() in {"derived", "conclusion"}:
+            out.append(p)
+    return out
+
+
+def _lexical_overlap_score(sym: dict, user_question: str) -> float:
+    n = sym.get("name") or ""
+    nt = set(_symbol_tokens(n))
+    desc = set(_symbol_tokens(sym.get("description") or ""))
+    q = _question_tokens(user_question)
+    if not nt:
+        return 0.0
+    score = len(q & nt) / float(len(nt))
+    if desc:
+        score += 0.5 * (len(q & desc) / float(len(desc)))
+    return score
+
+
+def _try_auto_select_derived_predicate(
+    user_question: str,
+    case: dict,
+    kb_schema: dict,
+    raw_args: list[str],
+) -> tuple[str, list[str]] | None:
+    if not question_asks_legal_conclusion(user_question):
+        return None
+    derived = _derived_bool_predicates(kb_schema)
+    if not derived:
+        return None
+    scored: list[tuple[float, dict]] = []
+    for sym in derived:
+        sc = _lexical_overlap_score(sym, user_question)
+        if sc > 0:
+            scored.append((sc, sym))
+    if not scored:
+        return None
+    scored.sort(key=lambda x: -x[0])
+    best_sc, best_sym = scored[0]
+    if len(scored) > 1 and best_sc < 0.35:
+        return None
+    if len(scored) > 1 and (best_sc - scored[1][0]) < 0.12:
+        return None
+    pred = str(best_sym["name"])
+    args = _fill_query_args_from_entities(pred, list(raw_args), case, kb_schema)
+    return pred, args
+
+
+def _validate_query_target_for_legal_question(
+    pred: str,
+    user_question: str,
+    kb_schema: dict,
+) -> None:
+    if not question_asks_legal_conclusion(user_question):
+        return
+    derived = _derived_bool_predicates(kb_schema)
+    if not derived:
+        return
+    pk = _symbol_kind(_symbol_sig(kb_schema, pred))
+    if pk != "observable":
+        return
+    raise ExtractionIRValidationError(
+        "Selected observable predicate '"
+        + pred
+        + "' for a legal-conclusion question. Observable predicates are case facts and should not be used "
+        "as final answers to legal-effect questions. Choose a derived predicate that directly represents "
+        "the requested legal status, right, obligation, permission, prohibition, validity result, entitlement, "
+        "exclusion, classification, or legal consequence."
+    )
+
+
 def _merge_typed_entity(out_entities: dict, typ: str, value: str) -> None:
     if not typ or not value:
         return
@@ -311,11 +389,9 @@ def _deceased_persons_from_is_deceased_facts(case: dict) -> set[str]:
 def _maybe_normalize_binary_person_person_survivor_deceased(
     query_obj: dict, case: dict, kb_schema: dict
 ) -> None:
-    """If KB asks (Person, Person) and facts give exactly one IsDeceased/ and one other person, use (survivor, deceased).
-
-    Fills duplicate or half-empty args when the model binds the same Person twice for both roles
-    (common when only one name appears under case.entities.Person).
-    """
+    """Domain-specific heuristic (disabled unless LEGAL_PIPELINE_ENABLE_DOMAIN_HEURISTICS=1)."""
+    if not domain_heuristics_enabled():
+        return
     if str(query_obj.get("type") or "").lower() != "predicate":
         return
     if str(query_obj.get("mode") or "").lower() != "boolean":
@@ -560,45 +636,53 @@ def normalize_query_ir(query_ir: dict, case: dict, kb_schema: dict, user_questio
         }
 
     pred_hint = str(query_ir.get("predicate_hint") or query_ir.get("predicate") or "").strip()
-    pred = _best_symbol_match(pred_hint, kb_schema, user_question=user_question, bool_only=True, prefer_derived=True)
-    if not pred:
-        raise ExtractionIRValidationError("Could not resolve query predicate from IR")
-    pk = _symbol_kind(_symbol_sig(kb_schema, pred))
-    if pk == "helper":
-        raise ExtractionIRValidationError(
-            "Do not query helper predicate " + pred + "; choose a derived legal conclusion observable from the case."
-        )
     mode = str(query_ir.get("mode") or "boolean").strip().lower()
     if mode not in ("boolean", "set"):
         mode = "boolean"
 
     raw_args = [_safe_entity(x) for x in (query_ir.get("args") or []) if _safe_entity(x)]
+
+    pred = _best_symbol_match(pred_hint, kb_schema, user_question=user_question, bool_only=True, prefer_derived=True)
+    if not pred:
+        raise ExtractionIRValidationError("Could not resolve query predicate from IR")
+
+    pk = _symbol_kind(_symbol_sig(kb_schema, pred))
+    if pk == "helper":
+        raise ExtractionIRValidationError(
+            "Do not query helper predicate " + pred + "; choose a derived legal conclusion."
+        )
+
+    if mode == "boolean" and pk == "observable" and question_asks_legal_conclusion(user_question):
+        auto = _try_auto_select_derived_predicate(user_question, case, kb_schema, raw_args)
+        if auto:
+            pred, args = auto
+            pk = _symbol_kind(_symbol_sig(kb_schema, pred))
+        else:
+            _validate_query_target_for_legal_question(pred, user_question, kb_schema)
+
     args = _fill_query_args_from_entities(pred, raw_args, case, kb_schema)
 
-    query_obj = {"type": "predicate", "predicate": pred, "mode": mode, "args": args, "explain": explain}
+    query_obj = {
+        "type": "predicate",
+        "predicate": pred,
+        "mode": mode,
+        "args": args,
+        "explain": explain,
+        "predicate_kind": pk,
+    }
 
-    # Existing project-specific role alignment still helps for spouse/deceased phrasing.
-    apply_role_arg_consistency(user_question, query_obj, case, kb_schema=kb_schema)
+    if domain_heuristics_enabled():
+        apply_role_arg_consistency(user_question, query_obj, case, kb_schema=kb_schema)
+        _maybe_normalize_binary_person_person_survivor_deceased(query_obj, case, kb_schema)
+    else:
+        from pipeline.extraction.query_role_generic import apply_generic_query_arg_fill
 
-    _maybe_normalize_binary_person_person_survivor_deceased(query_obj, case, kb_schema)
-
-    ql = (user_question or "").lower()
-    if (
-        query_obj.get("mode") == "boolean"
-        and isinstance(query_obj.get("args"), list)
-        and query_obj["args"]
-        and ("surviving spouse" in ql or ("langstlevende" in ql and "echtgenoot" in ql))
-    ):
-        deceased = _deceased_persons_from_is_deceased_facts(case)
-        pool = _person_constants_from_case(case)
-        alive_list = [p for p in pool if p not in deceased]
-        cur0 = _safe_entity(query_obj["args"][0])
-        if cur0 in deceased and len(alive_list) == 1:
-            query_obj["args"][0] = alive_list[0]
-        elif (not cur0 or cur0 in _PLACEHOLDERS or cur0 == "person") and len(alive_list) == 1:
-            query_obj["args"][0] = alive_list[0]
+        apply_generic_query_arg_fill(user_question, query_obj, case, kb_schema)
 
     _ensure_singleton_query_args(pred, query_obj["args"], case, kb_schema)
+
+    if mode == "boolean":
+        _validate_query_target_for_legal_question(pred, user_question, kb_schema)
 
     if mode == "boolean":
         _validate_query_args(pred, query_obj["args"], case, kb_schema)

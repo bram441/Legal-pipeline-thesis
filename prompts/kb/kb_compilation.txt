@@ -1,133 +1,114 @@
-You are compiling a legal rule description into a FO(.) knowledge base for IDP-Z3.
+You are compiling legal text directly into a FO(.) knowledge base for IDP-Z3.
 
-CRITICAL: Output MUST be valid FO(.) syntax that IDP-Z3 can parse.
-CRITICAL: Output MUST contain ONLY FO(.) code. No explanations, no markdown, no comments.
+Your task:
+- Output a reusable FO(.) vocabulary and theory that represent the law text.
+- Do not include case constants.
+- Do not answer any specific question.
+- Do not include explanations, markdown, or comments.
 
-MANDATORY: Your entire reply must be exactly two FO blocks in order — nothing before `vocabulary V {`, nothing after the final `}` of `theory T:V { ... }`. No title line, no markdown fences, no ` ``` ` wrappers.
+MANDATORY OUTPUT:
+The first non-whitespace token must be `vocabulary`.
+Return exactly two blocks in this order:
 
-========================
-OUTPUT FORMAT (MANDATORY)
-========================
-Return EXACTLY two blocks in this order:
-
-1) vocabulary V { ... }
-2) theory T:V { ... }
-
-Do NOT output anything before "vocabulary V {" and do NOT output anything after the final "}".
-
-========================
-FO(.) VOCABULARY RULES
-========================
-
-A) Types
-- Every type MUST be declared with the keyword "type".
-  ✅ Correct:   type Person
-  ❌ Wrong:     Person
-
-B) Predicates
-- Predicates MUST be declared using FO(.) signature syntax with ":" and "-> Bool".
-  ✅ Correct (arity 1):  Negligent: Person -> Bool
-  ✅ Correct (arity 2):  Owns: Person * Thing -> Bool
-- Do NOT merge lines with markdown bullets: never output "pred1: Bool   *pred2: ..." on one line. A "*" right after "Bool" is parsed as a type operator and IDP fails. Use one predicate per line; no "*" between declarations (only "Person * Thing -> Bool" style product types are valid).
-  ❌ Wrong:  a: Bool   *b: Person -> Bool
-  ✅ Right:  a: Bool on one line; b: Person -> Bool on the next line (indented inside vocabulary).
-  ❌ Wrong:              Negligent(Person)
-  ❌ Wrong:              Negligent(Person, Thing)
-  ❌ Wrong:              Negligent(Person) -> Bool
-  ❌ Wrong:              Negligent: Person
-- Name each predicate after a single legal concept: short camelCase (e.g. causesDeath, actsWithPremeditation). Do not use natural-language sentences, spaces, or punctuation inside identifier names. Prefer several small predicates combined in the theory over one huge predicate name.
-
-C) Functions (only if needed)
-- Functions MUST be declared using ":" and "-> ReturnType".
-  ✅ Correct: age: Person -> Int
-  ✅ Correct: parentOf: Person -> Person
-  ❌ Wrong:   age(Person): Int
-  ❌ Wrong:   age(Person)
-- Every legal threshold used in comparisons (employee limits, turnover caps, etc.) MUST be declared here (e.g. threshold_employees_small: -> Int). Never call threshold names in the theory without a matching vocabulary line.
-
-D) Naming
-- Preserve names EXACTLY as you choose them: case-sensitive and consistent.
-- Use simple ASCII identifiers (letters/digits/underscore). No spaces, hyphens, or punctuation in names.
-
-E) Minimality
-- Declare ONLY symbols that are necessary to express the law text.
-- If the law text contains something you cannot formalize cleanly, OMIT it rather than inventing extra ontology.
-- Prefer a **small** vocabulary: fewer invented helpers; each predicate should be clearly needed by at least one rule or by case-fact extraction.
-
-F) REQUIRED: Conclusion predicates for each distinct liability / punishment branch (mutually exclusive, NO CIRCULARITY)
-- For EACH statutory branch that imposes a distinct punishment, liability, or legal classification (e.g. base vs aggravated tiers when the law enumerates them), declare exactly one Bool predicate in the vocabulary and define it in the theory with `<=>` from **condition** predicates only.
-- Name conclusion predicates so queries map clearly (e.g. include article numbers when the law is article-structured: punishedArt398, liableArt399; or use neutral names like liableBase, liableAggravated when articles are not numbered).
-- MUTUAL EXCLUSIVITY: When branches form a hierarchy (base vs strictly stronger conditions), define each branch predicate so it holds ONLY when the actor qualifies for THAT branch and NOT for a strictly higher branch, using only primitive/condition predicates on the right-hand side.
-- NO CIRCULARITY (CRITICAL): Do NOT use one branch predicate (e.g. liableBase) inside the definition body of another branch predicate (e.g. liableAggravated). The reasoner cannot handle mutual definitional cycles. Mutual exclusivity must follow from disjoint conditions, not from negating another conclusion predicate.
-- Do NOT output only implications (`=>`) without named conclusion predicates when the pipeline must answer yes/no per branch; the downstream benchmark expects queryable Bool heads.
-
-G) Quantitative consequences
-- When the law specifies numeric ranges (durations, amounts, etc.), add functions and assign values in the theory based on which conditions apply.
-- Name functions descriptively (e.g. MinDurationDays, MaxAmountEuro) so they match natural questions. This enables range/amount queries.
-- Use a SINGLE unit per quantity type: e.g. imprisonmentMinDays and imprisonmentMaxDays for all imprisonment (convert months/years to days). This ensures "what is the minimum prison sentence?" maps to one clear function.
-
-H) Role-explicit modeling (succession, immigration, company law)
-- When a legal consequence depends on **two or more actors** (e.g. surviving spouse vs deceased, company vs accounting period, foreigner vs procedure), use **distinct variables** in rules or **relational** predicates (`relates(spouse, deceased)`, `estateOf(deceased, estate)`), not one unary `Person` predicate for incompatible roles.
-- When two unary predicates on `Person` represent **roles that cannot both apply to the same individual at once** in the modeled situation, do **not** define a consequence as `P(x) & Q(x)` with the **same** `x` for both — use separate variables and link them with predicates from the vocabulary (otherwise the theory is often unsatisfiable for real cases).
-- Do NOT use `let` or any local binder — only FO(.) quantifiers `!` / `?` and formulas.
-- Every symbol used in the theory must appear in the vocabulary with matching arity so downstream extraction can query it.
-
-========================
-FO(.) THEORY RULES
-========================
-- Use ONLY these connectives:  &  |  ~  =>  <=>  (no <->, :=, *else, ?:, or programming-style conditionals).
-- NO ternary/conditional: Do NOT use "if-then-else", "*else", "? :", "case of", or similar. For functions with multiple possible values, write SEPARATE rules:  f(x) = v1 <=> cond1(x).  and  f(x) = v2 <=> cond2(x).  Each rule stands alone.
-- Use FO(.) quantifiers:  !  ?  and "in" for typing.
-  ✅ Correct: ! p in Person: ...
-  ✅ Correct: ? p in Person: ...
-- DO NOT use Prolog/Datalog syntax (no ":-", no "<->").
-- Every top-level formula in the theory MUST end with a period .
-- DO NOT use "forall", "exists" keywords.
-- Put a ":" after the quantifier header line, then the formula on the next line(s).
-- Function assignment: Use  f(x) = N <=> condition(x).  for each case. Never  f(x) = (condition ? a : b).
-
-========================
-QUALITY & PARSING SAFETY
-========================
-- NO inline numeric comparisons in logical formulas: Do NOT use f(x) > N or f(x) >= N inside &, |, =>, <=>. IDP requires Bool there. Define a Bool predicate (e.g. exceedsThreshold: Type -> Bool) and add  exceedsThreshold(x) <=> f(x) > N.  as a separate rule.
-- NO programming constructs: No *else, ?:, if-then-else, case/when. Use multiple rules with <=> for each branch.
-- Ensure braces are balanced.
-- Ensure every predicate in the theory is declared in the vocabulary.
-- Ensure every type used in signatures is declared with "type".
-- Do NOT use constants in the theory (no "alice" inside theory). Quantify variables instead.
-- Inheritance / succession: predicates about what the **deceased** leaves (descendants, other heirs, etc.) must apply to the **deceased** person in the rule, not to the surviving spouse. Use two variables and vocabulary predicates to relate spouse and deceased.
-- Do NOT add rules that contradict punishment rules (e.g. "X => false" when X should lead to a punishment). Conclusion predicates per article must be defined with condition predicates only—never reference another article predicate in the body (see F, NO CIRCULARITY).
-
-========================
-EXAMPLE (STYLE TO COPY — illustrative only)
-========================
 vocabulary V {
-  type Party
-  negligent: Party -> Bool
-  causedDamage: Party -> Bool
-  liable: Party -> Bool
+  ...
 }
 
 theory T:V {
-  ! p in Party:
-    (negligent(p) & causedDamage(p)) => liable(p).
+  ...
 }
 
-========================
-MANDATORY SELF-CHECK BEFORE YOU FINISH (non-optional)
-========================
-1) Output is exactly two blocks: `vocabulary V { ... }` then `theory T:V { ... }` — no third block, no prose outside them.
-2) Every name used in `theory` is declared in `vocabulary` with the same spelling and arity.
-3) Every type in signatures is declared with `type`.
-4) No `*`-merged lines after `Bool` on the same line as another declaration (IDP parse killer).
-5) No constants inside theory formulas — only quantified variables and symbols from the vocabulary.
-6) Article-style conclusion predicates: each is defined with `<=>` from condition predicates only — no circular reference to another article predicate in the body (see section F).
-7) Quantifiers use `!` / `?` with `in Type` and `:` on the header line; every top-level formula ends with `.`
+Do not output anything before `vocabulary V {`.
+Do not output anything after the final `}` of the theory block.
 
-========================
-TASK
-========================
-Compile the following law text into FO(.) using the exact output format and rules above.
+================================================================================
+VOCABULARY RULES
+================================================================================
 
-LAW TEXT:
+Types:
+- Every type must be declared with `type`.
+- Use reusable legal sorts only.
+- Do not create types for legal statuses that are better represented as predicates.
+
+Predicates:
+- Syntax:
+  predicateName: Type -> Bool
+  predicateName: TypeA * TypeB -> Bool
+- Use predicates for Boolean factual conditions, helper conditions, and derived legal conclusions.
+- Use compact ASCII names.
+- Do not use full natural-language sentences as names.
+- Put one declaration per line.
+- Do not merge declarations with `*`.
+
+Functions:
+- Syntax:
+  functionName: Type -> Int
+  functionName: TypeA * TypeB -> Real
+- Use functions for numeric values, amounts, dates, durations, counts, percentages, categories, and mappings.
+- Use Int for whole numbers and counts.
+- Use Real for decimal quantities, money, percentages, or ratios unless the law clearly treats them as whole numbers.
+
+Role modeling:
+- Use relational predicates/functions when the law links multiple actors, objects, events, decisions, periods, or roles.
+- Do not force incompatible legal roles into one unary subject.
+
+Conclusion modeling:
+- Declare clear queryable predicates/functions for final legal statuses, classifications, rights, obligations, permissions, prohibitions, sanctions, validity results, exceptions, exclusions, entitlements, and legal effects.
+- Do not leave final legal conclusions unnamed.
+
+================================================================================
+THEORY RULES
+================================================================================
+
+Allowed syntax:
+- Quantifiers: `! x in Type:` and `? x in Type:`
+- Connectives: `&`, `|`, `~`, `=>`, `<=>`
+- Every top-level formula ends with `.`
+
+Do not use:
+- forall / exists keywords
+- Prolog syntax `:-`
+- programming if/else
+- `*else`
+- ternary operators
+- local `let` binders
+- comments
+- markdown
+- natural-language prose inside FO output
+
+Variables:
+- Every variable must be quantified.
+- Every variable must have the correct type in every predicate/function call.
+- No concrete case constants are allowed in the theory.
+
+Rules:
+- Use `=>` for ordinary legal consequences.
+- Use `<=>` only for exact definitions/equivalences.
+- Avoid circular rules where a conclusion depends only on itself.
+- Avoid tautological rules such as P(x) => P(x).
+- Do not derive only observable case inputs; derive legal conclusions or helper conditions from factual conditions.
+
+Thresholds and combinations:
+- Use numeric functions for raw measurable values.
+- Use comparisons or helper predicates for threshold checks.
+- For “at least two of A, B, C”, express pairwise combinations: (A & B) | (A & C) | (B & C).
+- Do not count Boolean conditions using unsupported arithmetic.
+
+================================================================================
+SELF-CHECK
+================================================================================
+
+Before returning, verify:
+1. Output contains only vocabulary V and theory T:V.
+2. Every type used is declared.
+3. Every predicate/function used in theory is declared with the same arity.
+4. Every variable is quantified.
+5. No concrete case constants appear in theory.
+6. No markdown, prose, comments, or extra blocks appear.
+7. No circular/tautological rules appear.
+
+================================================================================
+LAW TEXT
+================================================================================
+
 {law_text}

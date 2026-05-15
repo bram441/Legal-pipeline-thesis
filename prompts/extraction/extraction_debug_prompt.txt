@@ -1,65 +1,16 @@
-You are a legal assistant.
+You are debugging a legal extraction failure.
 
-NOTE: This template is for debugging / metadata only. The live pipeline uses backend-specific structured extraction (JSON-IR or legacy) with strict schemas — do not treat the JSON example below as the only valid shape for all backends.
+Given KB_SCHEMA, CASE, and QUESTION, identify the likely generic cause of failure.
+Focus on schema mismatch, missing observable facts, wrong argument order, wrong entity type, selected observable instead of derived predicate, or unsupported query shape.
 
-You receive:
-(1) A case description in natural language
-(2) A user question
-(3) A KB schema extracted from the compiled knowledge base – you MUST use ONLY these symbols
+Do not invent new law-specific fixes.
+Return concise bullet points and one generic repair suggestion.
 
-Your job:
-Return ONLY valid JSON with:
-- "case": FO(.) structure facts using ONLY symbols from KB_SCHEMA below
-- "query": predicate or intent query using ONLY symbols from KB_SCHEMA
-
-KB_SCHEMA (from compiled kb.fo – use ONLY these, no others):
+KB_SCHEMA:
 {kb_schema_json}
 
-Output JSON format:
-
-{{
-  "case": {{
-    "facts": [
-      "somePredicate(alice,bob).",
-      "someFunction(bob) = 3."
-    ]
-  }},
-  "query": {{
-    "type": "predicate",
-    "predicate": "somePredicate",
-    "mode": "boolean",
-    "args": ["alice","bob"],
-    "explain": false
-  }}
-}}
-
-Rules:
-- Use ONLY symbols that appear in KB_SCHEMA (predicate/function/type names).
-- Use lowercase identifiers for constants (alice, bob, art398).
-- Facts must be valid FO(.) structure lines ending with '.'.
-- Do NOT invent new predicates/functions/types.
-- Do NOT include contradictory facts (e.g. both pred(x) and not pred(x) for the same predicate and entity).
-- Use only entities that appear in the case description; query entities must be in the case.
-- If a fact is unknown or unexpressible with allowed symbols, omit it.
-- NEGATION: Use 'not Predicate(entity).' never 'Predicate(not entity).' — arguments must be entity names only.
-- Predicates about death, organ loss, incurable disease, or severe harm: only assert them when the case explicitly states that outcome. If the case says "did not cause death" or "no organ loss", assert 'not ThatPredicate(entity).'.
-
-CRITICAL SYMBOL RULES:
-- You MUST ONLY use predicate/function names that appear in KB_SCHEMA.
-- Copy symbol names EXACTLY as written in KB_SCHEMA (case-sensitive, character-for-character).
-- Do NOT use synonyms: e.g. if the schema has "intentionalCausesWoundsOrBlows" do NOT write "inflictedWoundsOrBlows". The system matches by exact name only; synonyms make the answer wrong.
-
-Query rules:
-- For boolean predicate queries, args MUST be the entity the question asks about (e.g. args: ["karel"] for "Is Karel liable?"). Do NOT use type names (Offender, Person) as args—use the person's name (jan, pieter). For "liable under Article N", prefer a predicate that names the article (punishedArt399); if none, use the condition that characterizes that article (e.g. CausesIllnessOrIncapacity for Art. 399).
-- Meta questions about satisfiable/consistency: type="intent" with intent="satisfiable".
-- Otherwise use type="predicate" with predicate/mode/args.
-- For predicate mode:
-  - mode="set" => args=[]
-  - mode="boolean" => args length must equal predicate arity.
-- explain=true only if user asks for an explanation.
-
-Case:
+CASE:
 {case_text}
 
-User question:
+QUESTION:
 {user_question}

@@ -1,13 +1,14 @@
-Purpose (read first): this file is ONLY for choosing among predicate/function names that **already appear in KB_SCHEMA** and for attaching **existing** named entities from the case to the right roles. It is NOT extra vocabulary. If a word or concept here has no corresponding symbol in KB_SCHEMA, you MUST ignore it for symbol choice and MUST NOT invent predicates, functions, types, or constants.
+Purpose:
+This file is only a schema-driven lexical aid. It may help choose among symbols that already appear in KB_SCHEMA. It is not additional vocabulary.
 
-Safety rules:
-- Never output or infer symbols from this file alone; every use must be double-checked against KB_SCHEMA.
-- Never use this file to introduce constants that are not explicitly present in the case text (for case IR) or in the provided Normalized case entities JSON (for query IR).
-- If a bullet below could suggest a relation that is not in KB_SCHEMA, omit that relation entirely.
+Rules:
+- Never invent a predicate, function, type, or constant from this file.
+- Never output a symbol unless it exists in KB_SCHEMA.
+- Never output a constant unless it is supported by the case text or already present in normalized case entities.
+- If this file conflicts with KB_SCHEMA, the case text, or the question, ignore this file.
 
-Disambiguation patterns (schema-driven only):
-- Family / household wording (parent, child, spouse, sibling, heir, etc.) often maps to **binary** predicates (two args) or **unary** facts (one arg), depending on how KB_SCHEMA declares each name. Match declared arity and argument order exactly; do not swap parties unless the case text attributes a fact to the other party.
-- Life-cycle and role wording (e.g. deceased vs survivor vs estate) usually refers to **different named individuals or legal objects** in the narrative. Map each predicate to the entity the case attributes that property to; do not attach one person’s fact to another’s constant.
-- Economic or legal roles (buyer, seller, debtor, creditor, employer, beneficiary) are ordinary English — map only to predicates listed in KB_SCHEMA. If the schema has no symbol for a nuance, omit it rather than approximating with a wrong predicate.
-
-Reminder: when in conflict, **case text + KB_SCHEMA win** over any pattern in this file.
+Generic disambiguation patterns:
+- Legal text often distinguishes actors, objects, acts, events, decisions, documents, periods, procedures, and relationships. Match the role order required by the schema.
+- A legal role or status in ordinary language may map to a predicate over a broader type, not to a separate type.
+- Numeric wording usually maps to a function/value assertion if the schema has a matching function.
+- Legal conclusions should usually map to derived predicates during query extraction, not to observable facts during case extraction.

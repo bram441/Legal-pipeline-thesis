@@ -1,47 +1,60 @@
-MANDATORY REPAIR — STRUCTURAL / SYMBOLIC (FO)
-You previously compiled legal rules into FO(.) code, but IDP-Z3 rejected it: **syntax / parse / shape** (not yet a satisfiability check, or the failure was structural). You MUST fix every issue in ERROR REPORT and MACHINE-DETECTED ISSUES. A partial fix is a failed repair.
+You are repairing a legacy direct-FO(.) knowledge base that failed symbolic validation or linting.
 
-Your task: Fix the errors and output corrected FO(.) code. Output format: `vocabulary V { ... }` then `theory T:V { ... }` only. No `structure` blocks.
+Your task:
+- Return corrected FO(.) code only.
+- Preserve the intended legal meaning as much as possible.
+- Fix symbol, typing, arity, and modeling problems.
+- Do not add explanations, markdown, or comments.
 
-========================
-MACHINE-DETECTED ISSUES (must address if listed)
-========================
-{machine_hints}
+MANDATORY OUTPUT:
+Return exactly:
+1. vocabulary V { ... }
+2. theory T:V { ... }
 
-========================
-ERROR REPORT (verbatim from the toolchain)
-========================
+No text before, between, or after the two blocks except FO(.) code.
+
+================================================================================
+ERROR TO FIX
+================================================================================
+
 {error_message}
 
-========================
-YOUR PREVIOUS OUTPUT (has errors)
-========================
+================================================================================
+REPAIR RULES
+================================================================================
+
+Fix all applicable symbolic problems:
+- unknown predicate/function/type;
+- wrong arity;
+- wrong argument type;
+- variable used but not quantified;
+- function used as Boolean expression;
+- predicate used as numeric term;
+- custom type compared to number;
+- undeclared constants in theory;
+- concrete case constants in reusable law theory;
+- tautological/circular rules such as P(x) => P(x);
+- conclusion predicates that cannot be derived from observable/helper conditions;
+- rules that derive only observable case inputs.
+
+If roles are confused:
+- introduce or use relational predicates with separate variables;
+- do not reuse one variable for incompatible legal roles.
+
+If numeric values or thresholds are confused:
+- use functions for raw values;
+- use comparisons or helper predicates for threshold checks;
+- avoid unsupported Boolean arithmetic.
+
+Do not invent unnecessary symbols.
+If you add a symbol to fix the theory, declare it in vocabulary and use it consistently.
+
+If validation says a symbol is used as a predicate atom but exists only as a function:
+- If the symbol represents a yes/no legal condition or legal consequence, move it to predicates with returns "Bool".
+- If the symbol truly returns a value, do not use it as {"pred": ...}; use it only as {"func": ...} inside a comparison or value term.
+
+================================================================================
+PREVIOUS FO CODE
+================================================================================
+
 {previous_output}
-
-========================
-ORIGINAL LAW TEXT (for reference)
-========================
-{law_text}
-
-========================
-SCHEMA / SYMBOL ALIGNMENT (not only parse)
-========================
-- Every symbol called in `theory T:V` must be declared in `vocabulary V` with the same name and arity.
-- Prefer a **small** vocabulary: only predicates/functions needed for the law; one clear Bool **conclusion** predicate per article where the law asks yes/no questions.
-- Multi-party rules (e.g. surviving spouse + deceased): use **distinct variables or types** (Person, Estate, …) — do not overload one unary `Person` predicate for facts that belong to different roles unless the law is explicitly unary on one actor.
-
-========================
-SYMBOLIC / SYNTAX RULES (FO(.))
-========================
-- Equivalence: use "<=>" NOT "<->" (IDP requires <=>).
-- Predicate declarations: `name: Type -> Bool` or `name: T1 * T2 -> Bool` — NOT `name(Type): Bool`.
-- Product type `*` must appear **between types** with spaces (e.g. `Person * Good -> Bool`). Never `Bool*NextPred` on one line — that is a markdown bullet merge, not FO.
-- If the error shows `*SomeName` right after `Bool` on the same line: split into TWO lines; remove the spurious `*`.
-- Quantifiers: `! x in Type:` and `? x in Type:` only — not `forall` / `exists`, not `in Type*`.
-- Theory: each formula ends with `.` ; balanced `{ }`.
-- Built-in types: `Bool`, `Int`, `Real` (capitalized).
-- No ternary in rules: no `? :`, no `*else` — use separate guarded rules.
-
-Output ONLY the corrected FO(.) code. No explanations, no markdown fences, no prose outside the two blocks.
-
-FINAL CHECK: two blocks only; theory symbols ⊆ vocabulary; no `Bool*` line merges; quantifiers are `!`/`?` with `in Type`.

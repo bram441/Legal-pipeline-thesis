@@ -56,6 +56,9 @@ def run_main_json(
     if belief_scoring:
         env["SCORE_TREAT_OPEN_WITH_BELIEF"] = "1"
         env.setdefault("SCORE_BOOLEAN_BELIEF_THRESHOLD", "0.5")
+    else:
+        env["SCORE_TREAT_OPEN_WITH_BELIEF"] = "0"
+        env.pop("SCORE_BOOLEAN_BELIEF_THRESHOLD", None)
     return subprocess.call(cmd, cwd=str(_ROOT), env=env)
 
 
@@ -66,6 +69,31 @@ def read_score(path: Path) -> dict | None:
         return json.loads(path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError):
         return None
+
+
+def summarize_query_targets(score: dict | None) -> dict:
+    """Per-question query predicate/kind and observable-on-legal-conclusion warnings."""
+    if not score:
+        return {"items": [], "observable_legal_warning_count": 0}
+    items_out = []
+    warn_count = 0
+    for it in score.get("items") or []:
+        pred = it.get("query_predicate")
+        kind = it.get("query_predicate_kind")
+        warns = it.get("warnings") or []
+        if not pred and not kind and not warns:
+            continue
+        if warns:
+            warn_count += len(warns)
+        items_out.append(
+            {
+                "id": it.get("id"),
+                "predicate": pred,
+                "predicate_kind": kind,
+                "warnings": warns,
+            }
+        )
+    return {"items": items_out, "observable_legal_warning_count": warn_count}
 
 
 def discover_json_runs(runs_dir: Path) -> list[Path]:

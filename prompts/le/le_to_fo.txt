@@ -1,105 +1,112 @@
-You are converting Logical English (LE) rules into a FO(.) knowledge base for IDP-Z3.
+You are converting Logical English into a complete FO(.) knowledge base for IDP-Z3.
 
-CRITICAL: Output MUST be valid FO(.) syntax that IDP-Z3 can parse.
-CRITICAL: Output MUST contain ONLY FO(.) code. No explanations, no markdown, no comments.
-MANDATORY: First non-whitespace character must be `vocabulary` or `theory` per the format section — no preamble text.
+Your task:
+- Output a reusable FO(.) vocabulary and theory that represent the Logical English.
+- Do not include case constants.
+- Do not answer any specific question.
+- Do not include explanations, markdown, or comments.
 
-========================
-OUTPUT FORMAT (MANDATORY)
-========================
-Return EXACTLY two blocks in this order:
+MANDATORY OUTPUT:
+The first non-whitespace token must be `vocabulary`.
+Return exactly two blocks in this order:
 
-1) vocabulary V { ... }
-2) theory T:V { ... }
+vocabulary V {
+  ...
+}
 
-Do NOT output anything before "vocabulary V {" and do NOT output anything after the final "}".
+theory T:V {
+  ...
+}
 
-========================
-FO(.) VOCABULARY RULES
-========================
+Do not output anything before `vocabulary V {`.
+Do not output anything after the final `}` of the theory block.
 
-A) Types
-- Every type MUST be declared with the keyword "type".
-  ✅ Correct:   type Person
-  ❌ Wrong:     Person
+================================================================================
+VOCABULARY RULES
+================================================================================
 
-B) Predicates
-- Predicates MUST be declared using FO(.) signature syntax with ":" and "-> Bool".
-  ✅ Correct (arity 1):  Negligent: Person -> Bool
-  ✅ Correct (arity 2):  Owns: Person * Thing -> Bool
-  ❌ Wrong:              Negligent(Person)
-  ❌ Wrong:              Negligent(Person, Thing)
-  ❌ Wrong:              Negligent(Person) -> Bool
-  ❌ Wrong:              Negligent: Person
-- Use short camelCase names for one concept each (e.g. causesIllnessOrIncapacity). Do not encode full statutory sentences as a single identifier; split ideas and combine them in rules.
+Types:
+- Every type must be declared with `type`.
+- Use reusable legal sorts only.
+- Do not create types for legal statuses that are better represented as predicates.
 
-C) Functions (only if needed)
-- Functions MUST be declared using ":" and "-> ReturnType".
-  ✅ Correct: age: Person -> Int
-  ✅ Correct: parentOf: Person -> Person
-  ❌ Wrong:   age(Person): Int
-  ❌ Wrong:   age(Person)
+Predicates:
+- Syntax:
+  predicateName: Type -> Bool
+  predicateName: TypeA * TypeB -> Bool
+- Use predicates for Boolean factual conditions, helper conditions, and derived legal conclusions.
+- Use clear compact names.
+- Do not use full sentences as names.
+- Do not merge declarations on one line with `*`.
 
-D) Naming
-- Preserve names EXACTLY as you choose them: case-sensitive and consistent.
-- Use simple ASCII identifiers (letters/digits/underscore). No spaces, hyphens, or punctuation in names.
+Functions:
+- Syntax:
+  functionName: Type -> Int
+  functionName: TypeA * TypeB -> Real
+- Use functions for numeric values, dates, durations, amounts, counts, percentages, categories, and mappings.
+- Use Int for whole numbers and counts.
+- Use Real for decimal quantities, money, percentages, or ratios unless the law clearly treats them as whole numbers.
 
-E) Minimality
-- Declare ONLY symbols that are necessary to express the LE rules.
-- Do not add predicates or functions that do not appear in the LE text.
+Role modeling:
+- Use relational predicates/functions when the law links multiple actors, objects, events, decisions, periods, or roles.
+- Do not use the same variable for different legal roles unless the LE explicitly says they are the same.
 
-F) REQUIRED: One conclusion predicate per article (mutually exclusive, NO CIRCULARITY)
-- For EACH article that the LE text says "liable under Article N", declare exactly one Bool predicate in the vocabulary and define it in the theory with <=>.
-- Name it after the article: e.g. punishedArt398, punishedArt399, punishedArt400, punishedArt401 (or liableArt398, etc.). Use consistent naming.
-- Define each as: predicateName(x) <=> condition_formula(x). Use ONLY condition/primitive predicates in the formula (e.g. IntentionallyInflictsWoundsOrBlows, CausesIllnessOrIncapacity).
-- NO CIRCULARITY (CRITICAL): Do NOT use any other article predicate (punishedArt398, liableArt399, etc.) in the definition of an article predicate. Wrong: liableArt398(x) <=> ... & ~liableArt399(x). Right: liableArt398(x) <=> IntentionallyInflictsWoundsOrBlows(x) & ~CausesIllnessOrIncapacity(x) & ~CausesSevereHarm(x) & ~CausesDeath(x). Mutual exclusivity is achieved by the conditions alone.
-- Do NOT output only implications (=>) without a named conclusion predicate per article.
+Conclusion modeling:
+- Declare clear queryable predicates/functions for final legal statuses, rights, obligations, permissions, prohibitions, sanctions, validity results, exceptions, exclusions, entitlements, and legal effects.
+- Do not leave final legal results unnamed.
 
-G) Quantitative consequences
-- When the LE text states minimum/maximum imprisonment or fines, add functions (e.g. imprisonmentMinDays, imprisonmentMaxDays, fineMinEuros, fineMaxEuros) and assign values in the theory with separate rules per case: f(x) = N <=> condition(x).
-- Use a SINGLE unit per quantity type: imprisonmentMinDays and imprisonmentMaxDays for all imprisonment (values in days); fineMinEuros and fineMaxEuros for fines (values in euros).
+================================================================================
+THEORY RULES
+================================================================================
 
-H) Belgian company law — micro / small enterprise thresholds (when LE mentions size criteria)
-If the LE text compares employee counts, net turnover, or balance-sheet totals to legal limits, declare these in vocabulary as nullary Int functions (exact spelling) and use them in the theory only as function calls, never as bare names or Bool predicates:
+Allowed syntax:
+- Quantifiers: `! x in Type:` and `? x in Type:`
+- Connectives: `&`, `|`, `~`, `=>`, `<=>`
+- Every top-level formula ends with `.`
 
-  threshold_employees_micro: () -> Int
-  threshold_employees_small: () -> Int
-  threshold_net_turnover_micro: () -> Int
-  threshold_net_turnover_small: () -> Int
-  threshold_total_assets_micro: () -> Int
-  threshold_total_assets_small: () -> Int
+Do not use:
+- forall / exists keywords
+- Prolog syntax `:-`
+- programming if/else
+- `*else`
+- ternary operators
+- local `let` binders
+- comments
+- markdown
+- natural-language prose inside the FO output
 
-Example theory use: annual_average_employees(c) =< threshold_employees_small()  (or separate rules assigning numeric values from the law text).
+Variables:
+- Every variable in the theory must be quantified.
+- Every variable must have the correct type in every predicate/function call.
+- No concrete case constants are allowed in the theory.
 
-========================
-FO(.) THEORY RULES
-========================
-- Use ONLY these connectives:  &  |  ~  =>  <=>  (no <->, :=, *else, ?:, or programming-style conditionals).
-- NO ternary/conditional: Do NOT use "if-then-else", "*else", "? :", "case of", or similar. For functions with multiple possible values, write SEPARATE rules:  f(x) = v1 <=> cond1(x).  and  f(x) = v2 <=> cond2(x).  Each rule stands alone.
-- Use FO(.) quantifiers:  !  ?  and "in" for typing.
-  ✅ Correct: ! p in Person: ...
-  ✅ Correct: ? p in Person: ...
-- DO NOT use Prolog/Datalog syntax (no ":-", no "<->").
-- Every top-level formula in the theory MUST end with a period .
-- DO NOT use "forall", "exists" keywords.
-- Put a ":" after the quantifier header line, then the formula on the next line(s).
-- Function assignment: Use  f(x) = N <=> condition(x).  for each case. Never  f(x) = (condition ? a : b).
+Definitions and implications:
+- Use `=>` for ordinary legal consequences.
+- Use `<=>` only for true definitions/equivalences from the LE.
+- Avoid circular rules where a conclusion depends only on itself.
+- Avoid tautological rules such as P(x) => P(x).
 
-========================
-QUALITY & PARSING SAFETY
-========================
-- NO inline numeric comparisons in logical formulas: Do NOT use f(x) > N or f(x) >= N inside &, |, =>, <=>. IDP requires Bool there. Define a Bool predicate (e.g. exceedsThreshold: Type -> Bool) and add  exceedsThreshold(x) <=> f(x) > N.  as a separate rule.
-- NO programming constructs: No *else, ?:, if-then-else, case/when. Use multiple rules with <=> for each branch.
-- Ensure braces are balanced.
-- Ensure every predicate in the theory is declared in the vocabulary.
-- Ensure every type used in signatures is declared with "type".
-- Do NOT use constants in the theory (no "alice" inside theory). Quantify variables instead.
-- Conclusion predicates per article must be defined using only condition predicates—never reference another article predicate in the body (NO CIRCULARITY).
+Thresholds and combinations:
+- Use numeric functions for raw measurable values.
+- Use comparisons or helper predicates for threshold checks.
+- For “at least two of A, B, C”, express pairwise combinations: (A & B) | (A & C) | (B & C).
+- Do not count Boolean conditions using unsupported arithmetic.
 
-========================
-TASK
-========================
-Translate the Logical English below into FO(.) using the exact output format and rules above. Preserve all rules, conditions, and numeric consequences from the LE text. Use consistent identifiers (e.g. Person or Offender, IntentionallyInflictsWoundsOrBlows, CausesIllnessOrIncapacity, punishedArt398, punishedArt399, imprisonmentMinDays, imprisonmentMaxDays, fineMinEuros, fineMaxEuros).
+================================================================================
+SELF-CHECK
+================================================================================
 
-LOGICAL ENGLISH:
+Before returning, verify:
+1. Output contains only vocabulary V and theory T:V.
+2. Every type used is declared.
+3. Every predicate/function used in theory is declared with the same arity.
+4. Every variable is quantified.
+5. No case constants appear in the theory.
+6. No markdown, prose, comments, or extra blocks appear.
+7. No circular/tautological rules appear.
+
+================================================================================
+LOGICAL ENGLISH
+================================================================================
+
 {le_text}

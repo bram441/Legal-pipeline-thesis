@@ -4,6 +4,12 @@ import os
 import re
 
 from pipeline.eval.boolean_belief import summarize_boolean_symbolic
+from pipeline.semantic.legal_question import question_asks_legal_conclusion
+
+
+def belief_scoring_enabled() -> bool:
+    """True only when open-world belief scoring is explicitly requested (e.g. eval --belief-scoring)."""
+    return (os.getenv("SCORE_TREAT_OPEN_WITH_BELIEF") or "").strip().lower() in ("1", "true", "yes")
 
 
 def _normalize_range_for_compare(range_str, entity=None):
@@ -13,11 +19,9 @@ def _normalize_range_for_compare(range_str, entity=None):
     s = str(range_str).strip()
     if not s or "no model" in s.lower() or "unsatisfiable" in s.lower() or "not found" in s.lower():
         return None
-    # Single number
     m = re.search(r"^(-?\d+)", s)
     if m:
         return m.group(1)
-    # Mapping like {'pieter' -> 8} or 'pieter' -> 8
     if entity:
         entity_clean = str(entity).strip().lower().replace("'", "")
         for pattern in [
@@ -30,28 +34,95 @@ def _normalize_range_for_compare(range_str, entity=None):
     return None
 
 
-def score_question(expected, symbolic_result):
+def _belief_threshold_from_env_or_expected(expected: dict) -> float | None:
+    if not belief_scoring_enabled():
+        return None
+    thr_raw = expected.get("belief_match_threshold")
+    if thr_raw is None:
+        thr_raw = (os.getenv("SCORE_BOOLEAN_BELIEF_THRESHOLD") or "").strip()
+    if thr_raw in (None, ""):
+        return 0.5
+    try:
+        return max(0.0, min(1.0, float(thr_raw)))
+    except (TypeError, ValueError):
+        return None
+
+
+def _inconclusive_warning(exp_val: bool, label: str) -> str | None:
+    if exp_val is True and label == "unknown":
+        return (
+            "Expected true, but symbolic result is only possible, not certain. "
+            "This is an underconstrained or missing-fact result and is counted as inconclusive, not correct."
+        )
+    if exp_val is False and label == "unknown":
+        return (
+            "Expected false, but symbolic result is not decisively false. "
+            "Unknown/open results are counted as inconclusive, not correct."
+        )
+    return None
+
+
+def _predicate_kind_from_schema(kb_schema: dict | None, pred_name: str) -> str | None:
+    if not kb_schema or not pred_name:
+        return None
+    for p in kb_schema.get("predicates") or []:
+        if isinstance(p, dict) and p.get("name") == pred_name:
+            return str(p.get("kind") or "unknown").strip().lower()
+    return None
+
+
+def _query_target_warnings(
+    expected: dict,
+    query: dict | None,
+    kb_schema: dict | None,
+    user_question: str | None,
+) -> list[str]:
+    warnings: list[str] = []
+    if not query or not isinstance(expected, dict):
+        return warnings
+    if expected.get("mode") != "boolean":
+        return warnings
+    pred = str(query.get("predicate") or "").strip()
+    if not pred:
+        return warnings
+    pk = query.get("predicate_kind") or _predicate_kind_from_schema(kb_schema, pred)
+    if pk != "observable":
+        return warnings
+    if not question_asks_legal_conclusion(user_question or ""):
+        return warnings
+    warnings.append(
+        "Expected legal Boolean answer was evaluated using observable predicate '"
+        + pred
+        + "'. This may be a query-target error because observable predicates are case facts, not legal conclusions."
+    )
+    return warnings
+
+
+def _finalize_boolean_score(
+    out: dict,
+    expected: dict,
+    query: dict | None,
+    kb_schema: dict | None,
+    user_question: str | None,
+) -> dict:
+    if query:
+        pred = str(query.get("predicate") or "")
+        out["query_predicate"] = pred or None
+        out["query_predicate_kind"] = query.get("predicate_kind") or _predicate_kind_from_schema(kb_schema, pred)
+    warns = _query_target_warnings(expected, query, kb_schema, user_question)
+    if warns:
+        out["warnings"] = warns
+    return out
+
+
+def score_question(expected, symbolic_result, *, query=None, kb_schema=None, user_question=None):
     """
     Compares an expected answer object against the pipeline symbolic_result.
 
-    Supported expected schemas:
+    Boolean mode (default): decisive entailment/contradiction only.
+    Open/unknown (possible but not certain) is inconclusive and not correct.
 
-    A) Predicate question
-      {
-        "predicate": "liable",  # or any predicate; used for documentation
-        "mode": "set" | "boolean",
-        "value": ["alice"] | true,   # gold answer
-        "target": "alice"            # optional for boolean
-      }
-
-    B) Intent task
-      {
-        "intent": "satisfiable",
-        "value": true | false
-      }
-
-    symbolic_result is the dict from run_query (e.g. deduction returns
-    {certain, possible}; deduction_set returns {certain, possible} as lists).
+  Belief scoring: only when SCORE_TREAT_OPEN_WITH_BELIEF=1 (set by eval --belief-scoring).
     """
     if expected is None:
         return {"match": None, "reason": "no expected provided"}
@@ -72,7 +143,6 @@ def score_question(expected, symbolic_result):
             got_raw = pred.get("range")
             got_val = _normalize_range_for_compare(got_raw, pred.get("entity"))
             exp_norm = str(exp_val).strip() if exp_val is not None else None
-            # Allow small numeric tolerance (e.g. 180 vs 182 days) - default ±5
             tolerance = int(expected.get("tolerance_days", 5))
             try:
                 exp_int = int(exp_norm) if exp_norm is not None else None
@@ -87,7 +157,6 @@ def score_question(expected, symbolic_result):
             return {"match": match, "expected": exp_val, "got": got_val, "raw_range": got_raw}
         return {"match": False, "reason": "unsupported intent: " + str(intent)}
 
-    predicate = expected.get("predicate")
     mode = expected.get("mode")
 
     if mode == "set":
@@ -104,6 +173,8 @@ def score_question(expected, symbolic_result):
         if target and pred.get("target") and str(target).lower() != str(pred.get("target")).lower():
             return {
                 "match": False,
+                "decisive": True,
+                "inconclusive": False,
                 "reason": "target mismatch",
                 "expected_target": target,
                 "got_target": pred.get("target"),
@@ -112,73 +183,67 @@ def score_question(expected, symbolic_result):
         summ = summarize_boolean_symbolic(pred)
         p_yes = float(summ["p_yes"])
         label = summ["label"]
+        belief_threshold = _belief_threshold_from_env_or_expected(expected)
+        use_belief = belief_threshold is not None
 
-        thr_raw = expected.get("belief_match_threshold")
-        if thr_raw is None:
-            thr_raw = (os.getenv("SCORE_BOOLEAN_BELIEF_THRESHOLD") or "").strip()
-        belief_threshold = None
-        if thr_raw not in (None, ""):
-            try:
-                belief_threshold = max(0.0, min(1.0, float(thr_raw)))
-            except ValueError:
-                belief_threshold = None
-        if belief_threshold is None and (os.getenv("SCORE_TREAT_OPEN_WITH_BELIEF") or "").strip().lower() in (
-            "1",
-            "true",
-            "yes",
-        ):
-            thr2 = (os.getenv("SCORE_BOOLEAN_BELIEF_THRESHOLD") or "0.5").strip()
-            try:
-                belief_threshold = max(0.0, min(1.0, float(thr2)))
-            except ValueError:
-                belief_threshold = None
-
-        # Classical decisive answers
-        if label == "entailed":
-            got = True
-            match = exp_val is True
-            return {
-                "match": match,
-                "expected": exp_val,
-                "got": got,
-                "belief_yes": p_yes,
-                "credence_yes_pct": summ["credence_yes_pct"],
-                "verdict_strength_pct": summ["verdict_strength_pct"],
-                "epistemic_label": label,
-            }
-        if label == "contradicted":
-            got = False
-            match = exp_val is False
-            return {
-                "match": match,
-                "expected": exp_val,
-                "got": got,
-                "belief_yes": p_yes,
-                "credence_yes_pct": summ["credence_yes_pct"],
-                "verdict_strength_pct": summ["verdict_strength_pct"],
-                "epistemic_label": label,
-            }
-
-        # Open / unknown: do not map to got=False. Optionally score with a belief threshold.
-        out = {
-            "match": None,
+        base = {
             "expected": exp_val,
-            "got": None,
             "belief_yes": p_yes,
             "credence_yes_pct": summ["credence_yes_pct"],
             "verdict_strength_pct": summ["verdict_strength_pct"],
             "epistemic_label": label,
+            "scoring_mode": "belief" if use_belief else "decisive",
+        }
+
+        if label == "entailed":
+            got = True
+            match = exp_val is True
+            return _finalize_boolean_score(
+                {**base, "match": match, "got": got, "decisive": True, "inconclusive": False},
+                expected,
+                query,
+                kb_schema,
+                user_question,
+            )
+
+        if label == "contradicted":
+            got = False
+            match = exp_val is False
+            return _finalize_boolean_score(
+                {**base, "match": match, "got": got, "decisive": True, "inconclusive": False},
+                expected,
+                query,
+                kb_schema,
+                user_question,
+            )
+
+        out = {
+            **base,
+            "match": False,
+            "got": None,
+            "decisive": False,
+            "inconclusive": True,
             "reason": "open: neither entailed nor contradicted",
         }
-        if belief_threshold is not None:
+        warn = _inconclusive_warning(exp_val, label)
+        if warn:
+            out["warning"] = warn
+
+        if use_belief:
             if exp_val is True:
-                out["match"] = p_yes >= belief_threshold
+                belief_match = p_yes >= belief_threshold
+                out["match"] = belief_match
                 out["got"] = p_yes >= 0.5
             else:
-                out["match"] = (1.0 - p_yes) >= belief_threshold
+                belief_match = (1.0 - p_yes) >= belief_threshold
+                out["match"] = belief_match
                 out["got"] = p_yes < 0.5
             out["belief_match_threshold"] = belief_threshold
+            out["belief_scored"] = True
             out.pop("reason", None)
-        return out
+            out["decisive"] = False
+            out["inconclusive"] = not belief_match
+
+        return _finalize_boolean_score(out, expected, query, kb_schema, user_question)
 
     return {"match": False, "reason": "unsupported mode: " + str(mode)}

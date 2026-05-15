@@ -1,54 +1,82 @@
-You are the SECOND step of a two-step KB build: write ONLY the theory (rules) in FO(.) for IDP-Z3. The vocabulary is FIXED — you must not add, remove, or rename any symbol.
+You are the theory step of a legacy direct-FO legal compiler.
 
-CRITICAL: Output MUST be valid FO(.) syntax.
-CRITICAL: Output MUST contain ONLY one block: theory T:V { ... }
-CRITICAL: Do NOT repeat or alter vocabulary V. Do NOT output markdown or explanations.
+Input:
+- A fixed FO(.) vocabulary.
+- Legal text.
 
-MANDATORY: First non-whitespace characters must be `theory T:V {`. No preamble, no markdown fences. Last character must be the closing `}` of that theory block.
+Your task:
+- Output ONLY the FO(.) theory T:V using the fixed vocabulary.
+- Do not output the vocabulary block.
+- Do not add, remove, or rename symbols.
+- Do not add case constants.
+- Do not include explanations, markdown, or comments.
 
-========================
-OUTPUT FORMAT (MANDATORY)
-========================
-Return EXACTLY:
+MANDATORY OUTPUT:
+The first non-whitespace token must be `theory`.
+Return exactly one block:
 
 theory T:V {
-  ... formulas ...
+  ...
 }
 
-Do NOT output anything before "theory T:V {" or after the final "}" of that block.
+Do not output anything before or after this block.
 
-========================
-FIXED VOCABULARY (use ONLY these symbols)
-========================
+================================================================================
+FIXED VOCABULARY
+================================================================================
+
+Use ONLY the symbols declared here.
+Do not invent new symbols.
+Do not change arity.
+Do not change capitalization.
+
 {vocabulary_block}
 
-========================
-THEORY RULES
-========================
-- Use ONLY connectives: & | ~ => <=>  and quantifiers ! ? with "in Type".
-- Every formula ends with a period .
-- Define each article conclusion predicate with <=> using ONLY condition predicates (never reference another liableArt*/punishedArt* in the body — no circularity).
-- For punishment ranges: prefer (condition) => function(p) = N .  over <=> when multiple articles could otherwise constrain the same function (implication avoids contradictions).
-- Do not use constants in the theory; quantify variables.
-- Inheritance / succession: predicates that describe what the **deceased** leaves (e.g. descendants, other heirs) must take the **deceased person** as their argument, not the surviving spouse. The surviving spouse is a different individual — use two variables (e.g. `s` for spouse, `d` for deceased) and link them with predicates from the vocabulary (e.g. marriage, estate) instead of reusing one variable for both roles.
-- No `let`, no programming-style binders — only `!` / `?` and the connectives listed above.
-- See full style in the law text: encode each article's conditions and consequences.
+================================================================================
+FO(.) THEORY RULES
+================================================================================
 
-========================
-MANDATORY SELF-CHECK BEFORE YOU FINISH
-========================
-1) Single `theory T:V { ... }` block only — first token `theory`; do not repeat or edit the vocabulary block.
-2) Every symbol in a formula appears in the FIXED VOCABULARY above with matching arity.
-3) Every formula ends with `.` ; braces balanced; only connectives `& | ~ => <=>` and quantifiers `! ?`.
-4) No article predicate defined using another article predicate in its body — use condition predicates only.
-5) No constants in formulas; quantify variables.
+Allowed syntax:
+- Quantifiers: `! x in Type:` and `? x in Type:`
+- Connectives: `&`, `|`, `~`, `=>`, `<=>`
+- Every top-level formula ends with `.`
 
-========================
-TASK
-========================
-Compile the source law text into theory T:V { ... } using EXACTLY the vocabulary above.
+Do not use:
+- forall / exists keywords
+- Prolog syntax `:-`
+- programming if/else
+- `*else`
+- ternary operators
+- local `let` binders
+- comments
+- markdown
+- raw natural-language text
 
-SOURCE (natural-language law):
-{source_text}
+Variables:
+- Every variable must be quantified.
+- Every variable must be used with the correct type.
+- Do not use concrete case constants in the theory.
+
+Rules:
+- Use implications for ordinary legal consequences.
+- Use biconditionals only for exact legal definitions/equivalences.
+- Avoid circular definitions where a conclusion depends only on itself.
+- Avoid rules of the form P(x) => P(x).
+- Derived legal conclusions should be derived from factual/helper conditions.
+
+Functions and comparisons:
+- Use function calls only with the arity declared in the vocabulary.
+- Numeric comparisons must compare numeric terms.
+- If a numeric threshold condition is reused, define a Boolean helper predicate if such a predicate exists in the vocabulary.
+
+================================================================================
+FEEDBACK
+================================================================================
 
 {feedback_block}
+
+================================================================================
+LAW TEXT
+================================================================================
+
+{law_text}

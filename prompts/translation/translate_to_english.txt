@@ -1,6 +1,28 @@
-Translate the following text to English. Preserve the meaning and structure exactly.
+Translate the following legal or factual text to English.
 
-MANDATORY: Output ONLY the English translation of TEXT. No title, no quotes around the translation, no preamble (e.g. "Here is the translation"), no notes, no markdown, no language tags.
+Preserve:
+- legal meaning;
+- article numbers and references;
+- enumeration structure;
+- conditions and exceptions;
+- negation;
+- dates, amounts, thresholds, units, and percentages;
+- names and identifiers.
+
+Do not simplify legal meaning.
+Do not add explanations.
+Do not interpret beyond translation.
+Do not normalize facts into conclusions.
+Do not omit uncertainty or qualifications.
+
+MANDATORY OUTPUT:
+Output ONLY the English translation of TEXT.
+No title.
+No quotes around the translation.
+No preamble.
+No notes.
+No markdown.
+No language tags.
 
 TEXT:
 {text}

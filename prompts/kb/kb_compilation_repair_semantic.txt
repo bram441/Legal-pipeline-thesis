@@ -1,44 +1,51 @@
-MANDATORY REPAIR — SEMANTIC / UNSAT
-You previously compiled legal rules into FO(.) code; it **parses**, but the theory failed **semantic validation** (unsatisfiable, contradictory rules, or IDP reported no model / internal semantic error). You MUST address every point in SEMANTIC / UNSAT REPORT and in MACHINE-DETECTED ISSUES. A partial fix is a failed repair.
+You are repairing a legacy direct-FO(.) knowledge base that is syntactically valid but semantically invalid, inconsistent, empty, circular, or legally useless.
 
-Your task: Fix the **rules** so the theory has at least one model while still matching the law. Output ONLY: `vocabulary V { ... }` then `theory T:V { ... }`. No markdown, no explanations.
+Your task:
+- Return corrected FO(.) code only.
+- Preserve the intended legal meaning as much as possible.
+- Fix semantic/modeling problems.
+- Do not add explanations, markdown, or comments.
 
-========================
-MACHINE-DETECTED ISSUES (must address if listed)
-========================
-{machine_hints}
+MANDATORY OUTPUT:
+Return exactly:
+1. vocabulary V { ... }
+2. theory T:V { ... }
 
-========================
-SEMANTIC / UNSAT REPORT (verbatim)
-========================
+No text before, between, or after the two blocks except FO(.) code.
+
+================================================================================
+SEMANTIC ERROR OR WARNING TO FIX
+================================================================================
+
 {error_message}
 
-========================
-YOUR PREVIOUS OUTPUT (theory has issues)
-========================
+================================================================================
+REPAIR RULES
+================================================================================
+
+Fix all applicable semantic problems:
+- unsatisfiable theory caused by contradictory rules;
+- impossible type/role modeling;
+- derived-only KB with no observable inputs;
+- rules that derive conclusions only from themselves;
+- tautological rules such as P(x) => P(x);
+- legal conclusions with no path from observable facts;
+- exceptions modeled as contradictions instead of conditions blocking a result;
+- thresholds modeled without raw measurable values;
+- multi-role legal relations collapsed into one unary subject;
+- rules that encode a case-specific answer rather than reusable law.
+
+Prefer this structure:
+- observable predicates/functions for case inputs;
+- helper predicates for intermediate legal conditions;
+- derived predicates/functions for legal conclusions.
+
+Do not use concrete case constants in theory.
+Do not add arbitrary facts to force satisfiability.
+Do not remove important legal conclusions unless they are unsupported by the law text.
+
+================================================================================
+PREVIOUS FO CODE
+================================================================================
+
 {previous_output}
-
-========================
-ORIGINAL LAW TEXT (for reference)
-========================
-{law_text}
-
-========================
-SCHEMA ALIGNMENT (read even if the theory parses)
-========================
-- If conclusions mix roles (e.g. `deceasedLeavesDescendants` on the deceased but the usufruct rule quantifies only the spouse), the KB will answer wrong: relate parties with extra predicates or extra arguments.
-- Prefer **binary** relations (`marriedTo`, `estateOf`, `subjectToRemovalProcedure`) over overloaded unary `Person` predicates when the law involves two actors.
-- Keep the vocabulary **small** and query-friendly: avoid long synonym families; one main conclusion predicate per article/sub-article when possible.
-
-========================
-HOW TO FIX SEMANTICS
-========================
-- Make overlapping conclusions **mutually exclusive** where needed (e.g. `f(x)=30 <=> cond(x).` and `f(x)=8 <=> ~cond(x).` with exhaustive `cond`).
-- Avoid **circular** article predicates: never define `liableArt398` using `liableArt399` in the body — use only condition predicates.
-- **Inheritance / succession:** predicates about what the **deceased** leaves (descendants, other heirs, etc.) must apply to the **deceased** in the rule, not the same variable as the surviving spouse unless the vocabulary explicitly models it that way. Prefer two variables and linking facts.
-- Prefer `=>` over `<=>` for numeric function rules if multiple rules could otherwise contradict.
-- Rewrite constraints rather than deleting the law; shrink scope of rules if needed.
-
-FINAL CHECK: merged KB should admit a model; article predicates still use only condition predicates in bodies; multi-party roles disjoint.
-
-Output ONLY the corrected FO(.) code.

@@ -108,6 +108,31 @@ def build_json_ir_compile_hints(error_message: str) -> str:
     el = em.lower()
     out: list[str] = []
 
+    if "json_ir_schema_design_error" in el:
+        if "observable predicate" in el and ("consequent" in el or "then" in el):
+            out.append(
+                "The rule consequent uses an observable predicate. Observables are case-input facts — move them to "
+                "`if`, or add/use a derived predicate for the legal consequence and repair the symbol table if needed."
+            )
+        if "no derived legal outputs" in el:
+            out.append(
+                "Add derived predicates/functions for legal statuses, rights, obligations, permissions, prohibitions, "
+                "sanctions, validity results, entitlements, exclusions, exceptions, or legal effects described by the law."
+            )
+        if "no observable case-input" in el:
+            out.append(
+                "Add observable predicates/functions that case extraction can populate from factual case descriptions."
+            )
+        if "boolean predicate atom" in el or "bool predicate atom" in el:
+            out.append(
+                "A function was used as a Boolean atom. If yes/no, declare a predicate with returns Bool; "
+                "if numeric, use the function only inside compare/terms."
+            )
+    if "json_ir_rule_design_error" in el and "circular" in el:
+        out.append(
+            "Break circular derived-only rules by adding observable/helper conditions in `if`, or repair the symbol table."
+        )
+
     if "unsupported expression object" in el:
         out.append(
             "In `if` / `then` / nested `and`/`or`, each expression object must be ONLY one of: "
@@ -128,8 +153,8 @@ def build_json_ir_compile_hints(error_message: str) -> str:
         )
     if "expects type" in el and "got" in el:
         out.append(
-            "Predicate/function argument sorts must match SYMBOL_TABLE exactly. "
-            "Use variables of the declared arg type (or rewrite as a string rule if the model needs a looser FO encoding)."
+            "Predicate/function argument sorts must match SYMBOL_TABLE exactly. JSON_IR has no subtyping: "
+            "use the broader declared type for variables and represent roles with predicates, or repair the symbol signature."
         )
     if "unsupported term" in el or ("term object" in el and "func" in el):
         out.append(

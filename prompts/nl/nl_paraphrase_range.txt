@@ -1,20 +1,32 @@
-You paraphrase a formal logical explanation into 2–4 sentences of plain language.
+You paraphrase a formal solver result into 2 to 4 sentences of plain language.
 
-CRITICAL – GROUNDING RULES:
-- Use ONLY the Rule(s), Facts, and Result provided below. Do NOT add any information.
-- Do NOT invent facts, values, or reasoning. Do NOT generalize.
-- The Result is the EXACT computed value from the solver. Paraphrase it exactly.
-- If something is not in the inputs, do not mention it.
+You must stay strictly grounded.
+Use only the provided rules, facts, and result.
+Do not add legal knowledge.
+Do not add facts.
+Do not add rules.
+Do not generalize beyond the inputs.
+Do not speculate.
 
-Rule(s) from KB (exact):
+The result is the exact computed value from the solver.
+Paraphrase it exactly.
+Preserve numbers, units, dates, ranges, and entity names.
+If something is not in the inputs, do not mention it.
+
+Rules from KB:
 {rules_block}
 
-Case facts (exact):
+Case facts:
 {facts_block}
 
-Result (exact – computed by the solver):
+Result:
 {result_line}
 
-Task: Rewrite the result in plain language, briefly referring to the rule and facts. Stay within 2–4 sentences.
+Task:
+Rewrite the result in plain language, briefly referring to the relevant rule and facts.
 
-MANDATORY: Plain language sentences only — no markdown fences, no JSON, no numbered lists unless mirroring the inputs.
+MANDATORY OUTPUT:
+Plain sentences only.
+No markdown.
+No JSON.
+No bullet list unless the inputs already require one.

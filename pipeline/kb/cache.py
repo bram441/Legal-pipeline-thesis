@@ -605,7 +605,16 @@ def _use_le_enabled():
         return False
 
 
-def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.log", max_repair_attempts=8, cache_subdir=None):
+def get_or_compile_kb(
+    run_dir,
+    law_text,
+    model=None,
+    log_filename="kb_compile.log",
+    max_repair_attempts=8,
+    cache_subdir=None,
+    question_text=None,
+    case_text=None,
+):
     """Compile or load KB. When cache_subdir is set (e.g. 'translated'), use run_dir/cache_subdir/ for cache.
     When PIPELINE_USE_LE=1, appends 'le' to cache path so LE and non-LE KBs are cached separately.
     When PIPELINE_TRACE=1, writes all steps to run_dir/run_trace.txt for debugging.
@@ -657,9 +666,9 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
                     f.write(kb_text.strip() + "\n")
             kb_text = _validate_kb_fo_text(kb_text)
             try:
-                from pipeline.kb.kb_lint import lint_kb_fo_text_or_patch_company_thresholds
+                from pipeline.kb.kb_lint import lint_kb_fo_text
 
-                kb_text = lint_kb_fo_text_or_patch_company_thresholds(kb_text)
+                lint_kb_fo_text(kb_text)
                 with open(kb_path, "w", encoding="utf-8") as f:
                     f.write(kb_text.strip() + "\n")
             except Exception as lint_exc:
@@ -711,7 +720,19 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
             status_log("KB", "Repair attempt {}".format(attempt))
 
         try:
-            raw_kb_text, ir_kb_schema = compile_law_to_kb_fo(law_text, model=model, repair_feedback=repair_feedback)
+            json_ir_artifacts = (
+                os.path.join(base_run_dir, "json_ir_compile")
+                if kb_backend == "json_ir"
+                else None
+            )
+            raw_kb_text, ir_kb_schema = compile_law_to_kb_fo(
+                law_text,
+                model=model,
+                repair_feedback=repair_feedback,
+                question_text=question_text,
+                case_text=case_text,
+                artifact_dir=json_ir_artifacts,
+            )
         except LawCompilationError as e:
             msg = str(e)
             kb_b = get_kb_backend_from_env()
@@ -758,9 +779,9 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
             if trace:
                 trace.log("After sanitization", kb_text[:2000] + ("..." if len(kb_text) > 2000 else ""))
             try:
-                from pipeline.kb.kb_lint import lint_kb_fo_text_or_patch_company_thresholds
+                from pipeline.kb.kb_lint import lint_kb_fo_text
 
-                kb_text = lint_kb_fo_text_or_patch_company_thresholds(kb_text)
+                lint_kb_fo_text(kb_text)
             except Exception as lint_exc:
                 raise KBCacheError("KB lint: " + str(lint_exc)) from lint_exc
             kb_text = _validate_kb_fo_text(kb_text)
