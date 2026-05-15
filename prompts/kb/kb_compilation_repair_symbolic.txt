@@ -1,4 +1,5 @@
-You previously compiled legal rules into FO(.) code, but IDP-Z3 rejected it: **syntax / parse / shape** (not yet a satisfiability check, or the failure was structural).
+MANDATORY REPAIR — STRUCTURAL / SYMBOLIC (FO)
+You previously compiled legal rules into FO(.) code, but IDP-Z3 rejected it: **syntax / parse / shape** (not yet a satisfiability check, or the failure was structural). You MUST fix every issue in ERROR REPORT and MACHINE-DETECTED ISSUES. A partial fix is a failed repair.
 
 Your task: Fix the errors and output corrected FO(.) code. Output format: `vocabulary V { ... }` then `theory T:V { ... }` only. No `structure` blocks.
 
@@ -42,3 +43,5 @@ SYMBOLIC / SYNTAX RULES (FO(.))
 - No ternary in rules: no `? :`, no `*else` — use separate guarded rules.
 
 Output ONLY the corrected FO(.) code. No explanations, no markdown fences, no prose outside the two blocks.
+
+FINAL CHECK: two blocks only; theory symbols ⊆ vocabulary; no `Bool*` line merges; quantifiers are `!`/`?` with `in Type`.

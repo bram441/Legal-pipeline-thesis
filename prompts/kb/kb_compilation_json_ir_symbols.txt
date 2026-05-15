@@ -1,8 +1,23 @@
 You are Step 1 of a two-step legal compiler: vocabulary (types + predicates + functions) only.
 
-Return ONLY one JSON object. No markdown. No prose before or after the JSON. First character `{`, last character `}`.
+MANDATORY OUTPUT — NO EXCEPTIONS
+Return ONLY one JSON object. No markdown, no prose before or after. First character MUST be `{`, last character MUST be `}`. No keys other than those required for this step (see contract §6).
 
 {json_ir_contract}
+
+================================================================================
+ROUND CONTEXT (may be empty on the first attempt — if a section is empty, ignore it)
+================================================================================
+ERROR from toolchain (empty on first attempt):
+{error_message}
+
+PREVIOUS JSON OR RAW MODEL TEXT (empty on first attempt):
+{previous_output}
+
+DETERMINISTIC_HINTS (may be empty):
+{machine_hints}
+
+If ERROR is non-empty, you are fixing a failed attempt: eliminate every issue in ERROR; do not repeat the same invalid structure.
 
 Illustrative shape (placeholder names only — choose names and sorts that fit the LAW TEXT, not these literals unless they truly apply):
 {
@@ -27,6 +42,7 @@ Naming (predicates, functions, types):
 Modeling rules:
 - Prefer n-ary predicates over vague unary shortcuts when several individuals or objects are legally linked.
 - When the law compares a numeric or scalar value to a bound (tax, sentencing, eligibility, deadlines, damages, etc.), expose the raw value as a function (or inputs) and express the threshold with `compare` in rules plus Bool helpers if needed — same pattern for any domain, not only company law.
+- MANDATORY — thresholds used in rules: every legal limit referenced in comparisons (employee counts, turnover caps, asset ceilings, day limits, etc.) MUST be declared in `functions` with returns Int or Real (e.g. `threshold_employees_small`, `threshold_net_turnover_small`). Rules may call them as `{"func":"threshold_employees_small","args":[]}` or with entity args per signature — never as undeclared bare identifiers that only appear in the theory.
 - For legal definitions, include explicit derived or conclusion predicates; do not treat final legal conclusions as observable case-input predicates.
 - Do not model a legal status as its own sort when it is really a property of an existing individual; use a predicate instead (e.g. prefer Is_status(Person)->Bool with kind derived, not a separate type "StatusX").
 
@@ -34,11 +50,7 @@ This step must NOT include a "rules" key. Output keys are exactly: types, predic
 
 Before returning JSON, apply §7 self-check in the contract (types vs predicate/function args, Bool returns on predicates, identifier rules).
 
-Previous compilation error (may be empty):
-{error_message}
-
-Previous output (may be empty):
-{previous_output}
+{company_law_thresholds_addon}
 
 LAW TEXT:
 {law_text}

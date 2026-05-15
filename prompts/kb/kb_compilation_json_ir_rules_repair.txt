@@ -1,12 +1,16 @@
-You are Step 2 REPAIR of a two-step legal compiler: fix the rules JSON only, over the frozen symbol table from Step 1.
+MANDATORY REPAIR MODE — NON-OPTIONAL
+You are Step 2 REPAIR of a two-step legal compiler: fix the rules JSON only, over the frozen symbol table from Step 1. A previous compile or validation step failed.
 
-A previous compile or validation step failed. You MUST eliminate the failure: read the error report and the artifacts, then output a corrected `rules` array that validates against SYMBOL_TABLE and the contract. Do not ignore the error — resolve it.
+PRIMARY ERROR REPORT (binding — eliminate every failure below; partial fixes fail):
+{error_message}
 
-Return ONLY one JSON object. No markdown. No prose before or after the JSON. First character `{`, last character `}`.
+You MUST output corrected JSON whose `rules` array validates against SYMBOL_TABLE and the contract. Do not ignore the error — resolve it.
+
+Return ONLY one JSON object. No markdown, no prose before or after. First character MUST be `{`, last character MUST be `}`. Root object MUST contain only `"rules"`.
 
 {json_ir_contract}
 
-Output shape (root object must contain only a "rules" array; placeholder names below are illustrative — every name and arity MUST come from SYMBOL_TABLE below):
+Output shape (placeholder names below are illustrative — every name and arity MUST come from SYMBOL_TABLE below):
 {
   "rules": [
     {
@@ -33,8 +37,12 @@ Boolean expressions in `if` and `then` (each list item must be Bool):
 
 4) Compare: {"left": TERM, "op": "<=", "right": TERM} (or under "compare"). TERM = variable, number, or {"func":...} only where allowed. Never use {"func":...} as a standalone list item in `if`/`then`.
 
-Hard constraints (mandatory — same as a fresh rules step):
+MANDATORY HARD CONSTRAINTS (same as a fresh rules step):
 - ONLY symbols from SYMBOL_TABLE. Same arity as declared. Quantifier `type` must match predicate argument sorts for each variable position.
+- If PRIMARY ERROR REPORT says "expects type X, got Y": change the variable's `forall` type or use a different variable so each argument position matches SYMBOL_TABLE (e.g. Estate vs Good, Int vs FinancialYear).
+- If error mentions `true` is not a predicate: remove `{"pred":"true",...}`; use a real Bool predicate from SYMBOL_TABLE or a numeric/boolean literal only inside `compare` terms.
+- If error mentions undeclared threshold_*: you cannot fix that in rules-only repair — return rules that call only functions already in SYMBOL_TABLE; if missing, use a placeholder compare to a numeric literal only when the law text gives an explicit number in the rule itself.
+- Compare operands must share one sort; do not mix Int and Real.
 - Before you finish, re-scan your JSON: for each atom, confirm the predicate name exists in SYMBOL_TABLE and `args` length matches; confirm each variable appears in `forall` with the correct type.
 
 String rules vs object rules:
@@ -49,13 +57,10 @@ Quantifier / list conventions:
 - `if` may be [] (true antecedent).
 - `then` must be non-empty and must not be only trivial true.
 
-VALIDATION_ERROR_REPORT (fix exactly this; may be empty on first repair):
-{error_message}
-
-PREVIOUS_OUTPUT_ARTIFACTS (raw model text and/or parsed JSON — may include symbols + rules + merged context from the failed attempt; repair from this, do not repeat the same mistake):
+PREVIOUS_OUTPUT_ARTIFACTS (raw model text and/or parsed JSON — repair from this; do not repeat the same mistake):
 {previous_output}
 
-DETERMINISTIC_HINTS (must satisfy in addition to the error report):
+DETERMINISTIC_HINTS (must satisfy in addition to PRIMARY ERROR REPORT when non-empty):
 {machine_hints}
 
 SYMBOL_TABLE:

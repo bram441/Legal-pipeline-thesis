@@ -4,6 +4,8 @@ CRITICAL: Output MUST be valid FO(.) syntax.
 CRITICAL: Output MUST contain ONLY a single block: vocabulary V { ... }
 CRITICAL: Do NOT output theory T:V, markdown, or explanations.
 
+MANDATORY: First non-whitespace characters must be `vocabulary V {`. No preamble, no markdown fences. Last character must be the closing `}` of that vocabulary block.
+
 ========================
 OUTPUT FORMAT (MANDATORY)
 ========================
@@ -27,6 +29,14 @@ RULES (same as full KB compilation)
 - Mutually exclusive article predicates will be DEFINED in step 2; here you only DECLARE their names and signatures.
 - Prefer **relational** types/predicates when the law involves two parties (e.g. `Person * Person -> Bool`, `Estate`) instead of overloading many unary `Person` predicates for different roles.
 - Do NOT use `let`, markdown, or `*` between declarations on one line.
+
+========================
+MANDATORY SELF-CHECK BEFORE YOU FINISH
+========================
+1) Single `vocabulary V { ... }` block only — first token `vocabulary`.
+2) Every predicate ends with `-> Bool`; every function uses `-> Int|Real|...` with valid FO(.) product types.
+3) One declaration per line where required; no spurious `*` after `Bool` on the same line as another symbol.
+4) Declare every symbol the next step will need for rules (conditions, conclusions, numeric functions).
 
 ========================
 TASK

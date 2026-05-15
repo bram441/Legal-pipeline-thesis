@@ -1,13 +1,21 @@
 #!/usr/bin/env python3
-"""Run `main.py --mode json` over a numeric range of run folders and print a short summary.
+"""Run ``main.py --mode json`` over a numeric range of run folders and print a short summary.
 
-Example (from repo root):
+Examples (from repo root):
 
+  # JSON-IR pipeline (default; explicit for reproducible thesis batches)
   python scripts/batch_json_runs.py --base inputs/json --from 101 --to 110
 
-Forward extra flags to main.py after ``--``::
+  # Legacy FO + legacy extraction
+  python scripts/batch_json_runs.py --base inputs/json --from 1 --to 3 --pipeline-backend legacy
 
-  python scripts/batch_json_runs.py --base inputs/json --from 1 --to 3 -- --no-translate
+  # Optional: also pass --kb-backend (only when ``--pipeline-backend`` is omitted; see main.py)
+  python scripts/batch_json_runs.py --base inputs/json --from 1 --to 1 --kb-backend json_ir
+
+Forward *additional* flags to main.py after ``--`` (``--pipeline-backend`` / ``--kb-backend`` there are
+removed if you set the same options via this script's flags; script flags win):
+
+  python scripts/batch_json_runs.py --base inputs/json --from 1 --to 3 --pipeline-backend json_ir -- --no-translate
 """
 
 from __future__ import annotations
@@ -20,6 +28,10 @@ import sys
 from pathlib import Path
 
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
+
+from pipeline.kb.compile_backend import KB_BACKEND_CHOICES  # noqa: E402
 
 
 def _split_argv(argv: list[str]) -> tuple[list[str], list[str]]:
@@ -27,6 +39,27 @@ def _split_argv(argv: list[str]) -> tuple[list[str], list[str]]:
         i = argv.index("--")
         return argv[:i], argv[i + 1 :]
     return argv, []
+
+
+def _strip_main_flag(extra: list[str], flag: str) -> list[str]:
+    """Remove ``--flag``, ``--flag=value``, and ``--flag <value>`` tokens from forwarded argv."""
+    out: list[str] = []
+    i = 0
+    n = len(extra)
+    while i < n:
+        tok = extra[i]
+        if tok == flag:
+            if i + 1 < n and not str(extra[i + 1]).startswith("-"):
+                i += 2
+            else:
+                i += 1
+            continue
+        if tok.startswith(flag + "="):
+            i += 1
+            continue
+        out.append(tok)
+        i += 1
+    return out
 
 
 def _run_dir(base: Path, prefix: str, n: int, width: int) -> Path:
@@ -48,7 +81,11 @@ def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     our_args, main_extra = _split_argv(argv)
 
-    p = argparse.ArgumentParser(description="Batch JSON runs via main.py --mode json.")
+    p = argparse.ArgumentParser(
+        description="Batch JSON runs via main.py --mode json. "
+        "Sets --pipeline-backend explicitly by default (json_ir) so batches match run_evaluation "
+        "and are not accidentally driven only by .env."
+    )
     p.add_argument(
         "--base",
         type=Path,
@@ -62,11 +99,46 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--python", default=sys.executable, help="Python executable to run main.py")
     p.add_argument("--dry-run", action="store_true", help="Print commands only")
     p.add_argument("--csv", type=Path, default=None, help="Write one row per run to this CSV path")
+    p.add_argument(
+        "--pipeline-backend",
+        default="json_ir",
+        choices=["legacy", "json_ir"],
+        help="Passed to every main.py invocation (default: json_ir). Same semantics as run_evaluation.py.",
+    )
+    p.add_argument(
+        "--kb-backend",
+        default=None,
+        choices=list(KB_BACKEND_CHOICES),
+        metavar="NAME",
+        help="Optional: passed to main.py --kb-backend. When --pipeline-backend is set, main.py may ignore "
+        "this flag; prefer --pipeline-backend alone unless you know you need both.",
+    )
     args = p.parse_args(our_args)
 
     base = args.base
     if not base.is_absolute():
         base = (_PROJECT_ROOT / base).resolve()
+
+    tail = _strip_main_flag(_strip_main_flag(list(main_extra), "--pipeline-backend"), "--kb-backend")
+
+    if args.kb_backend and args.pipeline_backend:
+        implied_kb = "json_ir" if args.pipeline_backend == "json_ir" else "legacy_fo"
+        if args.kb_backend != implied_kb:
+            print(
+                "batch_json_runs: note: main.py ignores --kb-backend when --pipeline-backend is set "
+                "(effective KB backend is "
+                + implied_kb
+                + ").",
+                file=sys.stderr,
+            )
+
+    print(
+        "batch_json_runs: pipeline_backend="
+        + args.pipeline_backend
+        + " kb_backend="
+        + (args.kb_backend or "(omit)"),
+        file=sys.stderr,
+    )
 
     rows: list[dict[str, object]] = []
     for n in range(args.n_from, args.n_to + 1):
@@ -78,11 +150,27 @@ def main(argv: list[str] | None = None) -> int:
             "json",
             "--run",
             str(rd),
-            *main_extra,
+            *tail,
+            "--pipeline-backend",
+            args.pipeline_backend,
         ]
+        if args.kb_backend is not None:
+            cmd.extend(["--kb-backend", args.kb_backend])
         if args.dry_run:
             print(" ".join(cmd))
-            rows.append({"run": str(rd), "status": "dry_run"})
+            rows.append(
+                {
+                    "run": str(rd),
+                    "name": rd.name,
+                    "status": "dry_run",
+                    "exit_code": 0,
+                    "pipeline_backend": args.pipeline_backend,
+                    "kb_backend": args.kb_backend or "",
+                    "accuracy": "",
+                    "inconclusive": "",
+                    "failure_kind": "",
+                }
+            )
             continue
         proc = subprocess.run(
             cmd,
@@ -113,13 +201,16 @@ def main(argv: list[str] | None = None) -> int:
                 status = "incomplete"
                 failure_kind = "bad_score_json"
 
-        line = f"{rd.name}\t{status}\texit={proc.returncode}\taccuracy={accuracy}\tinconclusive={inconclusive}"
+        line = (
+            f"{rd.name}\t{status}\texit={proc.returncode}\tpipeline={args.pipeline_backend}"
+            f"\taccuracy={accuracy}\tinconclusive={inconclusive}"
+        )
         if failure_kind:
             line += f"\tkind={failure_kind}"
         print(line)
         if status == "failed" and (proc.stderr or "").strip():
-            tail = (proc.stderr or "").strip().splitlines()[-3:]
-            for ln in tail:
+            tail_err = (proc.stderr or "").strip().splitlines()[-3:]
+            for ln in tail_err:
                 print("  stderr:", ln[:240])
         rows.append(
             {
@@ -127,6 +218,8 @@ def main(argv: list[str] | None = None) -> int:
                 "name": rd.name,
                 "status": status,
                 "exit_code": proc.returncode,
+                "pipeline_backend": args.pipeline_backend,
+                "kb_backend": args.kb_backend or "",
                 "accuracy": accuracy,
                 "inconclusive": inconclusive,
                 "failure_kind": failure_kind,
@@ -138,8 +231,19 @@ def main(argv: list[str] | None = None) -> int:
         if not outp.is_absolute():
             outp = (_PROJECT_ROOT / outp).resolve()
         outp.parent.mkdir(parents=True, exist_ok=True)
+        fields = [
+            "run",
+            "name",
+            "status",
+            "exit_code",
+            "pipeline_backend",
+            "kb_backend",
+            "accuracy",
+            "inconclusive",
+            "failure_kind",
+        ]
         with outp.open("w", newline="", encoding="utf-8") as f:
-            w = csv.DictWriter(f, fieldnames=["run", "name", "status", "exit_code", "accuracy", "inconclusive", "failure_kind"])
+            w = csv.DictWriter(f, fieldnames=fields)
             w.writeheader()
             w.writerows(rows)
 

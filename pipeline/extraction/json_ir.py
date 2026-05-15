@@ -235,6 +235,7 @@ _DEFAULT_ENTITY_BY_SCHEMA_TYPE = {
     "Property": "property_main",
     "RealEstate": "residence_main",
     "HouseholdFurniture": "furniture_main",
+    "FinancialYear": "fy_main",
 }
 
 

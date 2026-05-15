@@ -22,19 +22,26 @@ Cross-phase rule: later steps never contradict earlier frozen symbols. If a name
   - Compare: {"compare":{"left":TERM,"op":"<=","right":TERM}} or the same three fields as a flat object {"left":...,"op":"<=","right":...}. Use only supported comparison operators as in the KB compiler.
 - TERM (for compare left/right, and for non-Bool-valued positions if any): variable string, number, or {"func":"FunctionName","args":[...]} with arity from the symbol table.
 - NEVER put {"func":...} as a standalone list element in `if` or `then` — function calls are not Booleans. For thresholds, use `compare` and/or Bool helper predicates declared in the symbol table.
+- Compare sorts: `left` and `right` must have the same scalar sort (Int with Int, Real with Real, Date with Date). Do not compare Int to Real or pass a Date/FinancialYear variable where Int is required unless the function signature uses that sort.
+- Quantifier types in `forall` must use type names exactly as declared in `types` / SYMBOL_TABLE (e.g. `FinancialYear`, not `financial_year`). Every variable's `type` must match every predicate/function argument position where that variable appears.
+- NEVER use the strings `true` or `false` as predicate names in atoms — they are literals, not predicates.
+- Every identifier called as a function or threshold in a rule must be declared under `functions` in Step 1 (e.g. `threshold_employee_small: -> Int`), never only mentioned inside rules.
 - Generic `not` example: {"not": {"pred":"p_hold","args":["x"]}}  (outer expr is Bool).
 - Generic `compare` example: {"left": {"func":"f_metric","args":["x"]},"op":"<=","right": 100}
 
 7) Self-check before returning JSON (KB compilation)
-- Step 1: every sort in predicate/function `args` appears in `types`; every predicate has returns Bool; names match identifier rules in §1.
-- Step 2: every predicate/function used in rules exists in the symbol table with identical arity; every rule variable appears in `forall` with a type that matches each use; no standalone {"func":...} in `if`/`then` lists.
+- Step 1: every sort in predicate/function `args` appears in `types`; every predicate has returns Bool; names match identifier rules in §1; every numeric threshold the law compares against is modeled as a function (or helper) in `functions`, not as an undeclared bare name.
+- Step 2: every predicate/function used in rules exists in the symbol table with identical arity; every rule variable appears in `forall` with a type that matches each use (same sort at every argument position); no standalone {"func":...} in `if`/`then` lists; no `{"pred":"true",...}` atoms; compare operands share one sort.
 
 3) Case IR — entities must cover every constant you use
+- Case `assertions` are observable inputs only. Do NOT assert predicates marked `derived` or `conclusion` in KB_SCHEMA (legal outcomes the KB should infer). When unsure, omit the assertion.
+- FORCED alignment: for each assertion, check KB_SCHEMA arg sorts position-by-position; the constant in `args[i]` must be listed under `entities` for that exact sort (not a nearby sort like Good vs HouseholdFurniture unless KB_SCHEMA uses that sort at position i).
 - Under `entities`, include every KB sort key you need. Every constant that appears in `assertions` or `value_assertions` must appear under the correct sort in `entities`.
 - If the law uses several property-like sorts but the narrative is a single object, still invent one constant per sort position the law requires (e.g. one estate constant, one goods constant) and reuse it consistently.
 - FORCED self-check before return: collect every string in all `args` arrays; each must appear under `entities` for the sort required by KB_SCHEMA for that position; there must be zero undeclared or mis-sorted constants.
 
 4) Query IR — grounded args and correct arity
+- FORCED alignment table (before return): for the chosen `predicate_hint`, list KB_SCHEMA parameter sorts in order; for each position i, pick exactly one constant from Normalized case entities under that sort (or "?" only if allowed). Never reuse a type name as an arg; never swap Person with Company or Estate with Good.
 - For kind "predicate", `args` must have exactly as many entries as the chosen predicate has parameters in KB_SCHEMA, in the same order. Too few or too many arguments is invalid.
 - Use concrete entity constants from the normalized case when possible. Do not leave empty strings. Use "?" only when an argument is genuinely irrecoverable; prefer adding a named entity under `entities` in the case (§3) and then using it here.
 - FORCED (query extraction with provided case JSON): every entry in `args` other than the single literal "?" must be a string that appears in the supplied Normalized case entities payload (any sort bucket). Do not introduce new constants in the query object; do not rename or re-tokenize case constants.

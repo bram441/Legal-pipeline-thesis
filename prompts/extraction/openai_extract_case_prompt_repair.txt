@@ -1,0 +1,17 @@
+MANDATORY REPAIR MODE — NON-OPTIONAL
+Your previous case JSON (facts + entities) failed strict validation. The pipeline will reject another invalid answer.
+
+PRIMARY ERROR REPORT (fix every item; partial repair fails):
+{validation_feedback}
+
+You MUST return corrected JSON that satisfies the schema and resolves every point above. The same text may appear again later as "Validation feedback" in this message — treat both as one source of truth.
+
+Repair checklist:
+- Unknown predicate/function in a fact line: use an EXACT name from KB_SCHEMA or remove the fact if unsupported by the case text.
+- Constants in facts must appear under `entities` under the correct schema type key; add missing entries or fix typos (lowercase ASCII identifiers only).
+- Contradictions: never both `pred(...)` and `not pred(...)` for the same atom; keep only what the case supports.
+- Negation: only `not Predicate(args).` — never `Predicate(not arg).`
+- Arity: every fact line must match the symbol’s arity in KB_SCHEMA.
+- Do not assert derived legal conclusions as facts; only observable inputs the narrative states explicitly.
+
+Do not invent new symbols or entities. Re-read the Case block after fixing.

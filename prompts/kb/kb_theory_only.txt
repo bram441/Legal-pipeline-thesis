@@ -4,6 +4,8 @@ CRITICAL: Output MUST be valid FO(.) syntax.
 CRITICAL: Output MUST contain ONLY one block: theory T:V { ... }
 CRITICAL: Do NOT repeat or alter vocabulary V. Do NOT output markdown or explanations.
 
+MANDATORY: First non-whitespace characters must be `theory T:V {`. No preamble, no markdown fences. Last character must be the closing `}` of that theory block.
+
 ========================
 OUTPUT FORMAT (MANDATORY)
 ========================
@@ -31,6 +33,15 @@ THEORY RULES
 - Inheritance / succession: predicates that describe what the **deceased** leaves (e.g. descendants, other heirs) must take the **deceased person** as their argument, not the surviving spouse. The surviving spouse is a different individual — use two variables (e.g. `s` for spouse, `d` for deceased) and link them with predicates from the vocabulary (e.g. marriage, estate) instead of reusing one variable for both roles.
 - No `let`, no programming-style binders — only `!` / `?` and the connectives listed above.
 - See full style in the law text: encode each article's conditions and consequences.
+
+========================
+MANDATORY SELF-CHECK BEFORE YOU FINISH
+========================
+1) Single `theory T:V { ... }` block only — first token `theory`; do not repeat or edit the vocabulary block.
+2) Every symbol in a formula appears in the FIXED VOCABULARY above with matching arity.
+3) Every formula ends with `.` ; braces balanced; only connectives `& | ~ => <=>` and quantifiers `! ?`.
+4) No article predicate defined using another article predicate in its body — use condition predicates only.
+5) No constants in formulas; quantify variables.
 
 ========================
 TASK

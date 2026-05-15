@@ -10,11 +10,15 @@ Usage (from project root):
   python scripts/run_evaluation.py --runs-dir inputs/json --runs run_001,run_003 --excel
 
 Outputs under results/reports/evaluation_<timestamp>/:
-  - matrix.json      full results
+  - matrix.json      full results (includes evaluation_cli: kb_backend, pipeline_backend)
   - report.md        human-readable tables
   - summary.csv      open in Excel / LibreOffice
   - summary.xlsx     if openpyxl is installed (--excel)
-  - work/            per (run, strategy) output dirs (run.json + pipeline results)
+  - work/            per (run, strategy[, pipeline]) output dirs — distinct names for legacy vs json_ir
+
+Default: --pipeline-backend json_ir; --kb-backend omitted (not passed to main.py). For a legacy sweep use
+``--pipeline-backend legacy``. Passing both --kb-backend and --pipeline-backend can confuse: main.py ignores
+--kb-backend when --pipeline-backend is set (stderr warning in main.py).
 """
 
 from __future__ import annotations
@@ -226,13 +230,18 @@ def main() -> int:
     p.add_argument("--no-translate", action="store_true", help="Pass --no-translate to main.py")
     p.add_argument(
         "--kb-backend",
-        default="legacy_fo",
-        help="KB compiler backend: one of " + ", ".join(KB_BACKEND_CHOICES) + ".",
+        default=None,
+        metavar="NAME",
+        help="Optional: pass through to main.py --kb-backend (legacy_fo | json_ir). Ignored when "
+        "--pipeline-backend is set, because the pipeline flag fixes KB+extraction together. "
+        "Omit both this and --pipeline-backend to use .env defaults.",
     )
     p.add_argument(
         "--pipeline-backend",
         default="json_ir",
-        help="Unified pipeline backend: 'legacy' or 'json_ir' (sets KB+extraction together). Default: json_ir.",
+        metavar="NAME",
+        help="Unified pipeline backend for main.py: 'legacy' or 'json_ir' (sets KB+extraction). "
+        "Default: json_ir. For a legacy sweep use --pipeline-backend legacy.",
     )
     p.add_argument("--clean", action="store_true", help="Remove output-dir if it exists before run")
     p.add_argument(
@@ -240,8 +249,14 @@ def main() -> int:
         action="store_true",
         help="Also write summary.xlsx (requires: pip install openpyxl)",
     )
+    p.add_argument(
+        "--belief-scoring",
+        action="store_true",
+        help="Set SCORE_TREAT_OPEN_WITH_BELIEF=1 and SCORE_BOOLEAN_BELIEF_THRESHOLD=0.5 for boolean "
+        "questions (scores open-world answers by credence; default is off / inconclusive).",
+    )
     args = p.parse_args()
-    if args.kb_backend not in KB_BACKEND_CHOICES:
+    if args.kb_backend is not None and args.kb_backend not in KB_BACKEND_CHOICES:
         print("--kb-backend must be one of: " + ", ".join(KB_BACKEND_CHOICES), file=sys.stderr)
         return 1
     if args.pipeline_backend is not None and args.pipeline_backend not in ("legacy", "json_ir"):
@@ -288,9 +303,16 @@ def main() -> int:
     print("Runs directory:", runs_dir)
     print("Runs:", ", ".join(run_ids))
     print("Strategies:", ", ".join(strategies))
-    print("KB backend:", args.kb_backend)
-    if args.pipeline_backend:
-        print("Pipeline backend:", args.pipeline_backend)
+    print("CLI --kb-backend:", args.kb_backend)
+    print("CLI --pipeline-backend:", args.pipeline_backend)
+    if args.pipeline_backend and args.kb_backend:
+        implied = "json_ir" if args.pipeline_backend == "json_ir" else "legacy_fo"
+        if args.kb_backend != implied:
+            print(
+                "Note: main.py ignores --kb-backend when --pipeline-backend is set "
+                "(effective KB backend is " + implied + ").",
+                file=sys.stderr,
+            )
     print("Output:", out)
     print()
 
@@ -300,7 +322,12 @@ def main() -> int:
         for src in run_paths:
             rid = src.name
             for strategy in strategies:
-                wdir = work_root / work_dir_name(src, strategy)
+                wdir = work_root / work_dir_name(
+                    src,
+                    strategy,
+                    pipeline_backend=args.pipeline_backend,
+                    kb_backend=args.kb_backend if args.pipeline_backend is None else None,
+                )
                 print("===", rid, "+", strategy, "->", wdir.name, "===")
                 copy_run_json(src, wdir)
                 code = run_main_json(
@@ -309,6 +336,7 @@ def main() -> int:
                     args.no_translate,
                     kb_backend=args.kb_backend,
                     pipeline_backend=args.pipeline_backend,
+                    belief_scoring=args.belief_scoring,
                 )
                 sc = read_score(wdir / "score.json")
                 if code != 0:
@@ -344,6 +372,11 @@ def main() -> int:
             "runs": run_ids,
             "cells": cells,
             "run_finished": run_finished,
+            "evaluation_cli": {
+                "kb_backend": args.kb_backend,
+                "pipeline_backend": args.pipeline_backend,
+                "belief_scoring": bool(args.belief_scoring),
+            },
         }
         try:
             (out / "matrix.json").write_text(

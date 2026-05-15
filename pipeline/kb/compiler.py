@@ -11,6 +11,8 @@ from pipeline.kb.json_ir import (
     preflight_json_ir_rule_predicates,
     render_json_ir_to_fo_and_schema,
 )
+from pipeline.kb.company_law import company_law_thresholds_prompt_addon
+from pipeline.kb.json_ir import inject_missing_company_threshold_functions
 from pipeline.kb.repair_hints import build_json_ir_compile_hints, build_machine_repair_hints
 
 # Short system-role guardrails; full spec lives in the rendered user prompts + json_ir_contract.
@@ -336,6 +338,7 @@ def _compile_json_ir_two_step(source_text, client, chosen_model, *, repair_feedb
         symbols_prompt_name = "kb/kb_compilation_json_ir_symbols.txt"
         machine_symbols_hints = ""
 
+    _threshold_addon = company_law_thresholds_prompt_addon(src)
     symbols_prompt = render_prompt(
         symbols_prompt_name,
         law_text=src,
@@ -343,6 +346,7 @@ def _compile_json_ir_two_step(source_text, client, chosen_model, *, repair_feedb
         previous_output=prev,
         machine_hints=machine_symbols_hints,
         json_ir_contract=_contract,
+        company_law_thresholds_addon=_threshold_addon,
     )
     symbols_obj, raw_symbols = _json_chat_kb_symbols(
         client,
@@ -420,7 +424,9 @@ def _compile_json_ir_two_step(source_text, client, chosen_model, *, repair_feedb
     merged_ir = {
         "types": symbol_table["types"],
         "predicates": symbol_table["predicates"],
-        "functions": symbol_table["functions"],
+        "functions": inject_missing_company_threshold_functions(
+            symbol_table["functions"], rules
+        ),
         "rules": rules,
     }
     try:

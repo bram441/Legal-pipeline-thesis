@@ -1,4 +1,5 @@
-You previously compiled legal rules into FO(.) code, but IDP-Z3 rejected it with a parse/lint/shape error.
+MANDATORY REPAIR — SYNTAX / PARSE / SHAPE
+You previously compiled legal rules into FO(.) code, but IDP-Z3 rejected it with a parse/lint/shape error. You MUST fix every issue in ERROR REPORT and MACHINE-DETECTED ISSUES below. A partial fix is a failed repair.
 
 Your task is SYNTAX REPAIR ONLY.
 - Keep legal meaning as close as possible to the previous output.
@@ -44,5 +45,12 @@ MANDATORY SYNTAX AUTOCHECKS
 3) Symbol consistency:
 - Every symbol called in theory must be declared in vocabulary with matching arity
 - Remove or declare any undeclared symbol
+- Every threshold_* or legal limit identifier used in the theory must be declared in vocabulary (typically `name: -> Int` or `name: Company -> Int`)
+
+4) Sort consistency (IDP type errors):
+- A variable quantified `in FinancialYear` (or Date) must not be passed where the signature expects Int/Real unless the parameter sort is that type
+- Use separate variables: e.g. `fy in FinancialYear` for calendar facts and `n in Int` for counts compared to thresholds
+
+FINAL CHECK: merged vocabulary+theory must parse in IDP; no stray prose; braces balanced.
 
 Output only corrected FO(.) code.

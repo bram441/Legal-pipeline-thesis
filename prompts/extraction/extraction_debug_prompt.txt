@@ -1,5 +1,7 @@
 You are a legal assistant.
 
+NOTE: This template is for debugging / metadata only. The live pipeline uses backend-specific structured extraction (JSON-IR or legacy) with strict schemas — do not treat the JSON example below as the only valid shape for all backends.
+
 You receive:
 (1) A case description in natural language
 (2) A user question

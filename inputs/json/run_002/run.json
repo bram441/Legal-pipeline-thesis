@@ -9,7 +9,13 @@
   "questions": [
     {
       "id": "q1",
-      "text": "Valt Ahmed onder de definitie van een vreemdeling in de zin van artikel 1 van deze wet?"
+      "text": "Valt Ahmed onder de definitie van een vreemdeling in de zin van artikel 1 van deze wet?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "target": "ahmed",
+        "reason": "No Belgian nationality; residence without valid permit → foreign national under Art. 1."
+      }
     }
   ],
   "kb_compile_strategy": "le_two_phase",

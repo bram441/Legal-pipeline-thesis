@@ -657,9 +657,11 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
                     f.write(kb_text.strip() + "\n")
             kb_text = _validate_kb_fo_text(kb_text)
             try:
-                from pipeline.kb.kb_lint import lint_kb_fo_text
+                from pipeline.kb.kb_lint import lint_kb_fo_text_or_patch_company_thresholds
 
-                lint_kb_fo_text(kb_text)
+                kb_text = lint_kb_fo_text_or_patch_company_thresholds(kb_text)
+                with open(kb_path, "w", encoding="utf-8") as f:
+                    f.write(kb_text.strip() + "\n")
             except Exception as lint_exc:
                 raise KBCacheError("KB lint: " + str(lint_exc)) from lint_exc
             _idp_parse_check(kb_text)
@@ -756,9 +758,9 @@ def get_or_compile_kb(run_dir, law_text, model=None, log_filename="kb_compile.lo
             if trace:
                 trace.log("After sanitization", kb_text[:2000] + ("..." if len(kb_text) > 2000 else ""))
             try:
-                from pipeline.kb.kb_lint import lint_kb_fo_text
+                from pipeline.kb.kb_lint import lint_kb_fo_text_or_patch_company_thresholds
 
-                lint_kb_fo_text(kb_text)
+                kb_text = lint_kb_fo_text_or_patch_company_thresholds(kb_text)
             except Exception as lint_exc:
                 raise KBCacheError("KB lint: " + str(lint_exc)) from lint_exc
             kb_text = _validate_kb_fo_text(kb_text)

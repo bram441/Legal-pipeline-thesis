@@ -64,6 +64,20 @@ _ASSET_LIKE_SORTS = frozenset(
         "EstateProperty",
     }
 )
+# Inheritance KBs often refine "Good" with household/real-estate sorts; treat as compatible.
+_GOOD_LIKE_SORTS = frozenset(
+    {
+        "Good",
+        "HouseholdFurniture",
+        "FamilyHome",
+        "MovableProperty",
+        "PersonalProperty",
+        "EstateProperty",
+    }
+)
+_ESTATE_LIKE_SORTS = frozenset({"Estate", "EstateProperty", "RealEstate", "ResidentialProperty"})
+
+from pipeline.kb.company_law import COMPANY_THRESHOLD_FUNCTION_NAMES
 
 
 def _law_sort_assignable(expected: str, got: str) -> bool:
@@ -71,7 +85,43 @@ def _law_sort_assignable(expected: str, got: str) -> bool:
         return True
     if expected == "Asset" and got in _ASSET_LIKE_SORTS:
         return True
+    if expected in _GOOD_LIKE_SORTS and got in _GOOD_LIKE_SORTS:
+        return True
+    if expected in _ESTATE_LIKE_SORTS and got in _ESTATE_LIKE_SORTS:
+        return True
     return False
+
+
+def _rules_blob_for_threshold_scan(rules_raw: list) -> str:
+    try:
+        return json.dumps(rules_raw, ensure_ascii=False).lower()
+    except (TypeError, ValueError):
+        return str(rules_raw).lower()
+
+
+def inject_missing_company_threshold_functions(functions_raw: list, rules_raw: list) -> list:
+    """If rules mention standard Belgian company thresholds, ensure they exist as Int functions."""
+    blob = _rules_blob_for_threshold_scan(rules_raw)
+    if not blob:
+        return list(functions_raw or [])
+    out: list = list(functions_raw or [])
+    declared = set()
+    for f in out:
+        if isinstance(f, dict) and f.get("name"):
+            declared.add(str(f["name"]).strip())
+    for nm in COMPANY_THRESHOLD_FUNCTION_NAMES:
+        if nm.lower() in blob and nm not in declared:
+            out.append(
+                {
+                    "name": nm,
+                    "args": [],
+                    "returns": "Int",
+                    "kind": "helper",
+                    "description": "Belgian micro/small enterprise threshold (auto-declared because referenced in rules)",
+                }
+            )
+            declared.add(nm)
+    return out
 _ALLOWED_COMPARE_OPS = {"=", "~=", "<", "=<", "<=", ">", ">=", "=>"}
 _ALLOWED_KINDS = {"observable", "derived", "helper", "conclusion", "input", "unknown"}
 
@@ -399,6 +449,84 @@ def _has_colon_inside_parens(rule: str) -> bool:
     return False
 
 
+def _sort_alias_key(name: str) -> str:
+    """Case- and punctuation-insensitive key so `FinancialYear` matches `financial_year` in FO text."""
+    return re.sub(r"[^a-z0-9]+", "", (name or "").lower())
+
+
+def _normalize_quantifier_sort(
+    got: str, declared_types: set[str], scalars: set[str]
+) -> str | None:
+    """Map quantifier sort text to a declared JSON-IR / scalar sort name; None if unknown."""
+    if got in declared_types or got in scalars:
+        return got
+    gk = _sort_alias_key(got)
+    for d in declared_types:
+        if _sort_alias_key(d) == gk:
+            return d
+    for s in scalars:
+        if _sort_alias_key(s) == gk:
+            return s
+    return None
+
+
+def _quantifier_var_types_from_head(head: str) -> dict[str, str]:
+    """Parse `! v1 in T1, v2 in T2` / `? ...` head (without trailing colon) into var -> sort name."""
+    h = (head or "").lstrip("!?").strip()
+    out: dict[str, str] = {}
+    for part in h.split(","):
+        part = part.strip()
+        m = re.match(r"^([A-Za-z_]\w*)\s+in\s+([A-Za-z_]\w*)\s*$", part)
+        if m:
+            out[m.group(1)] = m.group(2)
+    return out
+
+
+def _validate_string_rule_call_arg_sorts(
+    rule: str,
+    rule_idx: int,
+    symbols: dict[str, tuple[tuple[str, ...], str]],
+    declared_types: set[str],
+) -> None:
+    """Match quantified variables in string FO rules to symbol signatures (catches Date var used as Int, etc.)."""
+    if _top_level_colon_count(rule) > 1 or _has_colon_inside_parens(rule):
+        return
+    head, body = _split_fo_quantifier_head_and_body(rule)
+    if head is None:
+        return
+    env = _quantifier_var_types_from_head(head)
+    if not env:
+        return
+    for call in _rule_calls(body):
+        sig = symbols.get(call.name)
+        if not sig:
+            continue
+        arg_types, _ret = sig
+        m = re.search(r"\b" + re.escape(call.name) + r"\s*\(([^()]*)\)", body)
+        if not m:
+            continue
+        raw_args = [a.strip() for a in m.group(1).split(",")]
+        if len(raw_args) != len(arg_types):
+            continue
+        for j, (raw, exp) in enumerate(zip(raw_args, arg_types)):
+            if not raw or _NUMBER_RE.match(raw) or raw.lower() in {"true", "false"}:
+                continue
+            if not _IDENT_RE.match(raw):
+                continue
+            if raw not in env:
+                continue
+            got_raw = env[raw]
+            got = _normalize_quantifier_sort(got_raw, declared_types, _SCALAR_TYPES)
+            if got is None:
+                continue
+            if not _law_sort_assignable(exp, got):
+                raise JSONIRCompilationError(
+                    f"rules[{rule_idx}]: argument {j} to '{call.name}' expects sort {exp}, "
+                    f"but '{raw}' is quantified as {got_raw} (normalized: {got}). Fix the rule or the symbol table "
+                    f"(IDP errors such as 'integer expected (date found: {raw})' come from this mismatch)."
+                )
+
+
 def _validate_string_rule_no_unbound_constants(rule: str, declared_types: set[str]) -> None:
     """Law rules must not use bare case-like constants; every call arg should be a quantified var or literal."""
     if _top_level_colon_count(rule) > 1 or _has_colon_inside_parens(rule):
@@ -453,7 +581,9 @@ def _infer_term_type(
         if not s:
             raise JSONIRCompilationError(f"rules[{idx}].{ctx}: empty term.")
         if _NUMBER_RE.match(s) or s.lower() in {"true", "false"}:
-            return "Bool" if s.lower() in {"true", "false"} else "Int"
+            if s.lower() in {"true", "false"}:
+                return "Bool"
+            return "Real" if "." in s else "Int"
         if s not in env:
             raise JSONIRCompilationError(
                 f"rules[{idx}].{ctx}: unbound identifier '{s}' in object rule (not in quantifiers {sorted(env)})."
@@ -554,11 +684,10 @@ def _infer_expr_type(
                     f"rules[{idx}].{ctx}.compare: ordering comparisons require numeric terms, got {lt} vs {rt}."
                 )
         elif lt != rt:
-            numeric = {"Int", "Real"}
-            if not (lt in numeric and rt in numeric):
-                raise JSONIRCompilationError(
-                    f"rules[{idx}].{ctx}.compare: left type {lt} must match right type {rt} for comparison."
-                )
+            raise JSONIRCompilationError(
+                f"rules[{idx}].{ctx}.compare: left type {lt} must match right type {rt} for comparison "
+                "(IDP rejects mixed sorts, including Int vs Real)."
+            )
         return "Bool"
     keys = sorted(raw.keys()) if isinstance(raw, dict) else []
     raise JSONIRCompilationError(
@@ -744,6 +873,7 @@ def normalize_json_ir(ir: dict) -> dict:
     if len(set(types)) != len(types):
         raise JSONIRCompilationError("Duplicate type declarations in JSON IR.")
 
+    functions_raw = inject_missing_company_threshold_functions(functions_raw, rules_raw)
     predicates = [_validate_symbol_decl(p, f"predicates[{i}]", default_returns="Bool") for i, p in enumerate(predicates_raw)]
     functions = [_validate_symbol_decl(f, f"functions[{i}]", default_returns="Int") for i, f in enumerate(functions_raw)]
 
@@ -774,6 +904,7 @@ def normalize_json_ir(ir: dict) -> dict:
                 raise JSONIRCompilationError(f"rules[{i}] must be a non-empty string.")
             rr = _normalize_rule_text(r)
             _validate_string_rule_no_unbound_constants(rr, declared_type_names)
+            _validate_string_rule_call_arg_sorts(rr, i, seen_names, declared_type_names)
         else:
             rr = _normalize_rule_text(_render_rule_object(r, i, seen_names))
         if not rr.endswith("."):

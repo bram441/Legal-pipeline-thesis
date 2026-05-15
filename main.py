@@ -27,7 +27,6 @@ from pipeline.extraction.extractor import (
     extract_case_only,
     ExtractionError,
     extraction_backend_env_override,
-    EXTRACTION_BACKEND_CHOICES,
     get_extraction_backend_from_env,
 )
 from pipeline.io.text_runs import load_text_run, write_text_results
@@ -76,6 +75,20 @@ def _effective_pipeline_backend_label(cli_pipeline_backend, resolved_kb_backend,
     return "mixed"
 
 
+def _warn_cli_backend_mismatch(cli_pipeline_backend, cli_kb_backend):
+    """When both CLI flags are set, ``--pipeline-backend`` wins; warn if they disagree."""
+    if not cli_pipeline_backend or cli_kb_backend is None:
+        return
+    implied = "json_ir" if cli_pipeline_backend == "json_ir" else "legacy_fo"
+    if cli_kb_backend != implied:
+        print(
+            "Warning: --kb-backend %r is ignored when --pipeline-backend %r is set "
+            "(effective KB backend is %r)."
+            % (cli_kb_backend, cli_pipeline_backend, implied),
+            file=sys.stderr,
+        )
+
+
 def run_text_mode(run_dir, provider, translate=True, cli_kb_strategy=None, cli_kb_backend=None, cli_pipeline_backend=None):
     payload = load_text_run(run_dir)
 
@@ -100,6 +113,7 @@ def run_text_mode(run_dir, provider, translate=True, cli_kb_strategy=None, cli_k
         cli_pipeline_backend=cli_pipeline_backend,
         cli_kb_backend=cli_kb_backend,
     )
+    _warn_cli_backend_mismatch(cli_pipeline_backend, cli_kb_backend)
     pipeline_backend_label = _effective_pipeline_backend_label(
         cli_pipeline_backend, resolved_kb_backend, resolved_extraction_backend
     )
@@ -116,6 +130,7 @@ def run_text_mode(run_dir, provider, translate=True, cli_kb_strategy=None, cli_k
         out_lines.append("=== KB COMPILE STRATEGY ===")
         out_lines.append(strategy_label + " (use_le=" + str(ul) + ", two_phase=" + str(tp) + ")")
         out_lines.append("KB backend: " + backend_label)
+        out_lines.append("Extraction backend: " + resolved_extraction_backend)
         out_lines.append("Pipeline backend mode: " + pipeline_backend_label)
         out_lines.append("")
         out_lines.append("=== LAW (plain text input) ===")
@@ -206,6 +221,7 @@ def run_json_mode(run_dir, provider, translate=True, cli_kb_strategy=None, cli_k
         cli_pipeline_backend=cli_pipeline_backend,
         cli_kb_backend=cli_kb_backend,
     )
+    _warn_cli_backend_mismatch(cli_pipeline_backend, cli_kb_backend)
     pipeline_backend_label = _effective_pipeline_backend_label(
         cli_pipeline_backend, resolved_kb_backend, resolved_extraction_backend
     )
@@ -225,6 +241,7 @@ def run_json_mode(run_dir, provider, translate=True, cli_kb_strategy=None, cli_k
             "case": {"text": case_text},
             "kb_compile_strategy": strategy_label,
             "kb_compile_backend": backend_label,
+            "extraction_backend": resolved_extraction_backend,
             "pipeline_backend_mode": pipeline_backend_label,
             "kb_compile_flags": {"use_le": ul, "two_phase": tp},
             "questions": [],
@@ -238,6 +255,7 @@ def run_json_mode(run_dir, provider, translate=True, cli_kb_strategy=None, cli_k
             "items": [],
             "kb_compile_strategy": strategy_label,
             "pipeline_backend_mode": pipeline_backend_label,
+            "extraction_backend": resolved_extraction_backend,
         }
 
         pre_extracted_case = None
@@ -301,6 +319,7 @@ def run_json_mode(run_dir, provider, translate=True, cli_kb_strategy=None, cli_k
             {
                 "kb_compile_strategy": strategy_label,
                 "kb_compile_backend": backend_label,
+                "extraction_backend": resolved_extraction_backend,
                 "pipeline_backend_mode": pipeline_backend_label,
                 "kb_compile_flags": {"use_le": ul, "two_phase": tp},
             },
@@ -310,6 +329,7 @@ def run_json_mode(run_dir, provider, translate=True, cli_kb_strategy=None, cli_k
         print("Wrote:", os.path.join(run_dir, "score.json"))
         print("KB strategy:", strategy_label, "(use_le=" + str(ul) + ", two_phase=" + str(tp) + ")")
         print("KB backend:", backend_label)
+        print("Extraction backend:", resolved_extraction_backend)
         print("Pipeline backend mode:", pipeline_backend_label)
 
 
