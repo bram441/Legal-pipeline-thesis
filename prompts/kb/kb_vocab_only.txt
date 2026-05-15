@@ -1,49 +1,62 @@
-You are the FIRST step of a two-step KB build: define ONLY the vocabulary (types, predicates, functions) for IDP-Z3. Another model will add the theory in a second step.
+You are the vocabulary step of a legacy direct-FO legal compiler.
 
-CRITICAL: Output MUST be valid FO(.) syntax.
-CRITICAL: Output MUST contain ONLY a single block: vocabulary V { ... }
-CRITICAL: Do NOT output theory T:V, markdown, or explanations.
+Your task:
+- Output ONLY the FO(.) vocabulary needed to represent the law text.
+- Do not output theory rules.
+- Do not add case constants.
+- Do not include explanations, markdown, or comments.
 
-MANDATORY: First non-whitespace characters must be `vocabulary V {`. No preamble, no markdown fences. Last character must be the closing `}` of that vocabulary block.
-
-========================
-OUTPUT FORMAT (MANDATORY)
-========================
-Return EXACTLY one block:
+MANDATORY OUTPUT:
+The first non-whitespace token must be `vocabulary`.
+Return exactly one block:
 
 vocabulary V {
-  type ...
-  symbolName: Type -> Bool | Int | Real | ...
+  ...
 }
 
-Do NOT output anything before "vocabulary V {" or after the closing "}" of that block.
+Do not output anything before or after this block.
 
-========================
-RULES (same as full KB compilation)
-========================
-- Types: use "type Person" (or other domain types as needed).
-- Predicates: Name: Domain -> Bool
-- Functions: Name: Domain -> Int (e.g. imprisonmentMinDays, fineMaxEuros) when the law specifies quantities.
-- Short camelCase identifiers; one concept per symbol.
-- Declare every symbol needed later for rules: condition predicates (facts from cases), one Bool conclusion predicate per liability/punishment article (e.g. liableArt398, liableArt399), and numeric functions for sentencing/fines if applicable.
-- Mutually exclusive article predicates will be DEFINED in step 2; here you only DECLARE their names and signatures.
-- Prefer **relational** types/predicates when the law involves two parties (e.g. `Person * Person -> Bool`, `Estate`) instead of overloading many unary `Person` predicates for different roles.
-- Do NOT use `let`, markdown, or `*` between declarations on one line.
+================================================================================
+VOCABULARY RULES
+================================================================================
 
-========================
-MANDATORY SELF-CHECK BEFORE YOU FINISH
-========================
-1) Single `vocabulary V { ... }` block only — first token `vocabulary`.
-2) Every predicate ends with `-> Bool`; every function uses `-> Int|Real|...` with valid FO(.) product types.
-3) One declaration per line where required; no spurious `*` after `Bool` on the same line as another symbol.
-4) Declare every symbol the next step will need for rules (conditions, conclusions, numeric functions).
+Types:
+- Declare each type with `type`.
+- Use reusable legal sorts only.
+- Do not create a type for a legal status if the status is better represented as a predicate/function of another subject.
 
-========================
-TASK
-========================
-From the law text below, output ONLY vocabulary V { ... }.
+Predicates:
+- Syntax:
+  predicateName: Type -> Bool
+  predicateName: TypeA * TypeB -> Bool
+- Use predicates for Boolean factual conditions, helper conditions, and derived legal conclusions.
+- Use compact ASCII identifiers.
+- Put one declaration per line.
+- Do not merge declarations with `*`.
 
-SOURCE (natural-language law):
-{source_text}
+Functions:
+- Use functions for numeric values, amounts, dates, durations, counts, percentages, categories, and mappings.
+- Syntax:
+  functionName: Type -> Int
+  functionName: TypeA * TypeB -> Real
+
+Role modeling:
+- Use relational predicates/functions when the law links multiple actors, objects, events, decisions, periods, or roles.
+
+Conclusion modeling:
+- Declare queryable predicates/functions for final legal classifications, rights, obligations, permissions, prohibitions, sanctions, validity results, exceptions, exclusions, entitlements, and legal effects.
+
+Threshold/value modeling:
+- If the law compares measurable values, declare functions for raw measurable values and helper predicates for threshold conditions when useful.
+
+================================================================================
+FEEDBACK
+================================================================================
 
 {feedback_block}
+
+================================================================================
+LAW TEXT
+================================================================================
+
+{law_text}

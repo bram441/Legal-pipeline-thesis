@@ -22,5 +22,6 @@
     "use_le": true,
     "two_phase": true
   },
-  "pipeline_backend_mode": "json_ir"
+  "pipeline_backend_mode": "json_ir",
+  "extraction_backend": "json_ir"
 }

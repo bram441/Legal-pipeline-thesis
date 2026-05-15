@@ -116,12 +116,16 @@ def apply_role_arg_consistency(
     kb_schema: Optional[Dict] = None,
 ) -> bool:
     """
-    If the question is role-based (no named person) and the query is a unary boolean
-    predicate, align args with case facts when the model picked the deceased instead
-    of the surviving spouse (or vice versa).
+    Domain-specific heuristic (succession/spouse/deceased role repair). Disabled by default.
+    Set LEGAL_PIPELINE_ENABLE_DOMAIN_HEURISTICS=1 to enable for legacy experiments.
 
     Returns True if query_obj was modified.
     """
+    from pipeline.semantic.legal_question import domain_heuristics_enabled
+
+    if not domain_heuristics_enabled():
+        return False
+
     if _explicit_name_in_question(user_question):
         return False
 
@@ -161,7 +165,9 @@ def apply_role_arg_consistency(
     survivors = _survivor_constants(pairs)
     deceased = _deceased_constants(pairs)
     persons = set()
-    for vals in (case or {}).get("entities", {}).values():
+    ents = (case or {}).get("entities") or {}
+    for key in ("Person", "person"):
+        vals = ents.get(key)
         if isinstance(vals, list):
             for v in vals:
                 if isinstance(v, str) and v.strip():

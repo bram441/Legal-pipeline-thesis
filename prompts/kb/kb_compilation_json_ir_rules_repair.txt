@@ -1,70 +1,112 @@
-MANDATORY REPAIR MODE — NON-OPTIONAL
-You are Step 2 REPAIR of a two-step legal compiler: fix the rules JSON only, over the frozen symbol table from Step 1. A previous compile or validation step failed.
+You are Step 2 REPAIR of a two-step legal compiler.
 
-PRIMARY ERROR REPORT (binding — eliminate every failure below; partial fixes fail):
+Your task is to return corrected reusable legal rules over the frozen SYMBOL_TABLE.
+
+Do not create new symbols.
+Do not rename symbols.
+Do not change arities or types.
+Do not assume a concrete case.
+Do not include concrete names, organizations, dates, objects, IDs, or expected answers.
+
+================================================================================
+MANDATORY OUTPUT
+================================================================================
+
+Return ONLY one JSON object.
+No markdown.
+No prose before or after.
+First character MUST be `{`.
+Last character MUST be `}`.
+
+The root object must contain exactly one key:
+- rules
+
+No other top-level keys.
+
+================================================================================
+PRIMARY ERROR REPORT
+================================================================================
+
+You MUST fix every issue described here. Partial fixes fail.
+
 {error_message}
 
-You MUST output corrected JSON whose `rules` array validates against SYMBOL_TABLE and the contract. Do not ignore the error — resolve it.
-
-Return ONLY one JSON object. No markdown, no prose before or after. First character MUST be `{`, last character MUST be `}`. Root object MUST contain only `"rules"`.
+================================================================================
+CONTRACT
+================================================================================
 
 {json_ir_contract}
 
-Output shape (placeholder names below are illustrative — every name and arity MUST come from SYMBOL_TABLE below):
-{
-  "rules": [
-    {
-      "forall": [{"var":"x","type":"Sort1"}],
-      "if": [{"pred":"obs_rel","args":["x"]}],
-      "then": [{"pred":"drv_rel","args":["x"]}],
-      "operator": "implies"
-    }
-  ]
-}
+================================================================================
+REPAIR PRIORITIES
+================================================================================
 
-Definitions vs implications (`operator`):
-- "implies": antecedent => consequent.
-- "iff": equivalence. Placeholder example:
-  { "forall": [{"var":"x","type":"Sort1"}], "if": [{"pred":"obs_rel","args":["x"]}], "then": [{"pred":"drv_rel","args":["x"]}], "operator": "iff" }
+Fix all applicable issues:
+- invalid JSON;
+- wrong top-level keys;
+- raw FO string rules;
+- unknown predicate/function/type;
+- wrong arity;
+- variable used but not declared in forall;
+- variable declared with a type that does not match its use;
+- implicit subtype assumptions;
+- function used as a Boolean expression;
+- function name used as predicate atom;
+- predicate name used as function term;
+- comparison operands with incompatible types;
+- undeclared constants in reusable law rules;
+- case-specific constants in reusable law rules;
+- tautological rules such as P(x) => P(x);
+- circular rules where a derived predicate depends only on itself;
+- rules that derive no legal consequence;
+- rules that only derive observable case inputs;
+- rules with empty then;
+- threshold logic using illegal Boolean arithmetic.
 
-Boolean expressions in `if` and `then` (each list item must be Bool):
+If the error says a symbol is used as a predicate atom but exists only as a function:
+- If it is a yes/no legal condition or consequence, this is a SYMBOL error. The symbol table should be repaired so the symbol is a predicate.
+- If it truly returns a non-Boolean value, keep it as a function and use it only as a function term inside a comparison.
 
-1) Predicate atom: {"pred":"P","args":[...], "negated": false} — "negated": true negates only this call (~P(...)). Optional keys: "neg" instead of "negated"; "symbol" instead of "pred".
+If the error says a variable has a narrower role-like type but a symbol expects a broader type:
+- Do not rely on implicit subtyping.
+- Use the broader stable type in forall.
+- Add a role/status predicate to the if-condition if such a predicate exists in SYMBOL_TABLE.
+- If no suitable role/status predicate exists, the symbol table likely needs repair.
 
-2) Logical NOT of any Bool subexpression: {"not": <expr>} — use this to negate a whole subformula, not the same as "negated" on one atom.
+================================================================================
+CRITICAL CONSEQUENT RULE
+================================================================================
 
-3) AND / OR: {"and":[...]} and {"or":[...]} with non-empty lists.
+The `then` part of a rule should normally contain derived predicates.
 
-4) Compare: {"left": TERM, "op": "<=", "right": TERM} (or under "compare"). TERM = variable, number, or {"func":...} only where allowed. Never use {"func":...} as a standalone list item in `if`/`then`.
+Observable predicates represent facts supplied by a case. They belong in `if`, not in `then`.
 
-MANDATORY HARD CONSTRAINTS (same as a fresh rules step):
-- ONLY symbols from SYMBOL_TABLE. Same arity as declared. Quantifier `type` must match predicate argument sorts for each variable position.
-- If PRIMARY ERROR REPORT says "expects type X, got Y": change the variable's `forall` type or use a different variable so each argument position matches SYMBOL_TABLE (e.g. Estate vs Good, Int vs FinancialYear).
-- If error mentions `true` is not a predicate: remove `{"pred":"true",...}`; use a real Bool predicate from SYMBOL_TABLE or a numeric/boolean literal only inside `compare` terms.
-- If error mentions undeclared threshold_*: you cannot fix that in rules-only repair — return rules that call only functions already in SYMBOL_TABLE; if missing, use a placeholder compare to a numeric literal only when the law text gives an explicit number in the rule itself.
-- Compare operands must share one sort; do not mix Int and Real.
-- Before you finish, re-scan your JSON: for each atom, confirm the predicate name exists in SYMBOL_TABLE and `args` length matches; confirm each variable appears in `forall` with the correct type.
+Do not derive raw case-input facts from legal rules.
 
-String rules vs object rules:
-- Prefer object rules. Raw FO strings in `rules` are a legacy escape hatch — avoid unless unavoidable.
+If a legal consequence must be represented, use a predicate/function whose kind is `derived`.
 
-Counting / thresholds (examples with generic names — substitute from SYMBOL_TABLE):
-- “At least two of A,B,C”: OR of three AND branches (pairwise), as in the non-repair rules prompt.
-- “At most one exceeded”: helper Bool predicate + negation pattern from the non-repair rules prompt.
+If no suitable derived symbol exists, stop and request symbol-table repair — do not misuse an observable predicate in `then`.
 
-Quantifier / list conventions:
-- `forall` is a list (may be []).
-- `if` may be [] (true antecedent).
-- `then` must be non-empty and must not be only trivial true.
+================================================================================
+PREVIOUS ATTEMPT
+================================================================================
 
-PREVIOUS_OUTPUT_ARTIFACTS (raw model text and/or parsed JSON — repair from this; do not repeat the same mistake):
 {previous_output}
 
-DETERMINISTIC_HINTS (must satisfy in addition to PRIMARY ERROR REPORT when non-empty):
+================================================================================
+DETERMINISTIC HINTS
+================================================================================
+
 {machine_hints}
 
-SYMBOL_TABLE:
+================================================================================
+SYMBOL_TABLE
+================================================================================
+
 {symbol_table_json}
 
-LAW TEXT:
+================================================================================
+LAW TEXT
+================================================================================
+
 {law_text}

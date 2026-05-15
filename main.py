@@ -231,7 +231,17 @@ def run_json_mode(run_dir, provider, translate=True, cli_kb_strategy=None, cli_k
         stack.enter_context(kb_backend_env_override(resolved_kb_backend))
         stack.enter_context(extraction_backend_env_override(resolved_extraction_backend))
         status_log("KB", "Loading or compiling knowledge base")
-        kb_text, kb_schema = get_or_compile_kb(run_dir, law_text, cache_subdir="translated" if translate else None)
+        q_text = ""
+        if questions:
+            q0 = questions[0]
+            q_text = (q0.get("text", "") if isinstance(q0, dict) else str(q0)) or ""
+        kb_text, kb_schema = get_or_compile_kb(
+            run_dir,
+            law_text,
+            cache_subdir="translated" if translate else None,
+            question_text=q_text,
+            case_text=case_text,
+        )
         backend_label = get_kb_backend_from_env()
 
         results = {
@@ -251,7 +261,10 @@ def run_json_mode(run_dir, provider, translate=True, cli_kb_strategy=None, cli_k
             "id": run_obj.get("id"),
             "total": 0,
             "correct": 0,
+            "correct_decisive": 0,
+            "incorrect_decisive": 0,
             "inconclusive": 0,
+            "scoring_mode": "decisive",
             "items": [],
             "kb_compile_strategy": strategy_label,
             "pipeline_backend_mode": pipeline_backend_label,
@@ -292,24 +305,42 @@ def run_json_mode(run_dir, provider, translate=True, cli_kb_strategy=None, cli_k
             results["questions"].append(item)
 
             if expected is not None and not result.get("error_stage"):
-                score_item = score_question(expected, result.get("symbolic_result"))
+                score_item = score_question(
+                    expected,
+                    result.get("symbolic_result"),
+                    query=result.get("query"),
+                    kb_schema=kb_schema,
+                    user_question=qtext,
+                )
                 score_item["id"] = qid
                 score_item["text"] = qtext
 
                 score["total"] += 1
-                if score_item.get("match") is None:
+                if score_item.get("inconclusive"):
                     score["inconclusive"] += 1
                 elif score_item.get("match"):
                     score["correct"] += 1
+                    score["correct_decisive"] += 1
+                else:
+                    score["incorrect_decisive"] += 1
 
                 score["items"].append(score_item)
 
-        decisive = score["total"] - score["inconclusive"]
-        score["decisive"] = decisive
-        if decisive > 0:
-            score["accuracy"] = score["correct"] / decisive
+        if any(it.get("scoring_mode") == "belief" or it.get("belief_scored") for it in score["items"]):
+            score["scoring_mode"] = "belief"
+
+        decisive_answered = score["total"] - score["inconclusive"]
+        score["decisive"] = decisive_answered
+        if score["total"] > 0:
+            score["accuracy_decisive"] = score["correct"] / score["total"]
+            score["accuracy"] = score["accuracy_decisive"]
         else:
+            score["accuracy_decisive"] = None
             score["accuracy"] = None
+        if decisive_answered > 0:
+            score["accuracy_on_decisive_only"] = score["correct"] / decisive_answered
+        else:
+            score["accuracy_on_decisive_only"] = None
 
         write_json_results(run_dir, results)
         write_score(run_dir, score)

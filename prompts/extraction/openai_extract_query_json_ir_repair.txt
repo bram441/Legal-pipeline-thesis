@@ -1,19 +1,93 @@
-MANDATORY REPAIR MODE — NON-OPTIONAL
-Your previous query JSON failed strict validation. The pipeline will reject another invalid answer.
+You are repairing legal query JSON_IR.
 
-PRIMARY ERROR REPORT (you MUST fix every issue described here; partial fixes fail):
+Your previous query JSON failed strict validation.
+Return corrected JSON only.
+
+================================================================================
+MANDATORY OUTPUT
+================================================================================
+
+Return ONLY JSON matching the structured-output schema for this call.
+No markdown.
+No commentary.
+No keys other than those required by the schema.
+First character MUST be `{`.
+Last character MUST be `}`.
+
+================================================================================
+PRIMARY ERROR REPORT
+================================================================================
+
+You MUST fix every issue described here. Partial fixes fail.
+
 {validation_feedback}
 
-You MUST return corrected JSON that resolves EVERY point in PRIMARY ERROR REPORT above. The same report may also appear later in this message as "Validation feedback" — treat both as the same source of truth.
+================================================================================
+CONTRACT
+================================================================================
 
-Repair obligations (satisfy all that apply):
-- Unknown predicate or wrong arity: choose a `predicate_hint` that EXISTS in KB_SCHEMA and set `args` to exactly that predicate’s parameter count and order.
-- "Predicate arity mismatch" / "expects N arg(s)": count parameters in KB_SCHEMA for your `predicate_hint`; emit exactly N strings in `args` in schema order — pad with the correct case constant per sort, never duplicate the same Person twice unless the question is about two distinct roles and the case lists two people.
-- "Query argument type mismatch" / "not a X entity": replace `args[i]` with a constant from Normalized case entities under the sort KB_SCHEMA expects at position i (Person vs Company vs Estate vs Good vs FinancialYear).
-- "unresolved placeholder" / "?": replace with the sole candidate from case entities for that sort, or add nothing and pick a predicate you can ground; only keep "?" if the contract allows and the question is genuinely underspecified.
-- Illegal or invented constants in `args`: replace every offending arg with a constant that literally appears in "Normalized case entities" in this message, or with "?" only where the contract allows a single unknown slot and the question truly does not identify the party.
-- Placeholder or narrative tokens (e.g. this_company, the_debtor, CompanyA) are forbidden when the case entities list concrete constants — use those constants verbatim.
-- Empty strings in `args` are forbidden — use a real case constant or "?" per contract §4.
-- Surviving spouse / deceased wording: if the question names a role, bind `args` to the matching person constant from case facts (survivor vs deceased), not the other party.
+{json_ir_contract}
 
-Do not introduce new entity names in the query IR; the case JSON is the only source of ground terms. Re-validate mentally before returning.
+================================================================================
+REPAIR PRIORITIES
+================================================================================
+
+Fix all applicable issues:
+- unknown predicate;
+- unsupported query kind or intent;
+- wrong arity;
+- missing or too many args;
+- args in wrong order;
+- type mismatch between arg and predicate signature;
+- entity constant not present in Normalized case entities;
+- type name used as an argument;
+- placeholder used when a concrete entity exists;
+- observable predicate chosen when a derived legal conclusion directly answers the question;
+- helper predicate chosen when a derived predicate directly answers the question;
+- invented predicate/function/entity;
+- empty string argument;
+- natural-language phrase used as a symbol or argument.
+
+If predicate_hint is invalid:
+- Choose an exact predicate from KB_SCHEMA that directly answers the question.
+- Prefer kind = derived for legal conclusions.
+
+If args are invalid:
+- Use only constants from Normalized case entities.
+- Match the selected predicate’s argument types exactly.
+- If exactly one entity exists for a required type, use that entity.
+- If multiple entities exist, choose the one identified by the question.
+- Use "?" only when the query genuinely asks for an unknown entity and the contract allows it.
+
+If kind is unsupported:
+- Use kind = "predicate" unless the system explicitly supports the intent.
+
+================================================================================
+KB_SCHEMA
+================================================================================
+
+{kb_schema_json}
+
+================================================================================
+NORMALIZED CASE FACTS
+================================================================================
+
+{case_facts_json}
+
+================================================================================
+NORMALIZED CASE ENTITIES
+================================================================================
+
+{case_entities_json}
+
+================================================================================
+PREVIOUS QUERY JSON OR RAW OUTPUT
+================================================================================
+
+{previous_output}
+
+================================================================================
+QUESTION
+================================================================================
+
+{user_question}

@@ -500,6 +500,26 @@ def _schema_feedback_message(error, previous_output, kb_schema=None):
             "\n\nREMEDIATION (placeholders): replace ? with a concrete constant from case.entities for that sort, "
             "or ensure the case IR declares an entity for the required sort first."
         )
+    if "observable predicate" in el and "legal-conclusion" in el:
+        derived = [
+            p
+            for p in (kb_schema or {}).get("predicates") or []
+            if isinstance(p, dict)
+            and str(p.get("kind") or "").lower() in {"derived", "conclusion"}
+        ]
+        msg += (
+            "\n\nREMEDIATION (query target): The previous query selected an observable case-input predicate. "
+            "The question asks for a legal conclusion. Select a derived predicate instead."
+        )
+        if derived:
+            msg += "\n\nAvailable derived predicates:\n"
+            for p in derived[:25]:
+                args = ", ".join(p.get("args") or [])
+                msg += f"- {p.get('name')}({args}): {p.get('description', '')}\n"
+    if "unconstrained consequent variable" in el or "same variable twice" in el:
+        from pipeline.semantic.legal_question import witness_modeling_hint
+
+        msg += "\n\nREMEDIATION (rule design):" + witness_modeling_hint()
     return msg
 
 

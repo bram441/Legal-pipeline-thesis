@@ -48,6 +48,7 @@ copy_run_json = eval_support.copy_run_json
 parse_runs_selection = eval_support.parse_runs_selection
 parse_strategies_selection = eval_support.parse_strategies_selection
 read_score = eval_support.read_score
+summarize_query_targets = eval_support.summarize_query_targets
 run_main_json = eval_support.run_main_json
 work_dir_name = eval_support.work_dir_name
 classify_failure = eval_support.classify_failure
@@ -70,23 +71,39 @@ def _write_markdown(path: Path, matrix: dict) -> None:
     lines.extend(
         [
             "",
-            "## Accuracy (correct / total)",
+            "## Accuracy (decisive: correct / total; inconclusive counts as not correct)",
+            "",
+            "Primary metric: ``accuracy_decisive`` (unknown/open answers are not correct).",
             "",
             "| Run | " + " | ".join(strategies) + " |",
             "|" + "---|" * (len(strategies) + 1),
         ]
     )
+    cli = matrix.get("evaluation_cli") or {}
+    if cli.get("belief_scoring"):
+        lines.extend(
+            [
+                "",
+                "**Note:** Belief scoring was enabled for this run. "
+                "Open-world answers may be scored probabilistically; "
+                "``accuracy_decisive`` is still the main legal entailment metric.",
+            ]
+        )
     for r in runs:
         row = "| " + r + " |"
         for s in strategies:
             c = cells.get(r, {}).get(s, {})
             if c.get("ok"):
-                acc = c.get("accuracy")
+                acc = c.get("accuracy_decisive") if c.get("accuracy_decisive") is not None else c.get("accuracy")
                 cor = c.get("correct")
                 tot = c.get("total")
+                inc = c.get("inconclusive")
                 cell = "" if acc is None else "%.4f" % float(acc)
                 if cor is not None and tot is not None:
-                    cell += " (%s/%s)" % (cor, tot)
+                    cell += " (%s/%s" % (cor, tot)
+                    if inc is not None:
+                        cell += ", inc=%s" % inc
+                    cell += ")"
             else:
                 cell = "FAIL" if c.get("exit_code") is not None else "—"
             row += " " + cell + " |"
@@ -108,6 +125,43 @@ def _write_markdown(path: Path, matrix: dict) -> None:
         for s in strategies:
             cat = cells.get(r, {}).get(s, {}).get("failure_category") or "—"
             row += " " + str(cat) + " |"
+        lines.append(row)
+
+    lines.extend(
+        [
+            "",
+            "## Query target diagnostics",
+            "",
+            "Per-question query predicate and kind from `score.json` items. "
+            "``observable_legal_warning_count`` flags boolean legal questions scored against observable predicates.",
+            "",
+            "| Run | " + " | ".join(strategies) + " |",
+            "|" + "---|" * (len(strategies) + 1),
+        ]
+    )
+    for r in runs:
+        row = "| " + r + " |"
+        for s in strategies:
+            c = cells.get(r, {}).get(s, {})
+            n = c.get("observable_legal_warning_count")
+            if c.get("ok") and n is not None:
+                cell = str(n)
+                targets = c.get("query_targets") or []
+                if targets:
+                    kinds = ", ".join(
+                        sorted(
+                            {
+                                str(t.get("predicate_kind") or "?")
+                                + ":"
+                                + str(t.get("predicate") or "?")
+                                for t in targets
+                            }
+                        )
+                    )
+                    cell += " (" + kinds + ")"
+            else:
+                cell = "—"
+            row += " " + cell + " |"
         lines.append(row)
 
     lines.extend(["", "## Details (JSON)", "", "See `matrix.json`.", ""])
@@ -173,9 +227,12 @@ def _write_xlsx(path: Path, matrix: dict) -> bool:
             "strategy",
             "ok",
             "failure_category",
-            "accuracy",
+            "accuracy_decisive",
             "correct",
+            "incorrect_decisive",
+            "inconclusive",
             "total",
+            "scoring_mode",
             "path",
             "exit_code",
         ]
@@ -189,9 +246,12 @@ def _write_xlsx(path: Path, matrix: dict) -> bool:
                     s,
                     c.get("ok"),
                     c.get("failure_category"),
-                    c.get("accuracy"),
+                    c.get("accuracy_decisive", c.get("accuracy")),
                     c.get("correct"),
+                    c.get("incorrect_decisive"),
+                    c.get("inconclusive"),
                     c.get("total"),
+                    c.get("scoring_mode"),
                     c.get("path"),
                     c.get("exit_code"),
                 ]
@@ -351,14 +411,22 @@ def main() -> int:
                         "failure_category": classify_failure(wdir, code, ok=False),
                     }
                     continue
+                qt = summarize_query_targets(sc)
                 cells[rid][strategy] = {
                     "ok": True,
                     "exit_code": 0,
                     "path": str(wdir),
                     "accuracy": sc.get("accuracy") if sc else None,
+                    "accuracy_decisive": sc.get("accuracy_decisive") if sc else sc.get("accuracy") if sc else None,
                     "correct": sc.get("correct") if sc else None,
+                    "correct_decisive": sc.get("correct_decisive") if sc else None,
+                    "incorrect_decisive": sc.get("incorrect_decisive") if sc else None,
+                    "inconclusive": sc.get("inconclusive") if sc else None,
                     "total": sc.get("total") if sc else None,
+                    "scoring_mode": sc.get("scoring_mode") if sc else None,
                     "score_id": sc.get("id") if sc else None,
+                    "query_targets": qt.get("items") or [],
+                    "observable_legal_warning_count": qt.get("observable_legal_warning_count", 0),
                     "failure_category": classify_failure(wdir, 0, ok=True),
                 }
         run_finished = True
