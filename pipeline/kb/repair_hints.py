@@ -79,6 +79,19 @@ def build_machine_repair_hints(error_message: str, previous_output: str) -> str:
     if "𝔹" in em or "blackboard" in eml or "mathematical unicode" in eml:
         hints.append("Replace Unicode mathematical letters with ASCII (e.g. Bool, Real).")
 
+    if "date found" in eml or "integer expected" in eml or "ℤ value expected" in em:
+        hints.append(
+            "A variable typed as Date (or another sort) is used where Int/Real is required, or two sorts are mixed "
+            "in `=` / arithmetic. Align quantifier sorts (`! d in Date:`) with each symbol's declared argument types; "
+            "use a different variable for Int-typed parameters."
+        )
+
+    if "wrong arguments" in eml or "expected argument of type" in eml:
+        hints.append(
+            "Predicate/function argument sorts must match the vocabulary signatures exactly. "
+            "Fix the rule call argument order and variable sorts, or adjust the symbol table if the law model is wrong."
+        )
+
     if not hints:
         return "(none — follow the ERROR REPORT below exactly; do not repeat the same malformed pattern.)"
 
@@ -121,6 +134,21 @@ def build_json_ir_compile_hints(error_message: str) -> str:
     if "unsupported term" in el or ("term object" in el and "func" in el):
         out.append(
             "Non-Boolean terms must be strings (vars/constants), numbers, or `{\"func\":\"F\",\"args\":[...]}` with `F` declared as a function."
+        )
+    if "must match right type" in el and "compare" in el:
+        out.append(
+            "In `compare` objects, `left` and `right` must have the same sort (including Int vs Real — pick one). "
+            "Do not compare a Date variable to an Int expression without converting or using the correct variable."
+        )
+    if "lists it only under functions" in el or "bool predicate atom" in el:
+        out.append(
+            "A name used as {\"pred\":\"X\",...} must be under predicates with returns Bool in SYMBOL_TABLE. "
+            "If X is numeric or a threshold, move it to functions and use {\"func\":\"X\",\"args\":[...]} inside compare only."
+        )
+    if "integer expected" in el or "date found" in el or "expects sort" in el:
+        out.append(
+            "String rules: every `v in T` quantifier must match how `v` is passed into predicates/functions "
+            "(e.g. do not pass a Date-quantified `d1` into a parameter declared as Int)."
         )
 
     if not out:

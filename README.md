@@ -154,11 +154,18 @@ Evaluation:
 python scripts/run_evaluation.py --runs all --pipeline-backend json_ir
 ```
 
+Numeric batch (same explicit default as evaluation — does **not** rely on `.env` alone):
+
+```text
+python scripts/batch_json_runs.py --base inputs/json --from 1 --to 20 --pipeline-backend json_ir
+python scripts/batch_json_runs.py --base inputs/json --from 1 --to 20 --pipeline-backend legacy
+```
+
 `--kb-backend` is still supported for backward compatibility and experiments, but `--pipeline-backend` is the preferred switch.
 
 **Optional `run.json` fields (JSON runs)**  
 - `kb_compile_strategy`: one of `direct_single`, `direct_two_phase`, `le_single`, `le_two_phase`. Used when you do not pass `--kb-strategy` on the CLI.  
-- After each successful JSON run, `run.json` is merged with `kb_compile_strategy`, `kb_compile_flags`, `kb_compile_backend`, and `pipeline_backend_mode`.
+- After each successful JSON run, `run.json` is merged with `kb_compile_strategy`, `kb_compile_flags`, `kb_compile_backend`, `extraction_backend`, and `pipeline_backend_mode`.
 
 **CLI override**  
 ```text

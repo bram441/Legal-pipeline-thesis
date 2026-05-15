@@ -3,6 +3,8 @@ You are compiling a legal rule description into a FO(.) knowledge base for IDP-Z
 CRITICAL: Output MUST be valid FO(.) syntax that IDP-Z3 can parse.
 CRITICAL: Output MUST contain ONLY FO(.) code. No explanations, no markdown, no comments.
 
+MANDATORY: Your entire reply must be exactly two FO blocks in order — nothing before `vocabulary V {`, nothing after the final `}` of `theory T:V { ... }`. No title line, no markdown fences, no ` ``` ` wrappers.
+
 ========================
 OUTPUT FORMAT (MANDATORY)
 ========================
@@ -41,6 +43,7 @@ C) Functions (only if needed)
   ✅ Correct: parentOf: Person -> Person
   ❌ Wrong:   age(Person): Int
   ❌ Wrong:   age(Person)
+- Every legal threshold used in comparisons (employee limits, turnover caps, etc.) MUST be declared here (e.g. threshold_employees_small: -> Int). Never call threshold names in the theory without a matching vocabulary line.
 
 D) Naming
 - Preserve names EXACTLY as you choose them: case-sensitive and consistent.
@@ -51,13 +54,12 @@ E) Minimality
 - If the law text contains something you cannot formalize cleanly, OMIT it rather than inventing extra ontology.
 - Prefer a **small** vocabulary: fewer invented helpers; each predicate should be clearly needed by at least one rule or by case-fact extraction.
 
-F) REQUIRED: One conclusion predicate per article (mutually exclusive, NO CIRCULARITY)
-- For EACH article that imposes punishment/liability (e.g. Art. 398, 399, 400, 401), declare exactly one Bool predicate in the vocabulary and define it in the theory with <=>.
-- Name it after the article so queries map clearly: e.g. punishedArt398, punishedArt399, punishedArt400, punishedArt401 (or liableArt398, etc.). Use consistent naming.
-- Define each as: predicateName(x) <=> condition_formula(x). This ensures "Is X liable under Article 399?" can always be answered by querying that one predicate.
-- MUTUAL EXCLUSIVITY: When articles form a hierarchy (base vs aggravated, e.g. 398 = base, 399 = illness/incapacity, 400 = severe harm, 401 = death), define each article predicate so that it holds ONLY when the person qualifies for THAT article and NOT for a higher one. Use ONLY the condition/primitive predicates (e.g. IntentionallyInflictsWoundsOrBlows, CausesIllnessOrIncapacity, ActsWithPremeditation) on the right-hand side.
-- NO CIRCULARITY (CRITICAL): Do NOT use any other article predicate (punishedArt398, punishedArt399, liableArt398, liableArt399, etc.) in the definition of an article predicate. The reasoner cannot handle "liableArt398(x) <=> ... & ~liableArt399(x)". Define each article predicate using ONLY condition predicates. Example: punishedArt398(x) <=> IntentionallyInflictsWoundsOrBlows(x) & ~CausesIllnessOrIncapacity(x) & ~CausesSevereHarm(x) & ~CausesDeath(x). punishedArt399(x) <=> IntentionallyInflictsWoundsOrBlows(x) & CausesIllnessOrIncapacity(x) & ~CausesSevereHarm(x) & ~CausesDeath(x). Mutual exclusivity follows from the conditions; no reference to other article predicates.
-- Do NOT output only implications (=>) without a named conclusion predicate per article; the pipeline needs these for question answering.
+F) REQUIRED: Conclusion predicates for each distinct liability / punishment branch (mutually exclusive, NO CIRCULARITY)
+- For EACH statutory branch that imposes a distinct punishment, liability, or legal classification (e.g. base vs aggravated tiers when the law enumerates them), declare exactly one Bool predicate in the vocabulary and define it in the theory with `<=>` from **condition** predicates only.
+- Name conclusion predicates so queries map clearly (e.g. include article numbers when the law is article-structured: punishedArt398, liableArt399; or use neutral names like liableBase, liableAggravated when articles are not numbered).
+- MUTUAL EXCLUSIVITY: When branches form a hierarchy (base vs strictly stronger conditions), define each branch predicate so it holds ONLY when the actor qualifies for THAT branch and NOT for a strictly higher branch, using only primitive/condition predicates on the right-hand side.
+- NO CIRCULARITY (CRITICAL): Do NOT use one branch predicate (e.g. liableBase) inside the definition body of another branch predicate (e.g. liableAggravated). The reasoner cannot handle mutual definitional cycles. Mutual exclusivity must follow from disjoint conditions, not from negating another conclusion predicate.
+- Do NOT output only implications (`=>`) without named conclusion predicates when the pipeline must answer yes/no per branch; the downstream benchmark expects queryable Bool heads.
 
 G) Quantitative consequences
 - When the law specifies numeric ranges (durations, amounts, etc.), add functions and assign values in the theory based on which conditions apply.
@@ -97,7 +99,7 @@ QUALITY & PARSING SAFETY
 - Do NOT add rules that contradict punishment rules (e.g. "X => false" when X should lead to a punishment). Conclusion predicates per article must be defined with condition predicates only—never reference another article predicate in the body (see F, NO CIRCULARITY).
 
 ========================
-EXAMPLE (STYLE TO COPY)
+EXAMPLE (STYLE TO COPY — illustrative only)
 ========================
 vocabulary V {
   type Party
@@ -110,6 +112,17 @@ theory T:V {
   ! p in Party:
     (negligent(p) & causedDamage(p)) => liable(p).
 }
+
+========================
+MANDATORY SELF-CHECK BEFORE YOU FINISH (non-optional)
+========================
+1) Output is exactly two blocks: `vocabulary V { ... }` then `theory T:V { ... }` — no third block, no prose outside them.
+2) Every name used in `theory` is declared in `vocabulary` with the same spelling and arity.
+3) Every type in signatures is declared with `type`.
+4) No `*`-merged lines after `Bool` on the same line as another declaration (IDP parse killer).
+5) No constants inside theory formulas — only quantified variables and symbols from the vocabulary.
+6) Article-style conclusion predicates: each is defined with `<=>` from condition predicates only — no circular reference to another article predicate in the body (see section F).
+7) Quantifiers use `!` / `?` with `in Type` and `:` on the header line; every top-level formula ends with `.`
 
 ========================
 TASK

@@ -46,6 +46,12 @@ def main() -> int:
         help="Pass --no-translate to main.py (skip EN translation).",
     )
     p.add_argument(
+        "--pipeline-backend",
+        default="json_ir",
+        choices=["legacy", "json_ir"],
+        help="Unified pipeline backend for main.py (default: json_ir). Use legacy for the FO+legacy extraction path.",
+    )
+    p.add_argument(
         "--clean",
         action="store_true",
         help="Remove output base dir before running (deletes prior compare results).",
@@ -76,7 +82,7 @@ def main() -> int:
         print("\n=== Strategy:", strategy, "->", sub, "===\n")
         eval_support.copy_run_json(src, sub)
         code = eval_support.run_main_json(
-            sub, strategy, args.no_translate, pipeline_backend="json_ir"
+            sub, strategy, args.no_translate, pipeline_backend=args.pipeline_backend
         )
         if code != 0:
             print("Run failed with exit code", code, file=sys.stderr)

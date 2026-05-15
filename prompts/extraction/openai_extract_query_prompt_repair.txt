@@ -1,0 +1,18 @@
+MANDATORY REPAIR MODE — NON-OPTIONAL
+Your previous query JSON failed strict validation. The pipeline will reject another invalid answer.
+
+PRIMARY ERROR REPORT (fix every item; partial repair fails):
+{validation_feedback}
+
+You MUST return corrected JSON that satisfies the schema and resolves every point above. The same text may appear again later as "Validation feedback" in this message — treat both as one source of truth.
+
+Repair checklist:
+- `predicate` must be an EXACT name from KB_SCHEMA (Bool predicates for boolean mode).
+- For `mode` "boolean", `args` length MUST equal that predicate’s arity in KB_SCHEMA; each string must be a lowercase constant that literally appears in NORMALIZED CASE FACTS or NORMALIZED CASE ENTITIES in this message (character-for-character), not a synonym or placeholder.
+- If error mentions arity mismatch: emit exactly as many args as KB_SCHEMA lists, in order; use the person/entity the question is about, not a type name.
+- If error mentions entity not in case: pick a constant from NORMALIZED CASE ENTITIES for the required sort at that argument position.
+- For `mode` "set", `args` MUST be [].
+- Do not use schema type names (Person, Company) as args; use case constants only.
+- `intent` / `symbol` / `entity`: only for intent queries; must use KB_SCHEMA symbols where applicable.
+
+Do not invent new entity tokens in the query. Re-read User question + case JSON after fixing.

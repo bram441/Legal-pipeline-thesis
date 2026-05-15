@@ -12,5 +12,8 @@ Repair obligations (satisfy all that apply):
 - Unknown or undeclared entity constant: add it under the correct sort in `entities`, OR remove/replace the assertion if the case text does not justify that constant.
 - Type/sort mismatch: move constants to the correct `entities` key or change the assertion to use constants of the sorts the predicate expects.
 - Illegal identifier (uppercase, spaces, type name used as constant): rename to lowercase ASCII per the contract and ensure the constant is declared under `entities`.
+- "must not assert derived predicate" / "conclusion": DELETE that assertion from `assertions`. Replace with observable facts the case text actually states (dates, relationships, counts, registrations) so the KB can derive the conclusion later.
+- Contradiction or incompatible succession branches: keep only the branch supported by the case narrative; remove conflicting unary facts on the same person.
+- Missing sort bucket: if an assertion needs `Estate`, `Good`, `FinancialYear`, etc., add at least one constant under that sort in `entities` and use it in every arg position that requires it.
 
-Do not re-emit the same failing structure. After editing, mentally re-check: every constant in `assertions` / `value_assertions` appears under `entities`; every symbol is in KB_SCHEMA; every arity matches.
+Do not re-emit the same failing structure. After editing, mentally re-check: every constant in `assertions` / `value_assertions` appears under `entities`; every symbol is in KB_SCHEMA; every arity matches; no derived/conclusion predicates in `assertions`.

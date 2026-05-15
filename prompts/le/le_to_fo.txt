@@ -59,6 +59,18 @@ G) Quantitative consequences
 - When the LE text states minimum/maximum imprisonment or fines, add functions (e.g. imprisonmentMinDays, imprisonmentMaxDays, fineMinEuros, fineMaxEuros) and assign values in the theory with separate rules per case: f(x) = N <=> condition(x).
 - Use a SINGLE unit per quantity type: imprisonmentMinDays and imprisonmentMaxDays for all imprisonment (values in days); fineMinEuros and fineMaxEuros for fines (values in euros).
 
+H) Belgian company law — micro / small enterprise thresholds (when LE mentions size criteria)
+If the LE text compares employee counts, net turnover, or balance-sheet totals to legal limits, declare these in vocabulary as nullary Int functions (exact spelling) and use them in the theory only as function calls, never as bare names or Bool predicates:
+
+  threshold_employees_micro: () -> Int
+  threshold_employees_small: () -> Int
+  threshold_net_turnover_micro: () -> Int
+  threshold_net_turnover_small: () -> Int
+  threshold_total_assets_micro: () -> Int
+  threshold_total_assets_small: () -> Int
+
+Example theory use: annual_average_employees(c) =< threshold_employees_small()  (or separate rules assigning numeric values from the law text).
+
 ========================
 FO(.) THEORY RULES
 ========================

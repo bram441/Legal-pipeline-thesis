@@ -150,25 +150,34 @@ def _lexical_world_knowledge_block() -> str:
     return load_prompt("extraction/world_knowledge_lexical.txt").strip()
 
 
-def _json_ir_extraction_repair_preamble(is_case: bool, feedback) -> str:
-    """When validation failed, prepend strict repair instructions plus the validation error text.
-
-    Uses ``str.replace`` for the error body (not ``render_prompt``): feedback embeds JSON with
-    braces that would otherwise be flagged as unreplaced placeholders.
-    """
+def _extraction_repair_preamble(repair_template_rel: str, feedback) -> str:
+    """Prepend strict repair text + validation error. Uses replace() so embedded JSON in feedback does not break render_prompt."""
     if feedback is None or not str(feedback).strip():
         return ""
+    tmpl = load_prompt(repair_template_rel)
+    needle = "{validation_feedback}"
+    if needle not in tmpl:
+        raise PromptError("Repair template missing " + needle + ": " + repair_template_rel)
+    body = tmpl.replace(needle, str(feedback).strip())
+    return body.strip() + "\n\n"
+
+
+def _json_ir_extraction_repair_preamble(is_case: bool, feedback) -> str:
     rel = (
         "extraction/openai_extract_case_json_ir_repair.txt"
         if is_case
         else "extraction/openai_extract_query_json_ir_repair.txt"
     )
-    tmpl = load_prompt(rel)
-    needle = "{validation_feedback}"
-    if needle not in tmpl:
-        raise PromptError("Repair template missing " + needle + ": " + rel)
-    body = tmpl.replace(needle, str(feedback).strip())
-    return body.strip() + "\n\n"
+    return _extraction_repair_preamble(rel, feedback)
+
+
+def _legacy_extraction_repair_preamble(is_case: bool, feedback) -> str:
+    rel = (
+        "extraction/openai_extract_case_prompt_repair.txt"
+        if is_case
+        else "extraction/openai_extract_query_prompt_repair.txt"
+    )
+    return _extraction_repair_preamble(rel, feedback)
 
 
 def extract_case_only_openai(case_text, model, kb_schema=None, feedback=None):
@@ -185,7 +194,7 @@ def extract_case_only_openai(case_text, model, kb_schema=None, feedback=None):
     client = OpenAI(api_key=api_key)
     kb_schema_json = json.dumps(kb_schema or {}, ensure_ascii=False, indent=2)
 
-    case_user = render_prompt(
+    case_user = _legacy_extraction_repair_preamble(True, feedback) + render_prompt(
         "extraction/openai_extract_case_prompt.txt",
         kb_schema_json=kb_schema_json,
         case_text=str(case_text),
@@ -308,7 +317,7 @@ def extract_query_only_openai(user_question, model, kb_schema=None, case=None, f
     case_facts_json = json.dumps((case_obj.get("facts") or []), ensure_ascii=False, indent=2)
     case_entities_json = json.dumps((case_obj.get("entities") or {}), ensure_ascii=False, indent=2)
 
-    query_user = render_prompt(
+    query_user = _legacy_extraction_repair_preamble(False, feedback) + render_prompt(
         "extraction/openai_extract_query_prompt.txt",
         kb_schema_json=kb_schema_json,
         user_question=str(user_question),

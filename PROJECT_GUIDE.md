@@ -80,6 +80,9 @@ Run metadata now includes:
 - `kb_compile_backend`
 - `kb_compile_flags`
 - `pipeline_backend_mode`
+- `extraction_backend` (after JSON runs, merged into `run.json` with the other compile fields)
+
+**Batch JSON runs:** `scripts/batch_json_runs.py` accepts `--pipeline-backend` (default `json_ir`) and optional `--kb-backend`, forwards them to every `main.py` call, and strips duplicate `--pipeline-backend` / `--kb-backend` from arguments after `--` so script flags win. Prefer explicit `--pipeline-backend legacy` for legacy sweeps instead of relying on `.env` alone.
 
 ## 7) Debugging
 

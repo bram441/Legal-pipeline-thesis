@@ -484,6 +484,22 @@ def _schema_feedback_message(error, previous_output, kb_schema=None):
             msg += "\n\nValid symbols (use EXACT names, case-sensitive): " + ", ".join(valid)
     if kb_schema:
         msg += _arity_mismatch_repair_hint(err_s, previous_output, kb_schema)
+    el = err_s.lower()
+    if "derived predicate" in el or "must not assert derived" in el:
+        msg += (
+            "\n\nREMEDIATION (derived/conclusion predicates): remove those assertions from case IR. "
+            "Assert only observable/input facts and numeric value_assertions; let the KB derive legal conclusions."
+        )
+    if "query argument type mismatch" in el:
+        msg += (
+            "\n\nREMEDIATION (query arg sort): each args[i] must be a constant listed under case.entities "
+            "for the sort KB_SCHEMA expects at position i (Person, Company, Estate, Good, FinancialYear, etc.)."
+        )
+    if "unresolved placeholder" in el:
+        msg += (
+            "\n\nREMEDIATION (placeholders): replace ? with a concrete constant from case.entities for that sort, "
+            "or ensure the case IR declares an entity for the required sort first."
+        )
     return msg
 
 

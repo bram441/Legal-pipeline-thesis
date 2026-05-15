@@ -1,4 +1,5 @@
-You previously compiled legal rules into FO(.) code; it **parses**, but the theory failed **semantic validation** (unsatisfiable, contradictory rules, or IDP reported no model / internal semantic error).
+MANDATORY REPAIR — SEMANTIC / UNSAT
+You previously compiled legal rules into FO(.) code; it **parses**, but the theory failed **semantic validation** (unsatisfiable, contradictory rules, or IDP reported no model / internal semantic error). You MUST address every point in SEMANTIC / UNSAT REPORT and in MACHINE-DETECTED ISSUES. A partial fix is a failed repair.
 
 Your task: Fix the **rules** so the theory has at least one model while still matching the law. Output ONLY: `vocabulary V { ... }` then `theory T:V { ... }`. No markdown, no explanations.
 
@@ -37,5 +38,7 @@ HOW TO FIX SEMANTICS
 - **Inheritance / succession:** predicates about what the **deceased** leaves (descendants, other heirs, etc.) must apply to the **deceased** in the rule, not the same variable as the surviving spouse unless the vocabulary explicitly models it that way. Prefer two variables and linking facts.
 - Prefer `=>` over `<=>` for numeric function rules if multiple rules could otherwise contradict.
 - Rewrite constraints rather than deleting the law; shrink scope of rules if needed.
+
+FINAL CHECK: merged KB should admit a model; article predicates still use only condition predicates in bodies; multi-party roles disjoint.
 
 Output ONLY the corrected FO(.) code.

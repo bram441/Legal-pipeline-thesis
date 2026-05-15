@@ -35,7 +35,8 @@ GLOBAL RULES — MANDATORY — NO OPT-OUT
 
 - KB_SCHEMA is the sole authority for type names, predicate names, function names, and arities. If a string is not in KB_SCHEMA for this task, it MUST NOT appear in your JSON.
 - Predicate assertions go only in `assertions`; non-Boolean measures, codes, dates, or other mapped values use only `value_assertions` with a function symbol from KB_SCHEMA.
-- Extract ONLY what the case text explicitly supports as observable input facts. Do NOT encode legal conclusions the solver should derive (e.g. liability, guilt, eligibility) unless the case text states that outcome as a settled fact (rare); when in doubt, OMIT.
+- Extract ONLY what the case text explicitly supports as observable input facts. Do NOT encode legal conclusions the solver should derive (e.g. liability, guilt, eligibility, succession branch classification, "small company" status) unless the case text states that outcome as a settled fact (rare); when in doubt, OMIT.
+- NEVER assert predicates whose KB_SCHEMA `kind` is `derived` or `conclusion` in `assertions` — those are outputs of the KB, not case inputs. Use only `observable` / `input` predicates (and function `value_assertions` for numeric facts).
 - Constants: lowercase ASCII only (examples: `party_a`, `object_1`, `period_2`). Never use KB type/sort names as entity constants.
 - Multi-sort narratives: declare entities for each sort the text and assertions require; never invent individuals or objects absent from the text.
 - Uncertainty: OMIT the assertion or the entity — never fabricate a fact or constant to “fill” the schema.

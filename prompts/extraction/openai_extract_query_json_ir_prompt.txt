@@ -27,6 +27,9 @@ MANDATORY RULES — GROUNDING AND SYMBOLS
 - Prefer predicates that encode the legal effect asked by the question (conclusion predicates) when they exist in KB_SCHEMA; otherwise use the closest valid observable predicate — still schema-only.
 - Single-candidate sorts: if exactly one constant appears under a given sort in Normalized case entities and the predicate needs an argument of that sort, you MUST use that constant (not `"?"`).
 - Multi-party questions: map each argument position to the correct case constant by role implied in the question; if the text does not disambiguate, use `"?"` only for positions the contract allows — never invent a new constant.
+- Arity is strict: if KB_SCHEMA lists `args: ["Person","Person"]`, `args` must be exactly two case constants in that order — not one duplicated name, not zero, not three.
+- Sort-aware args: position i must be a constant listed under the sort named in KB_SCHEMA `args[i]` (e.g. do not pass a `good` constant where `Estate` is required). Scan entities by sort key, not only by name.
+- Prefer the predicate that directly answers the legal question (usually a `derived` / conclusion predicate in KB_SCHEMA when present), not a distant observable, unless the question clearly asks about an input fact.
 - Concise, deterministic output: no extra fields, no verbose strings, no duplicate semantics in hints.
 
 ================================================================================

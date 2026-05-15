@@ -1,6 +1,10 @@
-You are Step 1 REPAIR of a two-step legal compiler: fix the vocabulary (types + predicates + functions) only.
+MANDATORY REPAIR MODE — NON-OPTIONAL
+You are Step 1 REPAIR of a two-step legal compiler: fix the vocabulary (types + predicates + functions) only. A previous attempt failed validation or was inconsistent with later steps.
 
-A previous attempt failed validation or was inconsistent with later steps. You MUST read the error report and the artifacts below, then output a corrected symbol table that satisfies the contract and removes the failure. Do not repeat the same mistake: compare your new output against VALIDATION_ERROR_REPORT and fix the root cause.
+PRIMARY ERROR REPORT (binding — fix the root cause of every item; partial fixes fail):
+{error_message}
+
+You MUST output a corrected symbol table that satisfies the contract and removes the failure. Compare your new output against PRIMARY ERROR REPORT and PREVIOUS_ATTEMPT below; do not repeat the same mistake.
 
 Return ONLY one JSON object. No markdown. No prose before or after the JSON. First character `{`, last character `}`.
 
@@ -17,15 +21,16 @@ What to fix (non-exhaustive):
 - Invalid JSON, wrong types for fields, missing required keys, duplicate type names, predicate returns other than Bool.
 - Sort names used in predicate/function `args` must appear in "types".
 - If the error mentions a mismatch with rules (e.g. argument sorts), adjust predicate/function signatures OR add missing sorts so the frozen vocabulary can support consistent rules on the next attempt.
+- KB lint "undeclared symbol threshold_*": add each threshold as a `functions` entry (returns Int or Real) with the exact name used in rules; do not leave thresholds only inside rules.
+- IDP "integer expected (date found: …)" or "financial_year found": rules used a variable with the wrong quantifier sort — fix Step 1 signatures or ensure rules quantify variables with the sort each argument position requires.
 
-VALIDATION_ERROR_REPORT:
-{error_message}
-
-PREVIOUS_ATTEMPTS_OR_ARTIFACTS (raw model text and/or parsed JSON — use this as the baseline to correct, not to copy blindly if it was invalid):
+PREVIOUS_ATTEMPTS_OR_ARTIFACTS (raw model text and/or parsed JSON — correct this baseline; do not copy blindly if it was invalid):
 {previous_output}
 
-DETERMINISTIC_HINTS (may be empty):
+DETERMINISTIC_HINTS (may be empty — satisfy when non-empty):
 {machine_hints}
+
+{company_law_thresholds_addon}
 
 LAW TEXT:
 {law_text}

@@ -188,6 +188,24 @@ def _lint_undeclared_theory_calls(kb_text: str, vocab_body: str) -> List[str]:
     return issues
 
 
+def lint_kb_fo_text_or_patch_company_thresholds(kb_text: str) -> str:
+    """
+    Run static lint; if only missing Belgian company threshold declarations, patch vocabulary and retry once.
+    Returns possibly patched kb_text.
+    """
+    try:
+        lint_kb_fo_text(kb_text)
+        return kb_text
+    except KBLintError:
+        from pipeline.kb.company_law import patch_kb_missing_company_threshold_declarations
+
+        patched, changed = patch_kb_missing_company_threshold_declarations(kb_text)
+        if changed:
+            lint_kb_fo_text(patched)
+            return patched
+        raise
+
+
 def lint_kb_fo_text(kb_text: str) -> None:
     """
     Run all static lints. Raises KBLintError with combined message on failure.

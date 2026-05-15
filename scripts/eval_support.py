@@ -5,6 +5,7 @@ Shared helpers for KB strategy evaluation (used by run_evaluation.py and compare
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -29,7 +30,12 @@ def run_main_json(
     no_translate: bool,
     kb_backend: str | None = None,
     pipeline_backend: str | None = None,
+    *,
+    belief_scoring: bool = False,
 ) -> int:
+    """Invoke ``main.py --mode json``. Omit ``--kb-backend`` / ``--pipeline-backend`` when
+    arguments are ``None`` so the subprocess follows ``.env`` defaults.
+    """
     cmd = [
         sys.executable,
         str(_ROOT / "main.py"),
@@ -42,11 +48,15 @@ def run_main_json(
     ]
     if no_translate:
         cmd.append("--no-translate")
-    if kb_backend:
+    if kb_backend is not None:
         cmd.extend(["--kb-backend", kb_backend])
-    if pipeline_backend:
+    if pipeline_backend is not None:
         cmd.extend(["--pipeline-backend", pipeline_backend])
-    return subprocess.call(cmd, cwd=str(_ROOT))
+    env = os.environ.copy()
+    if belief_scoring:
+        env["SCORE_TREAT_OPEN_WITH_BELIEF"] = "1"
+        env.setdefault("SCORE_BOOLEAN_BELIEF_THRESHOLD", "0.5")
+    return subprocess.call(cmd, cwd=str(_ROOT), env=env)
 
 
 def read_score(path: Path) -> dict | None:
@@ -100,9 +110,24 @@ def parse_strategies_selection(spec: str) -> list[str]:
     return names
 
 
-def work_dir_name(run_folder: Path, strategy: str) -> str:
-    """Filesystem-safe unique name: run_003__direct_single"""
-    return run_folder.name + "__" + strategy
+def work_dir_name(
+    run_folder: Path,
+    strategy: str,
+    *,
+    pipeline_backend: str | None = None,
+    kb_backend: str | None = None,
+) -> str:
+    """Filesystem-safe unique name, e.g. ``run_003__direct_single__json_ir``.
+
+    Includes a backend suffix so two evaluation sweeps (legacy vs json_ir) do not
+    overwrite the same work directory.
+    """
+    base = run_folder.name + "__" + strategy
+    if pipeline_backend:
+        return base + "__" + pipeline_backend.replace("/", "_")
+    if kb_backend:
+        return base + "__" + kb_backend.replace("/", "_")
+    return base
 
 
 def _gather_eval_diag_text(work_dir: Path) -> str:

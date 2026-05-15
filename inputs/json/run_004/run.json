@@ -9,7 +9,13 @@
   "questions": [
     {
       "id": "q1",
-      "text": "Welk erfrecht verkrijgt de langstlevende echtgenoot volgens artikel 4.17, paragraaf 2?"
+      "text": "Verkrijgt Dirk volgens artikel 4.17, paragraaf 2 het vruchtgebruik van de overige goederen van Carla's eigen vermogen?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "target": "dirk",
+        "reason": "Carla leaves no descendants but does leave an ascendant and a close collateral relative. Under Art. 4.17 par. 2, the surviving spouse obtains usufruct of the remaining goods of the deceased's own property."
+      }
     }
   ],
   "kb_compile_strategy": "direct_single",
@@ -17,5 +23,6 @@
   "kb_compile_flags": {
     "use_le": false,
     "two_phase": false
-  }
+  },
+  "pipeline_backend_mode": "json_ir"
 }
