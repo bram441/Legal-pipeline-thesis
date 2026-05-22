@@ -4,6 +4,9 @@ Classical FO gives three epistemic cells: entailed, contradicted, or open (possi
 but not certain). For open cases we optionally apply a configurable *prior* toward
 Yes (``PIPELINE_OPEN_WORLD_P_YES``) so evaluation and NL can report a credence, not
 a spurious false.
+
+Symbolic failures (error, unsupported, missing entailment signals) must never be
+scored as decisive contradiction.
 """
 
 from __future__ import annotations
@@ -21,6 +24,23 @@ def open_world_p_yes() -> float:
     return max(0.0, min(1.0, v))
 
 
+def symbolic_result_is_inconclusive(symbolic_result: dict | None) -> bool:
+    """True when the symbolic layer did not produce a decisive entailment verdict."""
+    pred = symbolic_result or {}
+    status = str(pred.get("status") or "").strip().lower()
+    if status in ("error", "unsupported", "timeout", "failed"):
+        return True
+    if status and status not in ("ok", "success"):
+        return True
+    has_certain = "certain" in pred
+    has_possible = "possible" in pred
+    if not has_certain and not has_possible:
+        return True
+    if status == "ok" and has_certain is False and has_possible is False:
+        return True
+    return False
+
+
 def summarize_boolean_symbolic(symbolic_result: dict | None) -> dict:
     """
     Map ``{certain, possible}`` to labels and credence.
@@ -33,6 +53,17 @@ def summarize_boolean_symbolic(symbolic_result: dict | None) -> dict:
       - credence_yes_pct: int 0..100 — round(p_yes * 100), useful for display
     """
     pred = symbolic_result or {}
+
+    if symbolic_result_is_inconclusive(pred):
+        return {
+            "label": "unknown",
+            "p_yes": open_world_p_yes(),
+            "p_no": 1.0 - open_world_p_yes(),
+            "verdict_strength_pct": 0,
+            "credence_yes_pct": int(round(open_world_p_yes() * 100)),
+            "symbolic_inconclusive": True,
+        }
+
     certain = bool(pred.get("certain"))
     possible = bool(pred.get("possible"))
 
@@ -43,6 +74,7 @@ def summarize_boolean_symbolic(symbolic_result: dict | None) -> dict:
             "p_no": 0.0,
             "verdict_strength_pct": 100,
             "credence_yes_pct": 100,
+            "symbolic_inconclusive": False,
         }
     if not possible:
         return {
@@ -51,6 +83,7 @@ def summarize_boolean_symbolic(symbolic_result: dict | None) -> dict:
             "p_no": 1.0,
             "verdict_strength_pct": 100,
             "credence_yes_pct": 0,
+            "symbolic_inconclusive": False,
         }
     p_yes = open_world_p_yes()
     strength = int(round(abs(p_yes - 0.5) * 2.0 * 100))
@@ -60,4 +93,5 @@ def summarize_boolean_symbolic(symbolic_result: dict | None) -> dict:
         "p_no": 1.0 - p_yes,
         "verdict_strength_pct": strength,
         "credence_yes_pct": int(round(p_yes * 100)),
+        "symbolic_inconclusive": True,
     }

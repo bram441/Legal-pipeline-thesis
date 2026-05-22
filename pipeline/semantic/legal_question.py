@@ -6,6 +6,32 @@ import os
 import re
 
 
+_LEGAL_DEFINITION_MARKERS_EN = (
+    r"\bwithin the meaning of\b",
+    r"\bfor the purposes of\b",
+    r"\bas defined in\b",
+    r"\bdefinition of\b",
+    r"\bin the sense of\b",
+    r"\bwithin the scope of\b",
+    r"\bfalls under\b",
+    r"\bqualifies as\b",
+    r"\bis considered\b",
+    r"\bis deemed\b",
+    r"\bwithin the meaning\b",
+)
+
+_LEGAL_DEFINITION_MARKERS_NL = (
+    r"\bin de zin van\b",
+    r"\bals bedoeld in\b",
+    r"\bbedoeld in artikel\b",
+    r"\bzoals gedefinieerd in\b",
+    r"\bvalt onder\b",
+    r"\bkwalificeert als\b",
+    r"\bwordt beschouwd als\b",
+    r"\bwordt geacht\b",
+    r"\bis sprake van\b",
+)
+
 _LEGAL_CONCLUSION_MARKERS_EN = (
     r"\bright\b",
     r"\bentitled\b",
@@ -25,6 +51,12 @@ _LEGAL_CONCLUSION_MARKERS_EN = (
     r"\bexcluded\b",
     r"\bforfeited\b",
     r"\blegal consequence\b",
+    r"\bconsequences\b",
+    r"\bconsequence\b",
+    r"\btake effect\b",
+    r"\btakes effect\b",
+    r"\bapply from\b",
+    r"\bapplies from\b",
     r"\bclassification\b",
     r"\bstatus\b",
     r"\baccording to\b",
@@ -63,6 +95,9 @@ _LEGAL_CONCLUSION_MARKERS_NL = (
     r"\bkwalificeert\b",
     r"\bis er sprake van\b",
     r"\bheeft .* recht\b",
+    r"\bgevolgen\b",
+    r"\btreden in werking\b",
+    r"\bgelden vanaf\b",
 )
 
 _FACTUAL_MARKERS = (
@@ -102,19 +137,26 @@ def domain_heuristics_enabled() -> bool:
     )
 
 
-def _matches_legal_conclusion_markers(question: str) -> bool:
-    t = (question or "").strip().lower()
+def _matches_patterns(question: str, patterns: tuple[str, ...]) -> bool:
+    t = (question or "").strip()
     if not t:
         return False
-    for pat in _LEGAL_CONCLUSION_MARKERS_EN + _LEGAL_CONCLUSION_MARKERS_NL:
+    for pat in patterns:
         if re.search(pat, t, re.IGNORECASE):
             return True
     return False
 
 
+def question_asks_legal_definition(question: str) -> bool:
+    """True when the question targets a legal definition or classification under a cited provision."""
+    return _matches_patterns(question, _LEGAL_DEFINITION_MARKERS_EN + _LEGAL_DEFINITION_MARKERS_NL)
+
+
 def question_asks_legal_conclusion(question: str) -> bool:
     """True when the question targets a legal effect, not merely a recorded fact."""
-    if _matches_legal_conclusion_markers(question):
+    if question_asks_legal_definition(question):
+        return True
+    if _matches_patterns(question, _LEGAL_CONCLUSION_MARKERS_EN + _LEGAL_CONCLUSION_MARKERS_NL):
         return True
     if question_asks_factual_only(question):
         return False

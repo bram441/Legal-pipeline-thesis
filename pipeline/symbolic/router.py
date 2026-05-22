@@ -1,39 +1,19 @@
 # pipeline/symbolic/router.py
 
-from importlib import import_module
-
 from debug import debug_log
 
-
-def _run_intent(case, query, base_kb_text):
-    intent = (query.get("intent") or "").strip().lower()
-    if not intent:
-        raise ValueError("Intent query missing 'intent'")
-
-    debug_log("router._run_intent", "intent=" + intent)
-
-    try:
-        mod = import_module("idp_z3.intents." + intent)
-    except Exception as e:
-        raise ValueError("Unsupported intent: " + intent + " (" + str(e) + ")")
-
-    run_fn = getattr(mod, "run", None)
-    if run_fn is None:
-        raise ValueError("Intent handler has no run(): " + intent)
-
-    return run_fn(case=case, base_kb_text=base_kb_text, query=query)
+from pipeline.symbolic.antecedent_coverage import (
+    compute_antecedent_coverage,
+    format_missing_observable_feedback,
+    missing_observable_symbols,
+)
+from pipeline.symbolic.executor import execute_intent
+from pipeline.symbolic.intent_registry import get_intent_spec
+from pipeline.symbolic.query_validate import validate_and_finalize_query
 
 
-def _normalize_predicate_query_to_intent(query):
-    """
-    Predicate queries are just a UI-friendly surface form.
-
-    We translate them to a symbolic *intent* so the backend remains generic:
-      - mode == "boolean"  -> intent "deduction" (entailment-like)
-      - mode == "set"      -> intent "deduction_set" (extension of predicate)
-
-    This keeps strict validation and avoids per-predicate handlers.
-    """
+def _normalize_predicate_query_to_intent(query: dict) -> dict:
+    """Map predicate surface form to internal intent execution query."""
     pred = (query.get("predicate") or "").strip()
     if not pred:
         raise ValueError("Predicate query missing 'predicate'")
@@ -45,14 +25,20 @@ def _normalize_predicate_query_to_intent(query):
         raise ValueError("query.args must be a list")
 
     if mode == "boolean":
+        if explain:
+            return {
+                "type": "intent",
+                "intent": "explain",
+                "target": {"type": "predicate", "predicate": pred, "args": args},
+                "predicate": pred,
+                "args": args,
+            }
         if len(args) < 1:
             raise ValueError("Boolean predicate query requires at least 1 argument")
-        # Deduction intent will interpret (predicate,args)
         debug_log("router._normalize", "predicate boolean -> deduction")
         return {
             "type": "intent",
             "intent": "deduction",
-            "explain": explain,
             "predicate": pred,
             "mode": "boolean",
             "args": args,
@@ -63,26 +49,63 @@ def _normalize_predicate_query_to_intent(query):
         return {
             "type": "intent",
             "intent": "deduction_set",
-            "explain": explain,
             "predicate": pred,
             "mode": "set",
             "args": [],
         }
 
-
     raise ValueError("Unsupported predicate query mode: " + str(mode))
 
 
-def run_query(case, query, base_kb_text):
-    q_type = (query.get("type") or "").strip().lower()
+def _intent_from_query(query: dict) -> str:
+    if str(query.get("type") or "").lower() == "intent":
+        return str(query.get("intent") or query.get("internal_intent") or "").strip().lower()
+    if str(query.get("type") or "").lower() == "predicate":
+        mode = str(query.get("mode") or "boolean").lower()
+        return "deduction_set" if mode == "set" else "deduction"
+    raise ValueError("Cannot determine intent from query")
 
+
+def run_query(case, query, base_kb_text, *, kb_schema=None, user_question=None):
+    """Run symbolic reasoning; returns (sat, normalized symbolic_result)."""
+    q_type = (query.get("type") or "").strip().lower()
     debug_log("router.run_query", "type=" + str(q_type))
 
-    if q_type == "intent":
-        return _run_intent(case, query, base_kb_text)
-
     if q_type == "predicate":
-        normalized = _normalize_predicate_query_to_intent(query)
-        return _run_intent(case, normalized, base_kb_text)
+        exec_query = _normalize_predicate_query_to_intent(query)
+    elif q_type == "intent":
+        exec_query = dict(query)
+    else:
+        raise ValueError("Unsupported query.type: " + str(q_type))
 
-    raise ValueError("Unsupported query.type: " + str(q_type))
+    intent = _intent_from_query(exec_query)
+    get_intent_spec(intent)
+
+    case_for_run = dict(case) if isinstance(case, dict) else case
+    if kb_schema and isinstance(case_for_run, dict) and "kb_schema" not in case_for_run:
+        case_for_run = {**case_for_run, "kb_schema": kb_schema}
+
+    sat, result = execute_intent(
+        intent,
+        case_for_run,
+        exec_query,
+        base_kb_text,
+        kb_schema=kb_schema,
+        user_question=user_question,
+    )
+
+    if kb_schema and isinstance(result, dict):
+        coverage = compute_antecedent_coverage(
+            case_for_run, query, kb_schema, symbolic_result=result
+        )
+        if coverage:
+            result["antecedent_coverage"] = coverage
+        label = str(result.get("label") or result.get("epistemic_label") or "").lower()
+        if label == "unknown" or (result.get("possible") and not result.get("certain")):
+            missing = missing_observable_symbols(coverage)
+            if missing:
+                hint = format_missing_observable_feedback(missing, kb_schema)
+                if hint:
+                    result["extraction_repair_hint"] = hint
+
+    return sat, result

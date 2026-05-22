@@ -198,7 +198,9 @@ def parse_json_ir(raw_text: str) -> dict:
             return obj
         except json.JSONDecodeError as e:
             last_err = e
-    raise JSONIRCompilationError("Invalid JSON IR output: " + str(last_err)) from last_err
+    if last_err is not None:
+        raise JSONIRCompilationError("Invalid JSON IR output: " + str(last_err)) from last_err
+    raise JSONIRCompilationError("Invalid JSON IR output: no parseable JSON object found")
 
 
 def _coerce_identifier(value: str) -> str:
@@ -226,7 +228,29 @@ def _require_ident(value: Any, ctx: str) -> str:
     coerced = _coerce_identifier(value.strip())
     if not _IDENT_RE.match(coerced):
         raise JSONIRCompilationError(ctx + " must be a valid identifier.")
+    if coerced.startswith("_") and not coerced.startswith("__"):
+        raise JSONIRCompilationError(
+            ctx + f": placeholder identifier '{coerced}' is not allowed; "
+            "use variables declared in the rule's forall."
+        )
     return coerced
+
+
+def _reject_malformed_expr_shape(raw: dict, idx: int, ctx: str) -> None:
+    """Reject common LLM shapes that mix function terms with comparison operators."""
+    keys = set(raw.keys())
+    if "pred" in keys or "symbol" in keys or "and" in keys or "or" in keys or "not" in keys:
+        return
+    if "compare" in keys:
+        return
+    if "func" in keys or "function" in keys:
+        if "op" in keys or "right" in keys or "left" in keys:
+            raise JSONIRCompilationError(
+                f"rules[{idx}].{ctx}: invalid expression — wrap comparisons as "
+                '{"left": {"func": "F", "args": ["x"]}, "op": "=<", "right": 10} '
+                'or {"compare": {"left": ..., "op": "=<", "right": ...}}; '
+                "do not put func and op/right at the same object level."
+            )
 
 
 def _validate_type_name(type_name: Any) -> str:
@@ -594,6 +618,121 @@ def _iter_pred_atoms_with_args(expr: Any):
         for x in expr.get("or") or []:
             yield from _iter_pred_atoms_with_args(x)
         return
+    comp = expr.get("compare") if "compare" in expr else expr if {"left", "op", "right"}.issubset(expr.keys()) else None
+    if isinstance(comp, dict):
+        for side in (comp.get("left"), comp.get("right")):
+            yield from _iter_pred_atoms_with_args(side)
+
+
+def _iter_function_refs(expr: Any):
+    """Yield (function_name, side_dict) for func atoms inside comparisons and nested logic."""
+    if isinstance(expr, list):
+        for x in expr:
+            yield from _iter_function_refs(x)
+        return
+    if not isinstance(expr, dict):
+        return
+    if "func" in expr or "function" in expr:
+        fn = str(expr.get("func") or expr.get("function") or "").strip()
+        if fn:
+            yield fn
+        return
+    if "not" in expr:
+        yield from _iter_function_refs(expr.get("not"))
+        return
+    if "and" in expr:
+        for x in expr.get("and") or []:
+            yield from _iter_function_refs(x)
+        return
+    if "or" in expr:
+        for x in expr.get("or") or []:
+            yield from _iter_function_refs(x)
+        return
+    comp = expr.get("compare") if "compare" in expr else expr if {"left", "op", "right"}.issubset(expr.keys()) else None
+    if isinstance(comp, dict):
+        for side in (comp.get("left"), comp.get("right")):
+            yield from _iter_function_refs(side)
+
+
+def _rule_expr_sides(raw_rule: dict) -> tuple[Any, Any]:
+    if_side = raw_rule.get("if", [])
+    then_side = raw_rule.get("then", []) if "then" in raw_rule else raw_rule.get("formula")
+    return if_side, then_side
+
+
+def _collect_helper_symbol_usage(
+    rules: list,
+    pred_kinds: dict[str, str],
+    fun_kinds: dict[str, str],
+) -> tuple[set[str], set[str], set[str], set[str]]:
+    """Return (helpers_in_if_preds, helpers_in_if_funs, helpers_defined_then_preds, helpers_defined_then_funs)."""
+    in_if_p: set[str] = set()
+    in_if_f: set[str] = set()
+    def_then_p: set[str] = set()
+    def_then_f: set[str] = set()
+
+    def _note_pred(name: str, *, in_if: bool, in_then: bool) -> None:
+        if pred_kinds.get(name) != "helper":
+            return
+        if in_if:
+            in_if_p.add(name)
+        if in_then:
+            def_then_p.add(name)
+
+    def _note_fun(name: str, *, in_if: bool, in_then: bool) -> None:
+        if fun_kinds.get(name) != "helper":
+            return
+        if in_if:
+            in_if_f.add(name)
+        if in_then:
+            def_then_f.add(name)
+
+    for raw_rule in rules or []:
+        if not isinstance(raw_rule, dict):
+            continue
+        if_side, then_side = _rule_expr_sides(raw_rule)
+        for atom in _iter_pred_atoms_with_args(if_side):
+            pn = str(atom.get("pred") or atom.get("symbol") or "").strip()
+            if pn:
+                _note_pred(pn, in_if=True, in_then=False)
+        for fn in _iter_function_refs(if_side):
+            _note_fun(fn, in_if=True, in_then=False)
+        for atom in _iter_pred_atoms_with_args(then_side):
+            pn = str(atom.get("pred") or atom.get("symbol") or "").strip()
+            if pn:
+                _note_pred(pn, in_if=False, in_then=True)
+        for fn in _iter_function_refs(then_side):
+            _note_fun(fn, in_if=False, in_then=True)
+
+    return in_if_p, in_if_f, def_then_p, def_then_f
+
+
+def _validate_floating_helpers(
+    ir: dict,
+    pred_kinds: dict[str, str],
+    fun_kinds: dict[str, str],
+) -> None:
+    """Reject helpers used in IF that are never defined in any rule THEN."""
+    rules = ir.get("rules") or []
+    in_if_p, in_if_f, def_then_p, def_then_f = _collect_helper_symbol_usage(rules, pred_kinds, fun_kinds)
+    floating_p = in_if_p - def_then_p
+    floating_f = in_if_f - def_then_f
+    for name in sorted(floating_p):
+        raise JSONIRCompilationError(
+            SCHEMA_DESIGN_TAG
+            + f": Helper predicate '{name}' is used as a rule condition but is never defined by any rule. "
+            "Helper symbols must be derived by rules. If this fact should come directly from the case, "
+            "mark it as observable. If it is an intermediate condition, add rules that derive it from "
+            "observable facts/functions."
+        )
+    for name in sorted(floating_f):
+        raise JSONIRCompilationError(
+            SCHEMA_DESIGN_TAG
+            + f": Helper function '{name}' is used as a rule condition but is never defined by any rule. "
+            "Helper symbols must be derived by rules. If this fact should come directly from the case, "
+            "mark it as observable. If it is an intermediate condition, add rules that derive it from "
+            "observable facts/functions."
+        )
 
 
 def _if_has_observable_bridge(expr: Any, pred_kinds: dict[str, str], fun_kinds: dict[str, str]) -> bool:
@@ -620,6 +759,53 @@ def _if_has_observable_bridge(expr: Any, pred_kinds: dict[str, str], fun_kinds: 
     return False
 
 
+def _validate_unary_role_conflation(
+    raw_rule: dict,
+    idx: int,
+    pred_descriptions: dict[str, str],
+) -> None:
+    """Reject one rule variable carrying incompatible unary subject roles (e.g. deceased vs surviving)."""
+    from pipeline.kb.role_hints import role_hints_conflict, unary_subject_role_hints
+    from pipeline.semantic.legal_question import witness_modeling_hint
+
+    if not isinstance(raw_rule, dict):
+        return
+    quant_env = _rule_quant_env(raw_rule, idx)
+    if not quant_env:
+        return
+
+    var_hints: dict[str, set[str]] = {v: set() for v in quant_env}
+
+    def _note_unary_calls(expr: Any) -> None:
+        for atom in _iter_pred_atoms_with_args(expr):
+            pn = str(atom.get("pred") or atom.get("symbol") or "").strip()
+            if not pn:
+                continue
+            args = atom.get("args") or []
+            if len(args) != 1:
+                continue
+            arg = args[0]
+            if isinstance(arg, str) and arg in quant_env:
+                for hint in unary_subject_role_hints(pn, pred_descriptions.get(pn, "")):
+                    var_hints[arg].add(hint)
+
+    for key in ("if", "then", "formula"):
+        if key in raw_rule:
+            _note_unary_calls(raw_rule.get(key))
+
+    for var, hints in sorted(var_hints.items()):
+        frozen = frozenset(hints)
+        if role_hints_conflict(frozen):
+            raise JSONIRCompilationError(
+                RULE_DESIGN_TAG
+                + f": rules[{idx}] variable '{var}' combines incompatible unary subject roles "
+                f"({', '.join(sorted(hints))}). Observables about different lifecycle roles must use "
+                "separate quantified variables linked by a binary relation (e.g. status_of(subject, other)), "
+                "not a single shared variable."
+                + witness_modeling_hint()
+            )
+
+
 def _validate_object_rule_role_binding(
     raw_rule: dict,
     idx: int,
@@ -631,6 +817,7 @@ def _validate_object_rule_role_binding(
 
     if not isinstance(raw_rule, dict):
         return
+    _validate_unary_role_conflation(raw_rule, idx, pred_descriptions)
     quant_env = _rule_quant_env(raw_rule, idx)
     if_side = raw_rule.get("if", [])
     then_side = raw_rule.get("then", []) if "then" in raw_rule else raw_rule.get("formula")
@@ -698,6 +885,38 @@ def _validate_object_rule_role_binding(
                         )
 
 
+def _derived_predicates_defined_in_rules(rules: list, pred_kinds: dict[str, str]) -> set[str]:
+    defined: set[str] = set()
+    for rule in rules or []:
+        if not isinstance(rule, dict):
+            continue
+        then_side = rule.get("then", []) if "then" in rule else rule.get("formula")
+        for atom in _iter_pred_atoms_with_args(then_side):
+            pn = str(atom.get("pred") or atom.get("symbol") or "").strip()
+            if pred_kinds.get(pn) in _DERIVED_OUTPUT_KINDS:
+                defined.add(pn)
+    return defined
+
+
+def _validate_derived_predicates_have_defining_rules(
+    ir: dict,
+    pred_kinds: dict[str, str],
+) -> None:
+    derived_names = {n for n, k in pred_kinds.items() if k in _DERIVED_OUTPUT_KINDS}
+    if not derived_names:
+        return
+    defined = _derived_predicates_defined_in_rules(ir.get("rules") or [], pred_kinds)
+    missing = sorted(derived_names - defined)
+    if missing:
+        raise JSONIRCompilationError(
+            SCHEMA_DESIGN_TAG
+            + ": derived predicate(s) "
+            + ", ".join(missing)
+            + " never appear in any rule THEN. Every derived legal-output symbol must be "
+            "defined by at least one rule."
+        )
+
+
 def validate_combined_json_ir_schema(
     ir: dict,
     predicates: list[SymbolDecl],
@@ -710,6 +929,8 @@ def validate_combined_json_ir_schema(
     pred_descriptions = {p.name: p.description for p in predicates}
     fun_kinds = {f.name: f.kind for f in functions}
     preflight_json_ir_rule_predicates(ir)
+    _validate_floating_helpers(ir, pred_kinds, fun_kinds)
+    _validate_derived_predicates_have_defining_rules(ir, pred_kinds)
     for i, rule in enumerate(ir.get("rules") or []):
         if isinstance(rule, dict):
             _validate_object_rule_schema_design(rule, i, pred_kinds, pred_names, fun_names)
@@ -1113,6 +1334,7 @@ def _infer_expr_type(
         raise JSONIRCompilationError(f"rules[{idx}].{ctx}: raw string expressions are not allowed inside object rules.")
     if not isinstance(raw, dict):
         raise JSONIRCompilationError(f"rules[{idx}].{ctx}: expression must be object or list.")
+    _reject_malformed_expr_shape(raw, idx, ctx)
     if "pred" in raw or "symbol" in raw:
         pred = _require_ident(raw.get("pred") or raw.get("symbol"), f"rules[{idx}].{ctx}.pred")
         args = raw.get("args", [])
@@ -1550,13 +1772,16 @@ def preflight_json_ir_rule_predicates(ir: dict) -> None:
             )
 
 
-def kb_schema_dict_from_normalized(norm: dict) -> dict:
+def kb_schema_dict_from_normalized(norm: dict, *, rules_objects: list | None = None) -> dict:
     """Schema for extraction/validation: preserves predicate/function metadata from JSON_IR."""
-    return {
+    out: dict = {
         "types": list(norm["types"]),
         "predicates": [dict(p) for p in norm["predicates"]],
         "functions": [dict(f) for f in norm["functions"]],
     }
+    if rules_objects:
+        out["rules"] = [dict(r) for r in rules_objects if isinstance(r, dict)]
+    return out
 
 
 def _fo_text_from_normalized(norm: dict) -> str:
@@ -1589,13 +1814,27 @@ def render_json_ir_to_fo_and_schema(ir: dict) -> tuple[str, dict]:
         "true",
         "yes",
     }
+
+    def _object_rules_from_source(source: dict) -> list:
+        return [r for r in (source.get("rules") or []) if isinstance(r, dict)]
+
     try:
-        norm = compile_validate_json_ir(ir)
+        predicates, functions, types = validate_json_ir_symbols(ir)
+        merged = {
+            "types": types,
+            "predicates": [_symbol_to_json(d) for d in predicates],
+            "functions": [_symbol_to_json(d) for d in functions],
+            "rules": ir.get("rules") or [],
+        }
+        validate_combined_json_ir_schema(merged, predicates, functions)
+        object_rules = _object_rules_from_source(merged)
+        norm = normalize_json_ir(merged)
     except JSONIRCompilationError:
         if not allow_partial:
             raise
         norm, _warnings = _normalize_with_quarantine(ir)
-    return _fo_text_from_normalized(norm), kb_schema_dict_from_normalized(norm)
+        object_rules = _object_rules_from_source(ir)
+    return _fo_text_from_normalized(norm), kb_schema_dict_from_normalized(norm, rules_objects=object_rules)
 
 
 def render_json_ir_to_fo(ir: dict) -> str:

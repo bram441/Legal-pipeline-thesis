@@ -128,18 +128,39 @@ def build_json_ir_compile_hints(error_message: str) -> str:
                 "A function was used as a Boolean atom. If yes/no, declare a predicate with returns Bool; "
                 "if numeric, use the function only inside compare/terms."
             )
+        if "helper predicate" in el and "never defined" in el:
+            out.append(
+                "Every helper used in a rule condition must be defined by some rule, or it must be reclassified "
+                "as observable. Do not leave helper predicates/functions open. Either add a rule whose THEN derives "
+                "the helper from observables, or change the symbol kind to observable for case-provided facts."
+            )
+        if "helper function" in el and "never defined" in el:
+            out.append(
+                "Every helper used in a rule condition must be defined by some rule, or it must be reclassified "
+                "as observable. Do not leave helper predicates/functions open."
+            )
     if "json_ir_rule_design_error" in el and "circular" in el:
         out.append(
             "Break circular derived-only rules by adding observable/helper conditions in `if`, or repair the symbol table."
         )
+    if "incompatible unary subject roles" in el:
+        out.append(
+            "Do not quantify a single variable over both deceased-style and surviving-style unary observables. "
+            "Introduce separate variables (e.g. subject, other) and a binary relation linking them, then rewrite rules."
+        )
 
-    if "unsupported expression object" in el:
+    if "unsupported expression object" in el or "func and op/right at the same object level" in el:
         out.append(
             "In `if` / `then` / nested `and`/`or`, each expression object must be ONLY one of: "
             "atom `{\"pred\":\"P\",\"args\":[...],\"negated\":false}`, "
             "`{\"and\":[ ... ]}`, `{\"or\":[ ... ]}`, `{\"not\": ... }`, "
             "or comparison `{\"left\":...,\"op\":\"=<\",\"right\":...}`. "
             "Remove keys such as `implies`, `when`, `forall`, `exists`, `iff` from inside `if`/`then` trees."
+        )
+    if "placeholder identifier" in el:
+        out.append(
+            "Do not invent identifiers starting with `_` (e.g. `_descendant`). "
+            "Declare every variable in `forall` and use those names in atoms and terms."
         )
     if "predicate must return bool" in el:
         out.append(

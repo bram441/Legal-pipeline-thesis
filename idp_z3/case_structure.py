@@ -2,6 +2,7 @@
 
 import os
 import re
+from collections import defaultdict
 
 # Predicates that are legal conclusions (derived by theory), not observable conditions.
 # These are NOT closed to {} when absent from case facts.
@@ -39,7 +40,7 @@ _bool_is_line = re.compile(
     re.IGNORECASE
 )
 _func_assign_line = re.compile(
-    r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*\((.*)\)\s*=\s*([^\.]+)\s*\.\s*$"
+    r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*\((.*)\)\s*=\s*(.+?)\s*\.\s*$"
 )
 _bad_star_call = re.compile(r"[A-Za-z_][A-Za-z0-9_]*\s*\*\s*\(")
 _number = re.compile(r"^-?\d+(\.\d+)?$")
@@ -87,7 +88,53 @@ def _split_args(arg_blob):
     return parts
 
 
-def build_structure_block_from_facts(facts, entities=None, kb_primary_type=None, kb_types=None, kb_predicate_names=None):
+def _schema_signature_maps(kb_schema):
+    """Predicate/function name -> tuple of argument type names from kb_schema."""
+    if not isinstance(kb_schema, dict):
+        return {}, {}
+    pred_sigs: dict[str, tuple[str, ...]] = {}
+    for p in kb_schema.get("predicates") or []:
+        if isinstance(p, dict) and p.get("name"):
+            pred_sigs[str(p["name"])] = tuple(p.get("args") or [])
+    fun_sigs: dict[str, tuple[str, ...]] = {}
+    for f in kb_schema.get("functions") or []:
+        if isinstance(f, dict) and f.get("name"):
+            fun_sigs[str(f["name"])] = tuple(f.get("args") or [])
+    return pred_sigs, fun_sigs
+
+
+def _index_fact_constants_by_type(pred_sigs, fun_sigs, pos_atoms, neg_atoms, func_assignments):
+    """Map KB type name -> constants appearing in case facts with that typed argument."""
+    by_type: dict[str, set[str]] = defaultdict(set)
+
+    def _note(name, args, sig_map):
+        sig = sig_map.get(name)
+        if not sig:
+            return
+        for i, arg in enumerate(args):
+            if i >= len(sig):
+                break
+            if isinstance(arg, str) and arg:
+                by_type[sig[i]].add(arg)
+
+    for pred, args in list(pos_atoms) + list(neg_atoms):
+        _note(pred, args, pred_sigs)
+    for fun, pairs in func_assignments.items():
+        for arg_tup, _rhs in pairs:
+            _note(fun, list(arg_tup), fun_sigs)
+    return dict(by_type)
+
+
+def build_structure_block_from_facts(
+    facts,
+    entities=None,
+    kb_primary_type=None,
+    kb_types=None,
+    kb_predicate_names=None,
+    predicate_kinds=None,
+    close_world_observables=None,
+    kb_schema=None,
+):
     if not isinstance(facts, list):
         raise ValueError("case.facts must be a list of strings")
 
@@ -201,21 +248,31 @@ def build_structure_block_from_facts(facts, entities=None, kb_primary_type=None,
         if pred not in ext:
             ext[pred] = set()
 
-    # Close world only when explicitly enabled:
-    # predicates in the KB but not in facts get extension {} (false),
-    # except conclusion predicates (derived by theory).
-    close_world = (os.getenv("CASE_CLOSE_WORLD_PREDICATES", "") or "").strip().lower() in (
-        "1",
-        "true",
-        "yes",
-    )
-    if close_world and kb_predicate_names:
-        for pred in kb_predicate_names:
-            if not pred or pred in ext:
-                continue
-            if _is_conclusion_predicate(pred.lower()):
-                continue
-            ext[pred] = set()
+    # Schema-based close world for observables (JSON-IR default when kinds are provided).
+    kinds = predicate_kinds if isinstance(predicate_kinds, dict) else None
+    if kinds:
+        close_obs = close_world_observables
+        if close_obs is None:
+            env = (os.getenv("JSON_IR_CLOSE_WORLD_OBSERVABLES", "1") or "").strip().lower()
+            close_obs = env not in ("0", "false", "no")
+        if close_obs:
+            for pred, kind in kinds.items():
+                if kind == "observable" and pred and pred not in ext:
+                    ext[pred] = set()
+    else:
+        # Legacy FO path: close world only when explicitly enabled, with name heuristics.
+        close_world = (os.getenv("CASE_CLOSE_WORLD_PREDICATES", "") or "").strip().lower() in (
+            "1",
+            "true",
+            "yes",
+        )
+        if close_world and kb_predicate_names:
+            for pred in kb_predicate_names:
+                if not pred or pred in ext:
+                    continue
+                if _is_conclusion_predicate(pred.lower()):
+                    continue
+                ext[pred] = set()
 
     # --- Domain: IDP requires every constant used in queries / __sel constraints to appear
     # in the structure interpretation for its type. Typed `case.entities` are authoritative:
@@ -247,17 +304,31 @@ def build_structure_block_from_facts(facts, entities=None, kb_primary_type=None,
     if kb_primary_type:
         primary_constants = {c for c in constants_from_facts if c not in non_primary_entity_values}
 
+    pred_sigs, fun_sigs = _schema_signature_maps(kb_schema)
+    constants_by_type = (
+        _index_fact_constants_by_type(pred_sigs, fun_sigs, pos_atoms, neg_atoms, func_assignments)
+        if pred_sigs or fun_sigs
+        else {}
+    )
+    used_in_facts = set(constants_from_facts)
+
+    has_schema_sigs = bool(pred_sigs or fun_sigs)
     inferred_domain_lines = []
     if isinstance(entities, dict):
         for t_name, t_vals in entities.items():
             if not (isinstance(t_name, str) and isinstance(t_vals, list) and t_vals):
                 continue
-            vs = set()
-            for v in t_vals:
-                if isinstance(v, str) and v.strip():
-                    e = _to_idp_elem(v.strip())
-                    vs.add(e)
-                    constants.add(e)
+            vs: set[str] = set()
+            typed_used = constants_by_type.get(t_name)
+            if typed_used:
+                vs |= typed_used
+            else:
+                for v in t_vals:
+                    if isinstance(v, str) and v.strip():
+                        e = _to_idp_elem(v.strip())
+                        if not has_schema_sigs or e in used_in_facts:
+                            vs.add(e)
+                        constants.add(e)
             if t_name == kb_primary_type and primary_constants:
                 vs |= primary_constants
             vals = sorted(vs)
@@ -268,7 +339,12 @@ def build_structure_block_from_facts(facts, entities=None, kb_primary_type=None,
     # If no entities dict, constants come from facts only (no filtering needed)
 
     if domain_type and constants:
-        inferred_domain_lines.append((domain_type, domain_type + " := " + _mk_set(sorted(constants)) + "."))
+        dom_vals = set(constants)
+        if constants_by_type.get(domain_type):
+            dom_vals = set(constants_by_type[domain_type])
+        inferred_domain_lines.append(
+            (domain_type, domain_type + " := " + _mk_set(sorted(dom_vals)) + ".")
+        )
 
     # Build predicate extension lines
     pred_lines = []

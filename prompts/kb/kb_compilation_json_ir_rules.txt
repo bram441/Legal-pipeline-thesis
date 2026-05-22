@@ -67,13 +67,18 @@ HIGH-PRIORITY RULE RULES
 - The declared type must match every use.
 - Do not rely on implicit subtyping.
 - If a concept is a role/status/subset, quantify the broader type and add a role/status predicate in the if-condition.
+- Do not apply both a deceased-style and a surviving-style unary observable to the same variable. Use separate variables and, when needed, a binary relation predicate linking them.
+- Do not use placeholder names starting with `_`; every identifier must be declared in forall.
 
 3. Express legal consequences.
 - A good rule derives a derived legal result from observable facts/functions and helper conditions.
+- Rules that state when consequences apply, take effect, or start from a period must conclude on a derived legal-effect predicate (not only a static classification predicate).
+- Definition-style provisions must conclude on a derived predicate representing the legal status/classification under the provision.
 - Do not create P(x) => P(x).
 - Do not create rules where a derived predicate depends only on itself.
 - Do not create rules that only derive observable case inputs.
 - Do not create rules with empty then.
+- Every derived predicate in SYMBOL_TABLE must appear in at least one rule THEN.
 
 4. No case constants.
 - Every identifier used as an argument must be a quantified variable unless it is a numeric literal.
