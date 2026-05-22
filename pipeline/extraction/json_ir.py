@@ -19,8 +19,13 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from pipeline.semantic.legal_question import domain_heuristics_enabled, question_asks_legal_conclusion
+from pipeline.semantic.legal_question import (
+    domain_heuristics_enabled,
+    question_asks_legal_conclusion,
+    question_asks_legal_definition,
+)
 from pipeline.extraction.query_role_resolve import apply_role_arg_consistency
+from pipeline.symbolic.intent_registry import list_public_intents
 
 
 class ExtractionIRValidationError(Exception):
@@ -52,21 +57,8 @@ _PLACEHOLDERS = frozenset(
     }
 )
 
-SUPPORTED_QUERY_INTENTS: frozenset[str] = frozenset(
-    {
-        "satisfiable",
-        "deduction",
-        "deduction_set",
-        "get_range",
-        "explain",
-        "propagation",
-        "model_checking",
-        "model_expansion",
-        "relevance",
-        "optimization",
-    }
-)
-# Stable order for OpenAI json_schema enums and docs.
+# Public intents selectable in extraction (internal deduction/deduction_set use predicate mode).
+SUPPORTED_QUERY_INTENTS: frozenset[str] = frozenset(list_public_intents())
 SUPPORTED_QUERY_INTENTS_SORTED: tuple[str, ...] = tuple(sorted(SUPPORTED_QUERY_INTENTS))
 _NUMBER_RE = re.compile(r"^-?\d+(?:\.\d+)?$")
 _IDENT_RE = re.compile(r"^[A-Za-z_]\w*$")
@@ -213,6 +205,99 @@ def _lexical_overlap_score(sym: dict, user_question: str) -> float:
     return score
 
 
+_EFFECT_QUESTION_TOKENS = frozenset(
+    {
+        "apply", "applies", "applied", "effect", "effective", "consequence", "consequences",
+        "following", "follow", "from", "period", "year", "timing", "commence", "start", "end",
+        "cease", "take", "gelden", "gevolgen", "werking", "vanaf", "periode", "jaar",
+    }
+)
+
+_EFFECT_PREDICATE_TOKENS = frozenset(
+    {
+        "apply", "applies", "effect", "effective", "consequence", "consequences", "following",
+        "commence", "start", "end", "cease", "period", "timing", "entitled", "entitlement",
+    }
+)
+
+_CLASSIFICATION_NAME_PREFIXES = ("is_", "has_")
+
+
+def _looks_like_classification_predicate(sym: dict) -> bool:
+    n = (sym.get("name") or "").lower()
+    if not n.startswith(_CLASSIFICATION_NAME_PREFIXES):
+        return False
+    desc = (sym.get("description") or "").lower()
+    blob = n + " " + desc
+    if any(t in blob for t in _EFFECT_PREDICATE_TOKENS):
+        return False
+    return True
+
+
+def _derived_predicate_specificity_score(sym: dict, user_question: str) -> float:
+    """Score derived predicates; higher means a more specific match to the question."""
+    n = sym.get("name") or ""
+    nt = set(_symbol_tokens(n))
+    desc_toks = set(_symbol_tokens(sym.get("description") or ""))
+    q = _question_tokens(user_question)
+    overlap = _lexical_overlap_score(sym, user_question)
+    if not nt:
+        return overlap
+    q_hit = len(q & nt)
+    q_cov = q_hit / float(len(q)) if q else 0.0
+    name_cov = q_hit / float(len(nt))
+    token_bonus = min(len(nt), 14) * 0.035
+    score = overlap + 0.35 * q_cov + 0.12 * name_cov + token_bonus
+    effect_q = bool(q & _EFFECT_QUESTION_TOKENS)
+    effect_pred = bool((nt | desc_toks) & _EFFECT_PREDICATE_TOKENS)
+    if effect_q and effect_pred:
+        score += 0.45
+    if effect_q and _looks_like_classification_predicate(sym):
+        score -= 0.55
+    if question_asks_legal_definition(user_question) and _looks_like_classification_predicate(sym):
+        score -= 0.25
+    return score
+
+
+def _is_more_specific_derived(sym_a: dict, sym_b: dict, user_question: str) -> bool:
+    ta = set(_symbol_tokens(sym_a.get("name") or ""))
+    tb = set(_symbol_tokens(sym_b.get("name") or ""))
+    sa = _derived_predicate_specificity_score(sym_a, user_question)
+    sb = _derived_predicate_specificity_score(sym_b, user_question)
+    if ta and tb and tb < ta and sa >= sb - 0.05:
+        return True
+    return sa > sb + 0.08
+
+
+def _pick_most_specific_derived_predicate(
+    user_question: str,
+    kb_schema: dict,
+    current_pred: str | None,
+) -> str | None:
+    """Prefer the most specific derived predicate that matches the legal question."""
+    derived = _derived_bool_predicates(kb_schema)
+    if not derived:
+        return current_pred
+    scored = [( _derived_predicate_specificity_score(s, user_question), s) for s in derived]
+    scored = [(sc, s) for sc, s in scored if sc > 0]
+    if not scored:
+        return current_pred
+    scored.sort(key=lambda x: -x[0])
+    best_sc, best_sym = scored[0]
+    if best_sc < 0.2:
+        return current_pred
+    if len(scored) > 1 and (best_sc - scored[1][0]) < 0.05:
+        return current_pred
+    if not current_pred:
+        return str(best_sym["name"])
+    cur = _symbol_sig(kb_schema, current_pred)
+    if not cur or cur.get("kind") not in {"derived", "conclusion"}:
+        return str(best_sym["name"])
+    if _is_more_specific_derived(best_sym, cur, user_question):
+        return str(best_sym["name"])
+    return current_pred
+
+
 def _try_auto_select_derived_predicate(
     user_question: str,
     case: dict,
@@ -221,23 +306,9 @@ def _try_auto_select_derived_predicate(
 ) -> tuple[str, list[str]] | None:
     if not question_asks_legal_conclusion(user_question):
         return None
-    derived = _derived_bool_predicates(kb_schema)
-    if not derived:
+    pred = _pick_most_specific_derived_predicate(user_question, kb_schema, None)
+    if not pred:
         return None
-    scored: list[tuple[float, dict]] = []
-    for sym in derived:
-        sc = _lexical_overlap_score(sym, user_question)
-        if sc > 0:
-            scored.append((sc, sym))
-    if not scored:
-        return None
-    scored.sort(key=lambda x: -x[0])
-    best_sc, best_sym = scored[0]
-    if len(scored) > 1 and best_sc < 0.35:
-        return None
-    if len(scored) > 1 and (best_sc - scored[1][0]) < 0.12:
-        return None
-    pred = str(best_sym["name"])
     args = _fill_query_args_from_entities(pred, list(raw_args), case, kb_schema)
     return pred, args
 
@@ -250,19 +321,46 @@ def _validate_query_target_for_legal_question(
     if not question_asks_legal_conclusion(user_question):
         return
     derived = _derived_bool_predicates(kb_schema)
-    if not derived:
-        return
     pk = _symbol_kind(_symbol_sig(kb_schema, pred))
     if pk != "observable":
+        sig = _symbol_sig(kb_schema, pred) or {}
+        q = _question_tokens(user_question)
+        if q & _EFFECT_QUESTION_TOKENS and _looks_like_classification_predicate(sig):
+            has_effect_derived = any(
+                not _looks_like_classification_predicate(d)
+                and (_symbol_tokens(d.get("name")) | set(_symbol_tokens(d.get("description") or "")))
+                & _EFFECT_PREDICATE_TOKENS
+                for d in derived
+            )
+            if has_effect_derived:
+                raise ExtractionIRValidationError(
+                    "Question asks about legal consequences or timing, but query target '"
+                    + pred
+                    + "' looks like a static classification predicate. Choose a derived predicate that "
+                    "represents the legal effect, applicability, or temporal consequence."
+                )
+            raise ExtractionIRValidationError(
+                "Question asks about legal consequences or timing, but the knowledge base only exposes "
+                "classification-style derived predicates for '"
+                + pred
+                + "'. Add a derived legal-output predicate for the effect/timing rule in the KB."
+            )
         return
-    raise ExtractionIRValidationError(
-        "Selected observable predicate '"
-        + pred
-        + "' for a legal-conclusion question. Observable predicates are case facts and should not be used "
-        "as final answers to legal-effect questions. Choose a derived predicate that directly represents "
-        "the requested legal status, right, obligation, permission, prohibition, validity result, entitlement, "
-        "exclusion, classification, or legal consequence."
-    )
+    if derived:
+        raise ExtractionIRValidationError(
+            "Selected observable predicate '"
+            + pred
+            + "' for a legal-conclusion question. Observable predicates are case facts and should not be used "
+            "as final answers to legal-effect questions. Choose a derived predicate that directly represents "
+            "the requested legal status, right, obligation, permission, prohibition, validity result, entitlement, "
+            "exclusion, classification, or legal consequence."
+        )
+    if question_asks_legal_definition(user_question):
+        raise ExtractionIRValidationError(
+            "Legal-definition or legal-effect question cannot be answered with observable predicate '"
+            + pred
+            + "'. The knowledge base has no suitable derived predicate; repair the symbol table and rules."
+        )
 
 
 def _merge_typed_entity(out_entities: dict, typ: str, value: str) -> None:
@@ -620,20 +718,67 @@ def normalize_query_ir(query_ir: dict, case: dict, kb_schema: dict, user_questio
         intent_name = str(query_ir.get("intent") or "").strip().lower()
         if not intent_name:
             raise ExtractionIRValidationError("intent query requires a non-empty intent field")
+        if intent_name in ("deduction", "deduction_set"):
+            raise ExtractionIRValidationError(
+                "Direct intent '" + intent_name + "' is internal. Use kind=predicate with mode=boolean or mode=set."
+            )
         if intent_name not in SUPPORTED_QUERY_INTENTS:
             raise ExtractionIRValidationError(
                 "Unsupported query intent '"
                 + intent_name
-                + "'. Supported: "
+                + "'. Supported public intents: "
                 + ", ".join(SUPPORTED_QUERY_INTENTS_SORTED)
             )
-        return {
-            "type": "intent",
-            "intent": intent_name,
-            "symbol": str(query_ir.get("symbol_hint") or "").strip(),
-            "entity": _safe_entity(query_ir.get("entity_hint") or ""),
-            "explain": explain,
-        }
+        out: dict = {"type": "intent", "intent": intent_name, "explain": explain}
+        if intent_name == "get_range":
+            out["function"] = str(query_ir.get("function") or query_ir.get("symbol_hint") or "").strip()
+            out["args"] = [_safe_entity(x) for x in (query_ir.get("args") or []) if _safe_entity(x)]
+            out["entity"] = _safe_entity(query_ir.get("entity_hint") or "")
+        elif intent_name == "satisfiable":
+            pass
+        elif intent_name in ("propagation", "relevance"):
+            syms = query_ir.get("focus_symbols") or query_ir.get("symbol_hints") or []
+            if isinstance(syms, str):
+                syms = [syms]
+            out["focus_symbols"] = [str(s).strip() for s in syms if str(s).strip()]
+            ents = query_ir.get("focus_entities") or query_ir.get("entity_hints") or []
+            if isinstance(ents, str):
+                ents = [ents]
+            out["focus_entities"] = [_safe_entity(x) for x in ents if _safe_entity(x)]
+            if intent_name == "propagation":
+                out["include_unknown"] = bool(query_ir.get("include_unknown", False))
+        elif intent_name == "model_expansion":
+            syms = query_ir.get("focus_symbols") or []
+            if isinstance(syms, str):
+                syms = [syms]
+            out["focus_symbols"] = [str(s).strip() for s in syms if str(s).strip()]
+            ents = query_ir.get("focus_entities") or []
+            if isinstance(ents, str):
+                ents = [ents]
+            out["focus_entities"] = [_safe_entity(x) for x in ents if _safe_entity(x)]
+            mm = query_ir.get("max_models")
+            out["max_models"] = int(mm) if mm is not None else 1
+        elif intent_name == "optimization":
+            out["direction"] = str(query_ir.get("direction") or "min").strip().lower()
+            obj_fn = str(query_ir.get("function") or query_ir.get("symbol_hint") or "").strip()
+            out["objective"] = {
+                "function": obj_fn,
+                "args": [_safe_entity(x) for x in (query_ir.get("args") or []) if _safe_entity(x)],
+            }
+        elif intent_name == "explain":
+            target = query_ir.get("target")
+            if isinstance(target, dict):
+                out["target"] = target
+            elif str(query_ir.get("target_type") or "").lower() == "satisfiable":
+                out["target"] = {"type": "satisfiable"}
+            else:
+                pred = str(query_ir.get("predicate_hint") or query_ir.get("predicate") or "").strip()
+                args = [_safe_entity(x) for x in (query_ir.get("args") or []) if _safe_entity(x)]
+                if pred:
+                    out["target"] = {"type": "predicate", "predicate": pred, "args": args}
+                else:
+                    raise ExtractionIRValidationError("explain intent requires target or predicate_hint with args")
+        return out
 
     pred_hint = str(query_ir.get("predicate_hint") or query_ir.get("predicate") or "").strip()
     mode = str(query_ir.get("mode") or "boolean").strip().lower()
@@ -645,6 +790,16 @@ def normalize_query_ir(query_ir: dict, case: dict, kb_schema: dict, user_questio
     pred = _best_symbol_match(pred_hint, kb_schema, user_question=user_question, bool_only=True, prefer_derived=True)
     if not pred:
         raise ExtractionIRValidationError("Could not resolve query predicate from IR")
+
+    if question_asks_legal_conclusion(user_question):
+        refined = _pick_most_specific_derived_predicate(user_question, kb_schema, pred)
+        if refined:
+            pred = refined
+        pk_tmp = _symbol_kind(_symbol_sig(kb_schema, pred))
+        if pk_tmp == "observable":
+            auto = _try_auto_select_derived_predicate(user_question, case, kb_schema, raw_args)
+            if auto:
+                pred, raw_args = auto
 
     pk = _symbol_kind(_symbol_sig(kb_schema, pred))
     if pk == "helper":

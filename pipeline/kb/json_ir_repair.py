@@ -48,6 +48,12 @@ def normalize_error_signature(msg: str) -> str:
         if "predicate" in sl and "function term" in sl:
             m = re.search(r"predicate\s+'([^']+)'", s, re.I)
             return "schema::pred_as_fn::" + (m.group(1) if m else "?")
+        if "helper predicate" in sl and "never defined" in sl:
+            m = re.search(r"helper predicate\s+'([^']+)'", s, re.I)
+            return "schema::floating_helper_pred::" + (m.group(1) if m else "?")
+        if "helper function" in sl and "never defined" in sl:
+            m = re.search(r"helper function\s+'([^']+)'", s, re.I)
+            return "schema::floating_helper_fun::" + (m.group(1) if m else "?")
         return "schema::" + sl[:120]
     if RULE_DESIGN_TAG.lower() in sl:
         m = re.search(r"derived predicate\s+'([^']+)'", s, re.I)
@@ -127,6 +133,8 @@ def classify_json_ir_validation_error(
     if RULE_DESIGN_TAG.lower() in ml:
         if "circular" in ml:
             return JsonIRErrorKind.RULES_REPAIR_ONLY
+        if "incompatible unary subject roles" in ml:
+            return JsonIRErrorKind.SYMBOLS_REPAIR_REQUIRED
         return JsonIRErrorKind.SYMBOLS_REPAIR_REQUIRED
 
     if "observable predicate" in ml and ("consequent" in ml or "then" in ml):
@@ -139,6 +147,11 @@ def classify_json_ir_validation_error(
         return JsonIRErrorKind.SYMBOLS_REPAIR_REQUIRED
 
     if "no derived legal outputs" in ml or "no observable case-input" in ml:
+        return JsonIRErrorKind.SYMBOLS_REPAIR_REQUIRED
+
+    if "helper predicate" in ml and "never defined" in ml:
+        return JsonIRErrorKind.SYMBOLS_REPAIR_REQUIRED
+    if "helper function" in ml and "never defined" in ml:
         return JsonIRErrorKind.SYMBOLS_REPAIR_REQUIRED
 
     if "conflicting signatures for symbol" in ml:
@@ -205,9 +218,26 @@ def classify_json_ir_validation_error(
 
 def format_symbol_repair_error(validation_error: str) -> str:
     """Rich feedback for symbol repair after a combined IR failure."""
+    em = (validation_error or "").strip()
+    el = em.lower()
+    extra = ""
+    if "helper predicate" in el or "helper function" in el:
+        if "never defined" in el:
+            extra = (
+                "\n\nSymbol-kind contract:\n"
+                "- observable = supplied by case extraction.\n"
+                "- derived = final legal conclusion/output.\n"
+                "- helper = intermediate symbol that must be defined by rules.\n\n"
+                "Every helper used in a rule condition must be defined by some rule, or it must be "
+                "reclassified as observable. Do not leave helper predicates/functions open.\n\n"
+                "Either reclassify this helper as observable if the case should provide it directly, "
+                "or keep it as helper and ensure rules are generated to derive it from observable "
+                "facts/functions. Rules-only repair cannot fix a floating helper without symbol changes."
+            )
     return (
         "The rules phase exposed a symbol-table / schema design problem.\n\n"
-        + validation_error.strip()
+        + em
+        + extra
         + "\n\nRepair the symbol table (kinds, signatures, missing derived/observable symbols). "
         "Rules will be regenerated from your repaired symbols — do not assume the previous rules remain valid."
     )

@@ -34,6 +34,17 @@ def _predicate_names_from_kb(kb_text):
         return []
 
 
+def _predicate_kinds_from_schema(kb_schema):
+    """Map predicate name -> kind from JSON-IR kb_schema."""
+    if not isinstance(kb_schema, dict):
+        return None
+    kinds: dict[str, str] = {}
+    for p in kb_schema.get("predicates") or []:
+        if isinstance(p, dict) and p.get("name"):
+            kinds[str(p["name"])] = str(p.get("kind") or "unknown").strip().lower()
+    return kinds or None
+
+
 def _compose_program(case, base_kb_text, base_kb_for_schema=None):
     """Compose KB + structure. Use base_kb_for_schema (default: base_kb_text) for extracting
     types and predicate names - important when base_kb_text has been augmented with aux symbols
@@ -47,6 +58,8 @@ def _compose_program(case, base_kb_text, base_kb_for_schema=None):
     kb_primary = _primary_type_from_kb(schema_kb)
     kb_types = _all_types_from_kb(schema_kb)
     kb_preds = _predicate_names_from_kb(schema_kb)
+    kb_schema = case.get("kb_schema") if isinstance(case, dict) else None
+    pred_kinds = _predicate_kinds_from_schema(kb_schema)
     try:
         structure = build_structure_block_from_facts(
             case["facts"],
@@ -54,6 +67,8 @@ def _compose_program(case, base_kb_text, base_kb_for_schema=None):
             kb_primary_type=kb_primary,
             kb_types=kb_types,
             kb_predicate_names=kb_preds,
+            predicate_kinds=pred_kinds,
+            kb_schema=kb_schema,
         )
     except TypeError:
         structure = build_structure_block_from_facts(case["facts"])

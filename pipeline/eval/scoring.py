@@ -3,7 +3,7 @@
 import os
 import re
 
-from pipeline.eval.boolean_belief import summarize_boolean_symbolic
+from pipeline.eval.boolean_belief import summarize_boolean_symbolic, symbolic_result_is_inconclusive
 from pipeline.semantic.legal_question import question_asks_legal_conclusion
 
 
@@ -98,18 +98,56 @@ def _query_target_warnings(
     return warnings
 
 
+def _target_in_atom_list(atoms: list, pred: str | None, args: list) -> bool:
+    if not pred:
+        return False
+    want_args = [str(a).strip().lower() for a in (args or [])]
+    for item in atoms:
+        if not isinstance(item, dict):
+            continue
+        if str(item.get("predicate") or "") != str(pred):
+            continue
+        got_args = [str(a).strip().lower() for a in (item.get("args") or [])]
+        if got_args == want_args:
+            return True
+    return False
+
+
 def _finalize_boolean_score(
     out: dict,
     expected: dict,
     query: dict | None,
     kb_schema: dict | None,
     user_question: str | None,
+    symbolic_result: dict | None = None,
 ) -> dict:
     if query:
         pred = str(query.get("predicate") or "")
         out["query_predicate"] = pred or None
         out["query_predicate_kind"] = query.get("predicate_kind") or _predicate_kind_from_schema(kb_schema, pred)
     warns = _query_target_warnings(expected, query, kb_schema, user_question)
+    if symbolic_result and isinstance(symbolic_result, dict):
+        cov = symbolic_result.get("antecedent_coverage")
+        if cov:
+            from pipeline.symbolic.antecedent_coverage import missing_observable_symbols
+
+            missing = missing_observable_symbols(cov)
+            if missing:
+                warns = list(warns)
+                warns.append(
+                    "Antecedent diagnostics: missing observable case facts for "
+                    + ", ".join(missing)
+                    + " (blocking rule paths only)."
+                )
+        label = str(symbolic_result.get("label") or symbolic_result.get("epistemic_label") or "").lower()
+        inconclusive = label == "unknown" or (
+            symbolic_result.get("possible") and not symbolic_result.get("certain")
+        )
+        if inconclusive:
+            hint = symbolic_result.get("extraction_repair_hint")
+            if hint:
+                warns = list(warns)
+                warns.append(str(hint))
     if warns:
         out["warnings"] = warns
     return out
@@ -132,15 +170,25 @@ def score_question(expected, symbolic_result, *, query=None, kb_schema=None, use
 
     pred = symbolic_result or {}
 
+    sym_intent = str(pred.get("intent") or "").strip().lower()
+    certainty_class = pred.get("certainty_class")
+
     if expected.get("intent"):
         intent = str(expected.get("intent")).strip().lower()
         if intent == "satisfiable":
             exp_val = bool(expected.get("value"))
-            got_val = bool(pred.get("sat"))
-            return {"match": exp_val == got_val, "expected": exp_val, "got": got_val}
+            got_val = bool(pred.get("satisfiable") if "satisfiable" in pred else pred.get("sat"))
+            return {
+                "match": exp_val == got_val,
+                "expected": exp_val,
+                "got": got_val,
+                "scoring_mode": "decisive",
+                "certainty_class": "consistency",
+                "internal_intent": sym_intent or "satisfiable",
+            }
         if intent == "get_range":
             exp_val = expected.get("value")
-            got_raw = pred.get("range")
+            got_raw = pred.get("range") or (pred.get("values") or [None])[0]
             got_val = _normalize_range_for_compare(got_raw, pred.get("entity"))
             exp_norm = str(exp_val).strip() if exp_val is not None else None
             tolerance = int(expected.get("tolerance_days", 5))
@@ -154,8 +202,61 @@ def score_question(expected, symbolic_result, *, query=None, kb_schema=None, use
                 )
             except (ValueError, TypeError):
                 match = exp_norm is not None and got_val is not None and exp_norm == got_val
-            return {"match": match, "expected": exp_val, "got": got_val, "raw_range": got_raw}
-        return {"match": False, "reason": "unsupported intent: " + str(intent)}
+            return {
+                "match": match,
+                "expected": exp_val,
+                "got": got_val,
+                "raw_range": got_raw,
+                "scoring_mode": "decisive",
+                "certainty_class": "range",
+                "internal_intent": sym_intent or "get_range",
+            }
+        return {"match": False, "reason": "unsupported intent: " + str(intent), "scoring_mode": "manual"}
+
+    if sym_intent == "propagation" and expected.get("mode") == "boolean":
+        exp_val = bool(expected.get("value"))
+        target_pred = expected.get("target_predicate") or (query or {}).get("predicate")
+        target_args = expected.get("target_args") or (query or {}).get("args") or []
+        in_true = _target_in_atom_list(pred.get("certain_true") or [], target_pred, target_args)
+        in_false = _target_in_atom_list(pred.get("certain_false") or [], target_pred, target_args)
+        if exp_val is True:
+            match = in_true
+            got = True if in_true else (False if in_false else None)
+        else:
+            match = in_false
+            got = False if in_false else (True if in_true else None)
+        inconclusive = got is None
+        return {
+            "match": match if not inconclusive else False,
+            "got": got,
+            "decisive": not inconclusive,
+            "inconclusive": inconclusive,
+            "scoring_mode": "decisive",
+            "certainty_class": "decisive",
+            "internal_intent": "propagation",
+        }
+
+    if sym_intent == "model_expansion":
+        return {
+            "match": False,
+            "decisive": False,
+            "inconclusive": True,
+            "reason": "model_expansion yields possible models, not decisive legal truth",
+            "scoring_mode": "manual",
+            "certainty_class": "possible_model",
+            "internal_intent": "model_expansion",
+        }
+
+    if sym_intent in ("relevance", "explain"):
+        return {
+            "match": None,
+            "decisive": False,
+            "inconclusive": True,
+            "scoring_mode": "manual",
+            "certainty_class": "manual",
+            "internal_intent": sym_intent,
+            "reason": "manual scoring required",
+        }
 
     mode = expected.get("mode")
 
@@ -163,11 +264,38 @@ def score_question(expected, symbolic_result, *, query=None, kb_schema=None, use
         exp_set = sorted(str(x).strip().lower() for x in (expected.get("value") or []))
         got_set = sorted(
             str(x).strip().lower()
-            for x in (pred.get("certain") or pred.get("certain_set") or [])
+            for x in (pred.get("entailed") or pred.get("certain") or pred.get("certain_set") or [])
         )
-        return {"match": exp_set == got_set, "expected": exp_set, "got": got_set}
+        return {
+            "match": exp_set == got_set,
+            "expected": exp_set,
+            "got": got_set,
+            "scoring_mode": "decisive",
+            "certainty_class": pred.get("certainty_class") or "decisive",
+            "internal_intent": sym_intent or "deduction_set",
+        }
 
     if mode == "boolean":
+        if symbolic_result_is_inconclusive(pred):
+            exp_val = bool(expected.get("value"))
+            base = {
+                "expected": exp_val,
+                "epistemic_label": "unknown",
+                "scoring_mode": "decisive",
+                "match": False,
+                "got": None,
+                "decisive": False,
+                "inconclusive": True,
+                "reason": "symbolic failure or non-decisive symbolic output",
+                "symbolic_inconclusive": True,
+            }
+            status = str(pred.get("status") or "").strip().lower()
+            if status:
+                base["symbolic_status"] = status
+            return _finalize_boolean_score(
+                base, expected, query, kb_schema, user_question, pred
+            )
+
         exp_val = bool(expected.get("value"))
         target = expected.get("target")
         if target and pred.get("target") and str(target).lower() != str(pred.get("target")).lower():
@@ -204,6 +332,7 @@ def score_question(expected, symbolic_result, *, query=None, kb_schema=None, use
                 query,
                 kb_schema,
                 user_question,
+                pred,
             )
 
         if label == "contradicted":
@@ -215,6 +344,7 @@ def score_question(expected, symbolic_result, *, query=None, kb_schema=None, use
                 query,
                 kb_schema,
                 user_question,
+                pred,
             )
 
         out = {
@@ -244,6 +374,6 @@ def score_question(expected, symbolic_result, *, query=None, kb_schema=None, use
             out["decisive"] = False
             out["inconclusive"] = not belief_match
 
-        return _finalize_boolean_score(out, expected, query, kb_schema, user_question)
+        return _finalize_boolean_score(out, expected, query, kb_schema, user_question, pred)
 
     return {"match": False, "reason": "unsupported mode: " + str(mode)}

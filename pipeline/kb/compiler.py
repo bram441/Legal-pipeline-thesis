@@ -20,7 +20,9 @@ from pipeline.kb.json_ir_repair import (
 from pipeline.kb.law_scope import select_law_text_for_compilation, write_scope_artifacts
 from pipeline.kb.repair_hints import build_json_ir_compile_hints, build_machine_repair_hints
 
-_MAX_JSON_IR_ATTEMPTS = int(os.getenv("JSON_IR_MAX_COMPILE_ATTEMPTS", "8"))
+# Inner JSON-IR repair loop: symbols+rules per attempt; rules-only or full symbol reset on failure.
+# Default 2 ≈ one initial compile + one repair (Verus-style: fail → back to symbolic).
+_MAX_JSON_IR_ATTEMPTS = int(os.getenv("JSON_IR_MAX_COMPILE_ATTEMPTS", "2"))
 _MAX_RULES_REPAIR_BEFORE_SYMBOL_ESCALATION = int(os.getenv("JSON_IR_MAX_RULES_REPAIR", "2"))
 
 # Short system-role guardrails; full spec lives in the rendered user prompts + json_ir_contract.
@@ -445,6 +447,7 @@ def _compile_json_ir_two_step(
     art = Path(artifact_dir) if artifact_dir else None
 
     error_history: list[str] = []
+    last_exc: BaseException | None = None
     if repair_feedback:
         boot = (repair_feedback.get("error_message") or "").strip()
         if boot:
@@ -556,6 +559,7 @@ def _compile_json_ir_two_step(
             return fo_text, schema
 
         except JSONIRCompilationError as e:
+            last_exc = e
             msg = str(e)
             error_history.append(msg)
             sig = normalize_error_signature(msg)
@@ -613,10 +617,13 @@ def _compile_json_ir_two_step(
             "\n---\n".join(error_history[-3:]) if error_history else "(none)",
         )
     )
-    raise LawCompilationError(
+    err = LawCompilationError(
         summary,
         repair_snapshot={"previous_output": ctx, "error_history": error_history},
-    ) from (error_history[-1] if error_history else None)
+    )
+    if last_exc is not None:
+        raise err from last_exc
+    raise err
 
 
 def compile_law_to_kb_fo(

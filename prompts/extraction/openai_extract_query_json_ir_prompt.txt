@@ -30,9 +30,24 @@ QUERY FIELD RULES
 ================================================================================
 
 kind:
-- Use "predicate" for normal Boolean or set-style legal questions.
-- Use "intent" only if the system explicitly supports the requested intent.
-- If unsure, use "predicate".
+- Use "predicate" for yes/no (mode=boolean) or which-entities (mode=set) questions about a concrete predicate.
+- Use "intent" when the question needs propagation, model expansion, ranges, consistency, optimization, relevance, or explain.
+- Public intents only: propagation, model_expansion, get_range, satisfiable, optimization, relevance, explain.
+- Never use internal intents deduction or deduction_set (the router derives those from predicate mode).
+
+Intent selection (generic, law-agnostic):
+- predicate + boolean: whether a concrete legal status, right, obligation, permission, prohibition, validity result, entitlement, exclusion, classification, or consequence applies.
+- predicate + set: which legal actors, objects, events, decisions, or periods satisfy a unary legal condition.
+- propagation: what follows; what can be concluded; which legal consequences are certain across all models.
+- model_expansion: a possible completed legal situation; one possible assignment or outcome (not certainty).
+- get_range: possible values, ranges, amounts, dates, durations, counts, or percentages of a numeric function.
+- satisfiable: whether the case and law are jointly consistent.
+- optimization: minimum, maximum, earliest, latest, least, greatest, smallest, largest when a numeric objective exists.
+- relevance: which symbols or facts matter for the question.
+- explain: why, justification, or why not; use target_type=predicate with predicate_hint+args, or target_type=satisfiable for inconsistency.
+
+For kind=intent, fill intent-specific fields from the schema (focus_symbols, focus_entities, max_models, function, direction, target_type).
+If unsure between boolean predicate and propagation, prefer propagation when the question asks what is certain, not a single yes/no atom.
 
 predicate_hint:
 - Required for kind = "predicate".

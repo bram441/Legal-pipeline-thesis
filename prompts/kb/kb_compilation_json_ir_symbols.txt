@@ -91,13 +91,23 @@ HIGH-PRIORITY DECISION RULES
 - derived = final or intermediate legal result inferred from the law.
 - helper = internal intermediate condition.
 
-4. Legal ontology:
+4. Unary lifecycle / status predicates:
+- When one unary predicate names a surviving/alive role and another names a deceased role, prefer a binary relation (status_of(actor, other)) instead of stacking both roles on one variable.
+- Keep symbol descriptions short; avoid embedding the opposite lifecycle role in a unary predicate description.
+
+5. Legal ontology:
 - Prefer relations when the law links multiple actors, objects, acts, events, decisions, periods, or roles.
 - Prefer observable functions for raw measurable values.
 - Prefer helper predicates for threshold checks, exception checks, temporal checks, and combined conditions.
 - Prefer derived predicates for final yes/no legal conclusions.
 - Do not make final legal consequences observable.
 - Do not make raw case facts derived.
+
+6. Legal effects, timing, and definitions:
+- When a provision states that consequences apply, take effect, cease, start, end, or apply from a period, add a derived Boolean predicate for that legal effect or timing (not only a static size/status label).
+- When a provision defines a legal status or classification, add a derived predicate for that legal definition; use observables only for factual antecedents.
+- Prefer argument types that match the legal subject (e.g. actor + period) when the effect is time-bound.
+- Predicate descriptions should state the legal effect plainly; avoid naming only an intermediate label.
 
 ================================================================================
 EXISTENTIAL CONDITION MODELING RULE

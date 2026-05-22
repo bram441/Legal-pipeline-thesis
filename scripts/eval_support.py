@@ -71,20 +71,41 @@ def read_score(path: Path) -> dict | None:
         return None
 
 
+def _classify_score_warning(message: str) -> str:
+    w = (message or "").strip()
+    wl = w.lower()
+    if w.startswith("Expected legal Boolean answer was evaluated using observable predicate"):
+        return "observable_query_target"
+    if w.startswith("Antecedent diagnostics:"):
+        return "antecedent_diagnostic"
+    if "observable antecedent required by the kb rule" in wl:
+        return "antecedent_diagnostic"
+    return "other"
+
+
 def summarize_query_targets(score: dict | None) -> dict:
-    """Per-question query predicate/kind and observable-on-legal-conclusion warnings."""
+    """Per-question query predicate/kind and classified score warnings."""
     if not score:
-        return {"items": [], "observable_legal_warning_count": 0}
+        return {
+            "items": [],
+            "observable_query_target_warning_count": 0,
+            "antecedent_diagnostic_warning_count": 0,
+        }
     items_out = []
-    warn_count = 0
+    oqt_count = 0
+    ant_count = 0
     for it in score.get("items") or []:
         pred = it.get("query_predicate")
         kind = it.get("query_predicate_kind")
         warns = it.get("warnings") or []
         if not pred and not kind and not warns:
             continue
-        if warns:
-            warn_count += len(warns)
+        for w in warns:
+            kind_w = _classify_score_warning(str(w))
+            if kind_w == "observable_query_target":
+                oqt_count += 1
+            elif kind_w == "antecedent_diagnostic":
+                ant_count += 1
         items_out.append(
             {
                 "id": it.get("id"),
@@ -93,7 +114,11 @@ def summarize_query_targets(score: dict | None) -> dict:
                 "warnings": warns,
             }
         )
-    return {"items": items_out, "observable_legal_warning_count": warn_count}
+    return {
+        "items": items_out,
+        "observable_query_target_warning_count": oqt_count,
+        "antecedent_diagnostic_warning_count": ant_count,
+    }
 
 
 def discover_json_runs(runs_dir: Path) -> list[Path]:
@@ -178,6 +203,54 @@ def _gather_eval_diag_text(work_dir: Path) -> str:
     return "\n".join(parts)
 
 
+# Categories that indicate the pipeline did not complete cleanly (not merely wrong answers).
+EVAL_PIPELINE_FAILURE_CATEGORIES = frozenset(
+    {
+        "completed_with_errors",
+        "completed_with_symbolic_errors",
+        "scoring_missing",
+        "process_error",
+        "translation",
+        "case_extraction",
+        "kb_repair_exhausted",
+        "law_compilation",
+        "kb_lint",
+        "kb_idp_parse",
+        "kb_semantic",
+        "reasoning_symbol_mismatch",
+        "case_query_validation",
+        "kb_compile_validation",
+        "unknown",
+    }
+)
+
+
+def score_has_symbolic_errors(score: dict | None) -> bool:
+    if not score:
+        return False
+    for it in score.get("items") or []:
+        if (it or {}).get("symbolic_status") == "error":
+            return True
+    return False
+
+
+def is_eval_pipeline_failure(
+    *,
+    exit_code: int,
+    failure_category: str | None,
+    score: dict | None = None,
+) -> bool:
+    """True when a matrix cell failed for infra/compile/symbolic reasons (not wrong entailment)."""
+    if exit_code != 0:
+        return True
+    cat = (failure_category or "").strip()
+    if cat in EVAL_PIPELINE_FAILURE_CATEGORIES:
+        return True
+    if score_has_symbolic_errors(score):
+        return True
+    return False
+
+
 def classify_failure(work_dir: Path, exit_code: int, *, ok: bool) -> str:
     """
     Coarse category for evaluation matrix cells (debugging poor benchmark runs).
@@ -190,16 +263,26 @@ def classify_failure(work_dir: Path, exit_code: int, *, ok: bool) -> str:
     work_dir = work_dir.resolve()
 
     if ok and exit_code == 0:
+        score_path = work_dir / "score.json"
         results_path = work_dir / "results.json"
+        has_questions = False
         if results_path.is_file():
             try:
                 data = json.loads(results_path.read_text(encoding="utf-8"))
-                for q in data.get("questions") or []:
+                questions = data.get("questions") or []
+                has_questions = bool(questions)
+                for q in questions:
                     pipe = (q or {}).get("pipeline") or {}
                     if pipe.get("error_stage") or pipe.get("error"):
                         return "completed_with_errors"
             except (json.JSONDecodeError, OSError, TypeError):
                 pass
+        if has_questions and not score_path.is_file():
+            return "scoring_missing"
+        if score_path.is_file():
+            sc = read_score(score_path)
+            if score_has_symbolic_errors(sc):
+                return "completed_with_symbolic_errors"
         return "completed"
 
     blob_l = _gather_eval_diag_text(work_dir).lower()

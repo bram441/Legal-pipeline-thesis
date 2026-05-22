@@ -8,12 +8,14 @@ Usage (from project root):
   python scripts/run_evaluation.py --runs run_003
   python scripts/run_evaluation.py --runs all --strategies direct_single,le_single
   python scripts/run_evaluation.py --runs-dir inputs/json --runs run_001,run_003 --excel
+  python scripts/run_evaluation.py --runs all --strategies all --max-failures 8
 
 Outputs under results/reports/evaluation_<timestamp>/:
   - matrix.json      full results (includes evaluation_cli: kb_backend, pipeline_backend)
   - report.md        human-readable tables
   - summary.csv      open in Excel / LibreOffice
   - summary.xlsx     if openpyxl is installed (--excel)
+  - timings.csv      per-cell wall-clock duration (seconds)
   - work/            per (run, strategy[, pipeline]) output dirs — distinct names for legacy vs json_ir
 
 Default: --pipeline-backend json_ir; --kb-backend omitted (not passed to main.py). For a legacy sweep use
@@ -28,6 +30,7 @@ import csv
 import json
 import shutil
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -52,7 +55,19 @@ summarize_query_targets = eval_support.summarize_query_targets
 run_main_json = eval_support.run_main_json
 work_dir_name = eval_support.work_dir_name
 classify_failure = eval_support.classify_failure
+is_eval_pipeline_failure = eval_support.is_eval_pipeline_failure
 from pipeline.kb.compile_backend import KB_BACKEND_CHOICES
+
+
+def _format_duration(seconds: float | None) -> str:
+    if seconds is None:
+        return ""
+    s = float(seconds)
+    if s < 60:
+        return "%.1fs" % s
+    if s < 3600:
+        return "%.1fm" % (s / 60.0)
+    return "%.2fh" % (s / 3600.0)
 
 
 def _write_markdown(path: Path, matrix: dict) -> None:
@@ -66,7 +81,15 @@ def _write_markdown(path: Path, matrix: dict) -> None:
         "- Generated: " + matrix.get("generated_at", ""),
         "- Runs directory: " + matrix.get("runs_dir", ""),
     ]
-    if matrix.get("run_finished") is False:
+    if matrix.get("stopped_early"):
+        lines.extend(
+            [
+                "",
+                "**Note:** Stopped early: " + str(matrix.get("stop_reason") or "") + ".",
+                "",
+            ]
+        )
+    elif matrix.get("run_finished") is False:
         lines.extend(["", "**Note:** Run was interrupted; some strategy cells may be missing.", ""])
     lines.extend(
         [
@@ -133,7 +156,7 @@ def _write_markdown(path: Path, matrix: dict) -> None:
             "## Query target diagnostics",
             "",
             "Per-question query predicate and kind from `score.json` items. "
-            "``observable_legal_warning_count`` flags boolean legal questions scored against observable predicates.",
+            "``observable_query_target_warning_count`` / ``antecedent_diagnostic_warning_count`` split score warnings.",
             "",
             "| Run | " + " | ".join(strategies) + " |",
             "|" + "---|" * (len(strategies) + 1),
@@ -143,9 +166,10 @@ def _write_markdown(path: Path, matrix: dict) -> None:
         row = "| " + r + " |"
         for s in strategies:
             c = cells.get(r, {}).get(s, {})
-            n = c.get("observable_legal_warning_count")
-            if c.get("ok") and n is not None:
-                cell = str(n)
+            oqt = c.get("observable_query_target_warning_count")
+            ant = c.get("antecedent_diagnostic_warning_count")
+            if c.get("ok") and oqt is not None:
+                cell = f"oqt={oqt},ant={ant}"
                 targets = c.get("query_targets") or []
                 if targets:
                     kinds = ", ".join(
@@ -163,6 +187,24 @@ def _write_markdown(path: Path, matrix: dict) -> None:
                 cell = "—"
             row += " " + cell + " |"
         lines.append(row)
+
+    timing = matrix.get("timing") or {}
+    if timing:
+        lines.extend(
+            [
+                "",
+                "## Timing",
+                "",
+                "- Elapsed: " + _format_duration(timing.get("elapsed_sec"))
+                + (" (%s s)" % timing.get("elapsed_sec") if timing.get("elapsed_sec") is not None else ""),
+                "- Cells recorded: " + str(timing.get("cells_recorded", "")),
+                "- Avg per cell: "
+                + _format_duration(timing.get("avg_sec_per_cell"))
+                + (" (%s s)" % timing.get("avg_sec_per_cell") if timing.get("avg_sec_per_cell") is not None else ""),
+                "",
+                "See `timings.csv` for per (run, strategy) durations.",
+            ]
+        )
 
     lines.extend(["", "## Details (JSON)", "", "See `matrix.json`.", ""])
     path.write_text("\n".join(lines), encoding="utf-8")
@@ -194,6 +236,42 @@ def _write_csv(path: Path, matrix: dict) -> None:
                 c = cells.get(r, {}).get(s, {})
                 row.append(c.get("failure_category") or "")
             w.writerow(row)
+
+
+def _write_timings_csv(path: Path, matrix: dict) -> None:
+    runs = matrix["runs"]
+    strategies = matrix["strategies"]
+    cells = matrix["cells"]
+    with path.open("w", encoding="utf-8", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(
+            [
+                "run_id",
+                "strategy",
+                "duration_sec",
+                "duration_human",
+                "ok",
+                "failure_category",
+                "exit_code",
+            ]
+        )
+        for r in runs:
+            for s in strategies:
+                c = cells.get(r, {}).get(s, {})
+                if not c:
+                    continue
+                dur = c.get("duration_sec")
+                w.writerow(
+                    [
+                        r,
+                        s,
+                        dur,
+                        _format_duration(dur),
+                        c.get("ok"),
+                        c.get("failure_category"),
+                        c.get("exit_code"),
+                    ]
+                )
 
 
 def _write_xlsx(path: Path, matrix: dict) -> bool:
@@ -235,6 +313,7 @@ def _write_xlsx(path: Path, matrix: dict) -> bool:
             "scoring_mode",
             "path",
             "exit_code",
+            "duration_sec",
         ]
     )
     for r in runs:
@@ -254,6 +333,7 @@ def _write_xlsx(path: Path, matrix: dict) -> bool:
                     c.get("scoring_mode"),
                     c.get("path"),
                     c.get("exit_code"),
+                    c.get("duration_sec"),
                 ]
             )
 
@@ -314,6 +394,15 @@ def main() -> int:
         action="store_true",
         help="Set SCORE_TREAT_OPEN_WITH_BELIEF=1 and SCORE_BOOLEAN_BELIEF_THRESHOLD=0.5 for boolean "
         "questions (scores open-world answers by credence; default is off / inconclusive).",
+    )
+    p.add_argument(
+        "--max-failures",
+        type=int,
+        default=None,
+        metavar="N",
+        help="Stop the matrix early after N pipeline failures (non-zero exit, compile/reasoning "
+        "categories, or symbolic_status=error in score.json). Wrong decisive answers do not "
+        "count. Example: --max-failures 8 stops after ~2 runs if all four strategies fail.",
     )
     args = p.parse_args()
     if args.kb_backend is not None and args.kb_backend not in KB_BACKEND_CHOICES:
@@ -378,6 +467,13 @@ def main() -> int:
 
     exit_ok = True
     run_finished = False
+    stop_reason: str | None = None
+    pipeline_failure_count = 0
+    eval_t0 = time.perf_counter()
+    max_failures = args.max_failures
+    if max_failures is not None and max_failures < 1:
+        print("--max-failures must be >= 1", file=sys.stderr)
+        return 1
     try:
         for src in run_paths:
             rid = src.name
@@ -389,6 +485,7 @@ def main() -> int:
                     kb_backend=args.kb_backend if args.pipeline_backend is None else None,
                 )
                 print("===", rid, "+", strategy, "->", wdir.name, "===")
+                cell_t0 = time.perf_counter()
                 copy_run_json(src, wdir)
                 code = run_main_json(
                     wdir,
@@ -399,8 +496,10 @@ def main() -> int:
                     belief_scoring=args.belief_scoring,
                 )
                 sc = read_score(wdir / "score.json")
+                duration_sec = round(time.perf_counter() - cell_t0, 2)
                 if code != 0:
                     exit_ok = False
+                    failure_category = classify_failure(wdir, code, ok=False)
                     cells[rid][strategy] = {
                         "ok": False,
                         "exit_code": code,
@@ -408,31 +507,98 @@ def main() -> int:
                         "accuracy": None,
                         "correct": None,
                         "total": None,
-                        "failure_category": classify_failure(wdir, code, ok=False),
+                        "failure_category": failure_category,
+                        "duration_sec": duration_sec,
                     }
-                    continue
-                qt = summarize_query_targets(sc)
-                cells[rid][strategy] = {
-                    "ok": True,
-                    "exit_code": 0,
-                    "path": str(wdir),
-                    "accuracy": sc.get("accuracy") if sc else None,
-                    "accuracy_decisive": sc.get("accuracy_decisive") if sc else sc.get("accuracy") if sc else None,
-                    "correct": sc.get("correct") if sc else None,
-                    "correct_decisive": sc.get("correct_decisive") if sc else None,
-                    "incorrect_decisive": sc.get("incorrect_decisive") if sc else None,
-                    "inconclusive": sc.get("inconclusive") if sc else None,
-                    "total": sc.get("total") if sc else None,
-                    "scoring_mode": sc.get("scoring_mode") if sc else None,
-                    "score_id": sc.get("id") if sc else None,
-                    "query_targets": qt.get("items") or [],
-                    "observable_legal_warning_count": qt.get("observable_legal_warning_count", 0),
-                    "failure_category": classify_failure(wdir, 0, ok=True),
-                }
-        run_finished = True
+                    if is_eval_pipeline_failure(
+                        exit_code=code,
+                        failure_category=failure_category,
+                        score=sc,
+                    ):
+                        pipeline_failure_count += 1
+                else:
+                    qt = summarize_query_targets(sc)
+                    failure_category = classify_failure(wdir, 0, ok=True)
+                    cell_ok = failure_category == "completed"
+                    if not cell_ok:
+                        exit_ok = False
+                    cells[rid][strategy] = {
+                        "ok": cell_ok,
+                        "exit_code": 0,
+                        "path": str(wdir),
+                        "accuracy": sc.get("accuracy") if sc else None,
+                        "accuracy_decisive": sc.get("accuracy_decisive")
+                        if sc
+                        else sc.get("accuracy")
+                        if sc
+                        else None,
+                        "correct": sc.get("correct") if sc else None,
+                        "correct_decisive": sc.get("correct_decisive") if sc else None,
+                        "incorrect_decisive": sc.get("incorrect_decisive") if sc else None,
+                        "inconclusive": sc.get("inconclusive") if sc else None,
+                        "total": sc.get("total") if sc else None,
+                        "scoring_mode": sc.get("scoring_mode") if sc else None,
+                        "score_id": sc.get("id") if sc else None,
+                        "query_targets": qt.get("items") or [],
+                        "observable_query_target_warning_count": qt.get(
+                            "observable_query_target_warning_count", 0
+                        ),
+                        "antecedent_diagnostic_warning_count": qt.get(
+                            "antecedent_diagnostic_warning_count", 0
+                        ),
+                        "failure_category": failure_category,
+                        "duration_sec": duration_sec,
+                    }
+                    if is_eval_pipeline_failure(
+                        exit_code=0,
+                        failure_category=failure_category,
+                        score=sc,
+                    ):
+                        pipeline_failure_count += 1
+
+                print(
+                    "[eval] %s — %s"
+                    % (
+                        _format_duration(duration_sec),
+                        failure_category if code != 0 or not cell_ok else "completed",
+                    )
+                )
+
+                if max_failures is not None:
+                    print(
+                        "[eval] pipeline failures: %s/%s"
+                        % (pipeline_failure_count, max_failures)
+                    )
+                    if pipeline_failure_count >= max_failures:
+                        stop_reason = (
+                            "max_failures (%s)" % max_failures
+                        )
+                        print(
+                            "Stopping early: %s pipeline failures reached."
+                            % pipeline_failure_count,
+                            file=sys.stderr,
+                        )
+                        break
+            if stop_reason:
+                break
+        else:
+            run_finished = True
     except KeyboardInterrupt:
         print("\nInterrupted — writing partial matrix/report to " + str(out), file=sys.stderr)
     finally:
+        elapsed_sec = round(time.perf_counter() - eval_t0, 2)
+        durations = [
+            float(c["duration_sec"])
+            for row in cells.values()
+            for c in row.values()
+            if isinstance(c, dict) and c.get("duration_sec") is not None
+        ]
+        timing_summary = {
+            "started_at_utc": stamp,
+            "elapsed_sec": elapsed_sec,
+            "cells_recorded": len(durations),
+            "avg_sec_per_cell": round(sum(durations) / len(durations), 2) if durations else None,
+        }
         matrix = {
             "generated_at": stamp,
             "runs_dir": str(runs_dir),
@@ -440,11 +606,16 @@ def main() -> int:
             "runs": run_ids,
             "cells": cells,
             "run_finished": run_finished,
+            "timing": timing_summary,
             "evaluation_cli": {
                 "kb_backend": args.kb_backend,
                 "pipeline_backend": args.pipeline_backend,
                 "belief_scoring": bool(args.belief_scoring),
+                "max_failures": max_failures,
             },
+            "stopped_early": bool(stop_reason),
+            "stop_reason": stop_reason,
+            "pipeline_failure_count": pipeline_failure_count,
         }
         try:
             (out / "matrix.json").write_text(
@@ -452,6 +623,7 @@ def main() -> int:
             )
             _write_markdown(out / "report.md", matrix)
             _write_csv(out / "summary.csv", matrix)
+            _write_timings_csv(out / "timings.csv", matrix)
             xlsx_ok = False
             if args.excel:
                 xlsx_ok = _write_xlsx(out / "summary.xlsx", matrix)
@@ -464,12 +636,22 @@ def main() -> int:
             print("Wrote:", out / "matrix.json")
             print("Wrote:", out / "report.md")
             print("Wrote:", out / "summary.csv")
+            print("Wrote:", out / "timings.csv")
+            if timing_summary.get("cells_recorded"):
+                print(
+                    "Timing: %s total, %s avg/cell (%s cells)"
+                    % (
+                        _format_duration(timing_summary.get("elapsed_sec")),
+                        _format_duration(timing_summary.get("avg_sec_per_cell")),
+                        timing_summary.get("cells_recorded"),
+                    )
+                )
             if args.excel and xlsx_ok:
                 print("Wrote:", out / "summary.xlsx")
         except OSError as e:
             print("Failed to write evaluation reports:", e, file=sys.stderr)
 
-    if not run_finished:
+    if stop_reason or not run_finished:
         return 1
     return 0 if exit_ok else 1
 

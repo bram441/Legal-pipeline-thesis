@@ -12,36 +12,60 @@ from pipeline.utils.run_trace import RunTraceWriter
 from pipeline.domain.seeding import seed_entities_from_case_text
 
 def _build_prediction_summary(query, symbolic_result):
-    """
-    Build a structured, machine-readable prediction summary
-    for evaluation / testing purposes.
-    """
-    if not isinstance(query, dict):
+    """Machine-readable prediction summary for evaluation traces."""
+    if not isinstance(query, dict) or not isinstance(symbolic_result, dict):
         return None
+    intent = symbolic_result.get("intent") or query.get("internal_intent") or query.get("intent")
+    base = {
+        "query_type": query.get("query_type"),
+        "internal_intent": intent,
+        "output_kind": symbolic_result.get("output_kind"),
+        "status": symbolic_result.get("status", "ok"),
+        "certainty_class": symbolic_result.get("certainty_class"),
+    }
+    ok = symbolic_result.get("status", "ok") == "ok"
+    if not ok:
+        base["message"] = symbolic_result.get("message")
+        return base
 
-    mode = query.get("mode")
-
-    # --- Boolean predicate query ---
-    if mode == "boolean":
+    if symbolic_result.get("output_kind") == "epistemic_boolean" or query.get("mode") == "boolean":
         summ = summarize_boolean_symbolic(symbolic_result)
-        label = summ["label"]
-        return {
-            "mode": "boolean",
-            "label": label,
-            "belief_yes": summ["p_yes"],
-            "credence_yes_pct": summ["credence_yes_pct"],
-            "verdict_strength_pct": summ["verdict_strength_pct"],
-        }
+        base.update(
+            {
+                "mode": "boolean",
+                "label": symbolic_result.get("label") or summ["label"],
+                "belief_yes": summ["p_yes"],
+                "credence_yes_pct": summ["credence_yes_pct"],
+                "verdict_strength_pct": summ["verdict_strength_pct"],
+            }
+        )
+        return base
 
-    # --- Set query ---
-    if mode == "set":
-        return {
-            "mode": "set",
-            "certain_set": symbolic_result.get("certain", []),
-            "possible_set": symbolic_result.get("possible", []),
-        }
+    if symbolic_result.get("output_kind") == "entity_set" or query.get("mode") == "set":
+        base.update(
+            {
+                "mode": "set",
+                "certain_set": symbolic_result.get("entailed") or symbolic_result.get("certain", []),
+                "possible_set": symbolic_result.get("unknown") or symbolic_result.get("possible", []),
+            }
+        )
+        return base
 
-    return None
+    if intent == "propagation":
+        base["certain_true_count"] = len(symbolic_result.get("certain_true") or [])
+        return base
+    if intent == "model_expansion":
+        base["model_count"] = len(symbolic_result.get("models") or [])
+        base["certainty_class"] = "possible_model"
+        return base
+    if intent == "get_range":
+        base["values"] = symbolic_result.get("values") or []
+        return base
+    if intent == "satisfiable":
+        base["satisfiable"] = symbolic_result.get("satisfiable")
+        return base
+
+    return base
 
 
 def answer_legal_prompt(
@@ -225,7 +249,13 @@ def answer_legal_prompt(
     status_log("Reasoning", "Running symbolic reasoning (IDP-Z3)")
     debug_log("pipeline.answer_legal_prompt", "symbolic.run_query")
     try:
-        sat, result = run_query(case, query, base_kb_text=base_kb_text)
+        sat, result = run_query(
+            case,
+            query,
+            base_kb_text=base_kb_text,
+            kb_schema=kb_schema,
+            user_question=original_question,
+        )
     except Exception as e:
         from pipeline.utils.unicode_sanitize import sanitize_for_output
         err_msg = sanitize_for_output(str(e))
@@ -250,7 +280,7 @@ def answer_legal_prompt(
         trace.log("Prediction", json.dumps(_build_prediction_summary(query, result), indent=2))
         trace.close()
 
-    rendered = render_answer(case, query, sat, result, base_kb_text=base_kb_text)
+    rendered = render_answer(case, query, sat, result, base_kb_text=base_kb_text, kb_schema=kb_schema)
 
     if debug:
         debug_log("pipeline.answer_legal_prompt", "debug flag enabled")

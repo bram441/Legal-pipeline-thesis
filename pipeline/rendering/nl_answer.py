@@ -59,15 +59,42 @@ def render_get_range_nl(symbol, range_val, entity):
     return f"The {desc} is {range_val}."
 
 
-def _predicate_to_phrase(predicate, args):
-    """Convert predicate(args) to human phrase. Heuristic."""
+def _description_from_schema(predicate: str, kb_schema: dict | None) -> str | None:
+    if not kb_schema or not predicate:
+        return None
+    for p in kb_schema.get("predicates") or []:
+        if isinstance(p, dict) and p.get("name") == predicate:
+            d = str(p.get("description") or "").strip()
+            return d or None
+    return None
+
+
+def _entity_label(args: list) -> str:
+    if not args:
+        return ""
+    parts = [str(a).strip() for a in args if str(a).strip()]
+    if not parts:
+        return ""
+    out = []
+    for entity in parts:
+        out.append(entity[0].upper() + entity[1:] if len(entity) > 1 else entity.upper())
+    return ", ".join(out)
+
+
+def _predicate_to_phrase(predicate, args, kb_schema: dict | None = None):
+    """Convert predicate(args) to human phrase; prefer KB schema description when available."""
     pred = (predicate or "").strip()
     if not pred:
         return predicate
-    s = pred.lower()
-    entity = (args[0] if args else "").strip()
-    entity_cap = entity[0].upper() + entity[1:] if len(entity) > 1 else (entity.upper() if entity else "")
+    desc = _description_from_schema(pred, kb_schema)
+    entity_cap = _entity_label(list(args or []))
+    if desc:
+        text = desc.rstrip(".")
+        if entity_cap:
+            return f"{entity_cap}: {text}"
+        return text
 
+    s = pred.lower()
     art_match = re.search(r"art\.?(\d+)", s) or re.search(r"(\d{3})", pred)
     art = art_match.group(1) if art_match else ""
 
@@ -85,13 +112,13 @@ def _predicate_to_phrase(predicate, args):
     return phrase
 
 
-def render_boolean_nl(predicate, args, certain, possible):
+def render_boolean_nl(predicate, args, certain, possible, kb_schema: dict | None = None):
     """Convert boolean predicate result to natural language."""
     if certain is True:
-        phrase = _predicate_to_phrase(predicate, args)
+        phrase = _predicate_to_phrase(predicate, args, kb_schema=kb_schema)
         return f"Yes. {phrase}."
     if possible is False:
-        phrase = _predicate_to_phrase_negative(predicate, args)
+        phrase = _predicate_to_phrase_negative(predicate, args, kb_schema=kb_schema)
         msg = f"No. {phrase}."
         # Hint when answer is No: often caused by case facts using different predicate names than the KB
         msg += " (If you expected Yes, ensure case facts use the exact predicate names from the KB schema.)"
@@ -99,15 +126,20 @@ def render_boolean_nl(predicate, args, certain, possible):
     return "Unknown. The law and case facts do not determine this."
 
 
-def _predicate_to_phrase_negative(predicate, args):
+def _predicate_to_phrase_negative(predicate, args, kb_schema: dict | None = None):
     """Phrase for when predicate does NOT hold."""
     pred = (predicate or "").strip()
     if not pred:
         return "this does not hold"
-    s = pred.lower()
-    entity = (args[0] if args else "").strip()
-    entity_cap = entity[0].upper() + entity[1:] if len(entity) > 1 else (entity.upper() if entity else "")
+    desc = _description_from_schema(pred, kb_schema)
+    entity_cap = _entity_label(list(args or []))
+    if desc:
+        text = desc.rstrip(".")
+        if entity_cap:
+            return f"{entity_cap} does not satisfy: {text}"
+        return f"It is not the case that {text.lower()}"
 
+    s = pred.lower()
     art_match = re.search(r"art\.?(\d+)", s) or re.search(r"(\d{3})", pred)
     art = art_match.group(1) if art_match else ""
 
@@ -119,7 +151,6 @@ def _predicate_to_phrase_negative(predicate, args):
         phrase = f"does not satisfy {pred}"
 
     if entity_cap:
-        # Avoid "X is does not satisfy ..." (phrase already starts with "does not" for generic predicates)
         if phrase.startswith("does not"):
             return f"{entity_cap} {phrase}"
         return f"{entity_cap} is {phrase}"

@@ -314,6 +314,20 @@ def run_json_mode(run_dir, provider, translate=True, cli_kb_strategy=None, cli_k
                 )
                 score_item["id"] = qid
                 score_item["text"] = qtext
+                if isinstance(result.get("query"), dict):
+                    qmeta = result["query"]
+                else:
+                    qmeta = result.get("query") or {}
+                if isinstance(qmeta, dict):
+                    score_item["query_type"] = qmeta.get("query_type")
+                    score_item["internal_intent"] = qmeta.get("internal_intent") or (
+                        result.get("symbolic_result") or {}
+                    ).get("intent")
+                sym = result.get("symbolic_result") or {}
+                if isinstance(sym, dict):
+                    score_item["output_kind"] = sym.get("output_kind")
+                    score_item["certainty_class"] = sym.get("certainty_class") or score_item.get("certainty_class")
+                    score_item["symbolic_status"] = sym.get("status")
 
                 score["total"] += 1
                 if score_item.get("inconclusive"):

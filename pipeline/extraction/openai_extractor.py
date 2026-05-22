@@ -107,6 +107,9 @@ def _case_ir_schema():
 
 def _query_ir_schema():
     """Flat object schema (no ``oneOf``) for OpenAI structured output compatibility."""
+    from pipeline.symbolic.intent_registry import list_public_intents
+
+    public_intents = list(list_public_intents())
     return {
         "type": "json_schema",
         "json_schema": {
@@ -123,16 +126,29 @@ def _query_ir_schema():
                     "symbol_hint",
                     "entity_hint",
                     "explain",
+                    "focus_symbols",
+                    "focus_entities",
+                    "max_models",
+                    "function",
+                    "direction",
+                    "target_type",
                 ],
                 "properties": {
                     "kind": {"type": "string", "enum": ["predicate", "intent"]},
                     "predicate_hint": {"type": "string"},
                     "mode": {"type": "string", "enum": ["set", "boolean"]},
                     "args": {"type": "array", "items": {"type": "string"}},
-                    "intent": {"type": "string"},
+                    "intent": {"type": "string", "enum": public_intents},
                     "symbol_hint": {"type": "string"},
                     "entity_hint": {"type": "string"},
                     "explain": {"type": "boolean"},
+                    "focus_symbols": {"type": "array", "items": {"type": "string"}},
+                    "focus_entities": {"type": "array", "items": {"type": "string"}},
+                    "max_models": {"type": "integer"},
+                    "function": {"type": "string"},
+                    "direction": {"type": "string", "enum": ["min", "max", ""]},
+                    "target_type": {"type": "string", "enum": ["predicate", "satisfiable", ""]},
+                    "include_unknown": {"type": "boolean"},
                 },
             },
         },

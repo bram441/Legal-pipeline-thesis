@@ -10,12 +10,18 @@ def run(case, base_kb_text, query):
 
     When entity is set, only that entity's value is returned (filters full mapping).
     """
-    symbol = (query.get("symbol") or "").strip()
+    symbol = (query.get("function") or query.get("symbol") or "").strip()
     if not symbol:
-        raise ValueError("get_range intent requires query.symbol")
+        raise ValueError("get_range intent requires query.function or query.symbol")
     entity = (query.get("entity") or "").strip().lower()
+    args = query.get("args") or []
+    if args and not entity and len(args) == 1:
+        entity = str(args[0]).strip().lower()
 
     fo_code = _compose_program(case, base_kb_text)
     debug_log("intents.get_range.run", "symbol=" + symbol + " entity=" + entity)
-    out = run_get_range(fo_code, symbol_name=symbol, filter_entity=entity)
-    return True, {"symbol": symbol, "range": out.get("range"), "entity": entity}
+    try:
+        out = run_get_range(fo_code, symbol_name=symbol, filter_entity=entity)
+    except Exception as e:
+        return None, {"status": "unsupported", "message": str(e)}
+    return True, {"symbol": symbol, "function": symbol, "args": args, "range": out.get("range"), "entity": entity}
