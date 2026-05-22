@@ -157,8 +157,9 @@ def main():
 
     strategy_options = ["(from environment / .env)"] + list(STRATEGY_CHOICES)
     strategy_help = (
-        "KB compilation path: direct_single (law→FO), direct_two_phase (law→vocab→theory), "
-        "le_single (law→LE→FO), le_two_phase (law→LE→vocab→theory). "
+        "JSON_IR experiment strategies: direct_json_ir_translate, direct_json_ir_no_translate, "
+        "le_json_ir_translate, le_json_ir_no_translate (symbols_then_rules). "
+        "Legacy aliases (direct_single, le_two_phase, …) remain for compatibility. "
         "First option uses PIPELINE_USE_LE and PIPELINE_KB_TWO_PHASE from .env."
     )
     pipeline_backend_options = ["(from environment / .env)", "legacy", "json_ir"]

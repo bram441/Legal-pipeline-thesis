@@ -28,7 +28,15 @@ def symbolic_result_is_inconclusive(symbolic_result: dict | None) -> bool:
     """True when the symbolic layer did not produce a decisive entailment verdict."""
     pred = symbolic_result or {}
     status = str(pred.get("status") or "").strip().lower()
-    if status in ("error", "unsupported", "timeout", "failed"):
+    if status in (
+        "error",
+        "unsupported",
+        "timeout",
+        "failed",
+        "malformed",
+        "missing",
+        "missing_result",
+    ):
         return True
     if status and status not in ("ok", "success"):
         return True

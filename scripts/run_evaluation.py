@@ -6,7 +6,8 @@ Usage (from project root):
 
   python scripts/run_evaluation.py
   python scripts/run_evaluation.py --runs run_003
-  python scripts/run_evaluation.py --runs all --strategies direct_single,le_single
+  python scripts/run_evaluation.py --runs all --strategies all
+  python scripts/run_evaluation.py --runs run_003 --strategies direct_json_ir_translate,le_json_ir_no_translate
   python scripts/run_evaluation.py --runs-dir inputs/json --runs run_001,run_003 --excel
   python scripts/run_evaluation.py --runs all --strategies all --max-failures 8
 
@@ -50,6 +51,8 @@ STRATEGY_CHOICES = eval_support.STRATEGY_CHOICES
 copy_run_json = eval_support.copy_run_json
 parse_runs_selection = eval_support.parse_runs_selection
 parse_strategies_selection = eval_support.parse_strategies_selection
+strategy_metadata_for_eval = eval_support.strategy_metadata_for_eval
+CANONICAL_JSON_IR_STRATEGIES = eval_support.CANONICAL_JSON_IR_STRATEGIES
 read_score = eval_support.read_score
 summarize_query_targets = eval_support.summarize_query_targets
 run_main_json = eval_support.run_main_json
@@ -103,6 +106,49 @@ def _write_markdown(path: Path, matrix: dict) -> None:
         ]
     )
     cli = matrix.get("evaluation_cli") or {}
+    strat_meta = matrix.get("strategy_definitions") or {}
+    if strat_meta:
+        lines.extend(
+            [
+                "",
+                "## Strategy configuration",
+                "",
+                "JSON_IR backend always compiles via ``symbols_then_rules`` (symbols then rules). "
+                "Legacy names ``direct_two_phase`` / ``le_two_phase`` only change legacy FO staging; "
+                "they are deprecated for JSON_IR sweeps.",
+                "",
+                "| Strategy | Canonical | LE | Config trans | Effective trans | Source | JSON IR | Depr |",
+                "|---|:---|:---:|:---:|:---:|:---|:---|:---:|",
+            ]
+        )
+        for s in strategies:
+            d = strat_meta.get(s) or {}
+            lines.append(
+                "| %s | %s | %s | %s | %s | %s | %s | %s |"
+                % (
+                    s,
+                    d.get("canonical_strategy_name") or s,
+                    "yes" if d.get("uses_le_intermediate") else "no",
+                    "yes" if d.get("configured_translation") else "no",
+                    "yes" if d.get("effective_translation") else "no",
+                    d.get("translation_source") or "—",
+                    d.get("json_ir_generation") or "—",
+                    "yes" if d.get("strategy_deprecated") else "no",
+                )
+            )
+        override_warns = [
+            d.get("translation_override_warning")
+            for d in strat_meta.values()
+            if d.get("translation_override_warning")
+        ]
+        if cli.get("no_translate_global") or override_warns:
+            lines.extend(["", "**Translation overrides:**", ""])
+            if cli.get("no_translate_global"):
+                lines.append(
+                    "- Global ``--no-translate``: effective translation forced off for every cell."
+                )
+            for w in override_warns:
+                lines.append("- " + str(w))
     if cli.get("belief_scoring"):
         lines.extend(
             [
@@ -358,16 +404,22 @@ def main() -> int:
     p.add_argument(
         "--strategies",
         default="all",
-        help="Comma-separated strategy names or 'all'. Choices: "
-        + ", ".join(STRATEGY_CHOICES)
-        + ". Default: all",
+        help="Comma-separated strategy names or 'all'. Default 'all' runs the four canonical "
+        "JSON_IR strategies (direct/le × translate/no_translate). Deprecated legacy aliases "
+        "(direct_single, le_two_phase, …) must be named explicitly. Choices: "
+        + ", ".join(STRATEGY_CHOICES),
     )
     p.add_argument(
         "--output-dir",
         default=None,
         help="Report folder (default: results/reports/evaluation_<timestamp>)",
     )
-    p.add_argument("--no-translate", action="store_true", help="Pass --no-translate to main.py")
+    p.add_argument(
+        "--no-translate",
+        action="store_true",
+        help="Force skip translation for every cell (overrides per-strategy translate defaults). "
+        "Without this flag, each strategy uses its own translate setting.",
+    )
     p.add_argument(
         "--kb-backend",
         default=None,
@@ -424,7 +476,9 @@ def main() -> int:
         return 1
 
     try:
-        strategies = parse_strategies_selection(args.strategies)
+        strategies = parse_strategies_selection(
+            args.strategies, pipeline_backend=args.pipeline_backend
+        )
     except ValueError as e:
         print(e, file=sys.stderr)
         return 1
@@ -448,6 +502,16 @@ def main() -> int:
 
     run_ids = [p.name for p in run_paths]
     cells: dict[str, dict[str, dict]] = {rid: {} for rid in run_ids}
+    strategy_definitions = {
+        s: strategy_metadata_for_eval(
+            s,
+            pipeline_backend=args.pipeline_backend,
+            kb_backend=args.kb_backend,
+            belief_scoring=args.belief_scoring,
+            cli_no_translate=args.no_translate,
+        )
+        for s in strategies
+    }
 
     print("Runs directory:", runs_dir)
     print("Runs:", ", ".join(run_ids))
@@ -487,10 +551,17 @@ def main() -> int:
                 print("===", rid, "+", strategy, "->", wdir.name, "===")
                 cell_t0 = time.perf_counter()
                 copy_run_json(src, wdir)
+                cell_meta = strategy_metadata_for_eval(
+                    strategy,
+                    pipeline_backend=args.pipeline_backend,
+                    kb_backend=args.kb_backend,
+                    belief_scoring=args.belief_scoring,
+                    cli_no_translate=args.no_translate,
+                )
                 code = run_main_json(
                     wdir,
                     strategy,
-                    args.no_translate,
+                    cli_no_translate=args.no_translate,
                     kb_backend=args.kb_backend,
                     pipeline_backend=args.pipeline_backend,
                     belief_scoring=args.belief_scoring,
@@ -509,6 +580,7 @@ def main() -> int:
                         "total": None,
                         "failure_category": failure_category,
                         "duration_sec": duration_sec,
+                        "strategy_metadata": cell_meta,
                     }
                     if is_eval_pipeline_failure(
                         exit_code=code,
@@ -548,6 +620,7 @@ def main() -> int:
                         ),
                         "failure_category": failure_category,
                         "duration_sec": duration_sec,
+                        "strategy_metadata": cell_meta,
                     }
                     if is_eval_pipeline_failure(
                         exit_code=0,
@@ -556,13 +629,15 @@ def main() -> int:
                     ):
                         pipeline_failure_count += 1
 
-                print(
-                    "[eval] %s — %s"
-                    % (
-                        _format_duration(duration_sec),
-                        failure_category if code != 0 or not cell_ok else "completed",
-                    )
+                status_label = (
+                    failure_category
+                    if code != 0
+                    else (failure_category if not cell_ok else "completed")
                 )
+                print("[eval] %s — %s" % (_format_duration(duration_sec), status_label))
+                ow = cell_meta.get("translation_override_warning")
+                if ow:
+                    print("[eval] WARNING:", ow, file=sys.stderr)
 
                 if max_failures is not None:
                     print(
@@ -610,9 +685,12 @@ def main() -> int:
             "evaluation_cli": {
                 "kb_backend": args.kb_backend,
                 "pipeline_backend": args.pipeline_backend,
+                "no_translate_global": args.no_translate,
                 "belief_scoring": bool(args.belief_scoring),
                 "max_failures": max_failures,
             },
+            "strategy_definitions": strategy_definitions,
+            "canonical_json_ir_strategies": list(CANONICAL_JSON_IR_STRATEGIES),
             "stopped_early": bool(stop_reason),
             "stop_reason": stop_reason,
             "pipeline_failure_count": pipeline_failure_count,

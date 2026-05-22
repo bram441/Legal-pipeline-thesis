@@ -16,7 +16,14 @@ _ROOT = Path(__file__).resolve().parents[1]
 if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
-from pipeline.kb.compile_strategy import STRATEGY_CHOICES  # noqa: E402
+from pipeline.kb.compile_strategy import (  # noqa: E402
+    CANONICAL_JSON_IR_STRATEGIES,
+    STRATEGY_CHOICES,
+    default_strategies_for_pipeline,
+    get_strategy_spec,
+    resolve_translate,
+    strategy_metadata,
+)
 
 
 def copy_run_json(src_run_dir: Path, dest_dir: Path) -> None:
@@ -27,15 +34,25 @@ def copy_run_json(src_run_dir: Path, dest_dir: Path) -> None:
 def run_main_json(
     run_dir: Path,
     strategy: str,
-    no_translate: bool,
+    *,
+    translate_override: bool | None = None,
+    cli_no_translate: bool = False,
     kb_backend: str | None = None,
     pipeline_backend: str | None = None,
-    *,
     belief_scoring: bool = False,
 ) -> int:
     """Invoke ``main.py --mode json``. Omit ``--kb-backend`` / ``--pipeline-backend`` when
     arguments are ``None`` so the subprocess follows ``.env`` defaults.
+
+    Translation: strategy config wins unless ``translate_override`` is set (explicit per-cell
+    override) or ``cli_no_translate`` forces skip (global eval ``--no-translate``).
     """
+    get_strategy_spec(strategy)
+    if translate_override is not None:
+        use_translate = translate_override
+    else:
+        use_translate = resolve_translate(strategy, cli_no_translate=cli_no_translate)
+
     cmd = [
         sys.executable,
         str(_ROOT / "main.py"),
@@ -46,7 +63,7 @@ def run_main_json(
         "--kb-strategy",
         strategy,
     ]
-    if no_translate:
+    if not use_translate:
         cmd.append("--no-translate")
     if kb_backend is not None:
         cmd.extend(["--kb-backend", kb_backend])
@@ -150,10 +167,14 @@ def parse_runs_selection(runs_dir: Path, spec: str) -> list[Path]:
     return out
 
 
-def parse_strategies_selection(spec: str) -> list[str]:
+def parse_strategies_selection(
+    spec: str,
+    *,
+    pipeline_backend: str | None = "json_ir",
+) -> list[str]:
     spec = (spec or "all").strip()
     if spec.lower() == "all":
-        return list(STRATEGY_CHOICES)
+        return default_strategies_for_pipeline(pipeline_backend)
     names = [x.strip() for x in spec.split(",") if x.strip()]
     for n in names:
         if n not in STRATEGY_CHOICES:
@@ -161,6 +182,28 @@ def parse_strategies_selection(spec: str) -> list[str]:
                 "Unknown strategy %r. Expected one of: %s" % (n, ", ".join(STRATEGY_CHOICES))
             )
     return names
+
+
+def strategy_metadata_for_eval(
+    strategy: str,
+    *,
+    pipeline_backend: str | None,
+    kb_backend: str | None,
+    belief_scoring: bool,
+    translate_override: bool | None = None,
+    cli_no_translate: bool = False,
+) -> dict:
+    """Matrix/report metadata; reflects effective translation after overrides."""
+    pb = pipeline_backend or "json_ir"
+    return strategy_metadata(
+        strategy,
+        pipeline_backend_mode=pb,
+        kb_backend=kb_backend,
+        belief_scoring=belief_scoring,
+        cli_no_translate=cli_no_translate,
+        translate_override=translate_override,
+        translation_source_prefix="eval_",
+    )
 
 
 def work_dir_name(
