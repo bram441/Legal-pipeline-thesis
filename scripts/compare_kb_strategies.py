@@ -77,12 +77,16 @@ def main() -> int:
 
     results_summary: list[dict] = []
 
-    for strategy in eval_support.STRATEGY_CHOICES:
+    strategies = eval_support.default_strategies_for_pipeline(args.pipeline_backend)
+    for strategy in strategies:
         sub = out_base / strategy
         print("\n=== Strategy:", strategy, "->", sub, "===\n")
         eval_support.copy_run_json(src, sub)
         code = eval_support.run_main_json(
-            sub, strategy, args.no_translate, pipeline_backend=args.pipeline_backend
+            sub,
+            strategy,
+            cli_no_translate=args.no_translate,
+            pipeline_backend=args.pipeline_backend,
         )
         if code != 0:
             print("Run failed with exit code", code, file=sys.stderr)

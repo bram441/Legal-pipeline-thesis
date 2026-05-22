@@ -34,7 +34,14 @@ from pipeline.io.json_runs import load_json_run, write_json_results, write_score
 from pipeline.eval.scoring import score_question
 from pipeline.kb.cache import get_or_compile_kb
 from pipeline.kb.compile_backend import KB_BACKEND_CHOICES, get_kb_backend_from_env, kb_backend_env_override
-from pipeline.kb.compile_strategy import kb_run_context, strategy_to_flags, STRATEGY_CHOICES
+from pipeline.kb.compile_strategy import (
+    STRATEGY_CHOICES,
+    get_strategy_spec,
+    kb_run_context,
+    resolve_translate,
+    strategy_metadata,
+    strategy_to_flags,
+)
 from pipeline.utils.run_trace import trace_enabled
 from pipeline.translation.translator import translate_to_english, TranslationError
 from pipeline.utils.unicode_sanitize import sanitize_for_output
@@ -89,7 +96,15 @@ def _warn_cli_backend_mismatch(cli_pipeline_backend, cli_kb_backend):
         )
 
 
-def run_text_mode(run_dir, provider, translate=True, cli_kb_strategy=None, cli_kb_backend=None, cli_pipeline_backend=None):
+def run_text_mode(
+    run_dir,
+    provider,
+    *,
+    cli_no_translate: bool = False,
+    cli_kb_strategy=None,
+    cli_kb_backend=None,
+    cli_pipeline_backend=None,
+):
     payload = load_text_run(run_dir)
 
     law_text = payload["law_text"]
@@ -98,6 +113,8 @@ def run_text_mode(run_dir, provider, translate=True, cli_kb_strategy=None, cli_k
 
     ctx, strategy_label = kb_run_context(cli_strategy=cli_kb_strategy, run_json=None, mode="text")
     ul, tp = strategy_to_flags(strategy_label)
+    translate = resolve_translate(strategy_label, cli_no_translate=cli_no_translate)
+    spec = get_strategy_spec(strategy_label)
 
     if translate:
         try:
@@ -185,7 +202,15 @@ def run_text_mode(run_dir, provider, translate=True, cli_kb_strategy=None, cli_k
         print("Wrote:", os.path.join(run_dir, "results.txt"))
 
 
-def run_json_mode(run_dir, provider, translate=True, cli_kb_strategy=None, cli_kb_backend=None, cli_pipeline_backend=None):
+def run_json_mode(
+    run_dir,
+    provider,
+    *,
+    cli_no_translate: bool = False,
+    cli_kb_strategy=None,
+    cli_kb_backend=None,
+    cli_pipeline_backend=None,
+):
     run_obj = load_json_run(run_dir)
 
     law_obj = run_obj.get("law") or {}
@@ -202,6 +227,8 @@ def run_json_mode(run_dir, provider, translate=True, cli_kb_strategy=None, cli_k
 
     ctx, strategy_label = kb_run_context(cli_strategy=cli_kb_strategy, run_json=run_obj, mode="json")
     ul, tp = strategy_to_flags(strategy_label)
+    translate = resolve_translate(strategy_label, cli_no_translate=cli_no_translate)
+    spec = get_strategy_spec(strategy_label)
 
     if translate:
         try:
@@ -225,6 +252,16 @@ def run_json_mode(run_dir, provider, translate=True, cli_kb_strategy=None, cli_k
     pipeline_backend_label = _effective_pipeline_backend_label(
         cli_pipeline_backend, resolved_kb_backend, resolved_extraction_backend
     )
+    smeta = strategy_metadata(
+        strategy_label,
+        pipeline_backend_mode=pipeline_backend_label,
+        kb_backend=resolved_kb_backend,
+        cli_no_translate=cli_no_translate,
+        translation_source_prefix="main_",
+    )
+    warn = smeta.get("translation_override_warning")
+    if warn:
+        print("Warning:", warn, file=sys.stderr)
 
     with ExitStack() as stack:
         stack.enter_context(ctx)
@@ -253,7 +290,13 @@ def run_json_mode(run_dir, provider, translate=True, cli_kb_strategy=None, cli_k
             "kb_compile_backend": backend_label,
             "extraction_backend": resolved_extraction_backend,
             "pipeline_backend_mode": pipeline_backend_label,
-            "kb_compile_flags": {"use_le": ul, "two_phase": tp},
+            "kb_compile_flags": {
+                "use_le": ul,
+                "two_phase": tp,
+                "uses_translation": translate,
+                "json_ir_generation": spec.json_ir_generation,
+            },
+            "strategy_metadata": smeta,
             "questions": [],
         }
 
@@ -269,6 +312,7 @@ def run_json_mode(run_dir, provider, translate=True, cli_kb_strategy=None, cli_k
             "kb_compile_strategy": strategy_label,
             "pipeline_backend_mode": pipeline_backend_label,
             "extraction_backend": resolved_extraction_backend,
+            "strategy_metadata": smeta,
         }
 
         pre_extracted_case = None
@@ -366,13 +410,20 @@ def run_json_mode(run_dir, provider, translate=True, cli_kb_strategy=None, cli_k
                 "kb_compile_backend": backend_label,
                 "extraction_backend": resolved_extraction_backend,
                 "pipeline_backend_mode": pipeline_backend_label,
-                "kb_compile_flags": {"use_le": ul, "two_phase": tp},
+                "kb_compile_flags": {
+                    "use_le": ul,
+                    "two_phase": tp,
+                    "uses_translation": translate,
+                    "json_ir_generation": spec.json_ir_generation,
+                },
+                "strategy_metadata": smeta,
             },
         )
 
         print("Wrote:", os.path.join(run_dir, "results.json"))
         print("Wrote:", os.path.join(run_dir, "score.json"))
         print("KB strategy:", strategy_label, "(use_le=" + str(ul) + ", two_phase=" + str(tp) + ")")
+        print("Translation:", translate, "| json_ir_generation:", spec.json_ir_generation)
         print("KB backend:", backend_label)
         print("Extraction backend:", resolved_extraction_backend)
         print("Pipeline backend mode:", pipeline_backend_label)
@@ -383,7 +434,11 @@ def main():
     parser.add_argument("--mode", choices=["text", "json"], required=True)
     parser.add_argument("--run", required=True, help="Path to run folder (e.g., inputs/text/run_001)")
     parser.add_argument("--provider", choices=["auto", "openai"], default="auto")
-    parser.add_argument("--no-translate", action="store_true", help="Skip translation to English (input already in English)")
+    parser.add_argument(
+        "--no-translate",
+        action="store_true",
+        help="Skip translation to English. Overrides the strategy's translate setting when --kb-strategy is set.",
+    )
     parser.add_argument(
         "--kb-strategy",
         metavar="NAME",
@@ -422,12 +477,11 @@ def main():
         run_path = _PROJECT_ROOT / run_path
     run_dir = str(run_path.resolve())
 
-    translate = not args.no_translate
     if args.mode == "text":
         run_text_mode(
             run_dir,
             args.provider,
-            translate=translate,
+            cli_no_translate=args.no_translate,
             cli_kb_strategy=args.kb_strategy,
             cli_kb_backend=args.kb_backend,
             cli_pipeline_backend=args.pipeline_backend,
@@ -436,7 +490,7 @@ def main():
         run_json_mode(
             run_dir,
             args.provider,
-            translate=translate,
+            cli_no_translate=args.no_translate,
             cli_kb_strategy=args.kb_strategy,
             cli_kb_backend=args.kb_backend,
             cli_pipeline_backend=args.pipeline_backend,
