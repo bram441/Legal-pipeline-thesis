@@ -7,98 +7,62 @@ import os
 import re
 from typing import Any
 
+from pipeline.kb.law_citation import CitationRef, citations_to_legacy_keys, extract_citations
+from pipeline.kb.law_chunks import (
+    chunk_law_text,
+    chunks_to_scoped_text,
+    select_chunks_for_citations,
+)
+from pipeline.kb.legal_effect import (
+    law_text_has_strong_legal_effect_language,
+    question_has_legal_effect_language,
+)
+
 
 def _scope_mode() -> str:
     return (os.getenv("JSON_IR_SCOPE_MODE") or "cited").strip().lower()
-
-
-def _extract_citation_keys(question: str) -> list[str]:
-    """Return normalized citation keys like '4.17' or '1:24' from question text."""
-    q = question or ""
-    keys: list[str] = []
-    patterns = [
-        r"(?:article|artikel|art\.?)\s*(\d+(?:[:.]\d+)*(?:\s*,\s*par(?:agraph|agraaf)?\.?\s*\d+)?)",
-        r"(?:section|§)\s*(\d+(?:[:.]\d+)*)",
-    ]
-    for pat in patterns:
-        for m in re.finditer(pat, q, re.IGNORECASE):
-            raw = m.group(1).strip()
-            raw = re.sub(r"\s+", " ", raw)
-            keys.append(raw.replace(",", " ").strip())
-    out: list[str] = []
-    seen: set[str] = set()
-    for k in keys:
-        norm = re.sub(r"\s*par(?:agraph|agraaf)?\.?\s*(\d+)", r"(\1)", k, flags=re.I)
-        norm = norm.replace(" ", "")
-        if norm and norm not in seen:
-            seen.add(norm)
-            out.append(norm)
-    return out
-
-
-def _split_law_into_chunks(law_text: str) -> list[tuple[str, str]]:
-    """Split on article/section headings; returns (heading, body) chunks."""
-    text = (law_text or "").strip()
-    if not text:
-        return []
-    heading_re = re.compile(
-        r"(?im)^(?:\s*(?:article|artikel|art\.?)\s*(\d+(?:[:.]\d+)*)\b[^\n]*)",
-    )
-    matches = list(heading_re.finditer(text))
-    if not matches:
-        return [("", text)]
-    chunks: list[tuple[str, str]] = []
-    for i, m in enumerate(matches):
-        start = m.start()
-        end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
-        heading = m.group(0).strip()
-        body = text[start:end].strip()
-        key = m.group(1).replace(":", ".")
-        chunks.append((key, body if body else heading))
-    return chunks
-
-
-def _chunk_matches_citation(chunk_key: str, citation: str) -> bool:
-    ck = chunk_key.replace(":", ".").strip()
-    cit = citation.replace(":", ".").strip()
-    if ck == cit:
-        return True
-    if cit.startswith(ck + ".") or ck.startswith(cit + "."):
-        return True
-    return False
-
-
-def _select_by_citation(law_text: str, citations: list[str]) -> str | None:
-    if not citations:
-        return None
-    chunks = _split_law_into_chunks(law_text)
-    if len(chunks) <= 1 and chunks and not chunks[0][0]:
-        return None
-    selected: list[str] = []
-    for cit in citations:
-        for key, body in chunks:
-            if key and _chunk_matches_citation(key, cit):
-                selected.append(body)
-    if selected:
-        return "\n\n".join(selected)
-    return None
 
 
 def _select_by_keywords(law_text: str, question: str, case: str, top_k: int = 3) -> str:
     query_tokens = set(re.findall(r"[a-z0-9]{4,}", (question + " " + case).lower()))
     if not query_tokens:
         return law_text
-    chunks = _split_law_into_chunks(law_text)
+    chunks = chunk_law_text(law_text)
     if len(chunks) <= 1:
         return law_text
     scored: list[tuple[int, str]] = []
-    for _key, body in chunks:
-        body_l = body.lower()
+    for ch in chunks:
+        body_l = ch.text.lower()
         score = sum(1 for t in query_tokens if t in body_l)
-        scored.append((score, body))
+        scored.append((score, ch.text))
     scored.sort(key=lambda x: (-x[0], -len(x[1])))
     picked = [b for s, b in scored[:top_k] if s > 0]
     return "\n\n".join(picked) if picked else law_text
+
+
+def _enrich_scope_metadata(
+    meta: dict[str, Any],
+    *,
+    scoped_text: str,
+    question: str,
+    citations: list[CitationRef],
+) -> None:
+    meta["citations_structured"] = [
+        {
+            "article": c.article,
+            "paragraph": c.effective_paragraph(),
+            "point": c.point,
+            "lid": c.lid,
+            "raw": c.raw,
+            "confidence": c.confidence,
+        }
+        for c in citations
+    ]
+    meta["citations"] = citations_to_legacy_keys(citations)
+    meta["question_asks_legal_effect"] = question_has_legal_effect_language(question)
+    meta["contains_effect_language"] = law_text_has_strong_legal_effect_language(scoped_text)
+    if meta.get("scope_mode") is None:
+        meta["scope_mode"] = "exact_citation" if citations else "fallback_full_law"
 
 
 def select_law_text_for_compilation(
@@ -113,31 +77,55 @@ def select_law_text_for_compilation(
     """
     mode = _scope_mode()
     full = (law_text or "").strip()
-    meta: dict[str, Any] = {"mode": mode, "original_length": len(full)}
+    meta: dict[str, Any] = {
+        "mode": mode,
+        "original_length": len(full),
+        "scope_mode": None,
+        "cited_article": None,
+        "cited_paragraph": None,
+        "cited_point": None,
+        "selected_chunk_ids": [],
+        "selected_granularity": None,
+        "included_dependency_chunks": [],
+        "contains_effect_language": False,
+        "question_asks_legal_effect": False,
+    }
     if not full or mode == "full":
+        meta["scope_mode"] = "fallback_full_law"
         meta["selected_length"] = len(full)
+        meta["question_asks_legal_effect"] = question_has_legal_effect_language(
+            question_text or ""
+        )
+        meta["contains_effect_language"] = law_text_has_strong_legal_effect_language(full)
         return full, meta
 
     question = (question_text or "").strip()
     case = (case_text or "").strip()
-    citations = _extract_citation_keys(question)
+    citations = extract_citations(question)
 
     if mode == "cited" and citations:
-        picked = _select_by_citation(full, citations)
-        if picked:
-            meta["citations"] = citations
-            meta["selected_length"] = len(picked)
-            return picked, meta
+        all_chunks = chunk_law_text(full)
+        primary = max(citations, key=lambda c: (c.specificity(), c.confidence))
+        selected, sel_meta = select_chunks_for_citations(all_chunks, [primary])
+        if selected:
+            scoped = chunks_to_scoped_text(selected)
+            meta.update(sel_meta)
+            _enrich_scope_metadata(meta, scoped_text=scoped, question=question, citations=citations)
+            meta["selected_length"] = len(scoped)
+            return scoped, meta
 
     if mode in {"cited", "retrieve"}:
         picked = _select_by_keywords(full, question, case)
         if picked != full:
-            meta["selection"] = "keyword_retrieval"
+            meta["scope_mode"] = "keyword_retrieval"
+            meta["selected_granularity"] = "mixed"
             meta["selected_length"] = len(picked)
+            _enrich_scope_metadata(meta, scoped_text=picked, question=question, citations=citations)
             return picked, meta
 
-    meta["fallback"] = "full_law"
+    meta["scope_mode"] = "fallback_full_law"
     meta["selected_length"] = len(full)
+    _enrich_scope_metadata(meta, scoped_text=full, question=question, citations=citations)
     return full, meta
 
 

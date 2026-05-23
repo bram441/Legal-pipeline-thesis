@@ -21,7 +21,9 @@ def law_text_to_le(law_text, client, model):
     Convert law text to Logical English (controlled natural language).
     Returns a single string of LE rules/clauses.
     """
-    user_prompt = render_prompt("le/law_to_le.txt", law_text=(law_text or "").strip())
+    from pipeline.utils.prompt_paths import LE_LAW_TO_LE, LE_TO_FO
+
+    user_prompt = render_prompt(LE_LAW_TO_LE, law_text=(law_text or "").strip())
     resp = client.chat.completions.create(
         model=model,
         messages=[
@@ -41,7 +43,7 @@ def le_to_fo(le_text, client, model):
     Convert Logical English text to FO(.) (vocabulary + theory) for IDP-Z3.
     Returns a single string of FO(.) code.
     """
-    user_prompt = render_prompt("le/le_to_fo.txt", le_text=(le_text or "").strip())
+    user_prompt = render_prompt(LE_TO_FO, le_text=(le_text or "").strip())
     resp = client.chat.completions.create(
         model=model,
         messages=[

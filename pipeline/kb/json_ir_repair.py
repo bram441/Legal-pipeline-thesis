@@ -30,6 +30,46 @@ _RE_UNBOUND = re.compile(r"unbound identifier\s+'([^']+)'", re.IGNORECASE)
 _RE_RULE_IDX = re.compile(r"rules\[(\d+)\]")
 
 
+def normalize_error_code(msg: str) -> str:
+    """Stable error code for repair cards and repair history grouping."""
+    s = (msg or "").strip()
+    sl = s.lower()
+    if "json ir validation failed" in sl or "expected" in sl and "json" in sl:
+        if "parse" in sl or "json.loads" in sl or "invalid json" in sl:
+            return "json_parse_error"
+    if "openai call failed" in sl and "json" in sl:
+        return "json_parse_error"
+    if "helper predicate" in sl and ("defining rule" in sl or "never defined" in sl or "no defining rule" in sl):
+        return "missing_helper_definition"
+    if "helper function" in sl and ("defining rule" in sl or "never defined" in sl):
+        return "missing_helper_definition"
+    if "computed-looking observable" in sl or "looks computed/composite" in sl:
+        return "computed_observable_unsafe"
+    if "does not appear in the scoped law text" in sl or "do not invent or alter legal thresholds" in sl:
+        return "numeric_threshold_not_in_law_text"
+    if "cannot prove disqualification" in sl or "exclusion rule such as" in sl:
+        return "missing_threshold_classification_exclusion"
+    if "at-most-one" in sl or "more-than-one criteria" in sl or "simple or over individual" in sl:
+        return "threshold_cardinality_or_singleton"
+    if "semantically identical to the status" in sl or "classification encoded as a primitive type" in sl:
+        return "status_as_type"
+    if "legal-effect or timing language" in sl or "no derived legal-output predicate" in sl:
+        return "missing_legal_effect_output"
+    if "never appear in any rule then" in sl:
+        return "derived_predicate_not_defined"
+    if "unconstrained consequent variable" in sl:
+        return "ungrounded_variable"
+    if "conflicting signatures" in sl or "unknown return type" in sl or "unknown argument type" in sl:
+        return "invalid_signature"
+    if "unknown predicate" in sl or "undeclared symbol" in sl or "not declared" in sl:
+        return "unknown_symbol"
+    if "expects type" in sl and "got" in sl:
+        return "type_mismatch"
+    if "idp failed to parse" in sl or "failed to parse compiled kb" in sl:
+        return "idp_render_error"
+    return "unknown_validation_error"
+
+
 def normalize_error_signature(msg: str) -> str:
     """Stable key for repeated-error escalation (drops indices where useful)."""
     s = (msg or "").strip()
@@ -48,6 +88,18 @@ def normalize_error_signature(msg: str) -> str:
         if "predicate" in sl and "function term" in sl:
             m = re.search(r"predicate\s+'([^']+)'", s, re.I)
             return "schema::pred_as_fn::" + (m.group(1) if m else "?")
+        if "computed-looking observable" in sl:
+            m = re.search(r"observable predicate\s+'([^']+)'", s, re.I)
+            return "schema::computed_observable::" + (m.group(1) if m else "?")
+        if "looks computed/composite" in sl:
+            m = re.search(r"predicate\s+'([^']+)'", s, re.I)
+            return "schema::computed_observable_decl::" + (m.group(1) if m else "?")
+        if "legal-effect or timing language" in sl or "no derived legal-output" in sl:
+            return "schema::missing_legal_effect"
+        if "semantically identical to the status" in sl:
+            return "schema::status_as_type"
+        if "at-most-one" in sl or "simple or over individual" in sl:
+            return "schema::threshold_cardinality"
         if "helper predicate" in sl and "never defined" in sl:
             m = re.search(r"helper predicate\s+'([^']+)'", s, re.I)
             return "schema::floating_helper_pred::" + (m.group(1) if m else "?")
@@ -56,6 +108,14 @@ def normalize_error_signature(msg: str) -> str:
             return "schema::floating_helper_fun::" + (m.group(1) if m else "?")
         return "schema::" + sl[:120]
     if RULE_DESIGN_TAG.lower() in sl:
+        if "at-most-one" in sl or "simple or over individual" in sl:
+            return "rule::threshold_cardinality"
+        if "defining rule" in sl or "no defining rule" in sl:
+            m = re.search(r"helper predicate\s+'([^']+)'", s, re.I)
+            return "rule::missing_helper::" + (m.group(1) if m else "?")
+        if "never appear in any rule then" in sl:
+            m = re.search(r"derived predicate\(s\)\s+([^\s]+)", s, re.I)
+            return "rule::derived_undefined::" + (m.group(1) if m else "?")
         m = re.search(r"derived predicate\s+'([^']+)'", s, re.I)
         return "rule::circular::" + (m.group(1) if m else "?")
     m = _RE_PRED_TYPE_MISMATCH.search(s)
@@ -128,6 +188,8 @@ def classify_json_ir_validation_error(
     prev = previous_errors or []
 
     if SCHEMA_DESIGN_TAG.lower() in ml:
+        if "never appear in any rule then" in ml:
+            return JsonIRErrorKind.RULES_REPAIR_ONLY
         return JsonIRErrorKind.SYMBOLS_REPAIR_REQUIRED
 
     if RULE_DESIGN_TAG.lower() in ml:
@@ -135,6 +197,18 @@ def classify_json_ir_validation_error(
             return JsonIRErrorKind.RULES_REPAIR_ONLY
         if "incompatible unary subject roles" in ml:
             return JsonIRErrorKind.SYMBOLS_REPAIR_REQUIRED
+        if "does not appear in the scoped law text" in ml or "do not invent or alter legal thresholds" in ml:
+            return JsonIRErrorKind.RULES_REPAIR_ONLY
+        if "cannot prove disqualification" in ml or "exclusion rule such as" in ml:
+            return JsonIRErrorKind.RULES_REPAIR_ONLY
+        if "at-most-one" in ml or "more-than-one criteria" in ml or "simple or over individual" in ml:
+            return JsonIRErrorKind.RULES_REPAIR_ONLY
+        if "threshold comparisons" in ml and "favorable derived" in ml:
+            return JsonIRErrorKind.RULES_REPAIR_ONLY
+        if "repair layer: rules" in ml or "has no defining rule" in ml:
+            return JsonIRErrorKind.RULES_REPAIR_ONLY
+        if "helper predicate" in ml and "defining rule" in ml:
+            return JsonIRErrorKind.RULES_REPAIR_ONLY
         return JsonIRErrorKind.SYMBOLS_REPAIR_REQUIRED
 
     if "observable predicate" in ml and ("consequent" in ml or "then" in ml):
@@ -149,10 +223,14 @@ def classify_json_ir_validation_error(
     if "no derived legal outputs" in ml or "no observable case-input" in ml:
         return JsonIRErrorKind.SYMBOLS_REPAIR_REQUIRED
 
-    if "helper predicate" in ml and "never defined" in ml:
+    if "computed-looking observable" in ml or "looks computed/composite" in ml:
         return JsonIRErrorKind.SYMBOLS_REPAIR_REQUIRED
+    if "repair layer: symbols" in ml:
+        return JsonIRErrorKind.SYMBOLS_REPAIR_REQUIRED
+    if "helper predicate" in ml and ("never defined" in ml or "defining rule" in ml):
+        return JsonIRErrorKind.RULES_REPAIR_ONLY
     if "helper function" in ml and "never defined" in ml:
-        return JsonIRErrorKind.SYMBOLS_REPAIR_REQUIRED
+        return JsonIRErrorKind.RULES_REPAIR_ONLY
 
     if "conflicting signatures for symbol" in ml:
         return JsonIRErrorKind.SYMBOLS_REPAIR_REQUIRED
@@ -221,18 +299,33 @@ def format_symbol_repair_error(validation_error: str) -> str:
     em = (validation_error or "").strip()
     el = em.lower()
     extra = ""
+    if "computed-looking observable" in el or "looks computed/composite" in el:
+        extra = (
+            "\n\nComputed/composite conditions (exceeds/meets/threshold/criteria-style) must not stay "
+            "observable unless directly_observable=true and cases may state the composite fact verbatim. "
+            "Otherwise use kind=helper with defining rules from numeric functions/comparisons, or encode "
+            "thresholds directly in rule if-conditions. Do not rely on negating an undefined atom."
+        )
+    if "semantically identical to the status" in el or "status or classification encoded as a primitive type" in el:
+        extra = (
+            "\n\nDo not create primitive types for legal statuses/classifications unless the law introduces "
+            "a separate object domain. Model statuses as derived predicates over broader entity types "
+            "(Person, Company, LegalEntity, etc.). For roles between entities, prefer relational predicates "
+            "(e.g. is_spouse_of(a, b)) over unary status types."
+        )
+    if "legal-effect or timing language" in el or "no derived legal-output predicate" in el:
+        extra = (
+            "\n\nThe law states a legal consequence, effect, or timing — add an explicit derived predicate "
+            "for that output (not only is_* classifications or threshold helpers). Set legal_output=true "
+            "or output_category=legal_effect when helpful. Rules repair cannot invent the query target."
+        )
     if "helper predicate" in el or "helper function" in el:
-        if "never defined" in el:
+        if "defining rule" in el or "never defined" in el:
             extra = (
-                "\n\nSymbol-kind contract:\n"
-                "- observable = supplied by case extraction.\n"
-                "- derived = final legal conclusion/output.\n"
-                "- helper = intermediate symbol that must be defined by rules.\n\n"
-                "Every helper used in a rule condition must be defined by some rule, or it must be "
-                "reclassified as observable. Do not leave helper predicates/functions open.\n\n"
-                "Either reclassify this helper as observable if the case should provide it directly, "
-                "or keep it as helper and ensure rules are generated to derive it from observable "
-                "facts/functions. Rules-only repair cannot fix a floating helper without symbol changes."
+                "\n\nEvery helper used in a rule (especially under negation) must have defining rules "
+                "in THEN from observable facts/functions. Prefer numeric function comparisons over "
+                "undefined threshold predicates. Do not rename the predicate or delete the negated "
+                "condition without adding a proper definition."
             )
     return (
         "The rules phase exposed a symbol-table / schema design problem.\n\n"

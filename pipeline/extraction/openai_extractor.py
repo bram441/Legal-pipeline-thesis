@@ -8,6 +8,17 @@ from pipeline.utils.prompt_loader import (
     load_prompt,
     render_prompt,
 )
+from pipeline.utils.prompt_paths import (
+    EXTRACTION_JSON_IR_CASE,
+    EXTRACTION_JSON_IR_CASE_REPAIR,
+    EXTRACTION_JSON_IR_QUERY,
+    EXTRACTION_JSON_IR_QUERY_REPAIR,
+    EXTRACTION_LEGACY_CASE,
+    EXTRACTION_LEGACY_CASE_REPAIR,
+    EXTRACTION_LEGACY_QUERY,
+    EXTRACTION_LEGACY_QUERY_REPAIR,
+    EXTRACTION_WORLD_KNOWLEDGE,
+)
 
 
 class LLMExtractionError(Exception):
@@ -163,7 +174,7 @@ def _feedback_block(feedback):
 
 def _lexical_world_knowledge_block() -> str:
     """Shared kinship / multi-party lexical hints; edit prompts/extraction/world_knowledge_lexical.txt."""
-    return load_prompt("extraction/world_knowledge_lexical.txt").strip()
+    return load_prompt(EXTRACTION_WORLD_KNOWLEDGE).strip()
 
 
 def _extraction_repair_preamble(repair_template_rel: str, feedback) -> str:
@@ -179,20 +190,12 @@ def _extraction_repair_preamble(repair_template_rel: str, feedback) -> str:
 
 
 def _json_ir_extraction_repair_preamble(is_case: bool, feedback) -> str:
-    rel = (
-        "extraction/openai_extract_case_json_ir_repair.txt"
-        if is_case
-        else "extraction/openai_extract_query_json_ir_repair.txt"
-    )
+    rel = EXTRACTION_JSON_IR_CASE_REPAIR if is_case else EXTRACTION_JSON_IR_QUERY_REPAIR
     return _extraction_repair_preamble(rel, feedback)
 
 
 def _legacy_extraction_repair_preamble(is_case: bool, feedback) -> str:
-    rel = (
-        "extraction/openai_extract_case_prompt_repair.txt"
-        if is_case
-        else "extraction/openai_extract_query_prompt_repair.txt"
-    )
+    rel = EXTRACTION_LEGACY_CASE_REPAIR if is_case else EXTRACTION_LEGACY_QUERY_REPAIR
     return _extraction_repair_preamble(rel, feedback)
 
 
@@ -211,7 +214,7 @@ def extract_case_only_openai(case_text, model, kb_schema=None, feedback=None):
     kb_schema_json = json.dumps(kb_schema or {}, ensure_ascii=False, indent=2)
 
     case_user = _legacy_extraction_repair_preamble(True, feedback) + render_prompt(
-        "extraction/openai_extract_case_prompt.txt",
+        EXTRACTION_LEGACY_CASE,
         kb_schema_json=kb_schema_json,
         case_text=str(case_text),
         feedback_block=_feedback_block(feedback),
@@ -262,7 +265,7 @@ def extract_case_ir_only_openai(case_text, model, kb_schema=None, feedback=None)
     client = OpenAI(api_key=api_key)
     kb_schema_json = json.dumps(kb_schema or {}, ensure_ascii=False, indent=2)
     user_msg = _json_ir_extraction_repair_preamble(True, feedback) + render_prompt(
-        "extraction/openai_extract_case_json_ir_prompt.txt",
+        EXTRACTION_JSON_IR_CASE,
         kb_schema_json=kb_schema_json,
         case_text=str(case_text),
         feedback_block=_feedback_block(feedback),
@@ -295,7 +298,7 @@ def extract_query_ir_only_openai(user_question, model, kb_schema=None, case=None
     case_facts_json = json.dumps((case_obj.get("facts") or []), ensure_ascii=False, indent=2)
     case_entities_json = json.dumps((case_obj.get("entities") or {}), ensure_ascii=False, indent=2)
     user_msg = _json_ir_extraction_repair_preamble(False, feedback) + render_prompt(
-        "extraction/openai_extract_query_json_ir_prompt.txt",
+        EXTRACTION_JSON_IR_QUERY,
         kb_schema_json=kb_schema_json,
         user_question=str(user_question),
         case_facts_json=case_facts_json,
@@ -334,7 +337,7 @@ def extract_query_only_openai(user_question, model, kb_schema=None, case=None, f
     case_entities_json = json.dumps((case_obj.get("entities") or {}), ensure_ascii=False, indent=2)
 
     query_user = _legacy_extraction_repair_preamble(False, feedback) + render_prompt(
-        "extraction/openai_extract_query_prompt.txt",
+        EXTRACTION_LEGACY_QUERY,
         kb_schema_json=kb_schema_json,
         user_question=str(user_question),
         case_facts_json=case_facts_json,

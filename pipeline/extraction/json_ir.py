@@ -19,6 +19,12 @@ from __future__ import annotations
 import re
 from typing import Any
 
+from pipeline.kb.legal_effect import (
+    predicate_looks_like_classification_output,
+    predicate_represents_legal_effect_output,
+    question_has_legal_effect_language,
+    schema_has_legal_effect_output_predicate,
+)
 from pipeline.semantic.legal_question import (
     domain_heuristics_enabled,
     question_asks_legal_conclusion,
@@ -205,33 +211,24 @@ def _lexical_overlap_score(sym: dict, user_question: str) -> float:
     return score
 
 
-_EFFECT_QUESTION_TOKENS = frozenset(
-    {
-        "apply", "applies", "applied", "effect", "effective", "consequence", "consequences",
-        "following", "follow", "from", "period", "year", "timing", "commence", "start", "end",
-        "cease", "take", "gelden", "gevolgen", "werking", "vanaf", "periode", "jaar",
-    }
-)
-
-_EFFECT_PREDICATE_TOKENS = frozenset(
-    {
-        "apply", "applies", "effect", "effective", "consequence", "consequences", "following",
-        "commence", "start", "end", "cease", "period", "timing", "entitled", "entitlement",
-    }
-)
-
-_CLASSIFICATION_NAME_PREFIXES = ("is_", "has_")
-
-
 def _looks_like_classification_predicate(sym: dict) -> bool:
-    n = (sym.get("name") or "").lower()
-    if not n.startswith(_CLASSIFICATION_NAME_PREFIXES):
-        return False
-    desc = (sym.get("description") or "").lower()
-    blob = n + " " + desc
-    if any(t in blob for t in _EFFECT_PREDICATE_TOKENS):
-        return False
-    return True
+    return predicate_looks_like_classification_output(
+        str(sym.get("name") or ""),
+        description=str(sym.get("description") or ""),
+        kind=str(sym.get("kind") or ""),
+        legal_output=sym.get("legal_output") if isinstance(sym.get("legal_output"), bool) else None,
+        output_category=str(sym.get("output_category") or ""),
+    )
+
+
+def _looks_like_legal_effect_predicate(sym: dict) -> bool:
+    return predicate_represents_legal_effect_output(
+        str(sym.get("name") or ""),
+        description=str(sym.get("description") or ""),
+        kind=str(sym.get("kind") or ""),
+        legal_output=sym.get("legal_output") if isinstance(sym.get("legal_output"), bool) else None,
+        output_category=str(sym.get("output_category") or ""),
+    )
 
 
 def _derived_predicate_specificity_score(sym: dict, user_question: str) -> float:
@@ -248,12 +245,12 @@ def _derived_predicate_specificity_score(sym: dict, user_question: str) -> float
     name_cov = q_hit / float(len(nt))
     token_bonus = min(len(nt), 14) * 0.035
     score = overlap + 0.35 * q_cov + 0.12 * name_cov + token_bonus
-    effect_q = bool(q & _EFFECT_QUESTION_TOKENS)
-    effect_pred = bool((nt | desc_toks) & _EFFECT_PREDICATE_TOKENS)
+    effect_q = question_has_legal_effect_language(user_question)
+    effect_pred = _looks_like_legal_effect_predicate(sym)
     if effect_q and effect_pred:
-        score += 0.45
+        score += 0.55
     if effect_q and _looks_like_classification_predicate(sym):
-        score -= 0.55
+        score -= 0.65
     if question_asks_legal_definition(user_question) and _looks_like_classification_predicate(sym):
         score -= 0.25
     return score
@@ -276,6 +273,10 @@ def _pick_most_specific_derived_predicate(
 ) -> str | None:
     """Prefer the most specific derived predicate that matches the legal question."""
     derived = _derived_bool_predicates(kb_schema)
+    if question_has_legal_effect_language(user_question):
+        effect_derived = [d for d in derived if _looks_like_legal_effect_predicate(d)]
+        if effect_derived:
+            derived = effect_derived
     if not derived:
         return current_pred
     scored = [( _derived_predicate_specificity_score(s, user_question), s) for s in derived]
@@ -318,20 +319,15 @@ def _validate_query_target_for_legal_question(
     user_question: str,
     kb_schema: dict,
 ) -> None:
-    if not question_asks_legal_conclusion(user_question):
+    effect_question = question_has_legal_effect_language(user_question)
+    if not question_asks_legal_conclusion(user_question) and not effect_question:
         return
     derived = _derived_bool_predicates(kb_schema)
     pk = _symbol_kind(_symbol_sig(kb_schema, pred))
     if pk != "observable":
         sig = _symbol_sig(kb_schema, pred) or {}
-        q = _question_tokens(user_question)
-        if q & _EFFECT_QUESTION_TOKENS and _looks_like_classification_predicate(sig):
-            has_effect_derived = any(
-                not _looks_like_classification_predicate(d)
-                and (_symbol_tokens(d.get("name")) | set(_symbol_tokens(d.get("description") or "")))
-                & _EFFECT_PREDICATE_TOKENS
-                for d in derived
-            )
+        if effect_question and _looks_like_classification_predicate(sig):
+            has_effect_derived = schema_has_legal_effect_output_predicate(derived)
             if has_effect_derived:
                 raise ExtractionIRValidationError(
                     "Question asks about legal consequences or timing, but query target '"

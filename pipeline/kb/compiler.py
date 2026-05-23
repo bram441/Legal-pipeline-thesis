@@ -11,17 +11,24 @@ from pipeline.kb.json_ir import (
     parse_json_ir,
     render_json_ir_to_fo_and_schema,
 )
-from pipeline.kb.json_ir_repair import (
-    JsonIRErrorKind,
-    classify_json_ir_validation_error,
-    format_symbol_repair_error,
-    normalize_error_signature,
+from pipeline.kb.json_ir_compile_loop import compile_json_ir_structured
+from pipeline.kb.json_ir_repair import format_symbol_repair_error
+from pipeline.utils.prompt_paths import (
+    KB_JSON_IR_RULES,
+    KB_JSON_IR_RULES_REPAIR,
+    KB_JSON_IR_SYMBOLS,
+    KB_JSON_IR_SYMBOLS_REPAIR,
+    KB_LEGACY_COMPILATION,
+    KB_LEGACY_REPAIR_SEMANTIC,
+    KB_LEGACY_REPAIR_SYMBOLIC,
+    KB_LEGACY_REPAIR_SYNTAX,
+    LE_THEORY_ONLY,
+    LE_VOCAB_ONLY,
 )
 from pipeline.kb.law_scope import select_law_text_for_compilation, write_scope_artifacts
 from pipeline.kb.repair_hints import build_json_ir_compile_hints, build_machine_repair_hints
 
-# Inner JSON-IR repair loop: symbols+rules per attempt; rules-only or full symbol reset on failure.
-# Default 2 ≈ one initial compile + one repair (Verus-style: fail → back to symbolic).
+# Legacy env vars; structured loop uses JSON_IR_MAX_SYMBOL_VERSIONS / JSON_IR_MAX_KB_LLM_CALLS.
 _MAX_JSON_IR_ATTEMPTS = int(os.getenv("JSON_IR_MAX_COMPILE_ATTEMPTS", "2"))
 _MAX_RULES_REPAIR_BEFORE_SYMBOL_ESCALATION = int(os.getenv("JSON_IR_MAX_RULES_REPAIR", "2"))
 
@@ -107,7 +114,7 @@ def _kb_repair_prompt_path(error_message: str) -> str:
         "missing 'theory t:v'",
     )
     if any(m in e for m in syntax_markers):
-        return "kb/kb_compilation_repair_syntax.txt"
+        return KB_LEGACY_REPAIR_SYNTAX
     semantic_markers = (
         "unsatisfiable",
         "no model exists",
@@ -119,8 +126,8 @@ def _kb_repair_prompt_path(error_message: str) -> str:
         "ordinal must be",
     )
     if any(m in e for m in semantic_markers):
-        return "kb/kb_compilation_repair_semantic.txt"
-    return "kb/kb_compilation_repair_symbolic.txt"
+        return KB_LEGACY_REPAIR_SEMANTIC
+    return KB_LEGACY_REPAIR_SYMBOLIC
 
 # Re-export for: from pipeline.kb.compiler import LawCompilationError
 __all__ = ["compile_law_to_kb_fo", "LawCompilationError"]
@@ -128,7 +135,7 @@ __all__ = ["compile_law_to_kb_fo", "LawCompilationError"]
 
 def _compile_direct_kb_single_call(law_text, client, chosen_model):
     """Single LLM call: full vocabulary + theory (original kb_compilation.txt)."""
-    user_prompt = render_prompt("kb/kb_compilation.txt", law_text=(law_text or "").strip())
+    user_prompt = render_prompt(KB_LEGACY_COMPILATION, law_text=(law_text or "").strip())
     try:
         resp = client.chat.completions.create(
             model=chosen_model,
@@ -360,11 +367,7 @@ def _call_symbols_llm(
     machine_hints: str,
 ) -> tuple[dict, str]:
     contract = load_json_ir_contract()
-    prompt_name = (
-        "kb/kb_compilation_json_ir_symbols_repair.txt"
-        if repair
-        else "kb/kb_compilation_json_ir_symbols.txt"
-    )
+    prompt_name = KB_JSON_IR_SYMBOLS_REPAIR if repair else KB_JSON_IR_SYMBOLS
     err_block = error_message
     if repair and rules_json.strip():
         err_block = format_symbol_repair_error(error_message)
@@ -399,7 +402,7 @@ def _call_rules_llm(
     st_json = json.dumps(symbol_table, ensure_ascii=False, indent=2)
     if repair:
         rules_prompt = render_prompt(
-            "kb/kb_compilation_json_ir_rules_repair.txt",
+            KB_JSON_IR_RULES_REPAIR,
             law_text=law_text,
             symbol_table_json=st_json,
             error_message=error_message,
@@ -409,7 +412,7 @@ def _call_rules_llm(
         )
     else:
         rules_prompt = render_prompt(
-            "kb/kb_compilation_json_ir_rules.txt",
+            KB_JSON_IR_RULES,
             law_text=law_text,
             symbol_table_json=st_json,
             json_ir_contract=contract,
@@ -423,7 +426,7 @@ def _scope_law_text_once(
     question_text: str | None,
     case_text: str | None,
     artifact_dir: str | Path | None,
-) -> str:
+) -> tuple[str, dict]:
     """Select cited/retrieved law slice from natural language (before LE or JSON-IR)."""
     scoped, scope_meta = select_law_text_for_compilation(
         (law_text or "").strip(),
@@ -432,7 +435,7 @@ def _scope_law_text_once(
     )
     if artifact_dir:
         write_scope_artifacts(str(artifact_dir), scoped, scope_meta)
-    return scoped
+    return scoped, scope_meta
 
 
 def _compile_json_ir_two_step(
@@ -442,188 +445,60 @@ def _compile_json_ir_two_step(
     *,
     repair_feedback=None,
     artifact_dir: str | Path | None = None,
+    scope_metadata: dict | None = None,
 ):
     src = (source_text or "").strip()
     art = Path(artifact_dir) if artifact_dir else None
 
-    error_history: list[str] = []
-    last_exc: BaseException | None = None
-    if repair_feedback:
-        boot = (repair_feedback.get("error_message") or "").strip()
-        if boot:
-            error_history.append(boot)
-    error_signatures: dict[str, int] = {}
-    rules_repair_streak = 0
-    symbols_repair_count = 0
-
-    symbol_table: dict | None = None
-    rules: list | None = None
-    raw_symbols = ""
-    raw_rules = ""
-    symbols_obj: dict | None = None
-    rules_obj: dict | None = None
-
-    for attempt in range(1, _MAX_JSON_IR_ATTEMPTS + 1):
-        try:
-            if symbol_table is None:
-                sym_repair = symbols_repair_count > 0
-                prev = _json_ir_repair_context(
-                    symbol_table=symbol_table,
-                    symbols_obj=symbols_obj,
-                    raw_symbols=raw_symbols,
-                    rules_obj={"rules": rules} if rules is not None else None,
-                    merged_ir=(
-                        {**symbol_table, "rules": rules}
-                        if symbol_table and rules is not None
-                        else None
-                    ),
-                )
-                rules_json = json.dumps({"rules": rules}, ensure_ascii=False, indent=2) if rules else ""
-                err_msg = error_history[-1] if error_history else ""
-                jh = build_json_ir_compile_hints(err_msg) if sym_repair else ""
-                symbols_obj, raw_symbols = _call_symbols_llm(
-                    client,
-                    chosen_model,
-                    src,
-                    repair=sym_repair,
-                    error_message=err_msg,
-                    previous_output=prev,
-                    rules_json=rules_json,
-                    machine_hints=jh,
-                )
-                symbol_table = _symbol_table_from_obj(symbols_obj)
-                for key in ("types", "predicates", "functions"):
-                    if not isinstance(symbol_table[key], list):
-                        raise JSONIRCompilationError(
-                            "JSON IR symbols phase returned invalid %r." % key
-                        )
-                from pipeline.kb.json_ir import validate_json_ir_symbols
-
-                validate_json_ir_symbols(symbol_table)
-                if art:
-                    _write_json_ir_artifact(
-                        art,
-                        attempt,
-                        "symbols.normalized.json",
-                        json.dumps(symbol_table, ensure_ascii=False, indent=2),
-                    )
-                    _write_json_ir_artifact(art, attempt, "symbols.raw.json", raw_symbols)
-
-            if rules is None:
-                prev = _json_ir_repair_context(
-                    symbol_table=symbol_table,
-                    raw_symbols=raw_symbols,
-                    rules_obj=rules_obj,
-                    raw_rules=raw_rules,
-                )
-                err_msg = error_history[-1] if error_history else ""
-                machine_hints = build_machine_repair_hints(err_msg, prev) if err_msg else ""
-                jh = build_json_ir_compile_hints(err_msg)
-                if jh.strip():
-                    machine_hints = (machine_hints + "\n\nJSON IR compile hints:\n" + jh).strip()
-                rules_repair = bool(err_msg)
-                rules_obj, raw_rules = _call_rules_llm(
-                    client,
-                    chosen_model,
-                    src,
-                    symbol_table,
-                    repair=rules_repair,
-                    error_message=err_msg,
-                    previous_output=prev,
-                    machine_hints=machine_hints,
-                )
-                rules = rules_obj.get("rules")
-                if not isinstance(rules, list):
-                    raise JSONIRCompilationError("JSON IR rules phase returned invalid 'rules'.")
-                if art:
-                    _write_json_ir_artifact(
-                        art, attempt, "rules.raw.json", raw_rules
-                    )
-
-            merged_ir = {
-                "types": symbol_table["types"],
-                "predicates": symbol_table["predicates"],
-                "functions": symbol_table["functions"],
-                "rules": rules,
-            }
-            if art:
-                _write_json_ir_artifact(
-                    art,
-                    attempt,
-                    "combined_ir.json",
-                    json.dumps(merged_ir, ensure_ascii=False, indent=2),
-                )
-            fo_text, schema = render_json_ir_to_fo_and_schema(merged_ir)
-            if art:
-                _write_json_ir_artifact(art, attempt, "rendered.fo", fo_text)
-            return fo_text, schema
-
-        except JSONIRCompilationError as e:
-            last_exc = e
-            msg = str(e)
-            error_history.append(msg)
-            sig = normalize_error_signature(msg)
-            error_signatures[sig] = error_signatures.get(sig, 0) + 1
-            kind = classify_json_ir_validation_error(
-                msg,
-                error_history[:-1],
-                rules_repair_count=rules_repair_streak,
-                max_rules_before_symbol_escalation=_MAX_RULES_REPAIR_BEFORE_SYMBOL_ESCALATION,
-            )
-            if error_signatures[sig] >= 2 and kind == JsonIRErrorKind.RULES_REPAIR_ONLY:
-                kind = JsonIRErrorKind.SYMBOLS_REPAIR_REQUIRED
-            if symbol_table is None:
-                kind = JsonIRErrorKind.SYMBOLS_REPAIR_REQUIRED
-
-            if art:
-                sub = art / ("attempt_%02d" % attempt)
-                sub.mkdir(parents=True, exist_ok=True)
-                (sub / "validation_error.txt").write_text(msg, encoding="utf-8")
-                (sub / "error_classification.txt").write_text(kind.value, encoding="utf-8")
-                if kind == JsonIRErrorKind.SYMBOLS_REPAIR_REQUIRED:
-                    reason = (
-                        "Routed to symbol repair: %s\nSignatures: %s\n"
-                        % (msg, json.dumps(error_signatures, indent=2))
-                    )
-                    (sub / "symbol_repair_reason.txt").write_text(reason, encoding="utf-8")
-
-            if kind == JsonIRErrorKind.SYMBOLS_REPAIR_REQUIRED:
-                symbols_repair_count += 1
-                rules_repair_streak = 0
-                rules = None
-                rules_obj = None
-                raw_rules = ""
-                symbol_table = None
-                symbols_obj = None
-                continue
-
-            rules_repair_streak += 1
-            rules = None
-            rules_obj = None
-            raw_rules = ""
-            continue
-
-    ctx = _json_ir_repair_context(
-        symbol_table=symbol_table,
-        symbols_obj=symbols_obj,
-        raw_symbols=raw_symbols,
-        raw_rules=raw_rules,
-        rules_obj={"rules": rules} if rules else None,
-    )
-    summary = (
-        "JSON IR compilation failed after %d attempts. Last errors:\n%s"
-        % (
-            _MAX_JSON_IR_ATTEMPTS,
-            "\n---\n".join(error_history[-3:]) if error_history else "(none)",
+    def _symbols_llm(
+        law_text: str,
+        *,
+        repair: bool,
+        error_message: str,
+        previous_output: str,
+        rules_json: str,
+        machine_hints: str,
+    ) -> tuple[dict, str]:
+        return _call_symbols_llm(
+            client,
+            chosen_model,
+            law_text,
+            repair=repair,
+            error_message=error_message,
+            previous_output=previous_output,
+            rules_json=rules_json,
+            machine_hints=machine_hints,
         )
+
+    def _rules_llm(
+        law_text: str,
+        symbol_table: dict,
+        *,
+        repair: bool,
+        error_message: str,
+        previous_output: str,
+        machine_hints: str,
+    ) -> tuple[dict, str]:
+        return _call_rules_llm(
+            client,
+            chosen_model,
+            law_text,
+            symbol_table,
+            repair=repair,
+            error_message=error_message,
+            previous_output=previous_output,
+            machine_hints=machine_hints,
+        )
+
+    return compile_json_ir_structured(
+        src,
+        symbols_llm=_symbols_llm,
+        rules_llm=_rules_llm,
+        repair_context_fn=_json_ir_repair_context,
+        artifact_dir=art,
+        repair_feedback=repair_feedback,
+        scope_metadata=scope_metadata,
     )
-    err = LawCompilationError(
-        summary,
-        repair_snapshot={"previous_output": ctx, "error_history": error_history},
-    )
-    if last_exc is not None:
-        raise err from last_exc
-    raise err
 
 
 def compile_law_to_kb_fo(
@@ -670,7 +545,7 @@ def compile_law_to_kb_fo(
     kb_backend = get_kb_backend_from_env()
     ir_schema = None
     full_law = (law_text or "").strip()
-    scoped_law = _scope_law_text_once(
+    scoped_law, scope_meta = _scope_law_text_once(
         full_law,
         question_text=question_text,
         case_text=case_text,
@@ -685,6 +560,7 @@ def compile_law_to_kb_fo(
                 chosen_model,
                 repair_feedback=repair_feedback,
                 artifact_dir=artifact_dir,
+                scope_metadata=scope_meta,
             )
         err = repair_feedback.get("error_message", "") or ""
         prev = repair_feedback.get("previous_output", "") or ""
@@ -742,14 +618,15 @@ def compile_law_to_kb_fo(
                     client,
                     chosen_model,
                     artifact_dir=artifact_dir,
+                    scope_metadata=scope_meta,
                 )
             elif two_ph:
                 text = compile_two_phase(
                     le_text,
                     client,
                     chosen_model,
-                    vocab_prompt="le/le_vocab_only.txt",
-                    theory_prompt="le/le_theory_only.txt",
+                    vocab_prompt=LE_VOCAB_ONLY,
+                    theory_prompt=LE_THEORY_ONLY,
                     system_message=sys_msg,
                     single_shot_fn=lambda: le_to_fo(le_text, client, chosen_model),
                 )
@@ -764,6 +641,7 @@ def compile_law_to_kb_fo(
                 client,
                 chosen_model,
                 artifact_dir=artifact_dir,
+                scope_metadata=scope_meta,
             )
         elif two_ph:
             text = compile_two_phase(

@@ -1,0 +1,32 @@
+You are repairing legacy query extraction JSON.
+
+Return only corrected JSON required by the caller.
+No markdown or commentary.
+
+Fix every validation issue:
+- unknown predicate;
+- unsupported query kind or intent;
+- wrong arity;
+- type mismatch;
+- entity not present in normalized case entities;
+- type name used as argument;
+- placeholder used where a concrete entity exists;
+- observable predicate chosen when a derived legal predicate directly answers the legal question.
+
+Validation feedback:
+{validation_feedback}
+
+KB_SCHEMA:
+{kb_schema_json}
+
+NORMALIZED CASE FACTS:
+{case_facts_json}
+
+NORMALIZED CASE ENTITIES:
+{case_entities_json}
+
+Previous output:
+{previous_output}
+
+QUESTION:
+{user_question}
