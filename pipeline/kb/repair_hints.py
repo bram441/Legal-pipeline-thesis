@@ -128,11 +128,33 @@ def build_json_ir_compile_hints(error_message: str) -> str:
                 "A function was used as a Boolean atom. If yes/no, declare a predicate with returns Bool; "
                 "if numeric, use the function only inside compare/terms."
             )
+        if "computed-looking observable" in el or "looks computed/composite" in el:
+            out.append(
+                "Threshold/count/exceeds/meets-style conditions must be helper/derived with defining rules, "
+                "or numeric comparisons on observable functions—not observable unless directly_observable=true."
+            )
+        if "semantically identical to the status" in el or "classification encoded as a primitive type" in el:
+            out.append(
+                "Status-as-type error: do not declare a narrow type matching a same-name is_* predicate. "
+                "Use a broader entity type and a derived status predicate over it; use binary relations for "
+                "roles between entities when the law links two parties."
+            )
+        if "legal-effect or timing language" in el or "no derived legal-output predicate" in el:
+            out.append(
+                "Add a derived legal-output predicate for consequences/effects/timing/rights/obligations "
+                "stated in the law—not only is_* classifications or threshold helpers. Optionally set "
+                "legal_output=true or output_category=legal_effect on that symbol."
+            )
+        if "helper predicate" in el and ("defining rule" in el or "never defined" in el):
+            out.append(
+                "Define the helper with rules (THEN derives it from observables/comparisons), or replace with "
+                "direct numeric comparisons. Do not delete negated conditions or rename without fixing definitions."
+            )
         if "helper predicate" in el and "never defined" in el:
             out.append(
                 "Every helper used in a rule condition must be defined by some rule, or it must be reclassified "
-                "as observable. Do not leave helper predicates/functions open. Either add a rule whose THEN derives "
-                "the helper from observables, or change the symbol kind to observable for case-provided facts."
+                "as observable with directly_observable=true. Either add a rule whose THEN derives "
+                "the helper from observables, or change the symbol kind."
             )
         if "helper function" in el and "never defined" in el:
             out.append(
@@ -142,6 +164,12 @@ def build_json_ir_compile_hints(error_message: str) -> str:
     if "json_ir_rule_design_error" in el and "circular" in el:
         out.append(
             "Break circular derived-only rules by adding observable/helper conditions in `if`, or repair the symbol table."
+        )
+    if "at-most-one" in el or "more-than-one criteria" in el or "simple or over individual threshold" in el:
+        out.append(
+            "Cardinality error: for 'not more than one criterion exceeded', never use a plain OR over single "
+            "threshold compares for a favorable derived conclusion. Use pairwise (A and B) or (A and C) or "
+            "(B and C), or NOT at_least_two_exceeded helper."
         )
     if "incompatible unary subject roles" in el:
         out.append(

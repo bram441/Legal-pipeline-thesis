@@ -152,9 +152,18 @@ def question_asks_legal_definition(question: str) -> bool:
     return _matches_patterns(question, _LEGAL_DEFINITION_MARKERS_EN + _LEGAL_DEFINITION_MARKERS_NL)
 
 
+def question_asks_legal_effect_timing(question: str) -> bool:
+    """True when the question targets consequences, applicability timing, or similar legal effects."""
+    from pipeline.kb.legal_effect import question_has_legal_effect_language
+
+    return question_has_legal_effect_language(question)
+
+
 def question_asks_legal_conclusion(question: str) -> bool:
     """True when the question targets a legal effect, not merely a recorded fact."""
     if question_asks_legal_definition(question):
+        return True
+    if question_asks_legal_effect_timing(question):
         return True
     if _matches_patterns(question, _LEGAL_CONCLUSION_MARKERS_EN + _LEGAL_CONCLUSION_MARKERS_NL):
         return True

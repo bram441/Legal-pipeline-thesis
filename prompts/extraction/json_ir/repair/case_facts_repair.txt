@@ -1,0 +1,83 @@
+You are repairing legal case JSON_IR.
+
+Your previous case JSON failed strict validation.
+Return corrected JSON only.
+
+================================================================================
+MANDATORY OUTPUT
+================================================================================
+
+Return ONLY JSON matching the structured-output schema for this call.
+No markdown.
+No commentary.
+No keys other than those required by the schema.
+First character MUST be `{`.
+Last character MUST be `}`.
+
+================================================================================
+PRIMARY ERROR REPORT
+================================================================================
+
+You MUST fix every issue described here. Partial fixes fail.
+
+{validation_feedback}
+
+================================================================================
+CONTRACT
+================================================================================
+
+{json_ir_contract}
+
+================================================================================
+REPAIR PRIORITIES
+================================================================================
+
+Fix all applicable issues:
+- unknown type, predicate, or function;
+- wrong arity;
+- wrong argument order;
+- type mismatch between argument and schema;
+- entity constant used but not declared;
+- entity declared under the wrong type;
+- illegal entity identifier;
+- type name used as an entity constant;
+- placeholder entity used where a concrete case entity exists;
+- predicate fact placed in value_assertions;
+- function value placed in assertions;
+- numeric value encoded as a vague Boolean when a function exists;
+- derived legal conclusion asserted as a case fact;
+- helper condition asserted when a more basic observable fact/value is available;
+- unsupported symbol invented from natural language;
+- fact not supported by the case text.
+
+If a derived predicate was asserted:
+- Delete that assertion.
+- Replace it only with observable facts/values that the case actually states.
+- Do not answer the legal question in the case JSON.
+
+If a constant is missing:
+- Add it under the exact required type if the case supports it.
+- Otherwise remove the assertion/value_assertion that used it.
+
+If an argument has the wrong type:
+- Use a correct constant of the required type from the case.
+- Otherwise remove the invalid assertion/value_assertion.
+- Do not move a constant to an incorrect type just to satisfy validation.
+
+================================================================================
+KB_SCHEMA
+================================================================================
+
+{kb_schema_json}
+
+================================================================================
+PREVIOUS CASE JSON OR RAW OUTPUT
+================================================================================
+
+{previous_output}
+
+================================================================================
+CASE
+================================================================================
+
+{case_text}

@@ -5,6 +5,7 @@ from pipeline.semantic.legal_question import (
     is_reflexive_predicate_name,
     question_asks_factual_only,
     question_asks_legal_conclusion,
+    question_asks_legal_effect_timing,
     witness_modeling_hint,
 )
 
@@ -13,5 +14,6 @@ __all__ = [
     "is_reflexive_predicate_name",
     "question_asks_factual_only",
     "question_asks_legal_conclusion",
+    "question_asks_legal_effect_timing",
     "witness_modeling_hint",
 ]

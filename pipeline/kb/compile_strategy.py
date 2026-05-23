@@ -266,10 +266,26 @@ def strategy_metadata(
     outer_rep = (os.getenv("PIPELINE_KB_MAX_REPAIR_ATTEMPTS") or "").strip()
     inner_rep = (os.getenv("JSON_IR_MAX_COMPILE_ATTEMPTS") or "").strip()
     repair_enabled = False
-    try:
-        repair_enabled = int(outer_rep or "0") > 0 or int(inner_rep or "0") > 0
-    except ValueError:
-        repair_enabled = bool(outer_rep or inner_rep)
+    json_ir_structured: dict[str, Any] = {}
+    if kb == "json_ir":
+        from pipeline.kb.cache import json_ir_outer_cache_retries_enabled, resolve_max_repair_attempts
+        from pipeline.kb.json_ir_compile_loop import compile_loop_limits_from_env
+
+        limits = compile_loop_limits_from_env()
+        repair_enabled = True
+        json_ir_structured = {
+            "json_ir_structured_repair_enabled": True,
+            "json_ir_max_symbol_versions": limits.max_symbol_versions,
+            "json_ir_max_rules_attempts_per_symbol_version": limits.max_rules_attempts_per_symbol_version,
+            "json_ir_max_kb_llm_calls": limits.max_total_kb_llm_calls,
+            "json_ir_outer_cache_retries_enabled": json_ir_outer_cache_retries_enabled(),
+            "json_ir_outer_cache_max_attempts": resolve_max_repair_attempts("json_ir", log_warnings=False),
+        }
+    else:
+        try:
+            repair_enabled = int(outer_rep or "0") > 0 or int(inner_rep or "0") > 0
+        except ValueError:
+            repair_enabled = bool(outer_rep or inner_rep)
 
     meta: dict[str, Any] = {
         "strategy_name": strategy_name,
@@ -283,6 +299,7 @@ def strategy_metadata(
         "law_scope_mode": law_scope,
         "repair_enabled": repair_enabled,
         **trans,
+        **json_ir_structured,
     }
     if strategy_name != canon:
         meta["strategy_is_deprecated_alias"] = True

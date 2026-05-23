@@ -77,6 +77,16 @@ derived:
 helper:
 - An intermediate condition used to express legal rules clearly.
 - Use for threshold checks, exception checks, temporal checks, combined conditions, and repeated subconditions.
+- Every helper predicate used in a rule must be defined by at least one rule (typically in THEN).
+
+directly_observable (optional metadata on a predicate):
+- Set `"directly_observable": true` only when future case texts may directly state that composite Boolean fact verbatim.
+- Do not use this flag for threshold/count/exceeds/meets-style conditions unless cases truly supply them as raw facts.
+
+legal_output / output_category (optional metadata on derived predicates):
+- Set `"legal_output": true` when the predicate is the legally answerable consequence/effect/timing output (not an intermediate classification).
+- Or set `"output_category"` to one of: legal_effect, timing, obligation, right, permission, prohibition, exception, classification.
+- Use output_category=classification only for static status labels (is_* size/category predicates), not for consequences-that-apply-from-period style outputs.
 
 Allowed kind values are exactly:
 - observable
@@ -96,6 +106,8 @@ Use a type for a stable domain of entities, such as a legal actor, object, act, 
 Do not create a new type merely because an entity has a contextual role, subtype-like label, status, classification, or condition in the law.
 
 Contextual roles, subset-like concepts, statuses, and classifications should usually be predicates over a broader type, not separate types.
+
+Do not pair a narrow status type with a same-name unary is_* predicate over that type (tautological type X plus is_x(X)). Model the status as a derived predicate over a broader entity type; use relational predicates when a role links two entities.
 
 Good generic pattern:
 - Type: GeneralObject

@@ -81,8 +81,8 @@ def compile_two_phase(
     client,
     chosen_model: str,
     *,
-    vocab_prompt: str = "kb/kb_vocab_only.txt",
-    theory_prompt: str = "kb/kb_theory_only.txt",
+    vocab_prompt: str = "kb/legacy/kb_vocab_only.txt",
+    theory_prompt: str = "kb/legacy/kb_theory_only.txt",
     system_message: str = "You compile legal rules into FO(.) code for IDP-Z3.",
     single_shot_fn=None,
 ) -> str:

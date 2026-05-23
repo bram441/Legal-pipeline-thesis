@@ -4,6 +4,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from pipeline.utils.prompt_paths import resolve_prompt_path
+
 PROMPTS_DIR = Path(__file__).resolve().parents[2] / "prompts"
 
 # Subfolders under prompts/ (paths are relative to PROMPTS_DIR, use forward slashes):
@@ -22,8 +24,9 @@ class PromptError(Exception):
 
 
 def load_prompt(relative_path: str) -> str:
-    """Load a prompt file. ``relative_path`` may include subdirs, e.g. ``kb/kb_compilation.txt``."""
-    path = PROMPTS_DIR / relative_path.replace("\\", "/")
+    """Load a prompt file. ``relative_path`` may be legacy or canonical (see prompt_paths)."""
+    canonical = resolve_prompt_path(relative_path)
+    path = PROMPTS_DIR / canonical.replace("\\", "/")
     if not path.exists():
         raise PromptError(f"Prompt file not found: {path}")
     return path.read_text(encoding="utf-8")

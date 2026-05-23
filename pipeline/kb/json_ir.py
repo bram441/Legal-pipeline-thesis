@@ -43,6 +43,10 @@ from dataclasses import dataclass
 from difflib import get_close_matches
 from typing import Any
 
+from pipeline.kb.composite_predicate_heuristics import (
+    looks_computed_composite,
+    symbol_directly_observable,
+)
 from pipeline.kb.json_ir_repair import RULE_DESIGN_TAG, SCHEMA_DESIGN_TAG
 
 
@@ -105,12 +109,25 @@ _ALLOWED_KINDS = {"observable", "derived", "helper", "conclusion", "input", "unk
 
 
 @dataclass(frozen=True)
+class PredAtomUsage:
+    """Predicate atom occurrence in a rule with negation and placement."""
+
+    name: str
+    negated: bool
+    rule_index: int
+    side: str  # "if" | "then"
+
+
+@dataclass(frozen=True)
 class SymbolDecl:
     name: str
     args: list[str]
     returns: str
     kind: str = "unknown"
     description: str = ""
+    directly_observable: bool = False
+    legal_output: bool | None = None
+    output_category: str = ""
 
 
 @dataclass(frozen=True)
@@ -280,12 +297,21 @@ def _validate_symbol_decl(raw: Any, ctx: str, *, default_returns: str) -> Symbol
     if not isinstance(args, list):
         raise JSONIRCompilationError(ctx + ".args must be a list.")
     parsed_args = [_require_ident(arg_t, f"{ctx}.args[{i}]") for i, arg_t in enumerate(args)]
+    raw_dict = raw if isinstance(raw, dict) else {}
+    lo_raw = raw_dict.get("legal_output")
+    legal_output: bool | None = None
+    if lo_raw is not None:
+        legal_output = bool(lo_raw)
+    output_category = str(raw_dict.get("output_category") or "").strip().lower()
     return SymbolDecl(
         name=name,
         args=parsed_args,
         returns=returns,
         kind=_normalize_kind(raw.get("kind")),
         description=str(raw.get("description") or "").strip(),
+        directly_observable=symbol_directly_observable(raw_dict),
+        legal_output=legal_output,
+        output_category=output_category,
     )
 
 
@@ -371,6 +397,17 @@ def validate_json_ir_symbols(ir: dict) -> tuple[list[SymbolDecl], list[SymbolDec
                 SCHEMA_DESIGN_TAG + ": Conflicting signatures for symbol: " + decl.name
             )
         seen_names[decl.name] = sig
+
+    type_descriptions: dict[str, str] = {}
+    for t in types_raw:
+        if isinstance(t, dict) and t.get("name"):
+            type_descriptions[str(t["name"])] = str(t.get("description") or "").strip()
+
+    from pipeline.kb.status_as_type import validate_status_as_type_symbols
+
+    validate_status_as_type_symbols(
+        types, predicates, type_descriptions=type_descriptions
+    )
 
     return predicates, functions, types
 
@@ -597,6 +634,80 @@ def _collect_vars_in_rule_expr(expr: Any, quant_env: dict[str, str]) -> set[str]
     return out
 
 
+def _iter_pred_atom_usages_in_expr(
+    expr: Any,
+    *,
+    rule_index: int,
+    side: str,
+    negated: bool = False,
+) -> Any:
+    """Yield PredAtomUsage for predicate atoms under optional classical negation."""
+    if isinstance(expr, list):
+        for x in expr:
+            yield from _iter_pred_atom_usages_in_expr(
+                x, rule_index=rule_index, side=side, negated=negated
+            )
+        return
+    if not isinstance(expr, dict):
+        return
+    if "pred" in expr or "symbol" in expr:
+        pn = str(expr.get("pred") or expr.get("symbol") or "").strip()
+        if pn:
+            atom_neg = bool(expr.get("neg") or expr.get("negated", False))
+            yield PredAtomUsage(
+                name=pn,
+                negated=negated or atom_neg,
+                rule_index=rule_index,
+                side=side,
+            )
+        return
+    if "not" in expr:
+        inner = expr.get("not")
+        yield from _iter_pred_atom_usages_in_expr(
+            inner, rule_index=rule_index, side=side, negated=True
+        )
+        return
+    if "and" in expr:
+        for x in expr.get("and") or []:
+            yield from _iter_pred_atom_usages_in_expr(
+                x, rule_index=rule_index, side=side, negated=negated
+            )
+        return
+    if "or" in expr:
+        for x in expr.get("or") or []:
+            yield from _iter_pred_atom_usages_in_expr(
+                x, rule_index=rule_index, side=side, negated=negated
+            )
+        return
+    comp = expr.get("compare") if "compare" in expr else expr if {"left", "op", "right"}.issubset(expr.keys()) else None
+    if isinstance(comp, dict):
+        for part in (comp.get("left"), comp.get("right")):
+            yield from _iter_pred_atom_usages_in_expr(
+                part, rule_index=rule_index, side=side, negated=negated
+            )
+
+
+def _collect_pred_atom_usages(rules: list) -> list[PredAtomUsage]:
+    out: list[PredAtomUsage] = []
+    for idx, raw_rule in enumerate(rules or []):
+        if not isinstance(raw_rule, dict):
+            continue
+        if_side, then_side = _rule_expr_sides(raw_rule)
+        for u in _iter_pred_atom_usages_in_expr(if_side, rule_index=idx, side="if"):
+            out.append(u)
+        for u in _iter_pred_atom_usages_in_expr(then_side, rule_index=idx, side="then"):
+            out.append(u)
+    return out
+
+
+def _predicates_defined_in_then(rules: list) -> set[str]:
+    defined: set[str] = set()
+    for u in _collect_pred_atom_usages(rules):
+        if u.side == "then":
+            defined.add(u.name)
+    return defined
+
+
 def _iter_pred_atoms_with_args(expr: Any):
     if isinstance(expr, list):
         for x in expr:
@@ -719,20 +830,92 @@ def _validate_floating_helpers(
     floating_f = in_if_f - def_then_f
     for name in sorted(floating_p):
         raise JSONIRCompilationError(
-            SCHEMA_DESIGN_TAG
-            + f": Helper predicate '{name}' is used as a rule condition but is never defined by any rule. "
-            "Helper symbols must be derived by rules. If this fact should come directly from the case, "
-            "mark it as observable. If it is an intermediate condition, add rules that derive it from "
-            "observable facts/functions."
+            RULE_DESIGN_TAG
+            + f": Helper predicate '{name}' is used as a rule condition but has no defining rule "
+            "(never appears in any rule THEN). Define it with rules from observable facts/functions "
+            "(e.g. numeric comparisons), or reclassify as observable with directly_observable=true only "
+            "if a case may state this composite fact verbatim. Do not delete the negated condition or "
+            "rename the predicate without fixing the definition."
         )
     for name in sorted(floating_f):
         raise JSONIRCompilationError(
-            SCHEMA_DESIGN_TAG
-            + f": Helper function '{name}' is used as a rule condition but is never defined by any rule. "
-            "Helper symbols must be derived by rules. If this fact should come directly from the case, "
-            "mark it as observable. If it is an intermediate condition, add rules that derive it from "
-            "observable facts/functions."
+            RULE_DESIGN_TAG
+            + f": Helper function '{name}' is used as a rule condition but has no defining rule. "
+            "Define it with rules from observable inputs, or reclassify as observable if case-provided."
         )
+
+
+def _validate_observable_composite_symbol_declarations(predicates: list[SymbolDecl]) -> None:
+    """Reject computed-looking observables unless explicitly marked case-direct."""
+    for decl in predicates:
+        if decl.kind != "observable":
+            continue
+        if decl.directly_observable:
+            continue
+        if looks_computed_composite(decl.name, decl.description):
+            raise JSONIRCompilationError(
+                SCHEMA_DESIGN_TAG
+                + f": Predicate '{decl.name}' (kind=observable) looks computed/composite "
+                "(threshold, count, exceeds/meets/satisfies-style condition). "
+                "Reclassify as kind=helper or derived and define it with rules from numeric functions "
+                "or comparisons, or set directly_observable=true only when case texts may directly state "
+                "this composite fact. Repair layer: symbols."
+            )
+
+
+def _validate_composite_predicate_rule_safety(
+    ir: dict,
+    predicates: list[SymbolDecl],
+    pred_kinds: dict[str, str],
+) -> None:
+    """
+    Block undefined computed/helper predicates—especially under negation—from proving legal conclusions.
+    """
+    rules = ir.get("rules") or []
+    decl_by_name = {p.name: p for p in predicates}
+    defined_then = _predicates_defined_in_then(rules)
+    usages = _collect_pred_atom_usages(rules)
+
+    for u in usages:
+        decl = decl_by_name.get(u.name)
+        if not decl:
+            continue
+        kind = pred_kinds.get(u.name, decl.kind)
+        computed = looks_computed_composite(decl.name, decl.description)
+        defined = u.name in defined_then
+
+        if kind == "observable" and computed and not decl.directly_observable:
+            if u.side == "if" and not defined:
+                neg_phrase = "negated " if u.negated else ""
+                raise JSONIRCompilationError(
+                    SCHEMA_DESIGN_TAG
+                    + f": Computed-looking observable predicate '{u.name}' is used {neg_phrase}"
+                    f"in rules[{u.rule_index}].if without any defining rule. "
+                    "Under closed-world reasoning, an undefined atom is false, so negation can "
+                    "spuriously entail legal conclusions. Repair: reclassify as helper/derived and add "
+                    "defining rules from numeric functions/comparisons, or set directly_observable=true "
+                    "only if cases may directly state this composite fact. Do not rename the predicate "
+                    "or delete the negated condition. Repair layer: symbols."
+                )
+
+        if kind == "helper" and u.side == "if" and not defined:
+            neg_phrase = "negated " if u.negated else ""
+            raise JSONIRCompilationError(
+                RULE_DESIGN_TAG
+                + f": Helper predicate '{u.name}' is used {neg_phrase}in rules[{u.rule_index}].if "
+                "but has no defining rule (never in any rule THEN). Add rules that define it from "
+                "observable facts/functions, or use direct numeric comparisons in the legal rule. "
+                "Do not rely on absence of an undefined helper to prove a negated condition. "
+                "Repair layer: rules."
+            )
+
+        if kind in _DERIVED_OUTPUT_KINDS and u.side == "if" and u.negated and not defined:
+            raise JSONIRCompilationError(
+                RULE_DESIGN_TAG
+                + f": Derived predicate '{u.name}' is negated in rules[{u.rule_index}].if without "
+                "a defining rule. Derived symbols must be defined in rule THEN clauses, not assumed "
+                "false when absent. Repair layer: rules."
+            )
 
 
 def _if_has_observable_bridge(expr: Any, pred_kinds: dict[str, str], fun_kinds: dict[str, str]) -> bool:
@@ -921,6 +1104,9 @@ def validate_combined_json_ir_schema(
     ir: dict,
     predicates: list[SymbolDecl],
     functions: list[SymbolDecl],
+    *,
+    law_text_for_lints: str | None = None,
+    scope_metadata: dict | None = None,
 ) -> None:
     """Run symbol + rule schema checks before FO rendering."""
     pred_kinds = _symbol_kind_map(predicates, functions)
@@ -929,7 +1115,36 @@ def validate_combined_json_ir_schema(
     pred_descriptions = {p.name: p.description for p in predicates}
     fun_kinds = {f.name: f.kind for f in functions}
     preflight_json_ir_rule_predicates(ir)
+    _validate_observable_composite_symbol_declarations(predicates)
     _validate_floating_helpers(ir, pred_kinds, fun_kinds)
+    _validate_composite_predicate_rule_safety(ir, predicates, pred_kinds)
+    from pipeline.kb.threshold_cardinality import validate_threshold_cardinality_rules
+
+    validate_threshold_cardinality_rules(ir, pred_kinds, law_text_for_lints)
+    from pipeline.kb.threshold_classification_negative import (
+        validate_threshold_classification_negative_support,
+    )
+
+    validate_threshold_classification_negative_support(
+        ir, pred_kinds, law_text_for_lints=law_text_for_lints
+    )
+    from pipeline.kb.numeric_threshold_provenance import (
+        validate_numeric_threshold_literals_in_rules,
+    )
+
+    validate_numeric_threshold_literals_in_rules(
+        ir, law_text_for_lints=law_text_for_lints
+    )
+    from pipeline.kb.legal_effect import validate_legal_effect_output_presence
+
+    validate_legal_effect_output_presence(
+        predicates,
+        law_text_for_lints=law_text_for_lints,
+        scope_metadata=scope_metadata,
+    )
+    from pipeline.kb.status_as_type import validate_status_as_type_rules
+
+    validate_status_as_type_rules(ir.get("rules") or [], pred_kinds=pred_kinds)
     _validate_derived_predicates_have_defining_rules(ir, pred_kinds)
     for i, rule in enumerate(ir.get("rules") or []):
         if isinstance(rule, dict):
@@ -937,7 +1152,12 @@ def validate_combined_json_ir_schema(
             _validate_object_rule_role_binding(rule, i, pred_kinds, pred_descriptions, fun_kinds)
 
 
-def compile_validate_json_ir(ir: dict) -> dict:
+def compile_validate_json_ir(
+    ir: dict,
+    *,
+    law_text_for_lints: str | None = None,
+    scope_metadata: dict | None = None,
+) -> dict:
     """Validate symbols + combined schema, then normalize to FO-ready IR."""
     predicates, functions, types = validate_json_ir_symbols(ir)
     merged = {
@@ -946,21 +1166,39 @@ def compile_validate_json_ir(ir: dict) -> dict:
         "functions": [_symbol_to_json(d) for d in functions],
         "rules": ir.get("rules") or [],
     }
-    validate_combined_json_ir_schema(merged, predicates, functions)
+    from pipeline.kb.numeric_compare_normalize import normalize_json_ir_rule_compare_sorts
+
+    normalize_json_ir_rule_compare_sorts(merged, predicates, functions)
+    validate_combined_json_ir_schema(
+        merged,
+        predicates,
+        functions,
+        law_text_for_lints=law_text_for_lints,
+        scope_metadata=scope_metadata,
+    )
     return normalize_json_ir(merged)
 
 
-def _normalize_with_quarantine(ir: dict) -> tuple[dict, list[str]]:
+def _normalize_with_quarantine(
+    ir: dict,
+    *,
+    law_text_for_lints: str | None = None,
+    scope_metadata: dict | None = None,
+) -> tuple[dict, list[str]]:
     """Drop invalid object rules one-by-one when JSON_IR_ALLOW_PARTIAL_KB is enabled."""
     warnings: list[str] = []
     rules = list(ir.get("rules") or [])
     if not rules:
-        return compile_validate_json_ir(ir), warnings
+        return compile_validate_json_ir(
+            ir, law_text_for_lints=law_text_for_lints, scope_metadata=scope_metadata
+        ), warnings
 
     last_err: JSONIRCompilationError | None = None
     for drop_round in range(len(rules) + 1):
         try:
-            return compile_validate_json_ir(ir), warnings
+            return compile_validate_json_ir(
+                ir, law_text_for_lints=law_text_for_lints, scope_metadata=scope_metadata
+            ), warnings
         except JSONIRCompilationError as e:
             last_err = e
             m = _RE_RULE_IDX.search(str(e))
@@ -1579,6 +1817,12 @@ def _symbol_to_json(d: SymbolDecl) -> dict[str, Any]:
         obj["kind"] = d.kind
     if d.description:
         obj["description"] = d.description
+    if d.directly_observable:
+        obj["directly_observable"] = True
+    if d.legal_output is not None:
+        obj["legal_output"] = d.legal_output
+    if d.output_category:
+        obj["output_category"] = d.output_category
     return obj
 
 
@@ -1637,6 +1881,19 @@ def normalize_json_ir(ir: dict) -> dict:
     pred_kinds = _symbol_kind_map(predicates, functions)
     pred_names = {p.name for p in predicates}
     fun_names = {f.name for f in functions}
+
+    from pipeline.kb.numeric_compare_normalize import normalize_json_ir_rule_compare_sorts
+
+    normalize_json_ir_rule_compare_sorts(
+        {
+            "types": types,
+            "predicates": [_symbol_to_json(d) for d in predicates],
+            "functions": [_symbol_to_json(d) for d in functions],
+            "rules": rules_raw,
+        },
+        predicates,
+        functions,
+    )
 
     rules: list[str] = []
     declared_type_names = set(types)
@@ -1808,7 +2065,12 @@ def _fo_text_from_normalized(norm: dict) -> str:
     return "\n".join(lines).strip() + "\n"
 
 
-def render_json_ir_to_fo_and_schema(ir: dict) -> tuple[str, dict]:
+def render_json_ir_to_fo_and_schema(
+    ir: dict,
+    *,
+    law_text_for_lints: str | None = None,
+    scope_metadata: dict | None = None,
+) -> tuple[str, dict]:
     allow_partial = (os.getenv("JSON_IR_ALLOW_PARTIAL_KB") or "").strip().lower() in {
         "1",
         "true",
@@ -1826,13 +2088,21 @@ def render_json_ir_to_fo_and_schema(ir: dict) -> tuple[str, dict]:
             "functions": [_symbol_to_json(d) for d in functions],
             "rules": ir.get("rules") or [],
         }
-        validate_combined_json_ir_schema(merged, predicates, functions)
+        validate_combined_json_ir_schema(
+            merged,
+            predicates,
+            functions,
+            law_text_for_lints=law_text_for_lints,
+            scope_metadata=scope_metadata,
+        )
         object_rules = _object_rules_from_source(merged)
         norm = normalize_json_ir(merged)
     except JSONIRCompilationError:
         if not allow_partial:
             raise
-        norm, _warnings = _normalize_with_quarantine(ir)
+        norm, _warnings = _normalize_with_quarantine(
+            ir, law_text_for_lints=law_text_for_lints, scope_metadata=scope_metadata
+        )
         object_rules = _object_rules_from_source(ir)
     return _fo_text_from_normalized(norm), kb_schema_dict_from_normalized(norm, rules_objects=object_rules)
 

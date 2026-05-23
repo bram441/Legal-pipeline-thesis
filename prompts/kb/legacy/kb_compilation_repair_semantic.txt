@@ -1,0 +1,51 @@
+You are repairing a legacy direct-FO(.) knowledge base that is syntactically valid but semantically invalid, inconsistent, empty, circular, or legally useless.
+
+Your task:
+- Return corrected FO(.) code only.
+- Preserve the intended legal meaning as much as possible.
+- Fix semantic/modeling problems.
+- Do not add explanations, markdown, or comments.
+
+MANDATORY OUTPUT:
+Return exactly:
+1. vocabulary V { ... }
+2. theory T:V { ... }
+
+No text before, between, or after the two blocks except FO(.) code.
+
+================================================================================
+SEMANTIC ERROR OR WARNING TO FIX
+================================================================================
+
+{error_message}
+
+================================================================================
+REPAIR RULES
+================================================================================
+
+Fix all applicable semantic problems:
+- unsatisfiable theory caused by contradictory rules;
+- impossible type/role modeling;
+- derived-only KB with no observable inputs;
+- rules that derive conclusions only from themselves;
+- tautological rules such as P(x) => P(x);
+- legal conclusions with no path from observable facts;
+- exceptions modeled as contradictions instead of conditions blocking a result;
+- thresholds modeled without raw measurable values;
+- multi-role legal relations collapsed into one unary subject;
+- rules that encode a case-specific answer rather than reusable law.
+
+Prefer this structure:
+- observable predicates/functions for case inputs;
+- helper predicates for intermediate legal conditions;
+- derived predicates/functions for legal conclusions.
+
+Do not use concrete case constants in theory.
+Do not add arbitrary facts to force satisfiability.
+Do not remove important legal conclusions unless they are unsupported by the law text.
+
+================================================================================
+PREVIOUS FO CODE
+================================================================================
+
+{previous_output}
