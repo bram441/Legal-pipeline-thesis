@@ -45,6 +45,7 @@ from typing import Any
 
 from pipeline.kb.composite_predicate_heuristics import (
     looks_computed_composite,
+    symbol_background_or_case_input,
     symbol_directly_observable,
 )
 from pipeline.kb.json_ir_repair import RULE_DESIGN_TAG, SCHEMA_DESIGN_TAG
@@ -126,6 +127,8 @@ class SymbolDecl:
     kind: str = "unknown"
     description: str = ""
     directly_observable: bool = False
+    background: bool = False
+    case_input: bool = False
     legal_output: bool | None = None
     output_category: str = ""
 
@@ -310,6 +313,8 @@ def _validate_symbol_decl(raw: Any, ctx: str, *, default_returns: str) -> Symbol
         kind=_normalize_kind(raw.get("kind")),
         description=str(raw.get("description") or "").strip(),
         directly_observable=symbol_directly_observable(raw_dict),
+        background=symbol_background_or_case_input(raw_dict),
+        case_input=bool(raw_dict.get("case_input") is True),
         legal_output=legal_output,
         output_category=output_category,
     )
@@ -324,7 +329,14 @@ def _symbol_kind_map(predicates: list[SymbolDecl], functions: list[SymbolDecl]) 
     return out
 
 
-def validate_json_ir_symbols(ir: dict) -> tuple[list[SymbolDecl], list[SymbolDecl], list[str]]:
+def validate_json_ir_symbols(
+    ir: dict,
+    *,
+    law_text_for_lints: str | None = None,
+    scope_metadata: dict | None = None,
+    question_text: str | None = None,
+    following_missing_temporal_support_repair: bool = False,
+) -> tuple[list[SymbolDecl], list[SymbolDecl], list[str]]:
     """Validate symbol-table design (no rules). Returns (predicates, functions, types)."""
     types_raw = ir.get("types")
     predicates_raw = ir.get("predicates", [])
@@ -408,6 +420,26 @@ def validate_json_ir_symbols(ir: dict) -> tuple[list[SymbolDecl], list[SymbolDec
     validate_status_as_type_symbols(
         types, predicates, type_descriptions=type_descriptions
     )
+
+    if scope_metadata is not None or (law_text_for_lints or "").strip():
+        from pipeline.kb.legal_effect import validate_legal_effect_symbols_stage
+
+        validate_legal_effect_symbols_stage(
+            predicates,
+            law_text_for_lints=law_text_for_lints,
+            scope_metadata=scope_metadata,
+        )
+        from pipeline.kb.temporal_support import validate_temporal_support_symbols_stage
+
+        validate_temporal_support_symbols_stage(
+            predicates,
+            functions,
+            types,
+            law_text_for_lints=law_text_for_lints,
+            scope_metadata=scope_metadata,
+            question_text=question_text,
+            following_missing_temporal_support_repair=following_missing_temporal_support_repair,
+        )
 
     return predicates, functions, types
 
@@ -818,16 +850,40 @@ def _collect_helper_symbol_usage(
     return in_if_p, in_if_f, def_then_p, def_then_f
 
 
+def _decl_by_name(
+    predicates: list[SymbolDecl],
+    functions: list[SymbolDecl],
+) -> dict[str, SymbolDecl]:
+    out: dict[str, SymbolDecl] = {}
+    for decl in predicates + functions:
+        out[decl.name] = decl
+    return out
+
+
 def _validate_floating_helpers(
     ir: dict,
     pred_kinds: dict[str, str],
     fun_kinds: dict[str, str],
+    *,
+    predicates: list[SymbolDecl] | None = None,
+    functions: list[SymbolDecl] | None = None,
 ) -> None:
     """Reject helpers used in IF that are never defined in any rule THEN."""
+    from pipeline.kb.temporal_support import temporal_support_exempt_from_helper_definition
+
     rules = ir.get("rules") or []
     in_if_p, in_if_f, def_then_p, def_then_f = _collect_helper_symbol_usage(rules, pred_kinds, fun_kinds)
-    floating_p = in_if_p - def_then_p
-    floating_f = in_if_f - def_then_f
+    by_name = _decl_by_name(predicates or [], functions or [])
+    floating_p = {
+        n
+        for n in (in_if_p - def_then_p)
+        if not (by_name.get(n) and temporal_support_exempt_from_helper_definition(by_name[n]))
+    }
+    floating_f = {
+        n
+        for n in (in_if_f - def_then_f)
+        if not (by_name.get(n) and temporal_support_exempt_from_helper_definition(by_name[n]))
+    }
     for name in sorted(floating_p):
         raise JSONIRCompilationError(
             RULE_DESIGN_TAG
@@ -899,6 +955,10 @@ def _validate_composite_predicate_rule_safety(
                 )
 
         if kind == "helper" and u.side == "if" and not defined:
+            from pipeline.kb.temporal_support import temporal_support_exempt_from_helper_definition
+
+            if temporal_support_exempt_from_helper_definition(decl):
+                continue
             neg_phrase = "negated " if u.negated else ""
             raise JSONIRCompilationError(
                 RULE_DESIGN_TAG
@@ -1116,7 +1176,9 @@ def validate_combined_json_ir_schema(
     fun_kinds = {f.name: f.kind for f in functions}
     preflight_json_ir_rule_predicates(ir)
     _validate_observable_composite_symbol_declarations(predicates)
-    _validate_floating_helpers(ir, pred_kinds, fun_kinds)
+    _validate_floating_helpers(
+        ir, pred_kinds, fun_kinds, predicates=predicates, functions=functions
+    )
     _validate_composite_predicate_rule_safety(ir, predicates, pred_kinds)
     from pipeline.kb.threshold_cardinality import validate_threshold_cardinality_rules
 
@@ -1159,7 +1221,11 @@ def compile_validate_json_ir(
     scope_metadata: dict | None = None,
 ) -> dict:
     """Validate symbols + combined schema, then normalize to FO-ready IR."""
-    predicates, functions, types = validate_json_ir_symbols(ir)
+    predicates, functions, types = validate_json_ir_symbols(
+        ir,
+        law_text_for_lints=law_text_for_lints,
+        scope_metadata=scope_metadata,
+    )
     merged = {
         "types": types,
         "predicates": [_symbol_to_json(d) for d in predicates],
@@ -2081,7 +2147,11 @@ def render_json_ir_to_fo_and_schema(
         return [r for r in (source.get("rules") or []) if isinstance(r, dict)]
 
     try:
-        predicates, functions, types = validate_json_ir_symbols(ir)
+        predicates, functions, types = validate_json_ir_symbols(
+            ir,
+            law_text_for_lints=law_text_for_lints,
+            scope_metadata=scope_metadata,
+        )
         merged = {
             "types": types,
             "predicates": [_symbol_to_json(d) for d in predicates],

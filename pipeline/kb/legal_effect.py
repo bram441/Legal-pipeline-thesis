@@ -398,6 +398,46 @@ def should_require_legal_effect_output(
     return law_text_has_strong_legal_effect_language(law_text_for_lints)
 
 
+def _raise_missing_legal_effect_output(
+    *,
+    law_text_for_lints: str | None,
+) -> None:
+    from pipeline.kb.json_ir import JSONIRCompilationError, SCHEMA_DESIGN_TAG
+
+    snippet = (law_text_for_lints or "").strip()
+    if len(snippet) > 120:
+        snippet = snippet[:117] + "..."
+    raise JSONIRCompilationError(
+        SCHEMA_DESIGN_TAG
+        + ": The scoped law text contains legal-effect or timing language"
+        + (f' ("{snippet}")' if snippet else "")
+        + ", but the JSON IR has no derived legal-output predicate representing that effect. "
+        "Do not model the provision only as classification or threshold predicates. "
+        "Add a derived predicate for the legal consequence, effect, applicability, timing, "
+        "obligation, right, permission, prohibition, or exception, with rules defining it. "
+        "Repair layer: symbols."
+    )
+
+
+def validate_legal_effect_symbols_stage(
+    predicates: list,
+    *,
+    law_text_for_lints: str | None,
+    scope_metadata: dict | None = None,
+) -> None:
+    """
+    Symbol-table stage: when scope/question metadata requires a legal-effect output,
+    fail before rules generation if no derived legal-output predicate is declared.
+    """
+    if not should_require_legal_effect_output(
+        law_text_for_lints, scope_metadata=scope_metadata
+    ):
+        return
+    if schema_has_legal_effect_output_predicate(predicates):
+        return
+    _raise_missing_legal_effect_output(law_text_for_lints=law_text_for_lints)
+
+
 def validate_legal_effect_output_presence(
     predicates: list,
     *,
@@ -416,22 +456,7 @@ def validate_legal_effect_output_presence(
         return
     if not schema_only_classification_or_intermediate_derived(predicates):
         return
-
-    from pipeline.kb.json_ir import JSONIRCompilationError, SCHEMA_DESIGN_TAG
-
-    snippet = (law_text_for_lints or "").strip()
-    if len(snippet) > 120:
-        snippet = snippet[:117] + "..."
-    raise JSONIRCompilationError(
-        SCHEMA_DESIGN_TAG
-        + ": The scoped law text contains legal-effect or timing language"
-        + (f' ("{snippet}")' if snippet else "")
-        + ", but the JSON IR has no derived legal-output predicate representing that effect. "
-        "Do not model the provision only as classification or threshold predicates. "
-        "Add a derived predicate for the legal consequence, effect, applicability, timing, "
-        "obligation, right, permission, prohibition, or exception, with rules defining it. "
-        "Repair layer: symbols."
-    )
+    _raise_missing_legal_effect_output(law_text_for_lints=law_text_for_lints)
 
 
 def symbol_dict_for_query(sym: dict) -> dict:

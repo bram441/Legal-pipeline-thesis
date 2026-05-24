@@ -30,6 +30,12 @@ from pipeline.semantic.legal_question import (
     question_asks_legal_conclusion,
     question_asks_legal_definition,
 )
+from pipeline.extraction.case_fact_validation import (
+    CaseFactAssertionRejected,
+    build_case_predicate_rejection_message,
+    case_function_may_be_asserted,
+    case_predicate_may_be_asserted,
+)
 from pipeline.extraction.query_role_resolve import apply_role_arg_consistency
 from pipeline.symbolic.intent_registry import list_public_intents
 
@@ -167,6 +173,16 @@ def _best_symbol_match(symbol_hint: Any, kb_schema: dict, *, user_question: Any 
             score += 0.25
         if prefer_derived and kind in {"observable", "input"}:
             score -= 0.15
+        if user_question and question_has_legal_effect_language(str(user_question)):
+            from pipeline.extraction.query_target_selection import (
+                is_legal_output_query_target,
+                is_temporal_support_background_target,
+            )
+
+            if is_temporal_support_background_target(sym):
+                score -= 2.0
+            elif is_legal_output_query_target(sym):
+                score += 0.35
         if score > best_score:
             best_score = score
             best = n
@@ -288,7 +304,10 @@ def _pick_most_specific_derived_predicate(
     if best_sc < 0.2:
         return current_pred
     if len(scored) > 1 and (best_sc - scored[1][0]) < 0.05:
-        return current_pred
+        cur = _symbol_sig(kb_schema, current_pred) if current_pred else None
+        if cur and str(cur.get("kind") or "").lower() in {"derived", "conclusion"}:
+            return current_pred
+        return str(best_sym["name"])
     if not current_pred:
         return str(best_sym["name"])
     cur = _symbol_sig(kb_schema, current_pred)
@@ -319,11 +338,28 @@ def _validate_query_target_for_legal_question(
     user_question: str,
     kb_schema: dict,
 ) -> None:
+    from pipeline.extraction.query_target_selection import (
+        is_legal_output_query_target,
+        is_temporal_support_background_target,
+    )
+
     effect_question = question_has_legal_effect_language(user_question)
     if not question_asks_legal_conclusion(user_question) and not effect_question:
         return
     derived = _derived_bool_predicates(kb_schema)
-    pk = _symbol_kind(_symbol_sig(kb_schema, pred))
+    sig = _symbol_sig(kb_schema, pred) or {}
+    if effect_question and is_temporal_support_background_target(sig):
+        if schema_has_legal_effect_output_predicate(derived) or any(
+            is_legal_output_query_target(p) for p in derived
+        ):
+            raise ExtractionIRValidationError(
+                "Query target '"
+                + pred
+                + "' is a temporal support/background relation (previous/next/consecutive period), "
+                "not the legal effect answer. Choose a derived predicate with legal_output=true or "
+                "output_category legal_effect/consequence/applicability/timing."
+            )
+    pk = _symbol_kind(sig)
     if pk != "observable":
         sig = _symbol_sig(kb_schema, pred) or {}
         if effect_question and _looks_like_classification_predicate(sig):
@@ -598,16 +634,12 @@ def normalize_case_ir(case_ir: dict, kb_schema: dict) -> dict:
         if not pred:
             raise ExtractionIRValidationError(f"Could not resolve predicate assertion symbol: {sym}")
         sig = _symbol_sig(kb_schema, pred)
-        k = _symbol_kind(sig)
-        if k == "helper":
-            raise ExtractionIRValidationError(
-                "Case extraction cannot assert helper predicate " + pred + ". Use observable facts only."
-            )
-        if k == "derived":
-            raise ExtractionIRValidationError(
-                "Case extraction must not assert derived predicate "
-                + pred
-                + " as a fact; assert observable inputs and let the KB derive conclusions."
+        allowed, rejection_code = case_predicate_may_be_asserted(sig)
+        if not allowed:
+            raise CaseFactAssertionRejected(
+                build_case_predicate_rejection_message(pred, rejection_code),
+                pred=pred,
+                rejection_code=rejection_code or "invalid_case_fact",
             )
         arity = len(sig.get("args") or []) if sig else 0
         args = _normalize_args(a.get("args") or [], arity)
@@ -634,9 +666,13 @@ def normalize_case_ir(case_ir: dict, kb_schema: dict) -> dict:
         if not fun:
             raise ExtractionIRValidationError(f"Could not resolve function assertion symbol: {sym}")
         sig = _symbol_sig(kb_schema, fun)
-        fk = _symbol_kind(sig)
-        if fk == "helper":
-            raise ExtractionIRValidationError("Case extraction cannot assert helper function " + fun + ".")
+        allowed, rejection_code = case_function_may_be_asserted(sig)
+        if not allowed:
+            raise ExtractionIRValidationError(
+                "Case extraction cannot assert helper/composite function "
+                + fun
+                + ". Use observable numeric inputs only."
+            )
         arity = len(sig.get("args") or []) if sig else 0
         args = _normalize_args(a.get("args") or [], arity)
         if args is None:
@@ -708,6 +744,7 @@ def _validate_query_args(pred: str, args: list[str], case: dict, kb_schema: dict
 def normalize_query_ir(query_ir: dict, case: dict, kb_schema: dict, user_question: str) -> dict:
     if not isinstance(query_ir, dict):
         raise ExtractionIRValidationError("query IR must be an object")
+    query_target_selection_diag: dict = {}
     kind = str(query_ir.get("kind") or "predicate").strip().lower()
     explain = bool(query_ir.get("explain", False))
     if kind == "intent":
@@ -787,6 +824,18 @@ def normalize_query_ir(query_ir: dict, case: dict, kb_schema: dict, user_questio
     if not pred:
         raise ExtractionIRValidationError("Could not resolve query predicate from IR")
 
+    if question_has_legal_effect_language(user_question):
+        from pipeline.extraction.query_target_selection import apply_query_target_selection
+
+        pred, query_target_selection_diag = apply_query_target_selection(
+            pred_hint=pred_hint,
+            user_question=user_question,
+            kb_schema=kb_schema,
+            current_pred=pred,
+        )
+        if not pred:
+            raise ExtractionIRValidationError("Could not resolve query predicate from IR")
+
     if question_asks_legal_conclusion(user_question):
         refined = _pick_most_specific_derived_predicate(user_question, kb_schema, pred)
         if refined:
@@ -821,6 +870,8 @@ def normalize_query_ir(query_ir: dict, case: dict, kb_schema: dict, user_questio
         "explain": explain,
         "predicate_kind": pk,
     }
+    if query_target_selection_diag:
+        query_obj["query_target_selection"] = query_target_selection_diag
 
     if domain_heuristics_enabled():
         apply_role_arg_consistency(user_question, query_obj, case, kb_schema=kb_schema)

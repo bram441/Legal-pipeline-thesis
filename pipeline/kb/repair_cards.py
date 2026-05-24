@@ -33,6 +33,54 @@ _CARDS: dict[str, RepairCard] = {
         ),
         preferred_pattern="helper(X) :- observable_fact(X), compare(metric(X), op, threshold).",
     ),
+    "missing_helper_definition_for_legal_effect": RepairCard(
+        card_id="missing_helper_definition_for_legal_effect",
+        title="Missing helper definition (legal-effect rule)",
+        layer="rules",
+        do_items=(
+            "The legal-effect derived predicate already exists; keep it in THEN.",
+            "Define every helper used in IF to derive that legal-effect predicate.",
+            "Threshold helpers: define from numeric compares on observable functions.",
+            "Temporal/consecutive helpers: define from period/year facts or inline per-year conditions.",
+            "If a helper cannot be defined, inline lower-level conditions; do not delete the legal-effect rule.",
+        ),
+        do_not_items=(
+            "Create new symbols during rules repair.",
+            "Delete the legal-effect rule or remove its THEN conclusion.",
+            "Turn the legal-effect predicate into a classification predicate.",
+            "Leave helpers undefined while they remain in the legal-effect rule IF.",
+        ),
+        preferred_pattern=(
+            "exceeds_A(X,Y) :- compare(metric(X,Y), >, threshold_A). "
+            "exceeds_two_consecutive(X,Y) :- exceeds_more_than_one(X,Y), exceeds_more_than_one(X, prior_year(Y)). "
+            "legal_effect(X,Y) :- exceeds_two_consecutive(X,Y)."
+        ),
+    ),
+    "missing_helper_definition_for_composite_temporal_threshold": RepairCard(
+        card_id="missing_helper_definition_for_composite_temporal_threshold",
+        title="Missing composite threshold/temporal helper (legal-effect)",
+        layer="rules",
+        do_items=(
+            "You are repairing rules only; do not create new symbols.",
+            "Do not delete the legal-effect rule.",
+            "Define per-criterion exceeded helpers from numeric comparisons on observables.",
+            "Define more_than_one_criterion as pairwise exceeded: (A&B) OR (A&C) OR (B&C).",
+            "Define two-consecutive-years from per-year conditions plus an existing prior-year relation.",
+            "Define following-period linkage only if the symbol table already has such a relation.",
+            "Keep the legal-effect output predicate in THEN.",
+        ),
+        do_not_items=(
+            "Create new symbols during rules repair.",
+            "Delete the legal-effect rule or remove its THEN conclusion.",
+            "Invent prior/following year functions not declared in the symbol table.",
+            "Leave composite helpers undefined while they remain in the legal-effect rule IF.",
+        ),
+        preferred_pattern=(
+            "exceeds_A(C,FY):-compare(...); exceeds_more_than_one(C,FY):-pairwise exceeded; "
+            "two_consecutive(C,FY):-exceeds_more_than_one(C,FY),exceeds_more_than_one(C,prior_year(FY)); "
+            "legal_effect(C,FY):-two_consecutive(C,FY)."
+        ),
+    ),
     "computed_observable_unsafe": RepairCard(
         card_id="computed_observable_unsafe",
         title="Computed condition marked observable",
@@ -46,20 +94,53 @@ _CARDS: dict[str, RepairCard] = {
             "Use observable kind merely to avoid defining rules.",
         ),
     ),
+    "computed_observable_unsafe_for_legal_effect": RepairCard(
+        card_id="computed_observable_unsafe_for_legal_effect",
+        title="Computed threshold helper blocks legal-effect KB",
+        layer="symbols",
+        do_items=(
+            "This KB derives a legal effect; threshold/consecutive helpers must not stay observable.",
+            "Change computed exceeds/threshold/criteria predicates to kind=helper (or derived).",
+            "Keep numeric amount/count functions as observable; define threshold helpers in rules via compares.",
+            "Preserve the legal-effect derived predicate and its rule in THEN.",
+            "After symbols validate, define every helper used in the legal-effect rule IF.",
+        ),
+        do_not_items=(
+            "Leave threshold helpers as observable to avoid rules.",
+            "Delete the legal-effect predicate or replace it with classification only.",
+            "Use directly_observable=true on threshold compares without case-level justification.",
+            "Remove helpers from the legal-effect rule without defining them.",
+        ),
+        preferred_pattern=(
+            "Symbols: exceeds_employee_threshold kind=helper. "
+            "Rules: exceeds_employee_threshold(C,FY) in THEN from compare(employees(C,FY), >, 50); "
+            "legal_effect(C,FY) in THEN when consecutive conditions hold."
+        ),
+    ),
     "missing_threshold_classification_exclusion": RepairCard(
         card_id="missing_threshold_classification_exclusion",
         title="Missing threshold classification exclusion",
         layer="rules",
         do_items=(
-            "Add a disqualification rule: at_least_two_exceeded => not classification (negated in THEN).",
-            "Pair with qualification: not at_least_two_exceeded => classification.",
-            "Define at_least_two_exceeded from threshold helpers before using it.",
+            "The KB may already have positive qualification rules; that is not enough for false-case reasoning.",
+            "For 'not more than one criterion is exceeded', add a negative/exclusion rule with pairwise exceeded logic.",
+            "Let A/B/C = criterion 1/2/3 exceeded. Correct exclusion: "
+            "((A AND B) OR (A AND C) OR (B AND C)) => NOT classification (negated predicate in THEN).",
+            "If positive rules already exist, preserve them and add the missing exclusion rule.",
+            "Preserve exact numeric thresholds from scoped law text in every compare literal.",
+            "Optional helper: define at_least_two_exceeded, then at_least_two_exceeded => not classification.",
         ),
         do_not_items=(
+            "A OR B OR C => NOT classification (simple OR of single exceeded compares).",
+            "within_A OR within_B OR within_C => classification (one within-threshold check is too weak).",
+            "Only positive pairwise within-threshold rules without an exclusion rule.",
             "Rely on open-world absence of proof to answer false legal questions.",
-            "Use only a positive sufficient rule with zero-threshold semantics.",
+            "Remove or replace existing positive qualification rules when adding exclusion.",
         ),
-        preferred_pattern="at_least_two_exceeded(c,y) => not is_classification(c,y).",
+        preferred_pattern=(
+            "((A_exceeded AND B_exceeded) OR (A_exceeded AND C_exceeded) OR (B_exceeded AND C_exceeded)) "
+            "=> NOT classification (negated: true in THEN)."
+        ),
     ),
     "numeric_threshold_not_in_law_text": RepairCard(
         card_id="numeric_threshold_not_in_law_text",
@@ -120,17 +201,65 @@ _CARDS: dict[str, RepairCard] = {
             "Make ordinary case entities impossible to classify.",
         ),
     ),
+    "missing_temporal_support_symbol": RepairCard(
+        card_id="missing_temporal_support_symbol",
+        title="Missing temporal support symbol",
+        layer="symbols",
+        do_items=(
+            "The symbol table is INVALID: the scoped law/question requires temporal reasoning "
+            "(previous, following, consecutive periods/years) but no temporal support relation/function exists.",
+            "You MUST add at least one temporal support predicate/function using existing period/year types.",
+            "Choose names from the law text and schema. Generic examples: "
+            "previous_period(Period, Period), next_period(Period, Period), "
+            "immediately_precedes(Period, Period), immediately_follows(Period, Period), "
+            "consecutive_periods(Period, Period), previous_year(Year, Year), next_year(Year, Year), "
+            "previous_financial_year(FinancialYear, FinancialYear), "
+            "next_financial_year(FinancialYear, FinancialYear), "
+            "consecutive_financial_years(FinancialYear, FinancialYear).",
+            "Temporal support must be a SEPARATE relation/function between period arguments — "
+            "not merely the words following/consecutive inside a legal-effect predicate name.",
+            "Mark temporal support as directly_observable=true and/or background=true / case_input=true; "
+            "use kind=observable (preferred) or helper — not derived/legal_output unless rule-definable.",
+            "Keep legal-effect output predicates separate from classification predicates.",
+            "Preserve existing classification/support predicates unless directly wrong.",
+            "Rules repair cannot define consecutive/following-period helpers until these symbols exist.",
+        ),
+        do_not_items=(
+            "Rename only the legal-effect predicate to embed following/previous/consecutive without adding "
+            "a separate period relation (that does NOT satisfy this requirement).",
+            "Hardcode case-specific constants, article numbers, or benchmark-specific shortcuts.",
+            "Encode temporal ordering only in a predicate name without period/year arguments.",
+            "Remove the legal-effect predicate.",
+            "Replace the legal-effect question with a broad classification predicate only.",
+        ),
+        preferred_pattern=(
+            "next_financial_year(FinancialYear, FinancialYear); "
+            "previous_financial_year(FinancialYear, FinancialYear); "
+            "legal_effect(Entity, Year) :- trigger(Entity, Year), next_financial_year(Year, Following)."
+        ),
+    ),
     "missing_legal_effect_output": RepairCard(
         card_id="missing_legal_effect_output",
         title="Missing legal-effect output predicate",
         layer="symbols",
         do_items=(
-            "Add a derived legal-output predicate for consequence/effect/timing/right/obligation.",
-            "Set legal_output=true or output_category=legal_effect when helpful.",
-            "Keep classification predicates only as intermediate support.",
+            "The symbol table may already include positive classification predicates; that is not enough for effect questions.",
+            "Add a derived legal-output predicate for consequence/effect/timing/applicability from scoped law text.",
+            "Set kind=derived, legal_output=true, output_category=legal_effect or timing.",
+            "When scope has classification + effect paragraphs: keep is_* classification predicates as support; "
+            "add a separate legal-effect predicate for the effect paragraph.",
+            "Name the predicate from law wording (e.g. consequences_apply_from_following_financial_year).",
+            "Rules repair will later define this predicate from effect antecedents — symbols phase only adds the declaration.",
         ),
         do_not_items=(
-            "Answer legal-effect questions using broad classification predicates only.",
+            "Answer effect/timing questions with is_small_company / is_micro_company / classification alone.",
+            "Rely on open-world absence of proof for a legal-effect answer.",
+            "Remove classification predicates when adding the legal-effect symbol.",
+            "Use only threshold/helper predicates without a legal_output derived predicate.",
+        ),
+        preferred_pattern=(
+            "consequences_apply_from_following_financial_year(company, period) "
+            "kind=derived legal_output=true output_category=legal_effect"
         ),
     ),
     "derived_predicate_not_defined": RepairCard(

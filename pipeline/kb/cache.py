@@ -2,6 +2,11 @@ import os
 import re
 
 from debug import status_log
+from pipeline.kb.cache_version import (
+    cache_manifest_matches,
+    invalidate_kb_cache_files,
+    write_cache_manifest,
+)
 from pipeline.kb.compile_backend import get_kb_backend_from_env
 from pipeline.kb.compiler import compile_law_to_kb_fo
 from pipeline.kb.exceptions import LawCompilationError
@@ -716,6 +721,14 @@ def get_or_compile_kb(
         trace.log("KB compiler backend", kb_backend)
 
     if os.path.exists(kb_path):
+        if kb_backend == "json_ir" and not cache_manifest_matches(run_dir, kb_backend=kb_backend):
+            status_log("KB", "Stale JSON-IR cache manifest; recompiling")
+            if trace:
+                trace.section("KB CACHE STALE - RECOMPILING")
+                trace.log("Reason", "cache_manifest version/backend mismatch")
+            invalidate_kb_cache_files(run_dir)
+
+    if os.path.exists(kb_path):
         status_log("KB", "Loading from cache")
         with open(kb_path, "r", encoding="utf-8") as f:
             cached_kb = f.read()
@@ -915,6 +928,8 @@ def get_or_compile_kb(
         f.write(kb_text.strip() + "\n")
 
     save_kb_schema(run_dir, kb_schema)
+    if kb_backend == "json_ir":
+        write_cache_manifest(run_dir, kb_backend=kb_backend)
 
     with open(log_path, "w", encoding="utf-8") as f:
         f.write("KB compiled successfully.\n")

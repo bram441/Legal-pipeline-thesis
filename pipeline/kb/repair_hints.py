@@ -165,6 +165,11 @@ def build_json_ir_compile_hints(error_message: str) -> str:
         out.append(
             "Break circular derived-only rules by adding observable/helper conditions in `if`, or repair the symbol table."
         )
+    if "cannot prove disqualification" in el or "missing exclusion" in el:
+        out.append(
+            "Add a pairwise-exceeded exclusion rule: ((A AND B) OR (A AND C) OR (B AND C)) => NOT classification "
+            "(negated in THEN). Preserve existing positive rules. Open-world absence of proof is not false."
+        )
     if "at-most-one" in el or "more-than-one criteria" in el or "simple or over individual threshold" in el:
         out.append(
             "Cardinality error: for 'not more than one criterion exceeded', never use a plain OR over single "

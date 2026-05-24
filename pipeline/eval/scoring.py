@@ -86,9 +86,25 @@ def _query_target_warnings(
     if not pred:
         return warnings
     pk = query.get("predicate_kind") or _predicate_kind_from_schema(kb_schema, pred)
-    if pk != "observable":
-        return warnings
     if not question_asks_legal_conclusion(user_question or ""):
+        return warnings
+    from pipeline.extraction.query_target_selection import is_temporal_support_background_target
+    from pipeline.kb.legal_effect import question_has_legal_effect_language
+
+    sig = None
+    for p in (kb_schema or {}).get("predicates") or []:
+        if isinstance(p, dict) and p.get("name") == pred:
+            sig = p
+            break
+    if sig and question_has_legal_effect_language(user_question or ""):
+        if is_temporal_support_background_target(sig):
+            warnings.append(
+                "Query target '"
+                + pred
+                + "' is a temporal support/background relation, not a legal-effect answer predicate."
+            )
+            return warnings
+    if pk != "observable":
         return warnings
     warnings.append(
         "Expected legal Boolean answer was evaluated using observable predicate '"
@@ -125,6 +141,9 @@ def _finalize_boolean_score(
         pred = str(query.get("predicate") or "")
         out["query_predicate"] = pred or None
         out["query_predicate_kind"] = query.get("predicate_kind") or _predicate_kind_from_schema(kb_schema, pred)
+        qts = query.get("query_target_selection")
+        if isinstance(qts, dict):
+            out["query_target_selection"] = qts
     warns = _query_target_warnings(expected, query, kb_schema, user_question)
     if symbolic_result and isinstance(symbolic_result, dict):
         cov = symbolic_result.get("antecedent_coverage")

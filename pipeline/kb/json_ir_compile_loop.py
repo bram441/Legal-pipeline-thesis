@@ -17,11 +17,30 @@ from pipeline.kb.json_ir_repair import (
     JsonIRErrorKind,
     classify_json_ir_validation_error,
     format_symbol_repair_error,
+    is_symbol_stage_repairable_error,
     normalize_error_code,
     normalize_error_signature,
 )
 from pipeline.kb.repair_cards import format_repair_card
 from pipeline.kb.repair_history import RepairEvent, RepairHistory
+from pipeline.kb.exclusion_repair_hints import build_missing_exclusion_repair_supplement
+from pipeline.kb.composite_temporal_threshold_repair_hints import (
+    build_composite_temporal_threshold_supplement,
+    qualifies_for_composite_temporal_threshold_card,
+)
+from pipeline.kb.temporal_support_repair_hints import (
+    build_missing_temporal_support_symbol_supplement,
+)
+from pipeline.kb.legal_effect_helper_repair_hints import (
+    build_legal_effect_computed_helper_supplement,
+    build_missing_legal_effect_helper_supplement,
+    legal_effect_rules_repair_context,
+)
+from pipeline.kb.legal_effect_repair_hints import (
+    build_missing_legal_effect_repair_supplement,
+    parse_symbol_table_from_repair_context,
+)
+from pipeline.kb.validation_evidence import MissingHelperEvidence, ValidationRepairEvidence
 from pipeline.kb.repair_hints import build_json_ir_compile_hints, build_machine_repair_hints
 from pipeline.kb.threshold_repair_progress import (
     ThresholdRepairSnapshot,
@@ -29,6 +48,12 @@ from pipeline.kb.threshold_repair_progress import (
     detect_threshold_cardinality_progress,
     should_stall_threshold_cardinality_repeat,
 )
+from pipeline.kb.evidence_extension import (
+    evidence_extension_config_from_env,
+    repair_hints_carry_validation_evidence,
+    should_grant_evidence_extension,
+)
+from pipeline.kb.evidence_extension import PendingEvidenceState as EvidenceTrackingState
 from pipeline.kb.validation_evidence import (
     collect_validation_repair_evidence,
     extract_error_path_from_message,
@@ -45,12 +70,8 @@ class CompileLoopLimits:
 
 
 def compile_loop_limits_from_env() -> CompileLoopLimits:
-    legacy_attempts = os.getenv("JSON_IR_MAX_COMPILE_ATTEMPTS", "").strip()
-    max_sv = os.getenv("JSON_IR_MAX_SYMBOL_VERSIONS", "").strip()
-    if not max_sv and legacy_attempts:
-        max_sv = legacy_attempts
-    if not max_sv:
-        max_sv = "3"
+    # Structured loop uses JSON_IR_MAX_SYMBOL_VERSIONS only (not legacy COMPILE_ATTEMPTS).
+    max_sv = os.getenv("JSON_IR_MAX_SYMBOL_VERSIONS", "").strip() or "3"
     return CompileLoopLimits(
         max_symbol_versions=int(max_sv),
         max_rules_attempts_per_symbol_version=int(
@@ -114,13 +135,152 @@ def _build_repair_hints(
     layer: str,
     secondary_diagnostics: str = "",
     progress_note: str = "",
+    law_text: str | None = None,
+    question_text: str | None = None,
+    scope_metadata: dict | None = None,
+    symbol_table: dict | None = None,
+    missing_helper_evidence: MissingHelperEvidence | None = None,
+    validation_evidence: ValidationRepairEvidence | None = None,
 ) -> str:
     parts: list[str] = []
-    card = format_repair_card(error_code)
+    st = symbol_table or parse_symbol_table_from_repair_context(previous_output)
+    legal_effect_ctx = legal_effect_rules_repair_context(
+        scope_metadata=scope_metadata,
+        symbol_table=st,
+    )
+    card_id = error_code
+    composite_card = False
+    temporal_escalation = (
+        error_code == "missing_temporal_support_symbol"
+        or (
+            missing_helper_evidence is not None
+            and missing_helper_evidence.missing_temporal_support_symbol
+        )
+    )
+    if temporal_escalation:
+        card_id = "missing_temporal_support_symbol"
+    elif (
+        error_code == "missing_helper_definition"
+        and missing_helper_evidence
+        and qualifies_for_composite_temporal_threshold_card(
+            helper_name=missing_helper_evidence.helper_name,
+            description="",
+            scope_metadata=scope_metadata,
+            symbol_table=st,
+            derives_legal_output=missing_helper_evidence.derives_legal_output,
+        )
+    ):
+        card_id = "missing_helper_definition_for_composite_temporal_threshold"
+        composite_card = True
+    elif (
+        error_code == "missing_helper_definition"
+        and missing_helper_evidence
+        and missing_helper_evidence.legal_effect_context
+    ):
+        card_id = "missing_helper_definition_for_legal_effect"
+    if error_code == "computed_observable_unsafe" and legal_effect_ctx:
+        card_id = "computed_observable_unsafe_for_legal_effect"
+    card = format_repair_card(card_id)
     parts.append("=== ERROR-SPECIFIC REPAIR CARD ===\n" + card)
+    if error_code == "missing_legal_effect_output":
+        parts.append(
+            "=== MISSING LEGAL-EFFECT OUTPUT (mandatory) ===\n"
+            + build_missing_legal_effect_repair_supplement(
+                error_message,
+                law_text=law_text,
+                question_text=question_text,
+                scope_metadata=scope_metadata,
+                symbol_table=st,
+            )
+        )
+    if error_code == "missing_threshold_classification_exclusion":
+        parts.append(
+            "=== MISSING EXCLUSION RULE (mandatory) ===\n"
+            + build_missing_exclusion_repair_supplement(
+                error_message,
+                law_text=law_text,
+                secondary_diagnostics=secondary_diagnostics,
+            )
+        )
+    if temporal_escalation:
+        ts_ev = None
+        if validation_evidence and getattr(validation_evidence, "temporal_support", None):
+            ts_ev = validation_evidence.temporal_support
+        parts.append(
+            "=== MISSING TEMPORAL SUPPORT SYMBOL (mandatory) ===\n"
+            + build_missing_temporal_support_symbol_supplement(
+                law_text=law_text,
+                question_text=question_text,
+                scope_metadata=scope_metadata,
+                symbol_table=st,
+                evidence=missing_helper_evidence or ts_ev,
+                helper_requiring_temporal_support=(
+                    getattr(missing_helper_evidence, "helper_name", None)
+                    if missing_helper_evidence
+                    else None
+                ),
+            )
+        )
+    if (
+        error_code == "missing_helper_definition"
+        and missing_helper_evidence
+        and missing_helper_evidence.missing_temporal_support_symbol
+    ):
+        parts.append(
+            "Rules repair cannot define this helper until temporal support symbols exist. "
+            "Escalate to symbols repair (previous/next/consecutive period relation)."
+        )
+    elif error_code == "missing_helper_definition" and missing_helper_evidence and composite_card:
+        parts.append(
+            "=== COMPOSITE THRESHOLD/TEMPORAL HELPER (mandatory) ===\n"
+            + build_composite_temporal_threshold_supplement(
+                error_message=error_message,
+                symbol_table=st,
+                evidence=missing_helper_evidence,
+                law_text=law_text,
+            )
+        )
+    elif (
+        error_code == "missing_helper_definition"
+        and missing_helper_evidence
+        and missing_helper_evidence.legal_effect_context
+    ):
+        parts.append(
+            "=== MISSING HELPER FOR LEGAL-EFFECT RULE (mandatory) ===\n"
+            + build_missing_legal_effect_helper_supplement(
+                error_message=error_message,
+                symbol_table=st,
+                evidence=missing_helper_evidence,
+                law_text=law_text,
+            )
+        )
+    if error_code == "computed_observable_unsafe" and legal_effect_ctx:
+        sec_helpers = (
+            validation_evidence.secondary_missing_helpers
+            if validation_evidence
+            else []
+        )
+        parts.append(
+            "=== LEGAL-EFFECT COMPUTED HELPER (mandatory) ===\n"
+            + build_legal_effect_computed_helper_supplement(
+                error_message=error_message,
+                symbol_table=st,
+                computed_predicate=(
+                    validation_evidence.computed_observable_predicate
+                    if validation_evidence
+                    else None
+                ),
+                computed_kind_hint=(
+                    validation_evidence.computed_observable_helper_kind_hint
+                    if validation_evidence
+                    else None
+                ),
+                secondary_helpers=sec_helpers,
+            )
+        )
     if progress_note.strip():
         parts.append("=== REPAIR PROGRESS (continue improving; do not repeat identical rules) ===\n" + progress_note)
-    if secondary_diagnostics.strip():
+    if secondary_diagnostics.strip() and error_code != "missing_threshold_classification_exclusion":
         parts.append("=== SECONDARY VALIDATION DIAGNOSTICS ===\n" + secondary_diagnostics)
     machine = build_machine_repair_hints(error_message, previous_output)
     if machine.strip() and "(none" not in machine[:40].lower():
@@ -172,6 +332,7 @@ def compile_json_ir_structured(
     limits: CompileLoopLimits | None = None,
     artifact_writer: ArtifactWriter | None = None,
     scope_metadata: dict | None = None,
+    question_text: str | None = None,
 ) -> tuple[str, dict]:
     """Run structured symbol×rules compile loop. Returns (fo_text, kb_schema)."""
     limits = limits or compile_loop_limits_from_env()
@@ -184,9 +345,20 @@ def compile_json_ir_structured(
     error_messages: list[str] = []
     signature_counts: dict[str, int] = {}
     rules_repair_streak = 0
+    pending_validation_evidence: ValidationRepairEvidence | None = None
+    evidence_state = EvidenceTrackingState()
+    evidence_ext_config = evidence_extension_config_from_env()
+    extension_symbol_slots = 0
+    extension_llm_slots = 0
+    evidence_extension_calls_used = 0
     last_threshold_snapshot: ThresholdRepairSnapshot | None = None
     last_secondary_diagnostics = ""
     last_progress_note = ""
+    pending_temporal_symbol_repair = False
+    pending_symbol_stage_repair = False
+    last_symbol_stage_error_code: str | None = None
+    symbol_repair_extension_slots = 0
+    _MAX_SYMBOL_REPAIR_EXTENSION_SLOTS = 2
 
     if repair_feedback:
         boot = (repair_feedback.get("error_message") or "").strip()
@@ -282,10 +454,92 @@ def compile_json_ir_structured(
         if len(history.distinct_errors) > 8:
             history.distinct_errors = history.distinct_errors[-8:]
 
-    for symbol_version in range(1, limits.max_symbol_versions + 1):
-        if total_llm_calls >= limits.max_total_kb_llm_calls:
-            history.budget_exhausted = True
-            break
+    symbol_version = 0
+    while True:
+        effective_symbol_cap = (
+            limits.max_symbol_versions
+            + extension_symbol_slots
+            + symbol_repair_extension_slots
+        )
+        if symbol_version >= effective_symbol_cap:
+            can_symbol_extend = (
+                pending_symbol_stage_repair
+                and is_symbol_stage_repairable_error(last_symbol_stage_error_code)
+                and total_llm_calls
+                < limits.max_total_kb_llm_calls + extension_llm_slots
+                and symbol_repair_extension_slots < _MAX_SYMBOL_REPAIR_EXTENSION_SLOTS
+            )
+            if can_symbol_extend:
+                symbol_repair_extension_slots += 1
+                _record(
+                    phase="validation",
+                    symbol_version=symbol_version,
+                    rules_attempt=0,
+                    action="symbol_repair_extension_granted",
+                    status="ok",
+                    route=last_symbol_stage_error_code,
+                )
+            else:
+                grant, reason = should_grant_evidence_extension(
+                    config=evidence_ext_config,
+                    extension_calls_used=evidence_extension_calls_used,
+                    evidence_state=evidence_state,
+                    validation_evidence=pending_validation_evidence,
+                    symbol_version=symbol_version,
+                    max_symbol_versions=limits.max_symbol_versions + extension_symbol_slots,
+                    total_llm_calls=total_llm_calls,
+                    max_total_kb_llm_calls=limits.max_total_kb_llm_calls,
+                )
+                if grant:
+                    extension_symbol_slots += 1
+                    extension_llm_slots += 1
+                    evidence_extension_calls_used += 1
+                    history.evidence_extension_used = True
+                    history.evidence_extension_calls = evidence_extension_calls_used
+                    history.evidence_extension_reason = reason
+                    _record(
+                        phase="validation",
+                        symbol_version=symbol_version,
+                        rules_attempt=0,
+                        action="evidence_extension_granted",
+                        status="ok",
+                        route=reason,
+                    )
+                else:
+                    if symbol_version >= limits.max_symbol_versions:
+                        history.symbol_budget_exhausted = True
+                    break
+
+        symbol_version += 1
+        if total_llm_calls >= limits.max_total_kb_llm_calls + extension_llm_slots:
+            grant, reason = should_grant_evidence_extension(
+                config=evidence_ext_config,
+                extension_calls_used=evidence_extension_calls_used,
+                evidence_state=evidence_state,
+                validation_evidence=pending_validation_evidence,
+                symbol_version=symbol_version - 1,
+                max_symbol_versions=limits.max_symbol_versions + extension_symbol_slots,
+                total_llm_calls=total_llm_calls,
+                max_total_kb_llm_calls=limits.max_total_kb_llm_calls,
+            )
+            if grant:
+                extension_symbol_slots += 1
+                extension_llm_slots += 1
+                evidence_extension_calls_used += 1
+                history.evidence_extension_used = True
+                history.evidence_extension_calls = evidence_extension_calls_used
+                history.evidence_extension_reason = reason
+                _record(
+                    phase="validation",
+                    symbol_version=symbol_version - 1,
+                    rules_attempt=0,
+                    action="evidence_extension_granted",
+                    status="ok",
+                    route=reason,
+                )
+            else:
+                history.budget_exhausted = True
+                break
 
         sym_repair = symbol_version > 1
         err_msg = error_messages[-1] if error_messages else ""
@@ -298,9 +552,40 @@ def compile_json_ir_structured(
         )
         rules_json = json.dumps({"rules": rules}, ensure_ascii=False, indent=2) if rules else ""
         error_code = normalize_error_code(err_msg) if err_msg else "unknown_validation_error"
-        hints = _build_repair_hints(
-            err_msg, prev, error_code=error_code, layer="symbols"
-        ) if sym_repair else ""
+        hints = (
+            _build_repair_hints(
+                err_msg,
+                prev,
+                error_code=error_code,
+                layer="symbols",
+                law_text=src,
+                question_text=question_text,
+                scope_metadata=scope_metadata,
+                symbol_table=symbol_table,
+                missing_helper_evidence=(
+                    pending_validation_evidence.missing_helper
+                    if pending_validation_evidence
+                    else None
+                ),
+                secondary_diagnostics=(
+                    pending_validation_evidence.format_secondary_diagnostics()
+                    if pending_validation_evidence
+                    else ""
+                ),
+                validation_evidence=pending_validation_evidence,
+            )
+            if sym_repair
+            else ""
+        )
+        if sym_repair and repair_hints_carry_validation_evidence(
+            hints, validation_evidence=pending_validation_evidence
+        ):
+            evidence_state.mark_consumed()
+            history.evidence_consumed_by_repair = True
+            history.validation_evidence_path = evidence_state.validation_evidence_path
+            history.validation_evidence_fingerprint = (
+                evidence_state.validation_evidence_fingerprint
+            )
         err_for_prompt = err_msg
         if sym_repair and rules_json.strip():
             err_for_prompt = format_symbol_repair_error(err_msg)
@@ -351,7 +636,16 @@ def compile_json_ir_structured(
                 raise LawCompilationError("JSON IR symbols phase returned invalid %r." % key)
 
         try:
-            validate_json_ir_symbols(symbol_table)
+            validate_json_ir_symbols(
+                symbol_table,
+                law_text_for_lints=src,
+                scope_metadata=scope_metadata,
+                question_text=question_text,
+                following_missing_temporal_support_repair=pending_temporal_symbol_repair,
+            )
+            pending_temporal_symbol_repair = False
+            pending_symbol_stage_repair = False
+            last_symbol_stage_error_code = None
             ap = writer(
                 art, symbol_version, 0, symbol_version,
                 "symbols.normalized.json",
@@ -374,6 +668,12 @@ def compile_json_ir_structured(
                 msg, error_messages[:-1], rules_repair_count=0,
                 max_rules_before_symbol_escalation=limits.max_rules_before_symbol_escalation,
             )
+            code = normalize_error_code(msg)
+            if code == "missing_temporal_support_symbol":
+                pending_temporal_symbol_repair = True
+            if route == JsonIRErrorKind.SYMBOLS_REPAIR_REQUIRED:
+                pending_symbol_stage_repair = True
+                last_symbol_stage_error_code = code
             _record(
                 phase="validation",
                 symbol_version=symbol_version,
@@ -404,6 +704,7 @@ def compile_json_ir_structured(
         last_threshold_snapshot = None
         last_secondary_diagnostics = ""
         last_progress_note = ""
+        last_missing_helper_evidence: MissingHelperEvidence | None = None
 
         for rules_attempt in range(1, limits.max_rules_attempts_per_symbol_version + 1):
             if total_llm_calls >= limits.max_total_kb_llm_calls:
@@ -419,9 +720,24 @@ def compile_json_ir_structured(
                 raw_rules=raw_rules,
             )
             error_code = normalize_error_code(err_msg) if err_msg else "unknown_validation_error"
-            machine_hints = _build_repair_hints(
-                err_msg, prev, error_code=error_code, layer="rules"
-            ) if rules_repair and err_msg else ""
+            machine_hints = (
+                _build_repair_hints(
+                    err_msg,
+                    prev,
+                    error_code=error_code,
+                    layer="rules",
+                    secondary_diagnostics=last_secondary_diagnostics,
+                    progress_note=last_progress_note,
+                    law_text=src,
+                    question_text=question_text,
+                    scope_metadata=scope_metadata,
+                    symbol_table=symbol_table,
+                    missing_helper_evidence=last_missing_helper_evidence,
+                    validation_evidence=pending_validation_evidence,
+                )
+                if rules_repair and err_msg
+                else ""
+            )
 
             try:
                 total_llm_calls += 1
@@ -520,10 +836,36 @@ def compile_json_ir_structured(
 
                 pred_kinds = _pred_kinds_from_symbol_table(symbol_table)
                 evidence = collect_validation_repair_evidence(
-                    merged_ir, pred_kinds, law_text_for_lints=src
+                    merged_ir,
+                    pred_kinds,
+                    law_text_for_lints=src,
+                    error_message=msg,
+                    symbol_table=symbol_table,
+                    scope_metadata=scope_metadata,
+                    question_text=question_text,
                 )
+                last_missing_helper_evidence = evidence.missing_helper
+                pending_validation_evidence = evidence
                 last_secondary_diagnostics = evidence.format_secondary_diagnostics()
-                writer(
+                if evidence.missing_temporal_support_symbol or (
+                    code == "missing_helper_definition"
+                    and evidence.missing_helper
+                    and evidence.missing_helper.missing_temporal_support_symbol
+                ):
+                    kind = JsonIRErrorKind.SYMBOLS_REPAIR_REQUIRED
+                evidence_state.register_evidence(
+                    path=None,
+                    evidence=evidence,
+                    error_code=code,
+                    repair_route=kind.value,
+                )
+                history.validation_evidence_fingerprint = (
+                    evidence_state.validation_evidence_fingerprint
+                )
+                history.evidence_consumed_by_repair = (
+                    evidence_state.evidence_consumed_by_repair
+                )
+                evidence_path = writer(
                     art,
                     symbol_version,
                     rules_attempt,
@@ -534,12 +876,33 @@ def compile_json_ir_structured(
                             "cardinality_violations": evidence.cardinality_violations,
                             "numeric_provenance_issues": evidence.numeric_provenance_issues,
                             "law_thresholds": evidence.law_thresholds,
+                            "missing_helper": (
+                                evidence.missing_helper.to_dict()
+                                if evidence.missing_helper
+                                else None
+                            ),
+                            "secondary_missing_helpers": [
+                                h.to_dict() for h in evidence.secondary_missing_helpers
+                            ],
+                            "computed_observable_predicate": evidence.computed_observable_predicate,
+                            "computed_observable_helper_kind_hint": (
+                                evidence.computed_observable_helper_kind_hint
+                            ),
+                            "temporal_support": evidence.temporal_support,
+                            "missing_temporal_support_symbol": evidence.missing_temporal_support_symbol,
+                            "repair_route": evidence.repair_route,
                             "secondary_diagnostics_text": last_secondary_diagnostics,
+                            "validation_evidence_fingerprint": (
+                                evidence_state.validation_evidence_fingerprint
+                            ),
+                            "evidence_consumed_by_repair": evidence_state.evidence_consumed_by_repair,
                         },
                         ensure_ascii=False,
                         indent=2,
                     ),
                 )
+                evidence_state.validation_evidence_path = evidence_path
+                history.validation_evidence_path = evidence_path
 
                 progress_verdict = None
                 if code == "threshold_cardinality_or_singleton":
@@ -611,9 +974,21 @@ def compile_json_ir_structured(
                     break
 
                 history.final_normalized_error_code = code
+                if evidence.missing_temporal_support_symbol:
+                    history.final_normalized_error_code = "missing_temporal_support_symbol"
                 history.final_normalized_error_signature = sig
 
                 if kind == JsonIRErrorKind.SYMBOLS_REPAIR_REQUIRED:
+                    esc_code = normalize_error_code(msg)
+                    if evidence.missing_temporal_support_symbol or (
+                        evidence.missing_helper is not None
+                        and evidence.missing_helper.missing_temporal_support_symbol
+                    ):
+                        pending_temporal_symbol_repair = True
+                        esc_code = "missing_temporal_support_symbol"
+                    if is_symbol_stage_repairable_error(esc_code):
+                        pending_symbol_stage_repair = True
+                        last_symbol_stage_error_code = esc_code
                     rules_repair_streak = 0
                     rules = None
                     rules_obj = None
@@ -634,11 +1009,16 @@ def compile_json_ir_structured(
     history.final_failure_category = (
         "budget_exhausted" if history.budget_exhausted
         else "repair_stalled" if history.repair_stalled
+        else "symbol_budget_exhausted" if history.symbol_budget_exhausted
         else "validation_exhausted"
     )
     if error_messages:
         history.final_normalized_error_code = normalize_error_code(error_messages[-1])
         history.final_normalized_error_signature = normalize_error_signature(error_messages[-1])
+
+    history.evidence_consumed_by_repair = evidence_state.evidence_consumed_by_repair
+    history.validation_evidence_path = evidence_state.validation_evidence_path
+    history.validation_evidence_fingerprint = evidence_state.validation_evidence_fingerprint
 
     history.write(art)
     ctx = repair_context_fn(

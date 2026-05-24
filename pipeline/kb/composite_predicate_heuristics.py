@@ -87,3 +87,24 @@ def symbol_directly_observable(raw: dict | None) -> bool:
             if meta.get(key) is True:
                 return True
     return False
+
+
+def symbol_background_or_case_input(raw: dict | None) -> bool:
+    """Structural/background facts supplied with case input (not rule-derived)."""
+    if not isinstance(raw, dict):
+        return False
+    for key in (
+        "background",
+        "case_input",
+        "structural",
+        "temporal_background",
+        "background_relation",
+    ):
+        if raw.get(key) is True:
+            return True
+    meta = raw.get("metadata")
+    if isinstance(meta, dict):
+        for key in ("background", "case_input", "structural", "temporal_background"):
+            if meta.get(key) is True:
+                return True
+    return False
