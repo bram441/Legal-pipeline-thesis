@@ -446,6 +446,7 @@ def _compile_json_ir_two_step(
     repair_feedback=None,
     artifact_dir: str | Path | None = None,
     scope_metadata: dict | None = None,
+    question_text: str | None = None,
 ):
     src = (source_text or "").strip()
     art = Path(artifact_dir) if artifact_dir else None
@@ -498,6 +499,7 @@ def _compile_json_ir_two_step(
         artifact_dir=art,
         repair_feedback=repair_feedback,
         scope_metadata=scope_metadata,
+        question_text=question_text,
     )
 
 
@@ -561,6 +563,7 @@ def compile_law_to_kb_fo(
                 repair_feedback=repair_feedback,
                 artifact_dir=artifact_dir,
                 scope_metadata=scope_meta,
+                question_text=question_text,
             )
         err = repair_feedback.get("error_message", "") or ""
         prev = repair_feedback.get("previous_output", "") or ""
@@ -619,6 +622,7 @@ def compile_law_to_kb_fo(
                     chosen_model,
                     artifact_dir=artifact_dir,
                     scope_metadata=scope_meta,
+                    question_text=question_text,
                 )
             elif two_ph:
                 text = compile_two_phase(
@@ -642,6 +646,7 @@ def compile_law_to_kb_fo(
                 chosen_model,
                 artifact_dir=artifact_dir,
                 scope_metadata=scope_meta,
+                question_text=question_text,
             )
         elif two_ph:
             text = compile_two_phase(

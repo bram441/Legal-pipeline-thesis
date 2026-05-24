@@ -18,6 +18,26 @@ class JsonIRErrorKind(Enum):
     FATAL_RENDERER_BUG = "fatal_renderer_bug"
 
 
+# Symbol-table validation errors that warrant another symbol version when budget allows.
+SYMBOL_STAGE_REPAIRABLE_CODES: frozenset[str] = frozenset(
+    {
+        "missing_legal_effect_output",
+        "missing_temporal_support_symbol",
+        "status_as_type",
+        "computed_observable_unsafe",
+        "invalid_signature",
+        "unknown_symbol",
+        "type_mismatch",
+        "json_parse_error",
+    }
+)
+
+
+def is_symbol_stage_repairable_error(error_code: str | None) -> bool:
+    """True when a failed symbol validation should allow another symbol version."""
+    return bool(error_code) and error_code in SYMBOL_STAGE_REPAIRABLE_CODES
+
+
 _RE_PRED_TYPE_MISMATCH = re.compile(
     r"argument\s+(\d+)\s+to\s+predicate\s+'([^']+)'\s+expects\s+type\s+([^,]+),\s+got\s+([^.\s]+)",
     re.IGNORECASE,
@@ -53,8 +73,19 @@ def normalize_error_code(msg: str) -> str:
         return "threshold_cardinality_or_singleton"
     if "semantically identical to the status" in sl or "classification encoded as a primitive type" in sl:
         return "status_as_type"
-    if "legal-effect or timing language" in sl or "no derived legal-output predicate" in sl:
+    if (
+        "legal-effect or timing language" in sl
+        or "no derived legal-output predicate" in sl
+        or "no derived legal outputs" in sl
+        or "symbol table contains no derived legal outputs" in sl
+    ):
         return "missing_legal_effect_output"
+    if (
+        "no temporal support relation" in sl
+        or "temporal support relation/function" in sl
+        or "do not count as temporal support" in sl
+    ):
+        return "missing_temporal_support_symbol"
     if "never appear in any rule then" in sl:
         return "derived_predicate_not_defined"
     if "unconstrained consequent variable" in sl:
@@ -79,7 +110,7 @@ def normalize_error_signature(msg: str) -> str:
             m = re.search(r"observable predicate\s+'([^']+)'", s, re.I)
             return "schema::observable_in_then::" + (m.group(1) if m else "?")
         if "no derived legal outputs" in sl:
-            return "schema::no_derived"
+            return "schema::missing_legal_effect"
         if "no observable case-input" in sl:
             return "schema::no_observable"
         if "boolean predicate atom" in sl:
@@ -313,11 +344,19 @@ def format_symbol_repair_error(validation_error: str) -> str:
             "(Person, Company, LegalEntity, etc.). For roles between entities, prefer relational predicates "
             "(e.g. is_spouse_of(a, b)) over unary status types."
         )
-    if "legal-effect or timing language" in el or "no derived legal-output predicate" in el:
+    if (
+        "legal-effect or timing language" in el
+        or "no derived legal-output predicate" in el
+        or "no derived legal outputs" in el
+    ):
         extra = (
-            "\n\nThe law states a legal consequence, effect, or timing — add an explicit derived predicate "
-            "for that output (not only is_* classifications or threshold helpers). Set legal_output=true "
-            "or output_category=legal_effect when helpful. Rules repair cannot invent the query target."
+            "\n\nThe symbol table must include at least one derived predicate/function representing "
+            "legal classifications, consequences, rights, obligations, permissions, prohibitions, "
+            "exceptions, sanctions, validity results, entitlements, or exclusions. "
+            "When the law states a legal consequence, effect, or timing, add an explicit derived "
+            "legal-output predicate for that effect (not only is_* classifications or threshold helpers). "
+            "Set legal_output=true or output_category=legal_effect when helpful. "
+            "Preserve existing classification/support predicates. Rules repair cannot invent the query target."
         )
     if "helper predicate" in el or "helper function" in el:
         if "defining rule" in el or "never defined" in el:

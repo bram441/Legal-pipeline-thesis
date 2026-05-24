@@ -44,7 +44,14 @@ class RepairHistory:
     repeated_error_detected: bool = False
     repair_stalled: bool = False
     budget_exhausted: bool = False
+    symbol_budget_exhausted: bool = False
     distinct_errors: list[str] = field(default_factory=list)
+    validation_evidence_path: str | None = None
+    validation_evidence_fingerprint: str | None = None
+    evidence_consumed_by_repair: bool = False
+    evidence_extension_used: bool = False
+    evidence_extension_calls: int = 0
+    evidence_extension_reason: str | None = None
 
     def record(self, event: RepairEvent) -> None:
         self.events.append(event)
@@ -72,7 +79,14 @@ class RepairHistory:
                 "repeated_error_detected": self.repeated_error_detected,
                 "repair_stalled": self.repair_stalled,
                 "budget_exhausted": self.budget_exhausted,
+                "symbol_budget_exhausted": self.symbol_budget_exhausted,
                 "distinct_errors": self.distinct_errors,
+                "validation_evidence_path": self.validation_evidence_path,
+                "validation_evidence_fingerprint": self.validation_evidence_fingerprint,
+                "evidence_consumed_by_repair": self.evidence_consumed_by_repair,
+                "evidence_extension_used": self.evidence_extension_used,
+                "evidence_extension_calls": self.evidence_extension_calls,
+                "evidence_extension_reason": self.evidence_extension_reason,
             },
         }
         (root / "repair_history.json").write_text(
@@ -98,6 +112,13 @@ class RepairHistory:
                 "repeated_error_detected": self.repeated_error_detected,
                 "repair_stalled": self.repair_stalled,
                 "budget_exhausted": self.budget_exhausted,
+                "symbol_budget_exhausted": self.symbol_budget_exhausted,
                 "distinct_errors": self.distinct_errors,
+                "validation_evidence_path": self.validation_evidence_path,
+                "validation_evidence_fingerprint": self.validation_evidence_fingerprint,
+                "evidence_consumed_by_repair": self.evidence_consumed_by_repair,
+                "evidence_extension_used": self.evidence_extension_used,
+                "evidence_extension_calls": self.evidence_extension_calls,
+                "evidence_extension_reason": self.evidence_extension_reason,
             },
         }

@@ -4,6 +4,7 @@ __pycache__/
 *.pyc
 ui/.cache
 .cache
+.pytest_cache
 **/.cache/
 ui/run
 example_laws

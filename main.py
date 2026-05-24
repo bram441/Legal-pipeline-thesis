@@ -23,6 +23,7 @@ if sys.platform == "win32" and hasattr(sys.stdout, "fileno"):
 
 from debug import status_log
 from pipeline.app.pipeline import answer_legal_prompt
+from pipeline.extraction.case_fact_validation import CASE_EXTRACTION_REPAIR_ARTIFACT
 from pipeline.extraction.extractor import (
     extract_case_only,
     ExtractionError,
@@ -163,7 +164,12 @@ def run_text_mode(
         pre_extracted_case = None
         try:
             status_log("Case", "Extracting case once for all questions")
-            pre_extracted_case = extract_case_only(case_text, kb_schema=kb_schema, provider=provider)
+            pre_extracted_case = extract_case_only(
+                case_text,
+                kb_schema=kb_schema,
+                provider=provider,
+                repair_artifact_path=os.path.join(run_dir, CASE_EXTRACTION_REPAIR_ARTIFACT),
+            )
         except ExtractionError as e:
             print("Case extraction failed:", e)
             return
@@ -318,7 +324,12 @@ def run_json_mode(
         pre_extracted_case = None
         try:
             status_log("Case", "Extracting case once for all questions")
-            pre_extracted_case = extract_case_only(case_text, kb_schema=kb_schema, provider=provider)
+            pre_extracted_case = extract_case_only(
+                case_text,
+                kb_schema=kb_schema,
+                provider=provider,
+                repair_artifact_path=os.path.join(run_dir, CASE_EXTRACTION_REPAIR_ARTIFACT),
+            )
         except ExtractionError as e:
             print("Case extraction failed:", e)
             return

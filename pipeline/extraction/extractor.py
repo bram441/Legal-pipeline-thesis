@@ -18,6 +18,17 @@ from pipeline.extraction.json_ir import (
     normalize_query_ir,
 )
 from pipeline.extraction.case_entity_seed import seed_person_entities_from_case_text
+from pipeline.extraction.case_fact_validation import (
+    CASE_EXTRACTION_REPAIR_ARTIFACT,
+    CaseFactAssertionRejected,
+    CaseFactRejectionDiagnostics,
+    build_case_fact_rejection_repair_hint,
+    build_rejection_diagnostics,
+    case_fact_validation_error_matches,
+    parse_rejected_predicate_from_error,
+    parse_rejection_code_from_error,
+    validate_decomposition_repair_or_raise,
+)
 from pipeline.extraction.query_role_resolve import apply_role_arg_consistency
 from pipeline.validation.fo_validation import (
     normalize_and_validate_case,
@@ -468,7 +479,47 @@ def _arity_mismatch_repair_hint(error_msg, previous_output, kb_schema):
     return "\n".join(lines)
 
 
-def _schema_feedback_message(error, previous_output, kb_schema=None):
+def _write_case_extraction_repair_artifact(path: str | None, records: list[dict]) -> None:
+    if not path or not records:
+        return
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump({"attempts": records}, f, ensure_ascii=False, indent=2)
+            f.write("\n")
+    except OSError:
+        pass
+
+
+def _case_rejection_diagnostics_from_error(
+    error: Exception,
+    kb_schema: dict | None,
+    *,
+    case_text: str | None,
+    repair_attempt: int,
+) -> CaseFactRejectionDiagnostics | None:
+    if not kb_schema:
+        return None
+    pred = getattr(error, "pred", None) or parse_rejected_predicate_from_error(str(error))
+    code = getattr(error, "rejection_code", None) or parse_rejection_code_from_error(str(error))
+    if not pred and not case_fact_validation_error_matches(str(error)):
+        return None
+    return build_rejection_diagnostics(
+        pred or "INVALID_PREDICATE",
+        code or "invalid_case_fact",
+        kb_schema,
+        case_text=case_text,
+        repair_attempt=repair_attempt,
+    )
+
+
+def _schema_feedback_message(
+    error,
+    previous_output,
+    kb_schema=None,
+    *,
+    case_text: str | None = None,
+    rejection_diag: CaseFactRejectionDiagnostics | None = None,
+):
     """Build schema-aware feedback for LLM repair."""
     err_s = str(error)
     msg = (
@@ -490,6 +541,23 @@ def _schema_feedback_message(error, previous_output, kb_schema=None):
             "\n\nREMEDIATION (derived/conclusion predicates): remove those assertions from case IR. "
             "Assert only observable/input facts and numeric value_assertions; let the KB derive legal conclusions."
         )
+    if kb_schema:
+        if case_fact_validation_error_matches(err_s):
+            rejected_pred = parse_rejected_predicate_from_error(err_s) or "INVALID_PREDICATE"
+            rejection_code = parse_rejection_code_from_error(err_s)
+            diag = rejection_diag or build_rejection_diagnostics(
+                rejected_pred,
+                rejection_code or "invalid_case_fact",
+                kb_schema,
+                case_text=case_text,
+            )
+            msg += build_case_fact_rejection_repair_hint(
+                rejected_pred,
+                kb_schema,
+                rejection_code=rejection_code,
+                case_text=case_text,
+                rejection_diag=diag,
+            )
     if "query argument type mismatch" in el:
         msg += (
             "\n\nREMEDIATION (query arg sort): each args[i] must be a constant listed under case.entities "
@@ -570,6 +638,113 @@ def extraction_backend_env_override(backend: str | None):
             os.environ[key] = saved
 
 
+def _run_case_extraction_loop(
+    case_text: str,
+    *,
+    kb_schema: dict | None,
+    provider: str,
+    model: str,
+    max_retries: int,
+    use_json_ir: bool,
+    repair_artifact_path: str | None = None,
+) -> dict:
+    case_feedback = None
+    case_obj = None
+    last_case_error = None
+    pending_rejection_diag: CaseFactRejectionDiagnostics | None = None
+    repair_records: list[dict] = []
+
+    for case_attempt in range(max_retries):
+        if case_attempt == 0:
+            status_log("Case", "Extracting")
+        else:
+            status_log("Case", "Repair attempt {}".format(case_attempt))
+        try:
+            if use_json_ir:
+                case_ir = extract_case_ir_only_openai(
+                    case_text,
+                    model=model,
+                    kb_schema=kb_schema,
+                    feedback=case_feedback,
+                )
+                case_obj = normalize_case_ir(case_ir, kb_schema=kb_schema)
+                seed_person_entities_from_case_text(case_text, case_obj, kb_schema)
+            else:
+                case_obj = extract_case_only_openai(
+                    case_text,
+                    model=model,
+                    kb_schema=kb_schema,
+                    feedback=case_feedback,
+                )
+        except LLMExtractionError as e:
+            raise ExtractionError(str(e))
+        except (ExtractionIRValidationError, CaseFactAssertionRejected) as e:
+            last_case_error = e
+            pending_rejection_diag = _case_rejection_diagnostics_from_error(
+                e,
+                kb_schema,
+                case_text=case_text,
+                repair_attempt=case_attempt,
+            )
+            if pending_rejection_diag:
+                repair_records.append(pending_rejection_diag.to_dict())
+            case_feedback = _schema_feedback_message(
+                e,
+                case_obj or {},
+                kb_schema,
+                case_text=case_text,
+                rejection_diag=pending_rejection_diag,
+            )
+            continue
+
+        try:
+            validate_decomposition_repair_or_raise(case_obj, pending_rejection_diag)
+            pending_rejection_diag = None
+        except CaseFactAssertionRejected as e:
+            last_case_error = e
+            if pending_rejection_diag:
+                pending_rejection_diag.empty_facts_after_repair = True
+                repair_records.append(pending_rejection_diag.to_dict())
+            case_feedback = _schema_feedback_message(
+                e,
+                case_obj or {},
+                kb_schema,
+                case_text=case_text,
+                rejection_diag=pending_rejection_diag,
+            )
+            continue
+
+        try:
+            status_log("Case", "Validating")
+            case = normalize_and_validate_case(case_obj, kb_schema=kb_schema)
+            if pending_rejection_diag:
+                final_record = pending_rejection_diag.to_dict()
+                final_record["repair_succeeded"] = case_object_has_facts(case)
+                repair_records.append(final_record)
+            _write_case_extraction_repair_artifact(repair_artifact_path, repair_records)
+            return case
+        except ValueError as e:
+            last_case_error = e
+            case_feedback = _schema_feedback_message(
+                e,
+                case_obj,
+                kb_schema,
+                case_text=case_text,
+                rejection_diag=pending_rejection_diag,
+            )
+
+    _write_case_extraction_repair_artifact(repair_artifact_path, repair_records)
+    raise ExtractionError(
+        "Case extraction failed after {} repair attempts: {}".format(max_retries, last_case_error)
+    )
+
+
+def case_object_has_facts(case_obj: dict) -> bool:
+    from pipeline.extraction.case_fact_validation import case_object_has_non_entity_facts
+
+    return case_object_has_non_entity_facts(case_obj)
+
+
 def extract_case_and_query(case_text, user_question, kb_schema=None, provider="auto", model=None, max_retries=6):
     """Extract raw {case, query} JSON using the configured provider.
 
@@ -587,48 +762,14 @@ def extract_case_and_query(case_text, user_question, kb_schema=None, provider="a
 
     use_json_ir = (_extraction_backend() == "json_ir")
 
-    # --- Phase 1: Case extraction with feedback loop ---
-    case_feedback = None
-    case_obj = None
-    last_case_error = None
-    for case_attempt in range(max_retries):
-        if case_attempt == 0:
-            status_log("Case", "Extracting")
-        else:
-            status_log("Case", "Repair attempt {}".format(case_attempt))
-        try:
-            if use_json_ir:
-                case_ir = extract_case_ir_only_openai(
-                    case_text,
-                    model=chosen_model,
-                    kb_schema=kb_schema,
-                    feedback=case_feedback,
-                )
-                case_obj = normalize_case_ir(case_ir, kb_schema=kb_schema)
-                seed_person_entities_from_case_text(case_text, case_obj, kb_schema)
-            else:
-                case_obj = extract_case_only_openai(
-                    case_text,
-                    model=chosen_model,
-                    kb_schema=kb_schema,
-                    feedback=case_feedback,
-                )
-        except LLMExtractionError as e:
-            raise ExtractionError(str(e))
-        except ExtractionIRValidationError as e:
-            last_case_error = e
-            case_feedback = _schema_feedback_message(e, case_obj or {}, kb_schema)
-            continue
-
-        try:
-            status_log("Case", "Validating")
-            case = normalize_and_validate_case(case_obj, kb_schema=kb_schema)
-            break
-        except ValueError as e:
-            last_case_error = e
-            case_feedback = _schema_feedback_message(e, case_obj, kb_schema)
-    else:
-        raise ExtractionError("Case extraction failed after {} repair attempts: {}".format(max_retries, last_case_error))
+    case = _run_case_extraction_loop(
+        case_text,
+        kb_schema=kb_schema,
+        provider=provider,
+        model=chosen_model,
+        max_retries=max_retries,
+        use_json_ir=use_json_ir,
+    )
 
     # --- Phase 2: Query extraction with feedback loop ---
     query_feedback = None
@@ -684,7 +825,14 @@ def extract_case_and_query(case_text, user_question, kb_schema=None, provider="a
     return {"case": case, "query": query}
 
 
-def extract_case_only(case_text, kb_schema=None, provider="auto", model=None, max_retries=6):
+def extract_case_only(
+    case_text,
+    kb_schema=None,
+    provider="auto",
+    model=None,
+    max_retries=6,
+    repair_artifact_path: str | None = None,
+):
     """Extract and validate case facts only. Use for shared case across multiple questions."""
     if provider == "auto":
         provider = _auto_provider()
@@ -693,47 +841,14 @@ def extract_case_only(case_text, kb_schema=None, provider="auto", model=None, ma
 
     chosen_model = model or os.getenv("OPENAI_MODEL") or "gpt-4.1-mini"
     use_json_ir = (_extraction_backend() == "json_ir")
-    case_feedback = None
-    case_obj = None
-    last_case_error = None
-    for case_attempt in range(max_retries):
-        if case_attempt == 0:
-            status_log("Case", "Extracting")
-        else:
-            status_log("Case", "Repair attempt {}".format(case_attempt))
-        try:
-            if use_json_ir:
-                case_ir = extract_case_ir_only_openai(
-                    case_text,
-                    model=chosen_model,
-                    kb_schema=kb_schema,
-                    feedback=case_feedback,
-                )
-                case_obj = normalize_case_ir(case_ir, kb_schema=kb_schema)
-                seed_person_entities_from_case_text(case_text, case_obj, kb_schema)
-            else:
-                case_obj = extract_case_only_openai(
-                    case_text,
-                    model=chosen_model,
-                    kb_schema=kb_schema,
-                    feedback=case_feedback,
-                )
-        except LLMExtractionError as e:
-            raise ExtractionError(str(e))
-        except ExtractionIRValidationError as e:
-            last_case_error = e
-            case_feedback = _schema_feedback_message(e, case_obj or {}, kb_schema)
-            continue
-
-        try:
-            status_log("Case", "Validating")
-            case = normalize_and_validate_case(case_obj, kb_schema=kb_schema)
-            return case
-        except ValueError as e:
-            last_case_error = e
-            case_feedback = _schema_feedback_message(e, case_obj, kb_schema)
-    raise ExtractionError(
-        "Case extraction failed after {} repair attempts: {}".format(max_retries, last_case_error)
+    return _run_case_extraction_loop(
+        case_text,
+        kb_schema=kb_schema,
+        provider=provider,
+        model=chosen_model,
+        max_retries=max_retries,
+        use_json_ir=use_json_ir,
+        repair_artifact_path=repair_artifact_path,
     )
 
 
