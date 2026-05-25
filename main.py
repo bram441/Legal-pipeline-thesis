@@ -365,6 +365,7 @@ def run_json_mode(
 
             status_log("Question", "Processing {} of {}".format(i + 1, len(questions)))
             trace_path = os.path.join(run_dir, "run_trace.txt") if trace_enabled() else None
+            q_artifact = os.path.join(run_dir, "questions", str(qid or "q"))
             result = answer_legal_prompt(
                 case_text,
                 qtext,
@@ -375,6 +376,8 @@ def run_json_mode(
                 trace_path=trace_path,
                 pre_extracted_case=pre_extracted_case,
                 run_artifact_dir=run_dir,
+                question_artifact_dir=q_artifact,
+                expected_answer=expected,
             )
 
             item = {
@@ -405,10 +408,19 @@ def run_json_mode(
                         result.get("symbolic_result") or {}
                     ).get("intent")
                 sym = result.get("symbolic_result") or {}
+                routing = result.get("symbolic_intent_routing") or sym.get("routing") or {}
                 if isinstance(sym, dict):
                     score_item["output_kind"] = sym.get("output_kind")
                     score_item["certainty_class"] = sym.get("certainty_class") or score_item.get("certainty_class")
-                    score_item["symbolic_status"] = sym.get("status")
+                    score_item["symbolic_status"] = sym.get("symbolic_status") or sym.get("status")
+                    score_item["selected_intent"] = sym.get("selected_intent") or routing.get("selected_intent")
+                    score_item["detected_question_type"] = sym.get("detected_question_type") or routing.get(
+                        "detected_question_type"
+                    )
+                    sat_chk = sym.get("satisfiability_check") or {}
+                    score_item["satisfiability_status"] = sat_chk.get("status")
+                    if sym.get("symbolic_status") in ("unsupported",) or sym.get("status") == "unsupported":
+                        score_item["unsupported_intent_reason"] = sym.get("message")
 
                 score["total"] += 1
                 if score_item.get("inconclusive"):

@@ -325,6 +325,10 @@ EVAL_PIPELINE_FAILURE_CATEGORIES = frozenset(
         "case_query_validation",
         "kb_compile_validation",
         "llm_budget_guard",
+        "inconsistent_kb_case",
+        "intent_execution_error",
+        "unsupported_intent",
+        "unscored_intent",
         "unknown",
     }
 )

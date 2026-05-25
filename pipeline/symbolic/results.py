@@ -160,6 +160,9 @@ def normalize_get_range(raw: dict, query: dict) -> dict:
     if values is None and raw.get("range") is not None:
         rng = str(raw.get("range"))
         values = [v.strip() for v in re.split(r"[,;]", rng) if v.strip()] if "," in rng or ";" in rng else [rng]
+    confidence = raw.get("confidence")
+    if not confidence:
+        confidence = "possible_model_only" if raw.get("via_model_expand") else "idp_get_range"
     return {
         "intent": "get_range",
         "status": "ok",
@@ -171,7 +174,9 @@ def normalize_get_range(raw: dict, query: dict) -> dict:
         "max": raw.get("max"),
         "range": raw.get("range"),
         "entity": query.get("entity") or raw.get("entity"),
+        "confidence": confidence,
         "certainty_class": "range",
+        "warnings": list(raw.get("warnings") or []),
     }
 
 

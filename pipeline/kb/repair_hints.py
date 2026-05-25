@@ -129,10 +129,17 @@ def build_json_ir_compile_hints(error_message: str) -> str:
                 "if numeric, use the function only inside compare/terms."
             )
         if "computed-looking observable" in el or "looks computed/composite" in el:
-            out.append(
-                "Threshold/count/exceeds/meets-style conditions must be helper/derived with defining rules, "
-                "or numeric comparisons on observable functions—not observable unless directly_observable=true."
-            )
+            m = re.search(r"predicate\s+'([^']+)'", error_message or "", re.I)
+            if m:
+                from pipeline.kb.composite_predicate_heuristics import suggest_computed_observable_repair
+
+                out.append(suggest_computed_observable_repair(m.group(1)))
+            else:
+                out.append(
+                    "Threshold/count/consolidation conditions: helper/derived with defining rules. "
+                    "Document/identity/compliance behavior facts: observable with directly_observable=true "
+                    "or case_input=true. Legal conclusions: derived, not observable."
+                )
         if "semantically identical to the status" in el or "classification encoded as a primitive type" in el:
             out.append(
                 "Status-as-type error: do not declare a narrow type matching a same-name is_* predicate. "

@@ -93,12 +93,16 @@ _CARDS: dict[str, RepairCard] = {
         title="Computed condition marked observable",
         layer="symbols",
         do_items=(
-            "Change computed/composite predicates to helper or derived with defining rules.",
-            "Keep raw factual observables as observable.",
-            "Use directly_observable=true only if a case can state the composite fact verbatim.",
+            "Change threshold/count/consolidation predicates to helper or derived with defining rules.",
+            "Keep documentary/status facts (passport, travel document, comply/unwillingness with measure) "
+            "as kind=observable with directly_observable=true and/or case_input=true.",
+            "Keep legal conclusions/effects as derived (or helper+rules), not observable.",
+            "Use directly_observable=true only when a case can state the composite fact verbatim.",
         ),
         do_not_items=(
-            "Use observable kind merely to avoid defining rules.",
+            "Use observable kind merely to avoid defining rules for threshold helpers.",
+            "Mark legal-output/effect predicates as observable.",
+            "Force passport/compliance behavior facts into helper/derived unless they are rule-derived.",
         ),
     ),
     "computed_observable_unsafe_for_legal_effect": RepairCard(
