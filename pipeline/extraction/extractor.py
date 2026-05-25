@@ -5,8 +5,6 @@ from contextlib import contextmanager
 
 from debug import status_log
 from pipeline.extraction.openai_extractor import (
-    extract_case_only_openai,
-    extract_query_only_openai,
     extract_case_ir_only_openai,
     extract_query_ir_only_openai,
     LLMExtractionError,
@@ -42,7 +40,7 @@ class ExtractionError(Exception):
     pass
 
 
-EXTRACTION_BACKEND_CHOICES = ("legacy", "json_ir")
+EXTRACTION_BACKEND_CHOICES = ("json_ir",)
 
 # Default individuals when a predicate needs a sort the case did not list under entities.
 # Aligns with prompts/shared/json_ir_contract.txt (single undifferentiated estate / goods).
@@ -615,15 +613,8 @@ def _auto_provider():
 
 
 def get_extraction_backend_from_env() -> str:
-    """Resolve extraction backend from config (env overrides via pipeline.config)."""
-    from pipeline.config import config_section
-    from pipeline.kb.compile_backend import get_kb_backend_from_env
-
-    cfg_backend = str(config_section("extraction").get("backend") or "").strip().lower()
-    if cfg_backend in {"json_ir", "legacy"}:
-        return cfg_backend
-    kb = get_kb_backend_from_env()
-    return "json_ir" if kb == "json_ir" else "legacy"
+    """Extraction is always JSON-IR."""
+    return "json_ir"
 
 
 def get_extraction_max_retries() -> int:
@@ -666,7 +657,6 @@ def _run_case_extraction_loop(
     provider: str,
     model: str,
     max_retries: int,
-    use_json_ir: bool,
     repair_artifact_path: str | None = None,
 ) -> dict:
     case_feedback = None
@@ -681,28 +671,19 @@ def _run_case_extraction_loop(
         else:
             status_log("Case", "Repair attempt {}".format(case_attempt))
         try:
-            if use_json_ir:
-                case_ir = extract_case_ir_only_openai(
-                    case_text,
-                    model=model,
-                    kb_schema=kb_schema,
-                    feedback=case_feedback,
-                    schema_environment=schema_environment,
-                )
-                case_obj = normalize_case_ir(
-                    case_ir,
-                    kb_schema=kb_schema,
-                    case_text=case_text,
-                )
-                seed_person_entities_from_case_text(case_text, case_obj, kb_schema)
-            else:
-                case_obj = extract_case_only_openai(
-                    case_text,
-                    model=model,
-                    kb_schema=kb_schema,
-                    feedback=case_feedback,
-                    schema_environment=schema_environment,
-                )
+            case_ir = extract_case_ir_only_openai(
+                case_text,
+                model=model,
+                kb_schema=kb_schema,
+                feedback=case_feedback,
+                schema_environment=schema_environment,
+            )
+            case_obj = normalize_case_ir(
+                case_ir,
+                kb_schema=kb_schema,
+                case_text=case_text,
+            )
+            seed_person_entities_from_case_text(case_text, case_obj, kb_schema)
         except LLMExtractionError as e:
             raise ExtractionError(str(e))
         except (ExtractionIRValidationError, CaseFactAssertionRejected) as e:
@@ -823,8 +804,6 @@ def extract_case_and_query(
 
     chosen_model = model or os.getenv("OPENAI_MODEL") or "gpt-4.1-mini"
 
-    use_json_ir = (_extraction_backend() == "json_ir")
-
     case = _run_case_extraction_loop(
         case_text,
         kb_schema=kb_schema,
@@ -832,7 +811,6 @@ def extract_case_and_query(
         provider=provider,
         model=chosen_model,
         max_retries=max_retries,
-        use_json_ir=use_json_ir,
         repair_artifact_path=(
             os.path.join(run_artifact_dir, CASE_EXTRACTION_REPAIR_ARTIFACT)
             if run_artifact_dir
@@ -850,24 +828,15 @@ def extract_case_and_query(
         else:
             status_log("Query", "Repair attempt {}".format(query_attempt))
         try:
-            if use_json_ir:
-                query_ir = extract_query_ir_only_openai(
-                    user_question,
-                    model=chosen_model,
-                    kb_schema=kb_schema,
-                    case=case,
-                    feedback=query_feedback,
-                    schema_environment=schema_environment,
-                )
-                query_obj = normalize_query_ir(query_ir, case, kb_schema, user_question)
-            else:
-                query_obj = extract_query_only_openai(
-                    user_question,
-                    model=chosen_model,
-                    kb_schema=kb_schema,
-                    case=case,
-                    feedback=query_feedback,
-                )
+            query_ir = extract_query_ir_only_openai(
+                user_question,
+                model=chosen_model,
+                kb_schema=kb_schema,
+                case=case,
+                feedback=query_feedback,
+                schema_environment=schema_environment,
+            )
+            query_obj = normalize_query_ir(query_ir, case, kb_schema, user_question)
         except LLMExtractionError as e:
             raise ExtractionError(str(e))
         except ExtractionIRValidationError as e:
@@ -914,7 +883,6 @@ def extract_case_only(
         raise ExtractionError("Unsupported provider: " + str(provider))
 
     chosen_model = model or os.getenv("OPENAI_MODEL") or "gpt-4.1-mini"
-    use_json_ir = (_extraction_backend() == "json_ir")
     return _run_case_extraction_loop(
         case_text,
         kb_schema=kb_schema,
@@ -922,7 +890,6 @@ def extract_case_only(
         provider=provider,
         model=chosen_model,
         max_retries=max_retries,
-        use_json_ir=use_json_ir,
         repair_artifact_path=repair_artifact_path,
     )
 
@@ -944,7 +911,6 @@ def extract_query_only(
         raise ExtractionError("Unsupported provider: " + str(provider))
 
     chosen_model = model or os.getenv("OPENAI_MODEL") or "gpt-4.1-mini"
-    use_json_ir = (_extraction_backend() == "json_ir")
     query_feedback = None
     query_obj = None
     last_query_error = None
@@ -954,24 +920,15 @@ def extract_query_only(
         else:
             status_log("Query", "Repair attempt {}".format(query_attempt))
         try:
-            if use_json_ir:
-                query_ir = extract_query_ir_only_openai(
-                    user_question,
-                    model=chosen_model,
-                    kb_schema=kb_schema,
-                    case=case,
-                    feedback=query_feedback,
-                    schema_environment=schema_environment,
-                )
-                query_obj = normalize_query_ir(query_ir, case, kb_schema, user_question)
-            else:
-                query_obj = extract_query_only_openai(
-                    user_question,
-                    model=chosen_model,
-                    kb_schema=kb_schema,
-                    case=case,
-                    feedback=query_feedback,
-                )
+            query_ir = extract_query_ir_only_openai(
+                user_question,
+                model=chosen_model,
+                kb_schema=kb_schema,
+                case=case,
+                feedback=query_feedback,
+                schema_environment=schema_environment,
+            )
+            query_obj = normalize_query_ir(query_ir, case, kb_schema, user_question)
         except LLMExtractionError as e:
             raise ExtractionError(str(e))
         except ExtractionIRValidationError as e:

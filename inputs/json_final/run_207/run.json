@@ -1,0 +1,20 @@
+{
+  "id": "run_207",
+  "law": {
+    "path": "example_laws/erfrecht.text"
+  },
+  "case": {
+    "text": "Willem en Yara waren gehuwd. Yara overlijdt. Het appartement in Gent was bij het openvallen van de nalatenschap de voornaamste gezinswoning."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Verkrijgt Willem volgens artikel 4.20 als enige het recht op de huur van de gezinswoning?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "Art. 4.20: the surviving spouse exclusively obtains the rental right of the real estate that served as the family home."
+      }
+    }
+  ]
+}

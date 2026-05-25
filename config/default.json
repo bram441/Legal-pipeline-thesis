@@ -1,47 +1,45 @@
-{
-  "json_ir": {
-    "scope_mode": "cited",
-    "allow_partial_kb": false,
-    "close_world_observables": true,
-    "max_symbol_versions": 3,
-    "max_rules_attempts_per_symbol_version": 3,
-    "max_kb_llm_calls": 8,
-    "repeated_error_limit": 2,
-    "max_rules_before_symbol_escalation": 2,
-    "allow_evidence_extension": true,
-    "max_evidence_extension_calls": 1,
-    "allow_outer_cache_retries": false
-  },
-  "legacy": {
-    "enabled": false,
-    "max_repair_attempts": 8,
-    "use_two_phase": false,
-    "use_le": false
-  },
-  "extraction": {
-    "backend": "json_ir",
-    "provider": "auto",
-    "max_retries": 6,
-    "enable_domain_heuristics": false
-  },
-  "openai": {
-    "temperature": 0.0,
-    "top_p": 1.0,
-    "seed": null
-  },
-  "evaluation": {
-    "belief_scoring": false,
-    "boolean_belief_threshold": 0.5,
-    "open_world_p_yes": 0.5,
-    "run_pre_query_satisfiability_check": true,
-    "continue_if_satisfiability_unsupported": true,
-    "continue_if_satisfiability_error": false,
-    "enable_intent_diagnostics_on_unknown": false,
-    "model_expansion_max_models": 3
-  },
-  "debug": {
-    "trace": false,
-    "quiet": false,
-    "llm_call_tracking": false
-  }
-}
+{
+  "json_ir": {
+    "scope_mode": "cited",
+    "allow_partial_kb": false,
+    "close_world_observables": true,
+    "max_symbol_versions": 3,
+    "max_rules_attempts_per_symbol_version": 3,
+    "max_kb_llm_calls": 8,
+    "repeated_error_limit": 2,
+    "max_rules_before_symbol_escalation": 2,
+    "allow_evidence_extension": true,
+    "max_evidence_extension_calls": 1,
+    "allow_outer_cache_retries": false
+  },
+  "le": {
+    "use_le": false
+  },
+  "extraction": {
+    "backend": "json_ir",
+    "provider": "auto",
+    "max_retries": 6,
+    "enable_domain_heuristics": false
+  },
+  "openai": {
+    "temperature": 0.0,
+    "top_p": 1.0,
+    "seed": null
+  },
+  "evaluation": {
+    "belief_scoring": false,
+    "boolean_belief_threshold": 0.5,
+    "open_world_p_yes": 0.5,
+    "run_pre_query_satisfiability_check": true,
+    "continue_if_satisfiability_unsupported": true,
+    "continue_if_satisfiability_error": false,
+    "enable_intent_diagnostics_on_unknown": false,
+    "model_expansion_max_models": 3,
+    "pragmatic_factual_criteria_mode": false
+  },
+  "debug": {
+    "trace": false,
+    "quiet": false,
+    "llm_call_tracking": false
+  }
+}

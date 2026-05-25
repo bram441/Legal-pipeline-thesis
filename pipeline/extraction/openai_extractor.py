@@ -14,54 +14,12 @@ from pipeline.utils.prompt_paths import (
     EXTRACTION_JSON_IR_CASE_REPAIR,
     EXTRACTION_JSON_IR_QUERY,
     EXTRACTION_JSON_IR_QUERY_REPAIR,
-    EXTRACTION_LEGACY_CASE,
-    EXTRACTION_LEGACY_CASE_REPAIR,
-    EXTRACTION_LEGACY_QUERY,
-    EXTRACTION_LEGACY_QUERY_REPAIR,
     EXTRACTION_WORLD_KNOWLEDGE,
 )
 
 
 class LLMExtractionError(Exception):
     pass
-
-
-def _query_schema():
-    """Query-only schema for extract_query_only_openai.
-
-    OpenAI structured outputs reject many root-level ``oneOf`` shapes; use one flat
-    object and validate ``type``/``intent`` in Python (``normalize_and_validate_query``).
-    """
-    return {
-        "type": "json_schema",
-        "json_schema": {
-            "name": "query_only",
-            "schema": {
-                "type": "object",
-                "additionalProperties": False,
-                "required": [
-                    "type",
-                    "explain",
-                    "predicate",
-                    "mode",
-                    "args",
-                    "intent",
-                    "symbol",
-                    "entity",
-                ],
-                "properties": {
-                    "type": {"type": "string", "enum": ["predicate", "intent"]},
-                    "explain": {"type": "boolean"},
-                    "predicate": {"type": "string"},
-                    "mode": {"type": "string", "enum": ["set", "boolean"]},
-                    "args": {"type": "array", "items": {"type": "string"}},
-                    "intent": {"type": "string"},
-                    "symbol": {"type": "string"},
-                    "entity": {"type": "string"},
-                },
-            },
-        },
-    }
 
 
 def _case_ir_schema():
@@ -197,11 +155,6 @@ def _json_ir_extraction_repair_preamble(is_case: bool, feedback) -> str:
     return _extraction_repair_preamble(rel, feedback)
 
 
-def _legacy_extraction_repair_preamble(is_case: bool, feedback) -> str:
-    rel = EXTRACTION_LEGACY_CASE_REPAIR if is_case else EXTRACTION_LEGACY_QUERY_REPAIR
-    return _extraction_repair_preamble(rel, feedback)
-
-
 def _schema_environment_view(kb_schema, schema_environment=None) -> str:
     if schema_environment:
         from pipeline.kb.schema_environment import schema_environment_prompt_view
@@ -212,64 +165,6 @@ def _schema_environment_view(kb_schema, schema_environment=None) -> str:
 
         return schema_environment_prompt_view(build_schema_environment(kb_schema))
     return ""
-
-
-def extract_case_only_openai(case_text, model, kb_schema=None, feedback=None, schema_environment=None):
-    """Extract case facts only. Used by schema-aware feedback loop."""
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise LLMExtractionError("Missing OPENAI_API_KEY environment variable")
-
-    try:
-        from openai import OpenAI
-    except Exception as e:
-        raise LLMExtractionError("OpenAI SDK not installed or not importable: " + str(e))
-
-    client = OpenAI(api_key=api_key)
-    kb_schema_json = json.dumps(kb_schema or {}, ensure_ascii=False, indent=2)
-
-    case_user = _legacy_extraction_repair_preamble(True, feedback) + render_prompt(
-        EXTRACTION_LEGACY_CASE,
-        kb_schema_json=kb_schema_json,
-        case_text=str(case_text),
-        feedback_block=_feedback_block(feedback),
-        world_knowledge_lexical=_lexical_world_knowledge_block(),
-    )
-
-    resp = tracked_chat_completion_create(
-        client,
-        stage="case_extraction",
-        model=model,
-        messages=[
-            {"role": "system", "content": "Extract case facts only."},
-            {"role": "user", "content": case_user},
-        ],
-        metadata={"backend": "legacy"},
-        **chat_completion_sampling_kwargs(),
-        response_format={
-            "type": "json_schema",
-            "json_schema": {
-                "name": "case_only",
-                "schema": {
-                    "type": "object",
-                    "additionalProperties": False,
-                    "required": ["facts", "entities"],
-                    "properties": {
-                        "facts": {"type": "array", "items": {"type": "string"}},
-                        "entities": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "array",
-                                "items": {"type": "string"},
-                            },
-                        },
-                    },
-                },
-            },
-        },
-    )
-
-    return json.loads(resp.choices[0].message.content)
 
 
 def extract_case_ir_only_openai(case_text, model, kb_schema=None, feedback=None, schema_environment=None):
@@ -343,48 +238,4 @@ def extract_query_ir_only_openai(user_question, model, kb_schema=None, case=None
         response_format=_query_ir_schema(),
     )
     return json.loads(resp.choices[0].message.content)
-
-
-def extract_query_only_openai(user_question, model, kb_schema=None, case=None, feedback=None):
-    """Extract query only. Used by schema-aware feedback loop."""
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise LLMExtractionError("Missing OPENAI_API_KEY environment variable")
-
-    try:
-        from openai import OpenAI
-    except Exception as e:
-        raise LLMExtractionError("OpenAI SDK not installed or not importable: " + str(e))
-
-    client = OpenAI(api_key=api_key)
-    kb_schema_json = json.dumps(kb_schema or {}, ensure_ascii=False, indent=2)
-    case_obj = case or {}
-    case_facts_json = json.dumps((case_obj.get("facts") or []), ensure_ascii=False, indent=2)
-    case_entities_json = json.dumps((case_obj.get("entities") or {}), ensure_ascii=False, indent=2)
-
-    query_user = _legacy_extraction_repair_preamble(False, feedback) + render_prompt(
-        EXTRACTION_LEGACY_QUERY,
-        kb_schema_json=kb_schema_json,
-        user_question=str(user_question),
-        case_facts_json=case_facts_json,
-        case_entities_json=case_entities_json,
-        feedback_block=_feedback_block(feedback),
-        world_knowledge_lexical=_lexical_world_knowledge_block(),
-    )
-
-    resp = tracked_chat_completion_create(
-        client,
-        stage="query_extraction",
-        model=model,
-        messages=[
-            {"role": "system", "content": "Extract query only."},
-            {"role": "user", "content": query_user},
-        ],
-        metadata={"backend": "legacy"},
-        **chat_completion_sampling_kwargs(),
-        response_format=_query_schema(),
-    )
-
-    return json.loads(resp.choices[0].message.content)
-
 

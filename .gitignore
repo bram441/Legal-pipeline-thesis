@@ -1,19 +1,28 @@
 .venv
 .env
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
 .cache/
 **/.cache/
 ui/.cache
 ui/run
-example_laws
+
+
+# Evaluation outputs (reproducible; not versioned)
 results/
+
+# Archived evaluation runs (contents gitignored; folder marker kept)
+archive/evaluation_runs/*
+!archive/evaluation_runs/.gitkeep
 
 # Optional local config overrides (secrets stay in .env)
 config/local.json
 
-# Generated artifacts inside curated benchmark inputs (keep run.json)
+# Generated artifacts inside curated benchmark inputs (keep run.json, manifest, README)
 inputs/**/results.json
 inputs/**/score.json
 inputs/**/run_trace.txt
@@ -22,10 +31,17 @@ inputs/**/kb.fo
 inputs/**/kb_schema.json
 inputs/**/kb_compile.log
 inputs/**/cache_manifest.json
+inputs/**/llm_calls.jsonl
+inputs/**/llm_call_summary.json
+inputs/**/factual_criteria_mode_diagnostics.json
+inputs/**/threshold_exclusion_gap.json
+inputs/**/threshold_numeric_helper_gap.json
 inputs/**/translated/
 inputs/**/json_ir_compile/
 inputs/**/json_ir/
 inputs/**/kb_strategy_compare/
+inputs/**/work/
+inputs/**/questions/
 inputs/**/reports/
 inputs/**/case_extraction_repair.json
 inputs/**/schema_environment.json

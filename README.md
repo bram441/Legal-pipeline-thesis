@@ -22,12 +22,8 @@ Inputs:
 Pipeline:
 1. **KB compilation (LLM + Python hardening)**: `law_text` → FO(.) KB (`kb.fo`)
 2. **Schema extraction (parser)**: `kb.fo` → `kb_schema.json` (types, predicates, functions)
-3. **Case extraction**:
-   - `legacy` backend: LLM returns `{facts, entities}`
-   - `json_ir` backend: LLM returns structured case IR, Python deterministically renders facts
-4. **Query extraction**:
-   - `legacy` backend: LLM returns query object directly
-   - `json_ir` backend: LLM returns query IR (`predicate_hint`, `mode`, `args`, ...), Python resolves canonical predicate/args
+3. **Case extraction**: JSON-IR IR → validated facts (`extraction/json_ir.py`)
+4. **Query extraction**: query IR → canonical predicate/args (`query_target_selection.py`, etc.)
 5. **Strict validation + repair loop**:
    - Unknown symbol → hard error
    - Arity/type mismatch → hard error
@@ -62,7 +58,45 @@ Outputs:
 
 Each JSON benchmark run writes **`effective_config.json`** (merged config actually used).
 
-Primary KB strategy: **`direct_json_ir_translate`**. Legacy direct-FO strategies remain but are deprecated.
+**Primary path:** JSON-IR (`--pipeline-backend json_ir`). Legacy direct-FO is **deprecated** — see `docs/DEPRECATED_COMPONENTS.md`.
+
+### Strategy matrix (JSON-IR)
+
+| Strategy | Translation | Legal English |
+|----------|-------------|---------------|
+| `direct_json_ir_translate` | yes | no |
+| `direct_json_ir_no_translate` | no | no |
+| `le_json_ir_translate` | yes | yes |
+| `le_json_ir_no_translate` | no | yes |
+
+### Thesis test set
+
+Curated tiered benchmarks: **`inputs/json_final/`** (core / challenge / stress). See `inputs/json_final/README_TEST_SET.md` and `manifest.json`.
+
+### Quick start
+
+```bash
+pip install -r requirements.txt
+cp config/local.json.example config/local.json
+# .env: OPENAI_API_KEY=...
+
+python main.py --mode json --run inputs/json_final/run_201 --kb-strategy direct_json_ir_no_translate --no-translate
+```
+
+### Evaluation
+
+```bash
+# Full matrix (final thesis)
+python scripts/run_evaluation.py --runs-dir inputs/json_final --runs all --strategies direct_json_ir_no_translate
+```
+
+Reports: `results/reports/evaluation_<timestamp>/` — see `grouped_summary.json` for tier metrics.
+
+### Scoring warnings
+
+- **Unknown / inconclusive is not correct** in default decisive scoring.
+- **`model_expansion` possible outputs are not Boolean entailment** — diagnostics only.
+- Cells without valid `score.json` are **not** successful runs (`law_compilation`, `evaluation_no_score`, …).
 
 ---
 
@@ -92,11 +126,11 @@ Primary KB strategy: **`direct_json_ir_translate`**. Legacy direct-FO strategies
 **Central configuration** — loads `config/default.json`, applies env overrides
 
 ### `pipeline/extraction/`
-**Schema-driven extraction (legacy + JSON-IR backends)**
+**JSON-IR extraction**
 - `extractor.py`
   - provider routing, retries, repair feedback loops, backend selection
 - `openai_extractor.py`
-  - OpenAI-specific calls for legacy and JSON-IR extraction schemas
+  - OpenAI calls for JSON-IR extraction schemas
 - `json_ir.py`
   - deterministic normalization from extraction IR → validated case/query objects
 
@@ -138,7 +172,7 @@ Primary KB strategy: **`direct_json_ir_translate`**. Legacy direct-FO strategies
 
 ## Scripts
 
-See `scripts/README.md` for `compare_kb_strategies.py`, `diagnose_unsat.py`, and how UNSAT explanation relates to `pipeline/kb/semantic_check.py`.
+See `scripts/README.md` for `run_evaluation.py`, `diagnose_unsat.py`, and how UNSAT explanation relates to `pipeline/kb/semantic_check.py`.
 
 ## Prompts
 
@@ -149,42 +183,19 @@ Goals:
 - Prompts are editable without code changes
 - Prompts enforce FO(.) output constraints (especially for KB compilation)
 
-**KB compilation modes** (set env vars, then run; use separate cache dirs or runs to compare)
-
-| `PIPELINE_USE_LE` | `PIPELINE_KB_TWO_PHASE` | Pipeline |
-|-------------------|-------------------------|----------|
-| off | off | Law → single-shot FO (`kb/kb_compilation.txt`) |
-| off | on | Law → vocab → theory (`kb/kb_*_only.txt`), fallback single-shot |
-| on | off | Law → LE → single-shot FO (`le/le_to_fo.txt`) |
-| on | on | Law → LE → vocab → theory (`le/le_*_only.txt`), fallback `le_to_fo` |
-
-Repair after validation failure always uses full KB + `kb/kb_compilation_repair_symbolic.txt` (parse/syntax) or `kb/kb_compilation_repair_semantic.txt` (unsat / semantic check), with machine-detected hints (e.g. stray `*`) appended.
-
-To **recompile** and compare modes on the same run, remove the cached `kb.fo` (and optionally `kb_schema.json`) under that run’s `translated/le/` or `translated/` folder, or use a fresh run directory.
-
-## Backend modes (recommended)
-
-Use one unified mode switch for the whole stack:
-
-- `legacy`: legacy KB compiler + legacy extraction
-- `json_ir`: JSON-IR KB compiler + JSON-IR extraction
+**KB compilation** uses JSON-IR symbols-then-rules (`prompts/kb/json_ir/`). Optional LE: set `PIPELINE_USE_LE=1` or use `le_json_ir_*` strategies (law → LE → JSON-IR).
 
 CLI:
 ```text
-python main.py --mode json --run inputs/json/run_001 --pipeline-backend json_ir
+python main.py --mode json --run inputs/json_final/run_001 --kb-strategy direct_json_ir_no_translate --no-translate
 ```
 
 Evaluation:
 ```text
-python scripts/run_evaluation.py --runs all --pipeline-backend json_ir
+python scripts/run_evaluation.py --runs-dir inputs/json_final --runs run_001 --strategies direct_json_ir_no_translate
 ```
 
-Numeric batch (same explicit default as evaluation — does **not** rely on `.env` alone):
-
-```text
-python scripts/batch_json_runs.py --base inputs/json --from 1 --to 20 --pipeline-backend json_ir
-python scripts/batch_json_runs.py --base inputs/json --from 1 --to 20 --pipeline-backend legacy
-```
+For many runs, use `scripts/run_evaluation.py` (see `scripts/README.md`) instead of invoking `main.py` per run.
 
 `--kb-backend` is still supported for backward compatibility and experiments, but `--pipeline-backend` is the preferred switch.
 
@@ -198,13 +209,11 @@ python main.py --mode json --run inputs/json/run_001 --kb-strategy le_two_phase
 ```
 `--kb-strategy` overrides both `run.json` and `.env` for that invocation only.
 
-**Compare all four strategies on one JSON run** (writes separate folders + `compare_summary.json`):
+**Compare strategies on one or many JSON runs** (writes `results/reports/evaluation_<timestamp>/`):
 
 ```text
-python scripts/compare_kb_strategies.py --run inputs/json/run_003
+python scripts/run_evaluation.py --runs-dir inputs/json_final --runs run_003 --strategies all
 ```
-
-Output: `inputs/json/run_003/kb_strategy_compare/<strategy>/` for each of `direct_single`, `direct_two_phase`, `le_single`, `le_two_phase`. Use `--clean` to wipe a previous compare folder first.
 
 ---
 

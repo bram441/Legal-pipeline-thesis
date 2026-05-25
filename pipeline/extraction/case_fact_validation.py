@@ -17,6 +17,12 @@ from pipeline.kb.factual_case_input import (
     is_factual_case_input_candidate,
     is_query_or_legal_output_predicate,
 )
+from pipeline.kb.factual_criteria import (
+    case_text_supports_factual_criteria,
+    is_factual_criteria_input_candidate,
+    pragmatic_factual_criteria_mode_enabled,
+    symbol_marked_factual_criteria_input,
+)
 from pipeline.kb.legal_effect import (
     predicate_looks_like_classification_output,
     predicate_represents_legal_effect_output,
@@ -75,7 +81,40 @@ def case_fact_assertion_exempt(sig: dict[str, Any] | None) -> bool:
         return True
     if sig.get("case_input") is True:
         return True
+    if symbol_marked_factual_criteria_input(sig):
+        return True
     return False
+
+
+def case_predicate_may_be_asserted_as_factual_criteria(
+    sig: dict[str, Any] | None,
+    *,
+    case_text: str | None = None,
+    evidence_text: str | None = None,
+    query_predicate: str | None = None,
+    kb_schema: dict | None = None,
+) -> tuple[bool, str | None, str]:
+    """Pragmatic mode: factual legal criteria with explicit case evidence."""
+    if not pragmatic_factual_criteria_mode_enabled():
+        return False, "mode_disabled", ""
+    if not isinstance(sig, dict) or not sig.get("name"):
+        return False, "unknown_symbol", ""
+    if is_query_or_legal_output_predicate(sig, query_predicate=query_predicate):
+        return False, "legal_output", ""
+    if not (
+        symbol_marked_factual_criteria_input(sig)
+        or is_factual_criteria_input_candidate(sig, query_predicate=query_predicate, kb_schema=kb_schema)
+    ):
+        return False, "not_factual_criteria", ""
+    supported, snippet = case_text_supports_factual_criteria(
+        case_text,
+        str(sig["name"]),
+        sig,
+        evidence_text=evidence_text,
+    )
+    if not supported:
+        return False, "unsupported_by_case_text", ""
+    return True, None, snippet
 
 
 def _symbol_legal_output(sig: dict[str, Any]) -> bool:
@@ -165,6 +204,15 @@ def case_predicate_may_be_asserted(
     if kind in {"observable", "input"}:
         if sig.get("legal_output") is True:
             return False, "legal_output"
+        allowed_fc, code_fc, _ = case_predicate_may_be_asserted_as_factual_criteria(
+            sig,
+            case_text=case_text,
+            evidence_text=evidence_text,
+            query_predicate=query_predicate,
+            kb_schema=kb_schema,
+        )
+        if allowed_fc:
+            return True, None
         if looks_computed_composite(name, description):
             return False, "computed_composite"
         return True, None
@@ -176,6 +224,15 @@ def case_predicate_may_be_asserted(
         return False, "classification_output"
 
     if kind in {"helper", "derived", "conclusion"}:
+        allowed_fc, code_fc, _ = case_predicate_may_be_asserted_as_factual_criteria(
+            sig,
+            case_text=case_text,
+            evidence_text=evidence_text,
+            query_predicate=query_predicate,
+            kb_schema=kb_schema,
+        )
+        if allowed_fc:
+            return True, None
         allowed_factual, code, _ = case_predicate_may_be_asserted_as_factual_input(
             sig,
             case_text=case_text,
@@ -185,9 +242,18 @@ def case_predicate_may_be_asserted(
         )
         if allowed_factual:
             return True, None
-        return False, code or "derived_or_helper"
+        return False, code or code_fc or "derived_or_helper"
 
     if looks_computed_composite(name, description):
+        allowed_fc, code_fc, _ = case_predicate_may_be_asserted_as_factual_criteria(
+            sig,
+            case_text=case_text,
+            evidence_text=evidence_text,
+            query_predicate=query_predicate,
+            kb_schema=kb_schema,
+        )
+        if allowed_fc:
+            return True, None
         allowed_factual, code, _ = case_predicate_may_be_asserted_as_factual_input(
             sig,
             case_text=case_text,

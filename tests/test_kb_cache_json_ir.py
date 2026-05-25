@@ -57,19 +57,6 @@ def test_json_ir_calls_compile_once_on_law_compilation_error(
     assert "missing_helper_definition" in msg
 
 
-@patch("pipeline.kb.cache.trace_enabled", return_value=False)
-@patch("pipeline.kb.cache.get_kb_backend_from_env", return_value="legacy_fo")
-@patch("pipeline.kb.cache.compile_law_to_kb_fo")
-def test_legacy_fo_respects_pipeline_kb_max_repair_attempts(
-    mock_compile, _backend, _trace, monkeypatch, tmp_path
-) -> None:
-    monkeypatch.setenv("PIPELINE_KB_MAX_REPAIR_ATTEMPTS", "3")
-    mock_compile.side_effect = LawCompilationError("legacy compile failed")
-    with pytest.raises(KBCacheError):
-        get_or_compile_kb(str(tmp_path), "sample law text")
-    assert mock_compile.call_count == 3
-
-
 def test_pipeline_kb_max_repair_attempts_ignored_for_json_ir_by_default(monkeypatch) -> None:
     monkeypatch.setenv("PIPELINE_KB_MAX_REPAIR_ATTEMPTS", "8")
     assert resolve_max_repair_attempts("json_ir", log_warnings=False) == 1

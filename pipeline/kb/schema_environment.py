@@ -15,6 +15,11 @@ from pipeline.kb.factual_case_input import (
     case_given_predicate_name,
     is_factual_case_input_candidate,
 )
+from pipeline.kb.factual_criteria import (
+    is_factual_criteria_input_candidate,
+    pragmatic_factual_criteria_mode_enabled,
+    symbol_marked_factual_criteria_input,
+)
 from pipeline.kb.temporal_support import temporal_support_exempt_from_helper_definition
 
 SCHEMA_ENVIRONMENT_FILENAME = "schema_environment.json"
@@ -75,7 +80,13 @@ def _sym_dict(sym: dict[str, Any], *, kb_schema: dict[str, Any] | None = None) -
         allowed, _ = case_function_may_be_asserted(sym)
     assertable = bool(allowed)
     factual_case_input = is_factual_case_input_candidate(sym, kb_schema)
+    factual_criteria = symbol_marked_factual_criteria_input(sym) or (
+        pragmatic_factual_criteria_mode_enabled()
+        and is_factual_criteria_input_candidate(sym, kb_schema=kb_schema)
+    )
     case_given_input_predicate = case_given_predicate_name(name) if factual_case_input else None
+    if factual_criteria and not factual_case_input:
+        assertable = True
     query_target = False
     if returns.lower() == "bool":
         from pipeline.kb.legal_effect import predicate_represents_legal_effect_output
@@ -100,6 +111,7 @@ def _sym_dict(sym: dict[str, Any], *, kb_schema: dict[str, Any] | None = None) -
         "case_input": case_input,
         "assertable_in_case": assertable,
         "factual_case_input": factual_case_input,
+        "factual_criteria_input": factual_criteria,
         "case_given_input_predicate": case_given_input_predicate,
         "query_target_candidate": query_target,
         "temporal_support": temporal_support,
@@ -163,6 +175,9 @@ def build_schema_environment(kb_schema: dict[str, Any]) -> dict[str, Any]:
     factual_inputs = sorted(
         n for n, s in predicates.items() if s.get("factual_case_input")
     )
+    factual_criteria_inputs = sorted(
+        n for n, s in predicates.items() if s.get("factual_criteria_input")
+    )
 
     return {
         "types": types,
@@ -173,6 +188,7 @@ def build_schema_environment(kb_schema: dict[str, Any]) -> dict[str, Any]:
             "functions": assertable_funs,
         },
         "factual_case_input_predicates": factual_inputs,
+        "factual_criteria_input_predicates": factual_criteria_inputs,
         "legal_output_query_targets": legal_outputs,
         "temporal_support_symbols": temporal_syms,
     }
@@ -222,6 +238,17 @@ def schema_environment_prompt_view(env: dict[str, Any]) -> str:
         f = (env.get("functions") or {}).get(fname) or {}
         args = ", ".join(f.get("args") or [])
         lines.append(f"- function {fname}({args}) -> {f.get('returns', 'Int')}")
+
+    lines.append("")
+    lines.append(
+        "FACTUAL CRITERIA INPUT (externally checkable legal/factual conditions — assert only when case "
+        "text explicitly supports them; include evidence_text as a verbatim substring; never invent "
+        "numeric values):"
+    )
+    for pname in env.get("factual_criteria_input_predicates") or []:
+        p = (env.get("predicates") or {}).get(pname) or {}
+        args = ", ".join(p.get("args") or [])
+        lines.append(f"- {pname}({args})")
 
     lines.append("")
     lines.append(
