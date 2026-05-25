@@ -11,6 +11,17 @@ import re
 
 # Word-boundary tokens in predicate names or descriptions (EN + common NL artifacts).
 _COMPUTED_LEXICON: tuple[str, ...] = (
+    "carried_out",
+    "consolidation",
+    "consolidated",
+    "elimination",
+    "eliminated",
+    "eliminations",
+    "exceptional",
+    "duration",
+    "good_faith",
+    "mainly_not",
+    "no_longer",
     "exceeds",
     "exceed",
     "meets",
@@ -70,6 +81,11 @@ def looks_computed_composite(name: str, description: str = "") -> bool:
     if re.search(r"(?i)(exceeds?|meets?|satisf|qualif|compli|eligible|threshold|criteri|exception)", name or ""):
         return True
     if re.search(r"(?i)_(more_than|less_than|at_least|no_more_than|threshold|criterion|criteria|condition)_", name or ""):
+        return True
+    if re.search(
+        r"(?i)(consolidat|eliminat|carried_out|good_faith|exceptional|no_longer|mainly_not)",
+        name or "",
+    ):
         return True
     return False
 

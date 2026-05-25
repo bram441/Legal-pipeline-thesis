@@ -82,21 +82,33 @@ def run_query(case, query, base_kb_text, *, kb_schema=None, user_question=None):
     get_intent_spec(intent)
 
     case_for_run = dict(case) if isinstance(case, dict) else case
-    if kb_schema and isinstance(case_for_run, dict) and "kb_schema" not in case_for_run:
-        case_for_run = {**case_for_run, "kb_schema": kb_schema}
+    effective_kb = base_kb_text
+    effective_schema = kb_schema
+    if isinstance(case_for_run, dict) and case_for_run.get("case_given_factual_inputs") and kb_schema:
+        from pipeline.kb.case_given_bridge import augment_kb_for_case_given
+
+        effective_kb, effective_schema = augment_kb_for_case_given(
+            base_kb_text,
+            kb_schema,
+            case_for_run,
+        )
+        case_for_run = {**case_for_run, "kb_schema": effective_schema}
+
+    if effective_schema and isinstance(case_for_run, dict) and "kb_schema" not in case_for_run:
+        case_for_run = {**case_for_run, "kb_schema": effective_schema}
 
     sat, result = execute_intent(
         intent,
         case_for_run,
         exec_query,
-        base_kb_text,
-        kb_schema=kb_schema,
+        effective_kb,
+        kb_schema=effective_schema,
         user_question=user_question,
     )
 
-    if kb_schema and isinstance(result, dict):
+    if effective_schema and isinstance(result, dict):
         coverage = compute_antecedent_coverage(
-            case_for_run, query, kb_schema, symbolic_result=result
+            case_for_run, query, effective_schema, symbolic_result=result
         )
         if coverage:
             result["antecedent_coverage"] = coverage
@@ -104,7 +116,7 @@ def run_query(case, query, base_kb_text, *, kb_schema=None, user_question=None):
         if label == "unknown" or (result.get("possible") and not result.get("certain")):
             missing = missing_observable_symbols(coverage)
             if missing:
-                hint = format_missing_observable_feedback(missing, kb_schema)
+                hint = format_missing_observable_feedback(missing, effective_schema)
                 if hint:
                     result["extraction_repair_hint"] = hint
 

@@ -23,6 +23,7 @@ from pipeline.kb.temporal_support import (
 from pipeline.kb.legal_effect_helper_repair_hints import (
     classify_helper_kind_hint,
     extract_computed_observable_predicate,
+    extract_missing_helper_kind,
     extract_missing_helper_name,
     find_rules_using_helper,
     legal_effect_rules_repair_context,
@@ -48,10 +49,14 @@ class MissingHelperEvidence:
     undeclared_temporal_funcs_in_rules: list[str] = field(default_factory=list)
     legal_effect_context: bool = False
     is_secondary: bool = False
+    helper_signature: str = ""
+    helper_kind: str = "predicate"
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "helper_name": self.helper_name,
+            "helper_signature": self.helper_signature,
+            "helper_kind": self.helper_kind,
             "helper_kind_hint": self.helper_kind_hint,
             "helper_kind_hints": self.helper_kind_hints,
             "used_in_rules": self.used_in_rules,
@@ -73,13 +78,24 @@ class MissingHelperEvidence:
         lines = [
             "%s (legal-effect context=%s):"
             % (prefix, self.legal_effect_context),
-            "  helper: %s (kind=%s; hints=%s)"
+            "  helper: %s (signature=%s; kind=%s; hints=%s)"
             % (
                 self.helper_name,
+                self.helper_signature or "?",
                 self.helper_kind_hint,
                 ", ".join(self.helper_kind_hints) if self.helper_kind_hints else self.helper_kind_hint,
             ),
         ]
+        lines.append(
+            "  repair: define '%s' in THEN with rules, or reclassify as case_input/background only if safe; "
+            "do not rename without defining."
+            % self.helper_name
+        )
+        if "threshold" in self.helper_kind_hints or "counting" in self.helper_kind_hints:
+            lines.append(
+                "  threshold hint: prefer pairwise/conjunctive THEN definitions "
+                "((A&B) OR (A&C) OR (B&C)) for more-than-one helpers."
+            )
         if self.missing_temporal_support_symbol:
             lines.append(
                 "  missing_temporal_support_symbol: true (escalate to symbols repair)"
@@ -285,6 +301,34 @@ def _candidate_lower_level_symbols(
     return candidates[:12]
 
 
+def _helper_signature_from_symbol_table(helper: str, symbol_table: dict | None) -> str:
+    if not symbol_table:
+        return ""
+    for section in ("predicates", "functions"):
+        for sym in symbol_table.get(section) or []:
+            if not isinstance(sym, dict) or sym.get("name") != helper:
+                continue
+            args = sym.get("args") or []
+            returns = str(sym.get("returns") or "Bool").strip()
+            if args:
+                return "%s -> %s" % (" * ".join(str(a) for a in args), returns)
+            return "() -> %s" % returns
+    return ""
+
+
+def _infer_helper_kind(
+    helper: str,
+    symbol_table: dict | None,
+    error_message: str | None = None,
+) -> str:
+    if error_message and extract_missing_helper_kind(error_message) == "function":
+        return "function"
+    for f in (symbol_table or {}).get("functions") or []:
+        if isinstance(f, dict) and f.get("name") == helper:
+            return "function"
+    return "predicate"
+
+
 def _missing_helper_evidence_for_name(
     ir: dict,
     pred_kinds: dict[str, str],
@@ -295,11 +339,17 @@ def _missing_helper_evidence_for_name(
     law_text: str | None = None,
     question_text: str | None = None,
     is_secondary: bool = False,
+    error_message: str | None = None,
 ) -> MissingHelperEvidence:
-    from pipeline.kb.json_ir import _collect_helper_symbol_usage, _predicates_defined_in_then
+    from pipeline.kb.json_ir import _collect_helper_symbol_usage
 
     rules = ir.get("rules") or []
-    _, _, def_then_p, _ = _collect_helper_symbol_usage(rules, pred_kinds, {})
+    fun_kinds = {
+        str(f.get("name")): str(f.get("kind") or "")
+        for f in (symbol_table or {}).get("functions") or []
+        if isinstance(f, dict) and f.get("name")
+    }
+    _, _, def_then_p, _ = _collect_helper_symbol_usage(rules, pred_kinds, fun_kinds)
     legal_output_names = _legal_output_names_from_symbol_table(symbol_table)
 
     sym_desc = ""
@@ -340,6 +390,8 @@ def _missing_helper_evidence_for_name(
 
     return MissingHelperEvidence(
         helper_name=helper,
+        helper_signature=_helper_signature_from_symbol_table(helper, symbol_table),
+        helper_kind=_infer_helper_kind(helper, symbol_table, error_message),
         helper_kind_hint=primary_helper_kind_hint(kind_hints),
         helper_kind_hints=kind_hints,
         used_in_rules=usages,
@@ -383,6 +435,7 @@ def collect_missing_helper_evidence(
         law_text=law_text,
         question_text=question_text,
         is_secondary=False,
+        error_message=error_message,
     )
 
 
@@ -400,7 +453,12 @@ def collect_floating_helper_evidence(
     rules = ir.get("rules") or []
     if not rules:
         return []
-    in_if_p, _, def_then_p, _ = _collect_helper_symbol_usage(rules, pred_kinds, {})
+    fun_kinds = {
+        str(f.get("name")): str(f.get("kind") or "")
+        for f in (symbol_table or {}).get("functions") or []
+        if isinstance(f, dict) and f.get("name")
+    }
+    in_if_p, _, def_then_p, _ = _collect_helper_symbol_usage(rules, pred_kinds, fun_kinds)
     floating = sorted(in_if_p - def_then_p)
     if not floating:
         return []

@@ -49,51 +49,36 @@ def build_missing_exclusion_repair_supplement(
     *,
     law_text: str | None = None,
     secondary_diagnostics: str = "",
+    symbol_table: dict | None = None,
+    merged_ir: dict | None = None,
+    query_predicate: str | None = None,
 ) -> str:
     """
     Extra rules-repair guidance when the KB lacks disqualification/exclusion rules.
     """
+    from pipeline.kb.threshold_exclusion_scaffold import build_threshold_exclusion_repair_scaffold
+
+    scaffold = build_threshold_exclusion_repair_scaffold(
+        symbol_table,
+        merged_ir,
+        error_message=error_message,
+        law_text=law_text,
+        query_predicate=query_predicate,
+    )
     preds = extract_classification_predicates(error_message)
     pred_label = preds[0] if preds else "classification"
-    all_preds = ", ".join(preds) if preds else pred_label
     thresholds = format_law_thresholds_for_repair(law_text)
 
     lines = [
         "MISSING EXCLUSION RULE — REQUIRED REPAIR FOCUS",
         "",
-        "The KB already has, or may have, positive qualification rules. That is not enough for false-case reasoning.",
-        "Under open-world semantics, absence of proof for a favorable classification is NOT a false answer.",
-        "",
-        "Classification predicate to disqualify: %s" % all_preds,
+        "Classification predicate to disqualify: %s" % (", ".join(preds) if preds else pred_label),
         "Scoped law-text numeric thresholds (preserve exactly in compares): %s" % thresholds,
         "",
-        "For laws saying \"not more than one criterion is exceeded,\" add a negative/exclusion rule.",
-        "Let:",
-        "  A = criterion 1 exceeded",
-        "  B = criterion 2 exceeded",
-        "  C = criterion 3 exceeded",
-        "",
-        "Correct exclusion (pairwise exceeded, negated classification in THEN):",
-        "  %s" % _PAIRWISE_EXCLUSION_TEMPLATE.replace("classification", pred_label),
-        "",
-        "Concrete JSON_IR shape (example):",
-        "  if: { or: [",
-        "    { and: [ compare(metric_A, >, threshold_A), compare(metric_B, >, threshold_B) ] },",
-        "    { and: [ compare(metric_A, >, threshold_A), compare(metric_C, >, threshold_C) ] },",
-        "    { and: [ compare(metric_B, >, threshold_B), compare(metric_C, >, threshold_C) ] }",
-        "  ] }",
-        "  then: [ { pred: \"%s\", args: [...], negated: true } ]" % pred_label,
-        "",
-        "Do NOT use:",
-        "  A OR B OR C => NOT %s" % pred_label,
-        "  within_A OR within_B OR within_C => %s (simple OR within-threshold for qualification)" % pred_label,
-        "  only positive pairwise within-threshold rules without this exclusion rule",
-        "",
-        "If positive qualification rules already exist, preserve them and ADD this missing exclusion rule.",
-        "Do not remove or weaken existing positive rules while fixing this error.",
+        scaffold,
     ]
     if secondary_diagnostics.strip():
         lines.append("")
-        lines.append("Also address any secondary issues below (numeric thresholds, cardinality, etc.):")
+        lines.append("Also address secondary issues:")
         lines.append(secondary_diagnostics.strip())
     return "\n".join(lines)

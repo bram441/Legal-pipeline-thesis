@@ -2,6 +2,7 @@ import json
 import os
 
 from pipeline.utils.openai_sampling import chat_completion_sampling_kwargs
+from pipeline.utils.llm_call_tracker import tracked_chat_completion_create
 from pipeline.utils.prompt_loader import (
     PromptError,
     load_json_ir_contract,
@@ -87,6 +88,8 @@ def _case_ir_schema():
                                 "symbol": {"type": "string"},
                                 "args": {"type": "array", "items": {"type": "string"}},
                                 "negated": {"type": "boolean"},
+                                "evidence_text": {"type": "string"},
+                                "source": {"type": "string"},
                             },
                         },
                     },
@@ -199,7 +202,19 @@ def _legacy_extraction_repair_preamble(is_case: bool, feedback) -> str:
     return _extraction_repair_preamble(rel, feedback)
 
 
-def extract_case_only_openai(case_text, model, kb_schema=None, feedback=None):
+def _schema_environment_view(kb_schema, schema_environment=None) -> str:
+    if schema_environment:
+        from pipeline.kb.schema_environment import schema_environment_prompt_view
+
+        return schema_environment_prompt_view(schema_environment)
+    if kb_schema:
+        from pipeline.kb.schema_environment import build_schema_environment, schema_environment_prompt_view
+
+        return schema_environment_prompt_view(build_schema_environment(kb_schema))
+    return ""
+
+
+def extract_case_only_openai(case_text, model, kb_schema=None, feedback=None, schema_environment=None):
     """Extract case facts only. Used by schema-aware feedback loop."""
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
@@ -221,12 +236,15 @@ def extract_case_only_openai(case_text, model, kb_schema=None, feedback=None):
         world_knowledge_lexical=_lexical_world_knowledge_block(),
     )
 
-    resp = client.chat.completions.create(
+    resp = tracked_chat_completion_create(
+        client,
+        stage="case_extraction",
         model=model,
         messages=[
             {"role": "system", "content": "Extract case facts only."},
             {"role": "user", "content": case_user},
         ],
+        metadata={"backend": "legacy"},
         **chat_completion_sampling_kwargs(),
         response_format={
             "type": "json_schema",
@@ -254,7 +272,7 @@ def extract_case_only_openai(case_text, model, kb_schema=None, feedback=None):
     return json.loads(resp.choices[0].message.content)
 
 
-def extract_case_ir_only_openai(case_text, model, kb_schema=None, feedback=None):
+def extract_case_ir_only_openai(case_text, model, kb_schema=None, feedback=None, schema_environment=None):
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise LLMExtractionError("Missing OPENAI_API_KEY environment variable")
@@ -267,24 +285,28 @@ def extract_case_ir_only_openai(case_text, model, kb_schema=None, feedback=None)
     user_msg = _json_ir_extraction_repair_preamble(True, feedback) + render_prompt(
         EXTRACTION_JSON_IR_CASE,
         kb_schema_json=kb_schema_json,
+        schema_environment_view=_schema_environment_view(kb_schema, schema_environment),
         case_text=str(case_text),
         feedback_block=_feedback_block(feedback),
         world_knowledge_lexical=_lexical_world_knowledge_block(),
         json_ir_contract=load_json_ir_contract(),
     )
-    resp = client.chat.completions.create(
+    resp = tracked_chat_completion_create(
+        client,
+        stage="case_extraction",
         model=model,
         messages=[
             {"role": "system", "content": "Extract case IR only."},
             {"role": "user", "content": user_msg},
         ],
+        metadata={"backend": "json_ir"},
         **chat_completion_sampling_kwargs(),
         response_format=_case_ir_schema(),
     )
     return json.loads(resp.choices[0].message.content)
 
 
-def extract_query_ir_only_openai(user_question, model, kb_schema=None, case=None, feedback=None):
+def extract_query_ir_only_openai(user_question, model, kb_schema=None, case=None, feedback=None, schema_environment=None):
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise LLMExtractionError("Missing OPENAI_API_KEY environment variable")
@@ -300,6 +322,7 @@ def extract_query_ir_only_openai(user_question, model, kb_schema=None, case=None
     user_msg = _json_ir_extraction_repair_preamble(False, feedback) + render_prompt(
         EXTRACTION_JSON_IR_QUERY,
         kb_schema_json=kb_schema_json,
+        schema_environment_view=_schema_environment_view(kb_schema, schema_environment),
         user_question=str(user_question),
         case_facts_json=case_facts_json,
         case_entities_json=case_entities_json,
@@ -307,12 +330,15 @@ def extract_query_ir_only_openai(user_question, model, kb_schema=None, case=None
         world_knowledge_lexical=_lexical_world_knowledge_block(),
         json_ir_contract=load_json_ir_contract(),
     )
-    resp = client.chat.completions.create(
+    resp = tracked_chat_completion_create(
+        client,
+        stage="query_extraction",
         model=model,
         messages=[
             {"role": "system", "content": "Extract query IR only."},
             {"role": "user", "content": user_msg},
         ],
+        metadata={"backend": "json_ir"},
         **chat_completion_sampling_kwargs(),
         response_format=_query_ir_schema(),
     )
@@ -346,12 +372,15 @@ def extract_query_only_openai(user_question, model, kb_schema=None, case=None, f
         world_knowledge_lexical=_lexical_world_knowledge_block(),
     )
 
-    resp = client.chat.completions.create(
+    resp = tracked_chat_completion_create(
+        client,
+        stage="query_extraction",
         model=model,
         messages=[
             {"role": "system", "content": "Extract query only."},
             {"role": "user", "content": query_user},
         ],
+        metadata={"backend": "legacy"},
         **chat_completion_sampling_kwargs(),
         response_format=_query_schema(),
     )

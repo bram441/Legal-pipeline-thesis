@@ -56,9 +56,24 @@ CANONICAL_JSON_IR_STRATEGIES = eval_support.CANONICAL_JSON_IR_STRATEGIES
 read_score = eval_support.read_score
 summarize_query_targets = eval_support.summarize_query_targets
 run_main_json = eval_support.run_main_json
+count_eval_llm_calls = eval_support.count_eval_llm_calls
+read_llm_budget_guard = eval_support.read_llm_budget_guard
 work_dir_name = eval_support.work_dir_name
-classify_failure = eval_support.classify_failure
+build_eval_cell = eval_support.build_eval_cell
+summarize_matrix_status = eval_support.summarize_matrix_status
 is_eval_pipeline_failure = eval_support.is_eval_pipeline_failure
+from pipeline.utils.llm_call_tracker import (  # noqa: E402
+    clear_session_records,
+    enable_eval_tracking,
+    get_eval_call_count,
+    reset_cell_call_count,
+    reset_eval_call_count as reset_eval_llm_counter,
+    set_budget_limits,
+    set_eval_report_dir,
+    set_run_context,
+    write_cell_summary,
+    write_eval_summary,
+)
 from pipeline.kb.compile_backend import KB_BACKEND_CHOICES
 
 
@@ -94,17 +109,62 @@ def _write_markdown(path: Path, matrix: dict) -> None:
         )
     elif matrix.get("run_finished") is False:
         lines.extend(["", "**Note:** Run was interrupted; some strategy cells may be missing.", ""])
+    summary = matrix.get("status_summary") or {}
     lines.extend(
         [
             "",
+            "## Pipeline status summary",
+            "",
+            "- Cells total: " + str(summary.get("cells_total", "")),
+            "- **Scored cells** (valid ``score.json`` with ``total``): "
+            + str(summary.get("scored_cells", "")),
+            "- **evaluation_no_score** (exit 0, no score): "
+            + str(summary.get("evaluation_no_score_cells", "")),
+            "- **evaluation_bad_score**: " + str(summary.get("evaluation_bad_score_cells", "")),
+            "- **law_compilation** failures: " + str(summary.get("law_compilation_cells", "")),
+            "- Other failures: " + str(summary.get("other_failure_cells", "")),
+        ]
+    )
+    acc_scored = summary.get("accuracy_decisive_over_scored")
+    if acc_scored is not None:
+        lines.append(
+            "- Accuracy (decisive, **scored cells only**): %.4f" % float(acc_scored)
+        )
+    lines.extend(
+        [
+            "",
+            "Unscored cells are **not** successful pipeline completions; they are evaluation failures.",
+            "",
             "## Accuracy (decisive: correct / total; inconclusive counts as not correct)",
             "",
-            "Primary metric: ``accuracy_decisive`` (unknown/open answers are not correct).",
+            "Only **scored** cells show accuracy. Others show ``FAIL`` or status label.",
             "",
             "| Run | " + " | ".join(strategies) + " |",
             "|" + "---|" * (len(strategies) + 1),
         ]
     )
+    for r in runs:
+        row = "| " + r + " |"
+        for s in strategies:
+            c = cells.get(r, {}).get(s, {})
+            if c.get("scored") and c.get("accuracy_decisive") is not None:
+                acc = c.get("accuracy_decisive")
+                cor = c.get("correct_decisive")
+                tot = c.get("total")
+                inc = c.get("inconclusive")
+                cell = "%.4f" % float(acc)
+                if cor is not None and tot is not None:
+                    cell += " (%s/%s" % (cor, tot)
+                    if inc is not None:
+                        cell += ", inc=%s" % inc
+                    cell += ")"
+            elif c.get("failure_category"):
+                cell = str(c.get("failure_category"))
+            else:
+                cell = "—"
+            row += " " + cell + " |"
+        lines.append(row)
+
     cli = matrix.get("evaluation_cli") or {}
     strat_meta = matrix.get("strategy_definitions") or {}
     if strat_meta:
@@ -158,25 +218,6 @@ def _write_markdown(path: Path, matrix: dict) -> None:
                 "``accuracy_decisive`` is still the main legal entailment metric.",
             ]
         )
-    for r in runs:
-        row = "| " + r + " |"
-        for s in strategies:
-            c = cells.get(r, {}).get(s, {})
-            if c.get("ok"):
-                acc = c.get("accuracy_decisive") if c.get("accuracy_decisive") is not None else c.get("accuracy")
-                cor = c.get("correct")
-                tot = c.get("total")
-                inc = c.get("inconclusive")
-                cell = "" if acc is None else "%.4f" % float(acc)
-                if cor is not None and tot is not None:
-                    cell += " (%s/%s" % (cor, tot)
-                    if inc is not None:
-                        cell += ", inc=%s" % inc
-                    cell += ")"
-            else:
-                cell = "FAIL" if c.get("exit_code") is not None else "—"
-            row += " " + cell + " |"
-        lines.append(row)
 
     lines.extend(
         [
@@ -214,7 +255,7 @@ def _write_markdown(path: Path, matrix: dict) -> None:
             c = cells.get(r, {}).get(s, {})
             oqt = c.get("observable_query_target_warning_count")
             ant = c.get("antecedent_diagnostic_warning_count")
-            if c.get("ok") and oqt is not None:
+            if c.get("scored") and oqt is not None:
                 cell = f"oqt={oqt},ant={ant}"
                 targets = c.get("query_targets") or []
                 if targets:
@@ -260,18 +301,23 @@ def _write_csv(path: Path, matrix: dict) -> None:
     runs = matrix["runs"]
     strategies = matrix["strategies"]
     cells = matrix["cells"]
+    summary = matrix.get("status_summary") or {}
     with path.open("w", encoding="utf-8", newline="") as f:
         w = csv.writer(f)
+        w.writerow(["metric", "value"])
+        for key, val in summary.items():
+            w.writerow([key, val if val is not None else ""])
+        w.writerow([])
         w.writerow(["run_id"] + list(strategies))
+        w.writerow(["accuracy_decisive (scored cells only)"])
         for r in runs:
             row = [r]
             for s in strategies:
                 c = cells.get(r, {}).get(s, {})
-                if c.get("ok"):
-                    acc = c.get("accuracy")
-                    row.append("" if acc is None else acc)
+                if c.get("scored") and c.get("accuracy_decisive") is not None:
+                    row.append(c.get("accuracy_decisive"))
                 else:
-                    row.append("FAIL")
+                    row.append(c.get("failure_category") or "FAIL")
             w.writerow(row)
         w.writerow([])
         w.writerow(["failure_category (same run order)"])
@@ -281,6 +327,24 @@ def _write_csv(path: Path, matrix: dict) -> None:
             for s in strategies:
                 c = cells.get(r, {}).get(s, {})
                 row.append(c.get("failure_category") or "")
+            w.writerow(row)
+        w.writerow([])
+        w.writerow(["score_present"])
+        w.writerow(["run_id"] + list(strategies))
+        for r in runs:
+            row = [r]
+            for s in strategies:
+                c = cells.get(r, {}).get(s, {})
+                row.append(c.get("score_present"))
+            w.writerow(row)
+        w.writerow([])
+        w.writerow(["missing_score_reason"])
+        w.writerow(["run_id"] + list(strategies))
+        for r in runs:
+            row = [r]
+            for s in strategies:
+                c = cells.get(r, {}).get(s, {})
+                row.append(c.get("missing_score_reason") or "")
             w.writerow(row)
 
 
@@ -297,7 +361,10 @@ def _write_timings_csv(path: Path, matrix: dict) -> None:
                 "duration_sec",
                 "duration_human",
                 "ok",
+                "scored",
+                "score_present",
                 "failure_category",
+                "missing_score_reason",
                 "exit_code",
             ]
         )
@@ -314,7 +381,10 @@ def _write_timings_csv(path: Path, matrix: dict) -> None:
                         dur,
                         _format_duration(dur),
                         c.get("ok"),
+                        c.get("scored"),
+                        c.get("score_present"),
                         c.get("failure_category"),
+                        c.get("missing_score_reason"),
                         c.get("exit_code"),
                     ]
                 )
@@ -437,6 +507,12 @@ def main() -> int:
     )
     p.add_argument("--clean", action="store_true", help="Remove output-dir if it exists before run")
     p.add_argument(
+        "--fail-on-missing-score",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Exit non-zero if any cell has exit 0 but no valid score.json (default: true).",
+    )
+    p.add_argument(
         "--excel",
         action="store_true",
         help="Also write summary.xlsx (requires: pip install openpyxl)",
@@ -455,6 +531,20 @@ def main() -> int:
         help="Stop the matrix early after N pipeline failures (non-zero exit, compile/reasoning "
         "categories, or symbolic_status=error in score.json). Wrong decisive answers do not "
         "count. Example: --max-failures 8 stops after ~2 runs if all four strategies fail.",
+    )
+    p.add_argument(
+        "--max-llm-calls",
+        type=int,
+        default=None,
+        metavar="N",
+        help="Stop evaluation after N total tracked OpenAI calls (writes partial reports).",
+    )
+    p.add_argument(
+        "--max-llm-calls-per-cell",
+        type=int,
+        default=None,
+        metavar="N",
+        help="Stop a cell with failure_category=llm_budget_guard after N OpenAI calls in that cell.",
     )
     args = p.parse_args()
     if args.kb_backend is not None and args.kb_backend not in KB_BACKEND_CHOICES:
@@ -500,6 +590,15 @@ def main() -> int:
     out.mkdir(parents=True, exist_ok=True)
     work_root.mkdir(parents=True, exist_ok=True)
 
+    enable_eval_tracking(force=True)
+    clear_session_records()
+    reset_eval_llm_counter()
+    set_budget_limits(
+        max_eval_calls=args.max_llm_calls,
+        max_cell_calls=args.max_llm_calls_per_cell,
+    )
+    set_eval_report_dir(out)
+
     run_ids = [p.name for p in run_paths]
     cells: dict[str, dict[str, dict]] = {rid: {} for rid in run_ids}
     strategy_definitions = {
@@ -538,6 +637,13 @@ def main() -> int:
     if max_failures is not None and max_failures < 1:
         print("--max-failures must be >= 1", file=sys.stderr)
         return 1
+    if args.max_llm_calls is not None and args.max_llm_calls < 1:
+        print("--max-llm-calls must be >= 1", file=sys.stderr)
+        return 1
+    if args.max_llm_calls_per_cell is not None and args.max_llm_calls_per_cell < 1:
+        print("--max-llm-calls-per-cell must be >= 1", file=sys.stderr)
+        return 1
+    eval_llm_calls_before = 0
     try:
         for src in run_paths:
             rid = src.name
@@ -550,7 +656,11 @@ def main() -> int:
                 )
                 print("===", rid, "+", strategy, "->", wdir.name, "===")
                 cell_t0 = time.perf_counter()
+                if wdir.exists():
+                    shutil.rmtree(wdir)
                 copy_run_json(src, wdir)
+                reset_cell_call_count()
+                set_run_context(run_id=rid, strategy=strategy, artifact_dir=wdir)
                 cell_meta = strategy_metadata_for_eval(
                     strategy,
                     pipeline_backend=args.pipeline_backend,
@@ -558,6 +668,18 @@ def main() -> int:
                     belief_scoring=args.belief_scoring,
                     cli_no_translate=args.no_translate,
                 )
+                if (
+                    args.max_llm_calls is not None
+                    and eval_llm_calls_before >= args.max_llm_calls
+                ):
+                    stop_reason = "max_llm_calls (%s)" % args.max_llm_calls
+                    print(
+                        "[eval] stopping: eval LLM budget already at %s/%s"
+                        % (eval_llm_calls_before, args.max_llm_calls),
+                        file=sys.stderr,
+                    )
+                    break
+
                 code = run_main_json(
                     wdir,
                     strategy,
@@ -565,76 +687,56 @@ def main() -> int:
                     kb_backend=args.kb_backend,
                     pipeline_backend=args.pipeline_backend,
                     belief_scoring=args.belief_scoring,
+                    llm_call_tracking=True,
+                    max_llm_calls=args.max_llm_calls,
+                    max_llm_calls_per_cell=args.max_llm_calls_per_cell,
+                    llm_eval_calls_before=eval_llm_calls_before,
                 )
-                sc = read_score(wdir / "score.json")
-                duration_sec = round(time.perf_counter() - cell_t0, 2)
-                if code != 0:
-                    exit_ok = False
-                    failure_category = classify_failure(wdir, code, ok=False)
-                    cells[rid][strategy] = {
-                        "ok": False,
-                        "exit_code": code,
-                        "path": str(wdir),
-                        "accuracy": None,
-                        "correct": None,
-                        "total": None,
-                        "failure_category": failure_category,
-                        "duration_sec": duration_sec,
-                        "strategy_metadata": cell_meta,
-                    }
-                    if is_eval_pipeline_failure(
-                        exit_code=code,
-                        failure_category=failure_category,
-                        score=sc,
-                    ):
-                        pipeline_failure_count += 1
-                else:
-                    qt = summarize_query_targets(sc)
-                    failure_category = classify_failure(wdir, 0, ok=True)
-                    cell_ok = failure_category == "completed"
-                    if not cell_ok:
-                        exit_ok = False
-                    cells[rid][strategy] = {
-                        "ok": cell_ok,
-                        "exit_code": 0,
-                        "path": str(wdir),
-                        "accuracy": sc.get("accuracy") if sc else None,
-                        "accuracy_decisive": sc.get("accuracy_decisive")
-                        if sc
-                        else sc.get("accuracy")
-                        if sc
-                        else None,
-                        "correct": sc.get("correct") if sc else None,
-                        "correct_decisive": sc.get("correct_decisive") if sc else None,
-                        "incorrect_decisive": sc.get("incorrect_decisive") if sc else None,
-                        "inconclusive": sc.get("inconclusive") if sc else None,
-                        "total": sc.get("total") if sc else None,
-                        "scoring_mode": sc.get("scoring_mode") if sc else None,
-                        "score_id": sc.get("id") if sc else None,
-                        "query_targets": qt.get("items") or [],
-                        "observable_query_target_warning_count": qt.get(
-                            "observable_query_target_warning_count", 0
-                        ),
-                        "antecedent_diagnostic_warning_count": qt.get(
-                            "antecedent_diagnostic_warning_count", 0
-                        ),
-                        "failure_category": failure_category,
-                        "duration_sec": duration_sec,
-                        "strategy_metadata": cell_meta,
-                    }
-                    if is_eval_pipeline_failure(
-                        exit_code=0,
-                        failure_category=failure_category,
-                        score=sc,
-                    ):
-                        pipeline_failure_count += 1
 
-                status_label = (
-                    failure_category
-                    if code != 0
-                    else (failure_category if not cell_ok else "completed")
+                duration_sec = round(time.perf_counter() - cell_t0, 2)
+                write_cell_summary(wdir)
+                eval_llm_calls_before = count_eval_llm_calls(work_root)
+                cell = build_eval_cell(
+                    wdir,
+                    code,
+                    path=str(wdir),
+                    duration_sec=duration_sec,
+                    strategy_metadata=cell_meta,
                 )
-                print("[eval] %s — %s" % (_format_duration(duration_sec), status_label))
+                cells[rid][strategy] = cell
+                failure_category = cell.get("failure_category") or "unknown"
+                cell_ok = bool(cell.get("ok"))
+                if not cell_ok:
+                    exit_ok = False
+                sc = read_score(wdir / "score.json") if cell.get("score_present") else None
+                if is_eval_pipeline_failure(
+                    exit_code=code,
+                    failure_category=failure_category,
+                    score=sc,
+                ):
+                    pipeline_failure_count += 1
+                if (
+                    args.fail_on_missing_score
+                    and code == 0
+                    and not cell.get("scored")
+                ):
+                    exit_ok = False
+
+                status_label = failure_category
+                print(
+                    "[eval] %s — %s (llm_calls=%s)"
+                    % (_format_duration(duration_sec), status_label, eval_llm_calls_before)
+                )
+                guard = read_llm_budget_guard(wdir)
+                if guard and guard.get("scope") == "eval":
+                    stop_reason = "max_llm_calls (%s)" % guard.get("limit")
+                    break
+                if (
+                    args.max_llm_calls is not None
+                    and eval_llm_calls_before >= args.max_llm_calls
+                ):
+                    stop_reason = "max_llm_calls (%s)" % args.max_llm_calls
+                    break
                 ow = cell_meta.get("translation_override_warning")
                 if ow:
                     print("[eval] WARNING:", ow, file=sys.stderr)
@@ -674,12 +776,20 @@ def main() -> int:
             "cells_recorded": len(durations),
             "avg_sec_per_cell": round(sum(durations) / len(durations), 2) if durations else None,
         }
+        status_summary = summarize_matrix_status(cells, run_ids, strategies)
+        llm_summary = write_eval_summary(out, work_root=work_root)
+        status_summary["llm_eval_call_count"] = count_eval_llm_calls(work_root)
+        if llm_summary:
+            status_summary["llm_estimated_total_cost_usd"] = llm_summary.get(
+                "estimated_total_cost_usd"
+            )
         matrix = {
             "generated_at": stamp,
             "runs_dir": str(runs_dir),
             "strategies": strategies,
             "runs": run_ids,
             "cells": cells,
+            "status_summary": status_summary,
             "run_finished": run_finished,
             "timing": timing_summary,
             "evaluation_cli": {
@@ -688,7 +798,11 @@ def main() -> int:
                 "no_translate_global": args.no_translate,
                 "belief_scoring": bool(args.belief_scoring),
                 "max_failures": max_failures,
+                "fail_on_missing_score": bool(args.fail_on_missing_score),
+                "max_llm_calls": args.max_llm_calls,
+                "max_llm_calls_per_cell": args.max_llm_calls_per_cell,
             },
+            "llm_call_summary": llm_summary,
             "strategy_definitions": strategy_definitions,
             "canonical_json_ir_strategies": list(CANONICAL_JSON_IR_STRATEGIES),
             "stopped_early": bool(stop_reason),

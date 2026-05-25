@@ -69,6 +69,22 @@ def normalize_error_code(msg: str) -> str:
         return "numeric_threshold_not_in_law_text"
     if "cannot prove disqualification" in sl or "exclusion rule such as" in sl:
         return "missing_threshold_classification_exclusion"
+    if "uses predicate" in sl and "as a function term" in sl:
+        return "predicate_used_as_function"
+    if "as a bool predicate atom" in sl and "only under functions" in sl:
+        return "function_used_as_predicate"
+    if "numeric_threshold_ambiguous" in sl:
+        return "numeric_threshold_ambiguous"
+    if "suspicious self-relation" in sl or (
+        "same variable twice" in sl and "between-entities" in sl
+    ):
+        return "suspicious_self_relation"
+    if "no_helper_definition_progress" in sl:
+        return "no_helper_definition_progress"
+    if "repeated_missing_helper_definition" in sl:
+        return "repeated_missing_helper_definition"
+    if "repeated_missing_numeric_helper_definition" in sl:
+        return "repeated_missing_numeric_helper_definition"
     if "at-most-one" in sl or "more-than-one criteria" in sl or "simple or over individual" in sl:
         return "threshold_cardinality_or_singleton"
     if "semantically identical to the status" in sl or "classification encoded as a primitive type" in sl:
@@ -125,6 +141,12 @@ def normalize_error_signature(msg: str) -> str:
         if "looks computed/composite" in sl:
             m = re.search(r"predicate\s+'([^']+)'", s, re.I)
             return "schema::computed_observable_decl::" + (m.group(1) if m else "?")
+        if "as a bool predicate atom" in sl and "only under functions" in sl:
+            m = re.search(r"Rules use '([^']+)'", s, re.I)
+            return "schema::predicate_used_as_function::" + (m.group(1) if m else "?")
+        if "as a bool predicate atom" in sl and "lists it only under predicates" in sl:
+            m = re.search(r"Rules use '([^']+)'", s, re.I)
+            return "schema::function_used_as_predicate::" + (m.group(1) if m else "?")
         if "legal-effect or timing language" in sl or "no derived legal-output" in sl:
             return "schema::missing_legal_effect"
         if "semantically identical to the status" in sl:
@@ -246,10 +268,14 @@ def classify_json_ir_validation_error(
         return JsonIRErrorKind.SYMBOLS_REPAIR_REQUIRED
 
     if "used as a boolean predicate atom" in ml or "bool predicate atom" in ml:
+        if "only under functions" in ml:
+            return JsonIRErrorKind.RULES_REPAIR_ONLY
+        if "lists it only under predicates" in ml:
+            return JsonIRErrorKind.RULES_REPAIR_ONLY
         return JsonIRErrorKind.SYMBOLS_REPAIR_REQUIRED
 
     if "used as a function term" in ml and "predicate" in ml:
-        return JsonIRErrorKind.SYMBOLS_REPAIR_REQUIRED
+        return JsonIRErrorKind.RULES_REPAIR_ONLY
 
     if "no derived legal outputs" in ml or "no observable case-input" in ml:
         return JsonIRErrorKind.SYMBOLS_REPAIR_REQUIRED

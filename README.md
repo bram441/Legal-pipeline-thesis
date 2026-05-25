@@ -47,6 +47,22 @@ Outputs:
 - Answer text
 - Optional explanation (rule snippets + relevant facts + constraint checked + possible/certain)
 - Optional natural-language paraphrase
+- Run artifacts: `effective_config.json`, diagnostics (`schema_environment.json`, `symbolic_proof_gap.json`, …)
+
+---
+
+## Configuration (v2)
+
+| Source | Purpose |
+|--------|---------|
+| `.env` | Secrets only: `OPENAI_API_KEY`, optional model names |
+| `config/default.json` | Versioned pipeline behavior (JSON-IR repair limits, extraction backend, scoring, trace) |
+| `config/local.json` | Optional gitignored local overrides |
+| Environment variables | Backward-compatible overrides (`JSON_IR_*`, `PIPELINE_*`, `SCORE_*`) merged by `pipeline/config.py` |
+
+Each JSON benchmark run writes **`effective_config.json`** (merged config actually used).
+
+Primary KB strategy: **`direct_json_ir_translate`**. Legacy direct-FO strategies remain but are deprecated.
 
 ---
 
@@ -58,13 +74,22 @@ Outputs:
   - top-down orchestration: compile/load KB → extract schema → extract case/query → validate → seed domain → call symbolic tasks → render output
 
 ### `pipeline/kb/`
-**Law → FO(.)**
-- `compiler.py`
-  - calls the LLM to compile law text into FO(.) KB
-- `schema.py`
-  - parses the vocabulary in `kb.fo` into `kb_schema.json`
-- `cache.py`
-  - `get_or_compile_kb(run_dir, law_text, model)` loads cached KB/schema or compiles anew
+**Law → FO(.) (JSON-IR primary)**
+- `json_ir_compile_loop.py` — structured symbol/rules repair loop (limits from config)
+- `schema_environment.py` — typed environment for extraction + pre-solver validation
+- `factual_case_input.py`, `case_given_bridge.py` — controlled qualitative case inputs
+- `compiler.py`, `cache.py`, `schema.py` — compile, cache, FO vocabulary parsing
+
+### `pipeline/validation/`
+**Pre-solver contract enforcement**
+- `entity_type_mapping.py` — map case entities to KB types
+- `pre_solver_validation.py` — domain/signature checks before IDP-Z3
+
+### `pipeline/diagnostics/`
+- `symbolic_proof_gap.py` — why a query is unknown/inconclusive
+
+### `pipeline/config.py`
+**Central configuration** — loads `config/default.json`, applies env overrides
 
 ### `pipeline/extraction/`
 **Schema-driven extraction (legacy + JSON-IR backends)**

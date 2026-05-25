@@ -8,8 +8,9 @@ import os
 
 def trace_enabled():
     """True if run tracing should be written."""
-    v = (os.getenv("PIPELINE_TRACE") or "").strip().lower()
-    return v in ("1", "true", "yes")
+    from pipeline.config import config_section
+
+    return bool(config_section("debug").get("trace"))
 
 
 class RunTraceWriter:

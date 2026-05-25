@@ -11,6 +11,12 @@ from pipeline.kb.composite_predicate_heuristics import (
     symbol_background_or_case_input,
     symbol_directly_observable,
 )
+from pipeline.kb.factual_case_input import (
+    case_given_predicate_name,
+    case_text_explicitly_supports_factual_input,
+    is_factual_case_input_candidate,
+    is_query_or_legal_output_predicate,
+)
 from pipeline.kb.legal_effect import (
     predicate_looks_like_classification_output,
     predicate_represents_legal_effect_output,
@@ -96,7 +102,47 @@ def _symbol_classification_output(sig: dict[str, Any]) -> bool:
     )
 
 
-def case_predicate_may_be_asserted(sig: dict[str, Any] | None) -> tuple[bool, str | None]:
+def case_predicate_may_be_asserted_as_factual_input(
+    sig: dict[str, Any] | None,
+    *,
+    case_text: str | None = None,
+    evidence_text: str | None = None,
+    query_predicate: str | None = None,
+    kb_schema: dict | None = None,
+) -> tuple[bool, str | None, str]:
+    """
+    Narrow exception: helper/composite threshold/criterion satisfaction explicitly stated in case.
+
+    Returns (allowed, rejection_code, evidence_snippet).
+    """
+    if not isinstance(sig, dict) or not sig.get("name"):
+        return False, "unknown_symbol", ""
+
+    if is_query_or_legal_output_predicate(sig, query_predicate=query_predicate):
+        return False, "legal_output", ""
+
+    if not is_factual_case_input_candidate(sig, kb_schema):
+        return False, "not_factual_case_input", ""
+
+    supported, snippet = case_text_explicitly_supports_factual_input(
+        case_text,
+        str(sig["name"]),
+        sig,
+        evidence_text=evidence_text,
+    )
+    if not supported:
+        return False, "unsupported_by_case_text", ""
+    return True, None, snippet
+
+
+def case_predicate_may_be_asserted(
+    sig: dict[str, Any] | None,
+    *,
+    case_text: str | None = None,
+    evidence_text: str | None = None,
+    query_predicate: str | None = None,
+    kb_schema: dict | None = None,
+) -> tuple[bool, str | None]:
     """
     Return (allowed, rejection_code).
 
@@ -106,11 +152,14 @@ def case_predicate_may_be_asserted(sig: dict[str, Any] | None) -> tuple[bool, st
     if not isinstance(sig, dict) or not sig.get("name"):
         return False, "unknown_symbol"
 
+    name = str(sig.get("name") or "")
+    if query_predicate and name == str(query_predicate).strip():
+        return False, "query_predicate"
+
     if case_fact_assertion_exempt(sig):
         return True, None
 
     kind = str(sig.get("kind") or "unknown").strip().lower()
-    name = str(sig.get("name") or "")
     description = str(sig.get("description") or "")
 
     if kind in {"observable", "input"}:
@@ -127,9 +176,27 @@ def case_predicate_may_be_asserted(sig: dict[str, Any] | None) -> tuple[bool, st
         return False, "classification_output"
 
     if kind in {"helper", "derived", "conclusion"}:
-        return False, "derived_or_helper"
+        allowed_factual, code, _ = case_predicate_may_be_asserted_as_factual_input(
+            sig,
+            case_text=case_text,
+            evidence_text=evidence_text,
+            query_predicate=query_predicate,
+            kb_schema=kb_schema,
+        )
+        if allowed_factual:
+            return True, None
+        return False, code or "derived_or_helper"
 
     if looks_computed_composite(name, description):
+        allowed_factual, code, _ = case_predicate_may_be_asserted_as_factual_input(
+            sig,
+            case_text=case_text,
+            evidence_text=evidence_text,
+            query_predicate=query_predicate,
+            kb_schema=kb_schema,
+        )
+        if allowed_factual:
+            return True, None
         return False, "computed_composite"
 
     if kind not in _CASE_FACT_EXEMPT_KINDS:
@@ -164,6 +231,18 @@ def case_function_may_be_asserted(sig: dict[str, Any] | None) -> tuple[bool, str
 
 def build_case_predicate_rejection_message(pred: str, rejection_code: str | None) -> str:
     code = rejection_code or "invalid_case_fact"
+    if code == "unsupported_by_case_text":
+        return (
+            "Case extraction cannot assert predicate "
+            + pred
+            + " as a case-given factual input: the case text does not explicitly support it."
+        )
+    if code == "not_factual_case_input":
+        return (
+            "Case extraction cannot assert predicate "
+            + pred
+            + " as a case fact (not a controlled factual threshold/criterion input)."
+        )
     if code == "derived_or_helper":
         return (
             "Case extraction cannot assert helper/composite/derived predicate "
@@ -175,6 +254,12 @@ def build_case_predicate_rejection_message(pred: str, rejection_code: str | None
             "Case extraction cannot assert legal-output predicate "
             + pred
             + " as a fact. Assert observable inputs only; the query stage derives legal conclusions."
+        )
+    if code == "query_predicate":
+        return (
+            "Case extraction cannot assert the selected query predicate "
+            + pred
+            + " as a case fact. Use observable or factual threshold inputs only."
         )
     if code == "classification_output":
         return (
@@ -275,11 +360,11 @@ def _find_symbol(kb_schema: dict, name: str) -> dict[str, Any] | None:
 
 
 def _case_text_tokens(case_text: str | None) -> set[str]:
-    from pipeline.extraction.json_ir import _question_tokens, _symbol_tokens
+    from pipeline.extraction.ir_utils import question_tokens, symbol_tokens
 
     if not case_text:
         return set()
-    return _question_tokens(case_text) | set(_symbol_tokens(case_text))
+    return question_tokens(case_text) | set(symbol_tokens(case_text))
 
 
 def _case_text_for_numeric_scan(case_text: str | None) -> str:
@@ -347,7 +432,7 @@ def _score_replacement_candidate(
     composite_helper: bool,
     symbol_type: str,
 ) -> tuple[float, list[str]]:
-    from pipeline.extraction.json_ir import _symbol_tokens
+    from pipeline.extraction.ir_utils import symbol_tokens as _symbol_tokens
 
     name = str(sym.get("name") or "")
     desc = str(sym.get("description") or "")
@@ -382,7 +467,7 @@ def suggest_observable_replacements(
 ) -> list[dict[str, Any]]:
     rejected_sig = _find_symbol(kb_schema, rejected_pred)
     rejected_desc = str(rejected_sig.get("description") or "") if rejected_sig else ""
-    from pipeline.extraction.json_ir import _symbol_tokens
+    from pipeline.extraction.ir_utils import symbol_tokens as _symbol_tokens
 
     rejected_tokens = set(_symbol_tokens(rejected_pred) + _symbol_tokens(rejected_desc))
     case_tokens = _case_text_tokens(case_text)
@@ -475,7 +560,7 @@ def decomposition_required_from_case_text(
     case_tokens = _case_text_tokens(case_text)
     if not case_tokens:
         return False
-    from pipeline.extraction.json_ir import _symbol_tokens
+    from pipeline.extraction.ir_utils import symbol_tokens as _symbol_tokens
 
     for s in suggestions:
         reasons = list(s.get("reasons") or [])
@@ -582,6 +667,8 @@ def build_case_decomposition_repair_hint(
         "REMEDIATION (case facts — decompose into observables):",
         "- Rejected case fact: `" + pred + "` (" + (diag.rejection_reason or "invalid") + ").",
         "- Do NOT re-assert helper, composite, derived, classification, or legal-output predicates.",
+        "- Exception: when the case explicitly states a threshold/criterion satisfaction condition, you MAY "
+        "assert a listed factual case input predicate with evidence_text (never invent numeric values).",
         "- Removing the invalid assertion alone is NOT enough when the case states underlying facts.",
         "- Decompose the case text into assertable observable predicate assertions and/or numeric value_assertions.",
     ]
@@ -656,6 +743,78 @@ def build_case_fact_rejection_repair_hint(
         case_text=case_text,
     )
     return build_case_decomposition_repair_hint(diag, case_text=case_text)
+
+
+def build_factual_case_input_diagnostics(
+    case: dict[str, Any] | None,
+    *,
+    case_text: str | None = None,
+    query_predicate: str | None = None,
+    kb_schema: dict | None = None,
+) -> dict[str, Any]:
+    """Summarize accepted/rejected factual case inputs for artifacts."""
+    from pipeline.kb.factual_case_input import CASE_GIVEN_PREFIX
+
+    accepted = list((case or {}).get("case_given_factual_inputs") or [])
+    bridge_used = any(
+        str(e.get("input_predicate") or "").startswith(CASE_GIVEN_PREFIX) for e in accepted
+    )
+    return {
+        "case_given_factual_inputs": accepted,
+        "accepted_threshold_satisfaction_facts": [
+            {
+                "input_predicate": e.get("input_predicate"),
+                "target_predicate": e.get("target_predicate"),
+                "args": e.get("args"),
+                "evidence_text": e.get("evidence_text"),
+                "assertion_kind": e.get("assertion_kind"),
+            }
+            for e in accepted
+        ],
+        "case_text_has_numeric_values": case_text_has_numeric_values(case_text),
+        "case_text_numeric_values_explicit": case_text_has_numeric_values(case_text),
+        "bridge_predicates_generated": bridge_used,
+        "rejected_query_predicate_assertions": [],
+        "rejected_legal_outputs": [],
+        "query_predicate": query_predicate,
+    }
+
+
+def validate_case_facts_not_query_target(
+    case: dict[str, Any],
+    query: dict[str, Any],
+    kb_schema: dict | None = None,
+) -> None:
+    """Reject case facts that assert the selected boolean query predicate."""
+    if not isinstance(case, dict) or not isinstance(query, dict):
+        return
+    qpred = str(query.get("predicate") or "").strip()
+    if not qpred:
+        return
+    from pipeline.kb.factual_case_input import CASE_GIVEN_PREFIX
+
+    import re
+
+    atom_re = re.compile(r"^\s*(?:not|~|¬)?\s*([A-Za-z_][A-Za-z0-9_]*)\s*\(")
+    for ln in case.get("facts") or []:
+        if not isinstance(ln, str):
+            continue
+        m = atom_re.match(ln.strip())
+        if not m:
+            continue
+        fact_pred = m.group(1)
+        if fact_pred == qpred:
+            raise CaseFactAssertionRejected(
+                build_case_predicate_rejection_message(qpred, "query_predicate"),
+                pred=qpred,
+                rejection_code="query_predicate",
+            )
+        if fact_pred.startswith(CASE_GIVEN_PREFIX) and fact_pred[len(CASE_GIVEN_PREFIX) :] == qpred:
+            raise CaseFactAssertionRejected(
+                build_case_predicate_rejection_message(qpred, "query_predicate"),
+                pred=qpred,
+                rejection_code="query_predicate",
+            )
 
 
 def case_fact_validation_error_matches(error_message: str) -> bool:

@@ -1,0 +1,27 @@
+{
+  "id": "run_119",
+  "law": {
+    "path": "example_laws/microvennootschappen.txt"
+  },
+  "case": {
+    "text": "BV Start begint met haar bedrijf. Bij het begin van het eerste boekjaar schat zij te goeder trouw 12 werknemers, 1.000.000 euro netto-omzet exclusief btw en 300.000 euro balanstotaal."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Moet BV Start volgens artikel 1:24, paragraaf 3 meteen rekening houden met het overschrijden van meer dan één criterium in het eerste boekjaar?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "For starting companies, if the good-faith estimate shows that more than one criterion will be exceeded in the first financial year, this must be taken into account immediately."
+      }
+    }
+  ],
+  "kb_compile_strategy": "le_two_phase",
+  "kb_compile_backend": "json_ir",
+  "kb_compile_flags": {
+    "use_le": true,
+    "two_phase": true
+  },
+  "pipeline_backend_mode": "json_ir"
+}

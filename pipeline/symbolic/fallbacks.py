@@ -2,15 +2,18 @@
 
 from __future__ import annotations
 
-from idp_z3.predicate_solver import evaluate_atom
-
 from pipeline.symbolic.ground_atoms import (
     derived_symbols,
     filter_symbols_by_question,
-    function_sig,
     grounded_predicate_candidates,
     predicate_sig,
 )
+
+
+def _evaluate_atom(case, base_kb_text, predicate, args):
+    from idp_z3.predicate_solver import evaluate_atom
+
+    return evaluate_atom(case, base_kb_text, predicate, args)
 
 
 def run_deduction_set_fallback(case, base_kb_text, query, kb_schema=None) -> dict:
@@ -29,7 +32,7 @@ def run_deduction_set_fallback(case, base_kb_text, query, kb_schema=None) -> dic
     unknown: list[str] = []
     for args in candidates:
         ent = args[0]
-        res = evaluate_atom(case, base_kb_text, predicate, args)
+        res = _evaluate_atom(case, base_kb_text, predicate, args)
         if res.get("certain"):
             entailed.append(ent)
         elif not res.get("possible"):
@@ -71,7 +74,7 @@ def run_propagation_fallback(case, base_kb_text, query, kb_schema=None, user_que
             warnings.append(warn)
         for args in combos:
             atom = {"predicate": sym, "args": args}
-            res = evaluate_atom(case, base_kb_text, sym, args)
+            res = _evaluate_atom(case, base_kb_text, sym, args)
             if res.get("certain"):
                 certain_true.append(atom)
             elif not res.get("possible"):
@@ -115,7 +118,7 @@ def run_explain_fallback(case, base_kb_text, query, kb_schema=None) -> dict:
     args = list(target.get("args") or query.get("args") or [])
     if not pred or not args:
         raise ValueError("explain target requires predicate and args")
-    res = evaluate_atom(case, base_kb_text, pred, [str(a) for a in args])
+    res = _evaluate_atom(case, base_kb_text, pred, [str(a) for a in args])
     label = "entailed" if res.get("certain") else ("contradicted" if not res.get("possible") else "unknown")
     support = []
     try:

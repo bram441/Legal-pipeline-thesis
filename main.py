@@ -34,6 +34,7 @@ from pipeline.io.text_runs import load_text_run, write_text_results
 from pipeline.io.json_runs import load_json_run, write_json_results, write_score, merge_json_run_file
 from pipeline.eval.scoring import score_question
 from pipeline.kb.cache import get_or_compile_kb
+from pipeline.kb.schema_environment import build_schema_environment
 from pipeline.kb.compile_backend import KB_BACKEND_CHOICES, get_kb_backend_from_env, kb_backend_env_override
 from pipeline.kb.compile_strategy import (
     STRATEGY_CHOICES,
@@ -142,6 +143,7 @@ def run_text_mode(
         stack.enter_context(extraction_backend_env_override(resolved_extraction_backend))
         status_log("KB", "Loading or compiling knowledge base")
         kb_text, kb_schema = get_or_compile_kb(run_dir, law_text, cache_subdir="translated" if translate else None)
+        schema_environment = build_schema_environment(kb_schema) if kb_schema else None
         backend_label = get_kb_backend_from_env()
 
         out_lines = []
@@ -167,6 +169,7 @@ def run_text_mode(
             pre_extracted_case = extract_case_only(
                 case_text,
                 kb_schema=kb_schema,
+                schema_environment=schema_environment,
                 provider=provider,
                 repair_artifact_path=os.path.join(run_dir, CASE_EXTRACTION_REPAIR_ARTIFACT),
             )
@@ -186,8 +189,10 @@ def run_text_mode(
                 base_kb_text=kb_text,
                 extractor_provider=provider,
                 kb_schema=kb_schema,
+                schema_environment=schema_environment,
                 trace_path=trace_path,
                 pre_extracted_case=pre_extracted_case,
+                run_artifact_dir=run_dir,
             )
 
             if result.get("error_stage"):
@@ -219,6 +224,13 @@ def run_json_mode(
 ):
     run_obj = load_json_run(run_dir)
 
+    try:
+        from pipeline.config import save_effective_config
+
+        save_effective_config(os.path.join(run_dir, "effective_config.json"))
+    except Exception:
+        pass
+
     law_obj = run_obj.get("law") or {}
     law_text = (law_obj.get("text") or "").strip()
     law_path = law_obj.get("path")
@@ -232,6 +244,16 @@ def run_json_mode(
     questions = run_obj.get("questions") or []
 
     ctx, strategy_label = kb_run_context(cli_strategy=cli_kb_strategy, run_json=run_obj, mode="json")
+    try:
+        from pipeline.utils.llm_call_tracker import set_run_context
+
+        set_run_context(
+            run_id=str(run_obj.get("id") or Path(run_dir).name),
+            strategy=strategy_label,
+            artifact_dir=run_dir,
+        )
+    except Exception:
+        pass
     ul, tp = strategy_to_flags(strategy_label)
     translate = resolve_translate(strategy_label, cli_no_translate=cli_no_translate)
     spec = get_strategy_spec(strategy_label)
@@ -285,6 +307,7 @@ def run_json_mode(
             question_text=q_text,
             case_text=case_text,
         )
+        schema_environment = build_schema_environment(kb_schema) if kb_schema else None
         backend_label = get_kb_backend_from_env()
 
         results = {
@@ -327,6 +350,7 @@ def run_json_mode(
             pre_extracted_case = extract_case_only(
                 case_text,
                 kb_schema=kb_schema,
+                schema_environment=schema_environment,
                 provider=provider,
                 repair_artifact_path=os.path.join(run_dir, CASE_EXTRACTION_REPAIR_ARTIFACT),
             )
@@ -347,8 +371,10 @@ def run_json_mode(
                 base_kb_text=kb_text,
                 extractor_provider=provider,
                 kb_schema=kb_schema,
+                schema_environment=schema_environment,
                 trace_path=trace_path,
                 pre_extracted_case=pre_extracted_case,
+                run_artifact_dir=run_dir,
             )
 
             item = {
@@ -509,4 +535,10 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    from pipeline.utils.llm_call_tracker import LLMBudgetExceeded, apply_budget_from_env
+
+    apply_budget_from_env()
+    try:
+        main()
+    except LLMBudgetExceeded:
+        raise SystemExit(1)

@@ -105,7 +105,7 @@ HIGH-PRIORITY DECISION RULES
 - Do not make raw case facts derived.
 
 5b. Computed/composite conditions (critical):
-- Do not declare exceeds/meets/satisfies/threshold/criteria-style conditions as observable by default.
+- Do not declare exceeds/meets/satisfies/threshold/criteria/consolidation/elimination/carried_out/exception-style conditions as observable by default.
 - If you introduce such a helper, you must define it with rules in the rules phase (from numeric functions/comparisons).
 - Prefer numeric functions plus comparisons in rules over undefined threshold observables.
 - Set directly_observable=true only when a case text could directly state the composite fact verbatim (rare).
@@ -116,6 +116,16 @@ HIGH-PRIORITY DECISION RULES
 - Prefer argument types that match the legal subject (e.g. actor + period) when the effect is time-bound.
 - Optionally set legal_output=true or output_category=legal_effect|timing|obligation|right on effect predicates.
 - Predicate descriptions should state the legal effect plainly; avoid naming only an intermediate label.
+
+7. Temporal support (when the law or question involves periods):
+- If the scoped text mentions consecutive periods, a following/previous/next period, or a second time a condition holds, add at least one reusable temporal relation between period types (e.g. next_financial_year(Period, Period), previous_financial_year(Period, Period)) as an observable background relation.
+- Use the existing period/year type already declared (FinancialYear, Period, etc.); do not invent case-specific dates.
+- Temporal relations are structural support for rules, not final legal answers.
+
+8. Threshold counting helpers (when the law limits how many criteria may be exceeded):
+- Declare helper predicates such as exceeds_criterion_A, exceeds_criterion_B, and a counting helper at_least_two_criteria_exceeded (or equivalent) as kind=helper, not observable.
+- Do not mark exceeds_*, more_than_one_*, threshold_*, or good_faith_estimate_shows_* style conditions as observable unless a case could literally assert that composite sentence verbatim (rare).
+- Prefer observable numeric functions plus helper threshold predicates defined later in rules.
 
 ================================================================================
 EXISTENTIAL CONDITION MODELING RULE

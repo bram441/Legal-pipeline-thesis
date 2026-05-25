@@ -253,8 +253,9 @@ def build_structure_block_from_facts(
     if kinds:
         close_obs = close_world_observables
         if close_obs is None:
-            env = (os.getenv("JSON_IR_CLOSE_WORLD_OBSERVABLES", "1") or "").strip().lower()
-            close_obs = env not in ("0", "false", "no")
+            from pipeline.config import json_ir_config
+
+            close_obs = bool(json_ir_config().close_world_observables)
         if close_obs:
             for pred, kind in kinds.items():
                 if kind == "observable" and pred and pred not in ext:
@@ -322,13 +323,13 @@ def build_structure_block_from_facts(
             typed_used = constants_by_type.get(t_name)
             if typed_used:
                 vs |= typed_used
-            else:
-                for v in t_vals:
-                    if isinstance(v, str) and v.strip():
-                        e = _to_idp_elem(v.strip())
-                        if not has_schema_sigs or e in used_in_facts:
-                            vs.add(e)
-                        constants.add(e)
+            for v in t_vals:
+                if isinstance(v, str) and v.strip():
+                    e = _to_idp_elem(v.strip())
+                    # Always seed declared/resolved entities into their typed domain so
+                    # query-only constants (e.g. company in query args) exist in FO vocabulary.
+                    vs.add(e)
+                    constants.add(e)
             if t_name == kb_primary_type and primary_constants:
                 vs |= primary_constants
             vals = sorted(vs)

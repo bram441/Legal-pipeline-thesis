@@ -28,10 +28,13 @@ class EvidenceExtensionConfig:
 
 
 def evidence_extension_config_from_env() -> EvidenceExtensionConfig:
-    allow = (os.getenv("JSON_IR_ALLOW_EVIDENCE_EXTENSION") or "1").strip().lower()
-    enabled = allow in {"1", "true", "yes"}
-    max_calls = int((os.getenv("JSON_IR_MAX_EVIDENCE_EXTENSION_CALLS") or "1").strip() or "1")
-    return EvidenceExtensionConfig(enabled=enabled, max_calls=max(0, max_calls))
+    from pipeline.config import json_ir_config
+
+    cfg = json_ir_config()
+    return EvidenceExtensionConfig(
+        enabled=bool(cfg.allow_evidence_extension),
+        max_calls=max(0, int(cfg.max_evidence_extension_calls)),
+    )
 
 
 @dataclass

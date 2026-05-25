@@ -1,0 +1,27 @@
+{
+  "id": "run_113",
+  "law": {
+    "path": "example_laws/microvennootschappen.txt"
+  },
+  "case": {
+    "text": "BV Orion heeft rechtspersoonlijkheid. Op balansdatum van het laatst afgesloten boekjaar heeft zij 45 voltijdse equivalenten, een jaarlijkse netto-omzet van 10.000.000 euro exclusief btw en een balanstotaal van 5.000.000 euro."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Is BV Orion een kleine vennootschap volgens artikel 1:24, paragraaf 1?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "The company has legal personality and exceeds none of the three small-company thresholds: 50 employees, 11,250,000 turnover, 6,000,000 balance sheet total."
+      }
+    }
+  ],
+  "kb_compile_strategy": "le_two_phase",
+  "kb_compile_backend": "json_ir",
+  "kb_compile_flags": {
+    "use_le": true,
+    "two_phase": true
+  },
+  "pipeline_backend_mode": "json_ir"
+}

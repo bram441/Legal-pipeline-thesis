@@ -87,16 +87,35 @@ HIGH-PRIORITY RULE RULES
 5. Thresholds and combinations.
 - Use observable functions for raw measurable values.
 - Preserve numeric thresholds exactly as in the scoped law text. Do not invent, adjust, round, or add to legal constants.
-- Use comparisons or helper predicates for threshold checks; every helper MUST have defining rules (appear in some rule THEN).
-- Never use `not helper_predicate(x)` when helper_predicate has no defining rule—undefined atoms are false and negate to true spuriously.
-- Prefer `func(entity, period) <= threshold` over an undefined `exceeds_threshold(entity, period)` observable.
-- When the law says not more than one criterion is exceeded: NEVER derive a favorable status from `A_exceeded OR B_exceeded OR C_exceeded` or from `within_A OR within_B OR within_C` (one disjunct is not enough).
-- Correct: `at_least_two_exceeded = (A_exceeded and B_exceeded) or (A_exceeded and C_exceeded) or (B_exceeded and C_exceeded)` then `favorable_status if not at_least_two_exceeded`; or pairwise within-threshold OR of two-way ANDs.
-- For threshold classifications, include BOTH: (1) qualification `not at_least_two_exceeded => classification` AND (2) exclusion `at_least_two_exceeded => not classification` (use `"negated": true` in THEN). Do not rely on absence of proof for false answers.
+- FIRST define per-criterion exceeded helpers in THEN from numeric compares (e.g. employees_exceeded(c,fy) from compare(annual_average_employees_fte(c,fy), >, THRESHOLD)).
+- THEN define counting helper H in THEN with pairwise conjunctions: (T1 & T2) OR (T1 & T3) OR (T2 & T3).
+- Include BOTH qualification AND exclusion for at-most-one criterion laws:
+  (1) qualification: NOT H plus other conditions => classification (non-negated in THEN);
+  (2) exclusion: H => NOT classification (use "negated": true in THEN — never C = false).
+- Never use a function name as a Bool predicate atom; use compare(func(...), op, value) instead.
+- Never use `not helper_predicate(x)` when helper_predicate has no defining rule.
+- When the law says not more than one criterion is exceeded: NEVER derive a favorable status from `A_exceeded OR B_exceeded OR C_exceeded` alone.
 - For “at least two of A, B, C”, use pairwise combinations: (A and B) or (A and C) or (B and C).
 - For “at most one of A, B, C”, negate the “at least two” condition.
 - Do not count Boolean conditions with arithmetic.
 - Use Real literals (e.g. 900000.0) when comparing Real functions; use Int literals for Int functions.
+
+5b. Helper closure (critical):
+- Before finishing, list every helper predicate or helper-valued function used in any rule IF-condition.
+- Each such symbol MUST also appear in at least one rule THEN (defining it from observable functions/comparisons or simpler helpers).
+- Helper predicates: define in THEN as P(args) or negated P(args) from compares or simpler helpers.
+- Helper functions (Real/Int thresholds): define in THEN with compare equality to a law-text literal, e.g.
+  {"compare": {"left": {"func": "adjusted_employee_threshold", "args": ["c", "fy"]}, "op": "=", "right": 50}}
+- Prefer direct IF comparisons to law literals (annual_average_employees_fte(c,fy) <= 50) unless an adjusted threshold helper already exists in SYMBOL_TABLE and must be closed.
+- If helper H is missing a definition, ADD a new rule with H in THEN rather than deleting H from IF or renaming it.
+- Example pattern for exceeds_employee_threshold(c, fy): THEN exceeds_employee_threshold(c, fy) when compare(annual_average_employees(c, fy), >, 50).
+- Example pattern for more_than_one_criterion_exceeded(c, fy): THEN when at least two single-criterion exceedance helpers hold for the same (c, fy).
+- Never use numeric functions as Bool predicate atoms; never assign false/true to predicates as if they were functions.
+
+5c. Existential conditions without witness entities:
+- When the law only requires that some related entity exists (affiliation, consortium, subsidiary link), do NOT call a binary relation with the same variable twice (e.g. affiliated_with(c, c)).
+- Prefer an observable Boolean on the main subject (e.g. has_affiliated_companies(c)) unless the identity of the related entity is legally required in the conclusion.
+- Apply the same pattern for consortium/parent/subsidiary existence checks referenced in threshold consolidation rules.
 
 6. Raw FO is forbidden.
 - Every rule must be object-shaped JSON_IR.

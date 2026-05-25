@@ -13,7 +13,7 @@ from pipeline.kb.law_numeric_literals import extract_numeric_values_from_law_tex
 from pipeline.kb.numeric_threshold_provenance import _iter_compare_nodes, _literal_to_float, _side_is_function_term
 from pipeline.kb.threshold_cardinality import (
     _AT_LEAST_TWO_PRED_RE,
-    _is_negated_simple_or_of_thresholds,
+    _is_pairwise_or_of_thresholds,
     _rule_has_favorable_derived_then,
     law_text_has_at_most_one_criterion_language,
 )
@@ -60,62 +60,73 @@ def _has_negated_classification_in_then(rules: list, classification: str) -> boo
     return False
 
 
-def _if_has_negated_pairwise_threshold_structure(expr) -> bool:
-    """IF uses NOT (OR of multi-threshold AND groups) — encodes at-most-one qualification."""
+def _if_has_non_negated_at_least_two_helper(expr, *, negated: bool = False) -> bool:
     if isinstance(expr, list):
-        return any(_if_has_negated_pairwise_threshold_structure(x) for x in expr)
-    if not isinstance(expr, dict):
-        return False
-    if _is_negated_simple_or_of_thresholds(expr):
-        return True
-    if "not" in expr:
-        inner = expr.get("not")
-        if isinstance(inner, dict) and "or" in inner:
-            or_children = inner.get("or") or []
-            if len(or_children) >= 2:
-                and_pairs = sum(
-                    1
-                    for c in or_children
-                    if isinstance(c, dict) and "and" in c and len(c.get("and") or []) >= 2
-                )
-                if and_pairs >= 2:
-                    return True
-        return _if_has_negated_pairwise_threshold_structure(inner)
-    if "and" in expr:
-        return any(_if_has_negated_pairwise_threshold_structure(x) for x in (expr.get("and") or []))
-    if "or" in expr:
-        return any(_if_has_negated_pairwise_threshold_structure(x) for x in (expr.get("or") or []))
-    return False
-
-
-def _if_uses_at_least_two_helper(expr) -> bool:
-    if isinstance(expr, list):
-        return any(_if_uses_at_least_two_helper(x) for x in expr)
+        return any(_if_has_non_negated_at_least_two_helper(x, negated=negated) for x in expr)
     if not isinstance(expr, dict):
         return False
     if "pred" in expr or "symbol" in expr:
+        if negated:
+            return False
         name = str(expr.get("pred") or expr.get("symbol") or "")
+        if bool(expr.get("negated") or expr.get("neg")):
+            return False
         return bool(_AT_LEAST_TWO_PRED_RE.search(name))
     if "not" in expr:
-        return _if_uses_at_least_two_helper(expr.get("not"))
+        return _if_has_non_negated_at_least_two_helper(expr.get("not"), negated=True)
     if "and" in expr:
-        return any(_if_uses_at_least_two_helper(x) for x in (expr.get("and") or []))
+        return any(
+            _if_has_non_negated_at_least_two_helper(x, negated=negated)
+            for x in (expr.get("and") or [])
+        )
     if "or" in expr:
-        return any(_if_uses_at_least_two_helper(x) for x in (expr.get("or") or []))
+        return any(
+            _if_has_non_negated_at_least_two_helper(x, negated=negated)
+            for x in (expr.get("or") or [])
+        )
+    return False
+
+
+def _if_has_non_negated_pairwise_exceeded(expr) -> bool:
+    if isinstance(expr, list):
+        return any(_if_has_non_negated_pairwise_exceeded(x) for x in expr)
+    if not isinstance(expr, dict):
+        return False
+    if "not" in expr:
+        return False
+    if _is_pairwise_or_of_thresholds(expr):
+        return True
+    if "and" in expr:
+        return any(_if_has_non_negated_pairwise_exceeded(x) for x in (expr.get("and") or []))
+    if "or" in expr:
+        return any(_if_has_non_negated_pairwise_exceeded(x) for x in (expr.get("or") or []))
+    return False
+
+
+def _rule_has_exclusion_disqualification(
+    raw_rule: dict,
+    classification_preds: set[str],
+) -> bool:
+    if_side, _ = _rule_expr_sides(raw_rule)
+    negated_classifications = {
+        u.name
+        for u in _collect_pred_atom_usages([raw_rule])
+        if u.side == "then" and u.negated and u.name in classification_preds
+    }
+    if not negated_classifications:
+        return False
+    if _if_has_non_negated_at_least_two_helper(if_side):
+        return True
+    if _if_has_non_negated_pairwise_exceeded(if_side):
+        return True
     return False
 
 
 def _disqualification_semantics_present(rules: list, classification_preds: set[str]) -> bool:
-    for name in classification_preds:
-        if _has_negated_classification_in_then(rules, name):
-            return True
     for raw_rule in rules:
-        if not isinstance(raw_rule, dict):
-            continue
-        if_side, _ = _rule_expr_sides(raw_rule)
-        if _if_has_negated_pairwise_threshold_structure(if_side):
-            return True
-        if _if_uses_at_least_two_helper(if_side):
+        if isinstance(raw_rule, dict) and _rule_has_exclusion_disqualification(
+            raw_rule, classification_preds
+        ):
             return True
     return False
 

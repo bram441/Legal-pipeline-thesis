@@ -23,15 +23,22 @@ _CARDS: dict[str, RepairCard] = {
         title="Missing helper definition",
         layer="rules",
         do_items=(
-            "Define the helper predicate with rules using lower-level observables/functions.",
-            "Or replace the helper in the rule body with lower-level conditions.",
+            "The repair card names the exact missing helper and its signature from the symbol table.",
+            "Define the helper with one or more rules where it appears in THEN (from observables, compares, or simpler helpers).",
+            "Or reclassify as observable/case_input/background only when the fact is directly case-given and safe.",
+            "For threshold/counting helpers, prefer pairwise/conjunctive THEN definitions (A&B, A&C, B&C).",
+            "Temporal support relations marked background/case_input do not need a THEN definition.",
         ),
         do_not_items=(
-            "Delete the helper condition.",
-            "Mark it observable without a case-level justification.",
-            "Rename it without defining it.",
+            "Delete the helper condition from the rule IF.",
+            "Rename the helper without defining it in THEN.",
+            "Introduce another undefined helper to replace the missing one.",
+            "Mark computed threshold helpers observable without case-level justification.",
         ),
-        preferred_pattern="helper(X) :- observable_fact(X), compare(metric(X), op, threshold).",
+        preferred_pattern=(
+            "missing_helper(C,FY) in THEN from compare(metric(C,FY), >, threshold); "
+            "more_than_one(C,FY) in THEN from pairwise exceeded OR of (A&B)|(A&C)|(B&C)."
+        ),
     ),
     "missing_helper_definition_for_legal_effect": RepairCard(
         card_id="missing_helper_definition_for_legal_effect",
@@ -358,6 +365,106 @@ _CARDS: dict[str, RepairCard] = {
         do_not_items=(
             "Rename predicates without preserving semantics.",
             "Turn legal-output predicates into observables.",
+        ),
+    ),
+    "suspicious_self_relation": RepairCard(
+        card_id="suspicious_self_relation",
+        title="Suspicious self-relation R(x,x)",
+        layer="rules",
+        do_items=(
+            "Do not use R(c,c) to express existence of another related entity.",
+            "Introduce a distinct quantified variable: exists other != c and R(c, other).",
+            "Or model existence as an observable Boolean on the main subject (has_related_entities(c)).",
+            "Only use R(x,x) when the predicate is explicitly reflexive by name, description, or metadata.",
+        ),
+        do_not_items=(
+            "Keep affiliated_with(c,c) or forms_consortium_with(c,c) style self-applications.",
+            "Delete the legal condition instead of fixing the relation pattern.",
+        ),
+        preferred_pattern="has_affiliated_companies(c) observable OR affiliated_with(c, other) with other != c.",
+    ),
+    "no_helper_definition_progress": RepairCard(
+        card_id="no_helper_definition_progress",
+        title="No helper-definition progress",
+        layer="rules",
+        do_items=(
+            "Add a new rule with the missing helper in THEN, not only in IF.",
+            "Define from observables/compares or simpler helpers already in the symbol table.",
+            "For threshold helpers use pairwise/conjunctive THEN definitions.",
+        ),
+        do_not_items=(
+            "Resubmit identical rules without a THEN definition for the missing helper.",
+            "Rename the helper without defining it.",
+        ),
+    ),
+    "predicate_used_as_function": RepairCard(
+        card_id="predicate_used_as_function",
+        title="Predicate used as function",
+        layer="rules",
+        do_items=(
+            "Use predicates as P(args) or negated P(args) in IF/THEN.",
+            "Use numeric functions only inside compare left/right terms.",
+        ),
+        do_not_items=(
+            "Use a predicate name as a function term.",
+            "Write P(args) = value — predicates are not functions.",
+        ),
+    ),
+    "function_used_as_predicate": RepairCard(
+        card_id="function_used_as_predicate",
+        title="Function used as predicate",
+        layer="rules",
+        do_items=(
+            "Use numeric functions only inside compare left/right: F(args) op N.",
+            "For legal NO conclusions, use negated predicate in THEN.",
+        ),
+        do_not_items=(
+            "Use a function name as a Bool predicate atom.",
+            "Write F(args) = false — functions are not predicates.",
+        ),
+        preferred_pattern=(
+            'compare({"func": "F", "args": [...]}, "<=", {"func": "threshold", ...}) in IF; '
+            'THEN compare equality to define threshold helper from law literal.'
+        ),
+    ),
+    "repeated_missing_numeric_helper_definition": RepairCard(
+        card_id="repeated_missing_numeric_helper_definition",
+        title="Repeated missing numeric helper definition",
+        layer="rules",
+        do_items=(
+            "Define the threshold helper function in THEN with compare equality to a law-text literal.",
+            "Use the numeric threshold helper scaffold pattern.",
+        ),
+        do_not_items=(
+            "Reuse the function only in IF without a THEN equality definition.",
+            "Define case-value observables from law thresholds.",
+        ),
+    ),
+    "numeric_threshold_ambiguous": RepairCard(
+        card_id="numeric_threshold_ambiguous",
+        title="Ambiguous law threshold for numeric helper",
+        layer="rules",
+        do_items=(
+            "Pick the law literal matching the function name/description and scoped article.",
+            "Define with THEN compare equality using that single literal.",
+        ),
+        do_not_items=(
+            "Guess among multiple plausible thresholds silently.",
+            "Invent thresholds not present in scoped law text.",
+        ),
+    ),
+    "repeated_missing_helper_definition": RepairCard(
+        card_id="repeated_missing_helper_definition",
+        title="Repeated missing helper definition",
+        layer="rules",
+        do_items=(
+            "Two repair attempts failed to add a THEN rule for the same helper.",
+            "Use the threshold pairwise scaffold: define exceeded helpers, then counting helper H in THEN.",
+            "If symbols cannot express the helper, escalate to symbols repair with new helpers/functions.",
+        ),
+        do_not_items=(
+            "Rename the helper again without defining it.",
+            "Delete IF conditions that use the helper.",
         ),
     ),
 }

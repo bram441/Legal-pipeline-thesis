@@ -64,7 +64,10 @@ Fix all applicable issues:
 - threshold logic using illegal Boolean arithmetic;
 - missing exclusion rule for threshold classification (add at_least_two_exceeded => not classification in THEN);
 - numeric threshold literal not present in scoped law text (preserve law-text numbers exactly);
-- unsafe OR over single within-threshold compares when law requires at-most-one criterion exceeded.
+- unsafe OR over single within-threshold compares when law requires at-most-one criterion exceeded;
+- missing_helper_definition: ADD defining rules whose THEN contains the cited helper, built from observable numeric functions/comparisons; do NOT remove the helper from IF or rename it without defining it;
+- derived_predicate_not_defined: ADD at least one rule whose THEN contains each listed derived predicate;
+- helper used in IF but never in THEN: add a defining rule before attempting any other fix.
 
 Preserve numeric thresholds exactly from LAW TEXT. Do not change 900000 to 1900000 or similar.
 

@@ -1,0 +1,53 @@
+{
+  "id": "run_006",
+  "law": {
+    "path": "example_laws/microvennootschappen.txt"
+  },
+  "case": {
+    "text": "BV Horizon overschreed gedurende twee achtereenvolgende boekjaren telkens meer dan één van de drempels uit artikel 1:24, paragraaf 1. Het tweede jaar van overschrijding is boekjaar 2025."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Gaan de gevolgen volgens artikel 1:24, paragraaf 2 in vanaf het boekjaar dat volgt op boekjaar 2025?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "When more than one criterion is exceeded for two consecutive financial years, the effects start from the financial year following the year in which the criteria were exceeded for the second time."
+      }
+    }
+  ],
+  "kb_compile_strategy": "direct_json_ir_translate",
+  "kb_compile_backend": "json_ir",
+  "kb_compile_flags": {
+    "use_le": false,
+    "two_phase": false,
+    "uses_translation": true,
+    "json_ir_generation": "symbols_then_rules"
+  },
+  "pipeline_backend_mode": "json_ir",
+  "extraction_backend": "json_ir",
+  "strategy_metadata": {
+    "strategy_name": "direct_json_ir_translate",
+    "canonical_strategy_name": "direct_json_ir_translate",
+    "kb_backend": "json_ir",
+    "uses_le_intermediate": false,
+    "json_ir_generation": "symbols_then_rules",
+    "legacy_two_phase_env": false,
+    "belief_scoring": false,
+    "strategy_deprecated": false,
+    "law_scope_mode": null,
+    "repair_enabled": true,
+    "configured_translation": true,
+    "effective_translation": true,
+    "translation_source": "strategy",
+    "uses_translation": true,
+    "json_ir_structured_repair_enabled": true,
+    "json_ir_max_symbol_versions": 3,
+    "json_ir_max_rules_attempts_per_symbol_version": 3,
+    "json_ir_max_kb_llm_calls": 10,
+    "json_ir_outer_cache_retries_enabled": false,
+    "json_ir_outer_cache_max_attempts": 1,
+    "pipeline_backend_mode": "json_ir"
+  }
+}
