@@ -5,7 +5,7 @@ from debug import debug_log, status_log
 
 from pipeline.eval.boolean_belief import summarize_boolean_symbolic
 from pipeline.extraction.extractor import extract_case_and_query, extract_case_only, extract_query_only, ExtractionError
-from pipeline.symbolic.router import run_query
+from pipeline.symbolic.intent_execution import execute_routed_symbolic_query
 from pipeline.rendering.answer_renderer import render_answer
 from pipeline.validation.fo_validation import normalize_and_validate_case, normalize_and_validate_query
 from pipeline.validation.pre_solver_validation import (
@@ -89,6 +89,8 @@ def answer_legal_prompt(
     trace_path=None,
     pre_extracted_case=None,
     run_artifact_dir=None,
+    question_artifact_dir=None,
+    expected_answer=None,
 ):
     """Run the full pipeline for a single (case_text, user_question).
 
@@ -329,14 +331,18 @@ def answer_legal_prompt(
         trace.log("Query (normalized)", json.dumps(query, indent=2, ensure_ascii=False))
 
     status_log("Reasoning", "Running symbolic reasoning (IDP-Z3)")
-    debug_log("pipeline.answer_legal_prompt", "symbolic.run_query")
+    debug_log("pipeline.answer_legal_prompt", "symbolic.execute_routed")
+    q_art = question_artifact_dir or run_artifact_dir
     try:
-        sat, result = run_query(
+        sat, result, routing = execute_routed_symbolic_query(
             case,
             query,
-            base_kb_text=base_kb_text,
-            kb_schema=kb_schema,
+            base_kb_text,
             user_question=original_question,
+            expected=expected_answer,
+            kb_schema=kb_schema,
+            schema_environment=schema_environment,
+            artifact_dir=q_art,
         )
     except Exception as e:
         from pipeline.utils.unicode_sanitize import sanitize_for_output
@@ -397,7 +403,8 @@ def answer_legal_prompt(
         "case": case,
         "query": query,
         "symbolic_result": result,
-        "prediction": prediction,          # ← NEW (for tests)
+        "symbolic_intent_routing": routing,
+        "prediction": prediction,
         "natural_language": rendered.get("answer"),
         "explanation": rendered.get("explanation"),
         "extraction_prompt": extraction_prompt,

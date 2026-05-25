@@ -24,4 +24,12 @@ def run(case, base_kb_text, query):
         out = run_get_range(fo_code, symbol_name=symbol, filter_entity=entity)
     except Exception as e:
         return None, {"status": "unsupported", "message": str(e)}
-    return True, {"symbol": symbol, "function": symbol, "args": args, "range": out.get("range"), "entity": entity}
+    return True, {
+        "symbol": symbol,
+        "function": symbol,
+        "args": args,
+        "range": out.get("range"),
+        "entity": entity,
+        "via_model_expand": bool(out.get("via_model_expand")),
+        "confidence": "possible_model_only" if out.get("via_model_expand") else "idp_get_range",
+    }

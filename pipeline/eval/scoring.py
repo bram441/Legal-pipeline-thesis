@@ -193,8 +193,74 @@ def score_question(expected, symbolic_result, *, query=None, kb_schema=None, use
 
     pred = symbolic_result or {}
 
-    sym_intent = str(pred.get("intent") or "").strip().lower()
+    sym_status = str(pred.get("symbolic_status") or pred.get("status") or "ok").strip().lower()
+    sym_intent = str(pred.get("intent") or pred.get("selected_intent") or "").strip().lower()
     certainty_class = pred.get("certainty_class")
+
+    if sym_status in ("inconsistent", "unsatisfiable"):
+        return {
+            "match": False,
+            "decisive": False,
+            "inconclusive": True,
+            "scoring_mode": "unscored",
+            "failure_category": "inconsistent_kb_case",
+            "symbolic_status": sym_status,
+            "internal_intent": sym_intent,
+            "epistemic_label": "unknown",
+            "reason": pred.get("message") or "KB+case theory is unsatisfiable",
+        }
+
+    if sym_status == "error":
+        return {
+            "match": False,
+            "decisive": False,
+            "inconclusive": True,
+            "scoring_mode": "unscored",
+            "failure_category": "intent_execution_error",
+            "symbolic_status": sym_status,
+            "internal_intent": sym_intent,
+            "epistemic_label": "unknown",
+            "reason": pred.get("message") or "symbolic execution error",
+        }
+
+    if sym_status == "unsupported":
+        return {
+            "match": False,
+            "decisive": False,
+            "inconclusive": True,
+            "scoring_mode": "unscored",
+            "failure_category": "unsupported_intent",
+            "symbolic_status": sym_status,
+            "internal_intent": sym_intent,
+            "epistemic_label": "unknown",
+            "reason": pred.get("message") or "unsupported symbolic intent",
+        }
+
+    if (
+        str(expected.get("mode") or "").lower() == "boolean"
+        and sym_intent in (
+            "model_expansion",
+            "get_range",
+            "optimization",
+            "explain",
+            "relevance",
+            "propagation",
+        )
+        and not (
+            sym_intent == "propagation"
+            and (expected.get("target_predicate") or (query or {}).get("predicate"))
+        )
+    ):
+        return {
+            "match": False,
+            "decisive": False,
+            "inconclusive": True,
+            "scoring_mode": "manual",
+            "failure_category": "unscored_intent",
+            "internal_intent": sym_intent,
+            "epistemic_label": "unknown",
+            "reason": "Boolean expected answer cannot be scored from " + sym_intent,
+        }
 
     if expected.get("intent"):
         intent = str(expected.get("intent")).strip().lower()
@@ -289,11 +355,29 @@ def score_question(expected, symbolic_result, *, query=None, kb_schema=None, use
             str(x).strip().lower()
             for x in (pred.get("entailed") or pred.get("certain") or pred.get("certain_set") or [])
         )
+        if sym_intent == "model_expansion":
+            me = pred.get("model_expansion") or {}
+            outputs = me.get("possible_outputs") or []
+            got_set = sorted(
+                str((o.get("symbol") or "")).strip().lower()
+                for o in outputs
+                if isinstance(o, dict) and o.get("symbol")
+            )
+            if not got_set and me.get("status") == "no_output_symbols_available":
+                return {
+                    "match": False,
+                    "decisive": False,
+                    "inconclusive": True,
+                    "scoring_mode": "unscored",
+                    "failure_category": "unsupported_intent",
+                    "reason": "no_output_symbols_available",
+                    "internal_intent": sym_intent,
+                }
         return {
             "match": exp_set == got_set,
             "expected": exp_set,
             "got": got_set,
-            "scoring_mode": "decisive",
+            "scoring_mode": "decisive" if sym_intent in ("deduction_set", "model_expansion") else "manual",
             "certainty_class": pred.get("certainty_class") or "decisive",
             "internal_intent": sym_intent or "deduction_set",
         }

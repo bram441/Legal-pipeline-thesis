@@ -1,0 +1,12 @@
+{
+  "question": "Does the surviving spouse have the right to usufruct of the entire estate pursuant to Article 4.17?",
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "scorable": true,
+  "fallback_intent": null,
+  "warnings": [],
+  "legal_output_symbols": [],
+  "query_hint_type": "boolean",
+  "expected_question_type": "boolean"
+}

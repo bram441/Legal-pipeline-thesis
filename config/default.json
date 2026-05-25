@@ -32,7 +32,12 @@
   "evaluation": {
     "belief_scoring": false,
     "boolean_belief_threshold": 0.5,
-    "open_world_p_yes": 0.5
+    "open_world_p_yes": 0.5,
+    "run_pre_query_satisfiability_check": true,
+    "continue_if_satisfiability_unsupported": true,
+    "continue_if_satisfiability_error": false,
+    "enable_intent_diagnostics_on_unknown": false,
+    "model_expansion_max_models": 3
   },
   "debug": {
     "trace": false,

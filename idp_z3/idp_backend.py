@@ -114,7 +114,7 @@ def run_get_range(fo_code, symbol_name, theory_name="T", struct_name="S", timeou
         return {"range": "No model exists (theory is unsatisfiable)."}
     models = list(model_expand(*theories, S, max=1, timeout_seconds=timeout_seconds))
     if not models:
-        return {"range": "Could not expand model."}
+        return {"range": "Could not expand model.", "via_model_expand": True}
     model_str = sanitize_for_output(str(models[0]))
     pat = re.compile(r"\b" + re.escape(symbol_name) + r"\s*:=\s*(\{[^}]*\}|\d+)")
     m = pat.search(model_str)
@@ -122,8 +122,8 @@ def run_get_range(fo_code, symbol_name, theory_name="T", struct_name="S", timeou
         raw = m.group(1).strip()
         if filter_entity:
             raw = _filter_range_to_entity(raw, filter_entity)
-        return {"range": raw}
-    return {"range": "Symbol " + symbol_name + " not found in model output."}
+        return {"range": raw, "via_model_expand": True}
+    return {"range": "Symbol " + symbol_name + " not found in model output.", "via_model_expand": True}
 
 
 def _filter_range_to_entity(range_str, entity):
