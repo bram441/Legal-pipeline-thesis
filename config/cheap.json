@@ -1,0 +1,16 @@
+{
+  "json_ir": {
+    "max_kb_llm_calls": 6,
+    "max_symbol_versions": 2,
+    "max_rules_attempts_per_symbol_version": 2,
+    "repeated_error_limit": 2
+  },
+  "extraction": {
+    "max_retries": 2
+  },
+  "debug": {
+    "trace": false,
+    "quiet": false,
+    "llm_call_tracking": true
+  }
+}

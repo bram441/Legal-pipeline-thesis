@@ -617,44 +617,32 @@ def json_ir_outer_cache_retries_enabled() -> bool:
     return bool(json_ir_config().allow_outer_cache_retries)
 
 
-def resolve_max_repair_attempts(kb_backend: str, default: int = 8, *, log_warnings: bool = True) -> int:
-    """
-    Outer cache repair attempts. JSON_IR defaults to 1 (structured loop handles repair).
-    ``PIPELINE_KB_MAX_REPAIR_ATTEMPTS`` applies to legacy FO only unless
-    ``JSON_IR_ALLOW_OUTER_CACHE_RETRIES=1``.
-    """
+def resolve_max_repair_attempts(kb_backend: str | None = None, default: int = 8, *, log_warnings: bool = True) -> int:
+    """Outer cache attempts: 1 by default; optional outer retries via JSON_IR_ALLOW_OUTER_CACHE_RETRIES."""
+    del kb_backend
     env_attempts = (os.getenv("PIPELINE_KB_MAX_REPAIR_ATTEMPTS") or "").strip()
-    if kb_backend == "json_ir":
-        if json_ir_outer_cache_retries_enabled():
-            n = default
-            if env_attempts:
-                try:
-                    n = max(1, int(env_attempts))
-                except ValueError:
-                    pass
-            if log_warnings:
-                status_log(
-                    "KB",
-                    "WARNING: JSON_IR outer cache retries enabled (JSON_IR_ALLOW_OUTER_CACHE_RETRIES=1); "
-                    "structured compile loop may run up to {} outer time(s)".format(n),
-                )
-            return n
-        if env_attempts and log_warnings:
+    if json_ir_outer_cache_retries_enabled():
+        n = default
+        if env_attempts:
+            try:
+                n = max(1, int(env_attempts))
+            except ValueError:
+                pass
+        if log_warnings:
             status_log(
                 "KB",
-                "Ignoring PIPELINE_KB_MAX_REPAIR_ATTEMPTS={} for json_ir backend "
-                "(inner structured loop handles repair; set JSON_IR_ALLOW_OUTER_CACHE_RETRIES=1 to enable outer retries)".format(
-                    env_attempts
-                ),
+                "WARNING: JSON_IR outer cache retries enabled; "
+                "structured compile loop may run up to {} outer time(s)".format(n),
             )
-        return 1
-    n = default
-    if env_attempts:
-        try:
-            n = max(1, int(env_attempts))
-        except ValueError:
-            pass
-    return n
+        return n
+    if env_attempts and log_warnings:
+        status_log(
+            "KB",
+            "Ignoring PIPELINE_KB_MAX_REPAIR_ATTEMPTS={} (set JSON_IR_ALLOW_OUTER_CACHE_RETRIES=1 for outer retries)".format(
+                env_attempts
+            ),
+        )
+    return 1
 
 
 def _format_json_ir_cache_error(exc: LawCompilationError) -> str:
@@ -690,8 +678,7 @@ def get_or_compile_kb(
     """Compile or load KB. When cache_subdir is set (e.g. 'translated'), use run_dir/cache_subdir/ for cache.
     When PIPELINE_USE_LE=1, appends 'le' to cache path so LE and non-LE KBs are cached separately.
     When PIPELINE_TRACE=1, writes all steps to run_dir/run_trace.txt for debugging.
-    Outer repair: legacy FO uses ``PIPELINE_KB_MAX_REPAIR_ATTEMPTS`` (default 8).
-    JSON_IR uses a single outer attempt; repair is handled in ``json_ir_compile_loop``."""
+    JSON-IR uses a single outer attempt by default; repair is handled in ``json_ir_compile_loop``."""
     base_run_dir = run_dir
     trace_path = os.path.join(base_run_dir, "run_trace.txt") if trace_enabled() else None
 
@@ -700,8 +687,7 @@ def get_or_compile_kb(
     parts = []
     if cache_subdir:
         parts.append(cache_subdir)
-    if kb_backend != "legacy_fo":
-        parts.append(kb_backend)
+    parts.append(kb_backend)
     if _use_le_enabled():
         parts.append("le")
     if parts:
@@ -807,8 +793,6 @@ def get_or_compile_kb(
                     "KB",
                     "Generating from law text (Logical English)" if _use_le_enabled() else "Generating from law text",
                 )
-        elif kb_backend != "json_ir":
-            status_log("KB", "Repair attempt {}".format(attempt))
 
         try:
             json_ir_artifacts = (
@@ -837,14 +821,14 @@ def get_or_compile_kb(
             # Legacy FO: outer cache may retry compile with repair_feedback.
             # JSON_IR: structured loop handles repair; outer rerun only when
             # JSON_IR_ALLOW_OUTER_CACHE_RETRIES=1 (see resolve_max_repair_attempts).
-            outer_retry_ok = kb_b != "json_ir" or json_ir_outer_cache_retries_enabled()
+            outer_retry_ok = json_ir_outer_cache_retries_enabled()
             if outer_retry_ok and not non_retryable and attempt < max_repair_attempts - 1:
                 repair_feedback = {
                     "error_message": msg,
                     "previous_output": prev_out,
                 }
                 if trace:
-                    label = "json_ir outer cache retry" if kb_b == "json_ir" else "legacy outer repair"
+                    label = "json_ir outer cache retry"
                     trace.log_error("LawCompilationError ({})".format(label), e)
                 if kb_b == "json_ir":
                     status_log(

@@ -1,5 +1,14 @@
 {
+  "_comment": "Copy to config/local.json (gitignored). Merge only keys you need to override.",
   "json_ir": {
-    "max_kb_llm_calls": 12
+    "max_kb_llm_calls": 12,
+    "max_symbol_versions": 3
+  },
+  "evaluation": {
+    "pragmatic_factual_criteria_mode": false
+  },
+  "debug": {
+    "trace": false,
+    "llm_call_tracking": true
   }
 }

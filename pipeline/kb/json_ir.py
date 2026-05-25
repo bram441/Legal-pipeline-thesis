@@ -133,6 +133,7 @@ class SymbolDecl:
     non_reflexive: bool = False
     legal_output: bool | None = None
     output_category: str = ""
+    factual_criteria_input: bool = False
 
 
 @dataclass(frozen=True)
@@ -319,19 +320,24 @@ def _validate_symbol_decl(raw: Any, ctx: str, *, default_returns: str) -> Symbol
         raw_dict.get("non_reflexive") is True
         or meta.get("non_reflexive") is True
     )
+    factual_criteria_input = bool(
+        raw_dict.get("factual_criteria_input") is True
+        or (isinstance(meta, dict) and meta.get("factual_criteria_input") is True)
+    )
     return SymbolDecl(
         name=name,
         args=parsed_args,
         returns=returns,
         kind=_normalize_kind(raw.get("kind")),
         description=str(raw.get("description") or "").strip(),
-        directly_observable=symbol_directly_observable(raw_dict),
+        directly_observable=symbol_directly_observable(raw_dict) or factual_criteria_input,
         background=symbol_background_or_case_input(raw_dict),
-        case_input=bool(raw_dict.get("case_input") is True),
+        case_input=bool(raw_dict.get("case_input") is True) or factual_criteria_input,
         reflexive_allowed=reflexive_allowed,
         non_reflexive=non_reflexive,
         legal_output=legal_output,
         output_category=output_category,
+        factual_criteria_input=factual_criteria_input,
     )
 
 
@@ -967,10 +973,13 @@ def _validate_floating_helpers(
     rules = ir.get("rules") or []
     in_if_p, in_if_f, def_then_p, def_then_f = _collect_helper_symbol_usage(rules, pred_kinds, fun_kinds)
     by_name = _decl_by_name(predicates or [], functions or [])
+    from pipeline.kb.factual_criteria import decl_exempt_from_computed_observable_checks
+
     floating_p = {
         n
         for n in (in_if_p - def_then_p)
         if not (by_name.get(n) and temporal_support_exempt_from_helper_definition(by_name[n]))
+        and not (by_name.get(n) and decl_exempt_from_computed_observable_checks(by_name[n]))
     }
     floating_f = {
         n
@@ -1000,12 +1009,16 @@ def _validate_floating_helpers(
 
 def _validate_observable_composite_symbol_declarations(predicates: list[SymbolDecl]) -> None:
     """Reject computed-looking observables unless explicitly marked case-direct."""
+    from pipeline.kb.factual_criteria import decl_exempt_from_computed_observable_checks
+
     for decl in predicates:
         if decl.kind != "observable":
             continue
         if decl.directly_observable:
             continue
         if decl.background or decl.case_input:
+            continue
+        if decl_exempt_from_computed_observable_checks(decl):
             continue
         if looks_computed_composite(decl.name, decl.description):
             raise JSONIRCompilationError(
@@ -1030,6 +1043,7 @@ def _validate_composite_predicate_rule_safety(
     decl_by_name = {p.name: p for p in predicates}
     defined_then = _predicates_defined_in_then(rules)
     usages = _collect_pred_atom_usages(rules)
+    from pipeline.kb.factual_criteria import decl_exempt_from_computed_observable_checks
 
     for u in usages:
         decl = decl_by_name.get(u.name)
@@ -1038,6 +1052,9 @@ def _validate_composite_predicate_rule_safety(
         kind = pred_kinds.get(u.name, decl.kind)
         computed = looks_computed_composite(decl.name, decl.description)
         defined = u.name in defined_then
+
+        if decl_exempt_from_computed_observable_checks(decl):
+            continue
 
         if kind == "observable" and computed and not decl.directly_observable:
             if u.side == "if" and not defined:
@@ -1057,6 +1074,8 @@ def _validate_composite_predicate_rule_safety(
             from pipeline.kb.temporal_support import temporal_support_exempt_from_helper_definition
 
             if temporal_support_exempt_from_helper_definition(decl):
+                continue
+            if decl_exempt_from_computed_observable_checks(decl):
                 continue
             neg_phrase = "negated " if u.negated else ""
             raise JSONIRCompilationError(
@@ -2001,6 +2020,10 @@ def _symbol_to_json(d: SymbolDecl) -> dict[str, Any]:
         obj["description"] = d.description
     if d.directly_observable:
         obj["directly_observable"] = True
+    if d.case_input:
+        obj["case_input"] = True
+    if d.factual_criteria_input:
+        obj["factual_criteria_input"] = True
     if d.legal_output is not None:
         obj["legal_output"] = d.legal_output
     if d.output_category:
@@ -2254,6 +2277,17 @@ def render_json_ir_to_fo_and_schema(
     law_text_for_lints: str | None = None,
     scope_metadata: dict | None = None,
 ) -> tuple[str, dict]:
+    from pipeline.kb.factual_criteria import apply_pragmatic_factual_criteria_to_ir
+
+    query_pred = None
+    if isinstance(scope_metadata, dict):
+        query_pred = scope_metadata.get("query_predicate")
+    apply_pragmatic_factual_criteria_to_ir(
+        ir,
+        query_predicate=query_pred,
+        diagnostics=scope_metadata.get("factual_criteria_diagnostics") if isinstance(scope_metadata, dict) else None,
+    )
+
     allow_partial = (os.getenv("JSON_IR_ALLOW_PARTIAL_KB") or "").strip().lower() in {
         "1",
         "true",

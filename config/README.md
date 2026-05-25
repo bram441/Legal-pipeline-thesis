@@ -32,7 +32,35 @@ cp config/local.json.example config/local.json
 
 Edit `local.json` with partial overrides only; unspecified keys fall back to `default.json`.
 
-**`eval.json`** — optional benchmark/eval profile (not loaded automatically). Copy values into `local.json` or set env vars when running `scripts/run_evaluation.py` or clean-compile audits. Suggested eval knobs: `max_kb_llm_calls: 14`, `max_symbol_versions: 4`.
+### Config profiles (manual merge)
+
+Profiles are **not** loaded automatically. Copy sections into `config/local.json` before a run:
+
+| File | Purpose |
+|------|---------|
+| `config/cheap.json` | Debugging / smoke — low LLM budget (`max_kb_llm_calls: 6`) |
+| `config/eval.json` | Medium reproducible evaluation (`max_kb_llm_calls: 14`) |
+| `config/final.json` | Final thesis run — higher budget, trace off, LLM tracking on |
+
+Example:
+
+```bash
+# Merge final profile into local overrides (PowerShell)
+Get-Content config/default.json, config/final.json | ConvertFrom-Json  # inspect manually
+# Or copy keys from config/final.json into config/local.json by hand
+```
+
+### Evaluation keys (`evaluation` section)
+
+| Key | Default | Meaning |
+|-----|---------|---------|
+| `belief_scoring` | `false` | When true, open-world may score via belief threshold |
+| `boolean_belief_threshold` | `0.5` | Threshold when belief scoring enabled |
+| `run_pre_query_satisfiability_check` | `true` | SAT check before query |
+| `pragmatic_factual_criteria_mode` | `false` | Allow factual criteria as case inputs (thesis comparison) |
+| `model_expansion_max_models` | `3` | Cap for model-expansion diagnostics (not Boolean entailment) |
+
+**`eval.json`** — same as eval profile above; suggested: `max_kb_llm_calls: 14`, `max_symbol_versions: 4`.
 
 Example (raises KB compile LLM budget):
 

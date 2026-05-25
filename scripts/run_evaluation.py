@@ -12,22 +12,19 @@ Usage (from project root):
   python scripts/run_evaluation.py --runs all --strategies all --max-failures 8
 
 Outputs under results/reports/evaluation_<timestamp>/:
-  - matrix.json      full results (includes evaluation_cli: kb_backend, pipeline_backend)
+  - matrix.json      full results (evaluation_cli metadata)
   - report.md        human-readable tables
   - summary.csv      open in Excel / LibreOffice
   - summary.xlsx     if openpyxl is installed (--excel)
   - timings.csv      per-cell wall-clock duration (seconds)
-  - work/            per (run, strategy[, pipeline]) output dirs — distinct names for legacy vs json_ir
-
-Default: --pipeline-backend json_ir; --kb-backend omitted (not passed to main.py). For a legacy sweep use
-``--pipeline-backend legacy``. Passing both --kb-backend and --pipeline-backend can confuse: main.py ignores
---kb-backend when --pipeline-backend is set (stderr warning in main.py).
+  - work/            per (run, strategy) output dirs
 """
 
 from __future__ import annotations
 
 import argparse
 import csv
+import importlib.util
 import json
 import shutil
 import sys
@@ -74,7 +71,6 @@ from pipeline.utils.llm_call_tracker import (  # noqa: E402
     write_cell_summary,
     write_eval_summary,
 )
-from pipeline.kb.compile_backend import KB_BACKEND_CHOICES
 
 
 def _format_duration(seconds: float | None) -> str:
@@ -174,7 +170,6 @@ def _write_markdown(path: Path, matrix: dict) -> None:
                 "## Strategy configuration",
                 "",
                 "JSON_IR backend always compiles via ``symbols_then_rules`` (symbols then rules). "
-                "Legacy names ``direct_two_phase`` / ``le_two_phase`` only change legacy FO staging; "
                 "they are deprecated for JSON_IR sweeps.",
                 "",
                 "| Strategy | Canonical | LE | Config trans | Effective trans | Source | JSON IR | Depr |",
@@ -474,9 +469,8 @@ def main() -> int:
     p.add_argument(
         "--strategies",
         default="all",
-        help="Comma-separated strategy names or 'all'. Default 'all' runs the four canonical "
-        "JSON_IR strategies (direct/le × translate/no_translate). Deprecated legacy aliases "
-        "(direct_single, le_two_phase, …) must be named explicitly. Choices: "
+        help="Comma-separated strategy names or 'all'. Default 'all' runs the four "
+        "JSON_IR strategies (direct/le × translate/no_translate). Choices: "
         + ", ".join(STRATEGY_CHOICES),
     )
     p.add_argument(
@@ -489,21 +483,6 @@ def main() -> int:
         action="store_true",
         help="Force skip translation for every cell (overrides per-strategy translate defaults). "
         "Without this flag, each strategy uses its own translate setting.",
-    )
-    p.add_argument(
-        "--kb-backend",
-        default=None,
-        metavar="NAME",
-        help="Optional: pass through to main.py --kb-backend (legacy_fo | json_ir). Ignored when "
-        "--pipeline-backend is set, because the pipeline flag fixes KB+extraction together. "
-        "Omit both this and --pipeline-backend to use .env defaults.",
-    )
-    p.add_argument(
-        "--pipeline-backend",
-        default="json_ir",
-        metavar="NAME",
-        help="Unified pipeline backend for main.py: 'legacy' or 'json_ir' (sets KB+extraction). "
-        "Default: json_ir. For a legacy sweep use --pipeline-backend legacy.",
     )
     p.add_argument("--clean", action="store_true", help="Remove output-dir if it exists before run")
     p.add_argument(
@@ -547,13 +526,6 @@ def main() -> int:
         help="Stop a cell with failure_category=llm_budget_guard after N OpenAI calls in that cell.",
     )
     args = p.parse_args()
-    if args.kb_backend is not None and args.kb_backend not in KB_BACKEND_CHOICES:
-        print("--kb-backend must be one of: " + ", ".join(KB_BACKEND_CHOICES), file=sys.stderr)
-        return 1
-    if args.pipeline_backend is not None and args.pipeline_backend not in ("legacy", "json_ir"):
-        print("--pipeline-backend must be one of: legacy, json_ir", file=sys.stderr)
-        return 1
-
     runs_dir = Path(args.runs_dir)
     if not runs_dir.is_absolute():
         runs_dir = _ROOT / runs_dir
@@ -566,9 +538,7 @@ def main() -> int:
         return 1
 
     try:
-        strategies = parse_strategies_selection(
-            args.strategies, pipeline_backend=args.pipeline_backend
-        )
+        strategies = parse_strategies_selection(args.strategies)
     except ValueError as e:
         print(e, file=sys.stderr)
         return 1
@@ -604,8 +574,6 @@ def main() -> int:
     strategy_definitions = {
         s: strategy_metadata_for_eval(
             s,
-            pipeline_backend=args.pipeline_backend,
-            kb_backend=args.kb_backend,
             belief_scoring=args.belief_scoring,
             cli_no_translate=args.no_translate,
         )
@@ -615,16 +583,7 @@ def main() -> int:
     print("Runs directory:", runs_dir)
     print("Runs:", ", ".join(run_ids))
     print("Strategies:", ", ".join(strategies))
-    print("CLI --kb-backend:", args.kb_backend)
-    print("CLI --pipeline-backend:", args.pipeline_backend)
-    if args.pipeline_backend and args.kb_backend:
-        implied = "json_ir" if args.pipeline_backend == "json_ir" else "legacy_fo"
-        if args.kb_backend != implied:
-            print(
-                "Note: main.py ignores --kb-backend when --pipeline-backend is set "
-                "(effective KB backend is " + implied + ").",
-                file=sys.stderr,
-            )
+    print("Pipeline: json_ir")
     print("Output:", out)
     print()
 
@@ -648,12 +607,7 @@ def main() -> int:
         for src in run_paths:
             rid = src.name
             for strategy in strategies:
-                wdir = work_root / work_dir_name(
-                    src,
-                    strategy,
-                    pipeline_backend=args.pipeline_backend,
-                    kb_backend=args.kb_backend if args.pipeline_backend is None else None,
-                )
+                wdir = work_root / work_dir_name(src, strategy)
                 print("===", rid, "+", strategy, "->", wdir.name, "===")
                 cell_t0 = time.perf_counter()
                 if wdir.exists():
@@ -663,8 +617,6 @@ def main() -> int:
                 set_run_context(run_id=rid, strategy=strategy, artifact_dir=wdir)
                 cell_meta = strategy_metadata_for_eval(
                     strategy,
-                    pipeline_backend=args.pipeline_backend,
-                    kb_backend=args.kb_backend,
                     belief_scoring=args.belief_scoring,
                     cli_no_translate=args.no_translate,
                 )
@@ -684,8 +636,6 @@ def main() -> int:
                     wdir,
                     strategy,
                     cli_no_translate=args.no_translate,
-                    kb_backend=args.kb_backend,
-                    pipeline_backend=args.pipeline_backend,
                     belief_scoring=args.belief_scoring,
                     llm_call_tracking=True,
                     max_llm_calls=args.max_llm_calls,
@@ -793,8 +743,7 @@ def main() -> int:
             "run_finished": run_finished,
             "timing": timing_summary,
             "evaluation_cli": {
-                "kb_backend": args.kb_backend,
-                "pipeline_backend": args.pipeline_backend,
+                "pipeline_backend": "json_ir",
                 "no_translate_global": args.no_translate,
                 "belief_scoring": bool(args.belief_scoring),
                 "max_failures": max_failures,
@@ -840,6 +789,28 @@ def main() -> int:
                 )
             if args.excel and xlsx_ok:
                 print("Wrote:", out / "summary.xlsx")
+            try:
+                _eg_path = Path(__file__).resolve().parent / "eval_grouped_metrics.py"
+                _eg_spec = importlib.util.spec_from_file_location("eval_grouped_metrics", _eg_path)
+                eval_grouped = importlib.util.module_from_spec(_eg_spec)
+                assert _eg_spec.loader is not None
+                _eg_spec.loader.exec_module(eval_grouped)
+                manifest = eval_grouped.load_test_set_manifest(runs_dir)
+                grouped = eval_grouped.compute_grouped_metrics(matrix, manifest)
+                matrix["grouped_metrics"] = grouped
+                (out / "grouped_summary.json").write_text(
+                    json.dumps(grouped, indent=2, ensure_ascii=False) + "\n",
+                    encoding="utf-8",
+                )
+                grouped_md = eval_grouped.format_grouped_report_md(grouped)
+                report_md = (out / "report.md").read_text(encoding="utf-8")
+                (out / "report.md").write_text(
+                    report_md.rstrip() + "\n\n" + grouped_md + "\n",
+                    encoding="utf-8",
+                )
+                print("Wrote:", out / "grouped_summary.json")
+            except Exception as eg_err:
+                print("Note: grouped metrics skipped:", eg_err, file=sys.stderr)
         except OSError as e:
             print("Failed to write evaluation reports:", e, file=sys.stderr)
 

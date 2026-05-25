@@ -24,18 +24,12 @@ if sys.platform == "win32" and hasattr(sys.stdout, "fileno"):
 from debug import status_log
 from pipeline.app.pipeline import answer_legal_prompt
 from pipeline.extraction.case_fact_validation import CASE_EXTRACTION_REPAIR_ARTIFACT
-from pipeline.extraction.extractor import (
-    extract_case_only,
-    ExtractionError,
-    extraction_backend_env_override,
-    get_extraction_backend_from_env,
-)
+from pipeline.extraction.extractor import extract_case_only, ExtractionError
 from pipeline.io.text_runs import load_text_run, write_text_results
 from pipeline.io.json_runs import load_json_run, write_json_results, write_score, merge_json_run_file
 from pipeline.eval.scoring import score_question
 from pipeline.kb.cache import get_or_compile_kb
 from pipeline.kb.schema_environment import build_schema_environment
-from pipeline.kb.compile_backend import KB_BACKEND_CHOICES, get_kb_backend_from_env, kb_backend_env_override
 from pipeline.kb.compile_strategy import (
     STRATEGY_CHOICES,
     get_strategy_spec,
@@ -49,63 +43,12 @@ from pipeline.translation.translator import translate_to_english, TranslationErr
 from pipeline.utils.unicode_sanitize import sanitize_for_output
 
 
-def _resolve_backends(cli_pipeline_backend=None, cli_kb_backend=None):
-    """
-    Unified backend mode:
-      - pipeline_backend=legacy -> kb=legacy_fo, extraction=legacy
-      - pipeline_backend=json_ir -> kb=json_ir, extraction=json_ir
-    When pipeline is unset and --kb-backend is unset, KB and extraction follow
-    environment (defaults: both json_ir; set PIPELINE_*_BACKEND to override).
-    """
-    if cli_pipeline_backend is None:
-        if cli_kb_backend is None:
-            return get_kb_backend_from_env(), get_extraction_backend_from_env()
-        if cli_kb_backend == "legacy_fo":
-            return "legacy_fo", "legacy"
-        if cli_kb_backend == "json_ir":
-            return "json_ir", "json_ir"
-        raise ValueError("Unknown kb backend: " + str(cli_kb_backend))
-    if cli_pipeline_backend == "legacy":
-        return "legacy_fo", "legacy"
-    if cli_pipeline_backend == "json_ir":
-        return "json_ir", "json_ir"
-    raise ValueError("Unknown pipeline backend: " + str(cli_pipeline_backend))
-
-
-def _effective_pipeline_backend_label(cli_pipeline_backend, resolved_kb_backend, resolved_extraction_backend):
-    if cli_pipeline_backend in ("legacy", "json_ir"):
-        return cli_pipeline_backend
-    # If both were explicitly resolved together by other means, infer a clean label.
-    if resolved_kb_backend == "legacy_fo" and resolved_extraction_backend == "legacy":
-        return "legacy"
-    if resolved_kb_backend == "json_ir" and resolved_extraction_backend == "json_ir":
-        return "json_ir"
-    # Environment/default/manual mix (still useful to expose explicitly).
-    return "mixed"
-
-
-def _warn_cli_backend_mismatch(cli_pipeline_backend, cli_kb_backend):
-    """When both CLI flags are set, ``--pipeline-backend`` wins; warn if they disagree."""
-    if not cli_pipeline_backend or cli_kb_backend is None:
-        return
-    implied = "json_ir" if cli_pipeline_backend == "json_ir" else "legacy_fo"
-    if cli_kb_backend != implied:
-        print(
-            "Warning: --kb-backend %r is ignored when --pipeline-backend %r is set "
-            "(effective KB backend is %r)."
-            % (cli_kb_backend, cli_pipeline_backend, implied),
-            file=sys.stderr,
-        )
-
-
 def run_text_mode(
     run_dir,
     provider,
     *,
     cli_no_translate: bool = False,
     cli_kb_strategy=None,
-    cli_kb_backend=None,
-    cli_pipeline_backend=None,
 ):
     payload = load_text_run(run_dir)
 
@@ -128,30 +71,17 @@ def run_text_mode(
             print("Translation failed:", e)
             return
 
-    resolved_kb_backend, resolved_extraction_backend = _resolve_backends(
-        cli_pipeline_backend=cli_pipeline_backend,
-        cli_kb_backend=cli_kb_backend,
-    )
-    _warn_cli_backend_mismatch(cli_pipeline_backend, cli_kb_backend)
-    pipeline_backend_label = _effective_pipeline_backend_label(
-        cli_pipeline_backend, resolved_kb_backend, resolved_extraction_backend
-    )
-
     with ExitStack() as stack:
         stack.enter_context(ctx)
-        stack.enter_context(kb_backend_env_override(resolved_kb_backend))
-        stack.enter_context(extraction_backend_env_override(resolved_extraction_backend))
         status_log("KB", "Loading or compiling knowledge base")
         kb_text, kb_schema = get_or_compile_kb(run_dir, law_text, cache_subdir="translated" if translate else None)
         schema_environment = build_schema_environment(kb_schema) if kb_schema else None
-        backend_label = get_kb_backend_from_env()
 
         out_lines = []
         out_lines.append("=== KB COMPILE STRATEGY ===")
-        out_lines.append(strategy_label + " (use_le=" + str(ul) + ", two_phase=" + str(tp) + ")")
-        out_lines.append("KB backend: " + backend_label)
-        out_lines.append("Extraction backend: " + resolved_extraction_backend)
-        out_lines.append("Pipeline backend mode: " + pipeline_backend_label)
+        out_lines.append(strategy_label + " (use_le=" + str(ul) + ")")
+        out_lines.append("KB backend: json_ir")
+        out_lines.append("Extraction backend: json_ir")
         out_lines.append("")
         out_lines.append("=== LAW (plain text input) ===")
         out_lines.append(law_text)
@@ -219,8 +149,6 @@ def run_json_mode(
     *,
     cli_no_translate: bool = False,
     cli_kb_strategy=None,
-    cli_kb_backend=None,
-    cli_pipeline_backend=None,
 ):
     run_obj = load_json_run(run_dir)
 
@@ -272,18 +200,8 @@ def run_json_mode(
             print("Translation failed:", e)
             return
 
-    resolved_kb_backend, resolved_extraction_backend = _resolve_backends(
-        cli_pipeline_backend=cli_pipeline_backend,
-        cli_kb_backend=cli_kb_backend,
-    )
-    _warn_cli_backend_mismatch(cli_pipeline_backend, cli_kb_backend)
-    pipeline_backend_label = _effective_pipeline_backend_label(
-        cli_pipeline_backend, resolved_kb_backend, resolved_extraction_backend
-    )
     smeta = strategy_metadata(
         strategy_label,
-        pipeline_backend_mode=pipeline_backend_label,
-        kb_backend=resolved_kb_backend,
         cli_no_translate=cli_no_translate,
         translation_source_prefix="main_",
     )
@@ -293,8 +211,6 @@ def run_json_mode(
 
     with ExitStack() as stack:
         stack.enter_context(ctx)
-        stack.enter_context(kb_backend_env_override(resolved_kb_backend))
-        stack.enter_context(extraction_backend_env_override(resolved_extraction_backend))
         status_log("KB", "Loading or compiling knowledge base")
         q_text = ""
         if questions:
@@ -308,7 +224,18 @@ def run_json_mode(
             case_text=case_text,
         )
         schema_environment = build_schema_environment(kb_schema) if kb_schema else None
-        backend_label = get_kb_backend_from_env()
+
+        fc_diag_src = os.path.join(run_dir, "json_ir_compile", "factual_criteria_mode_diagnostics.json")
+        if os.path.isfile(fc_diag_src):
+            try:
+                import shutil
+
+                shutil.copy2(
+                    fc_diag_src,
+                    os.path.join(run_dir, "factual_criteria_mode_diagnostics.json"),
+                )
+            except OSError:
+                pass
 
         results = {
             "id": run_obj.get("id"),
@@ -316,12 +243,11 @@ def run_json_mode(
             "kb_used": {"fo": kb_text},
             "case": {"text": case_text},
             "kb_compile_strategy": strategy_label,
-            "kb_compile_backend": backend_label,
-            "extraction_backend": resolved_extraction_backend,
-            "pipeline_backend_mode": pipeline_backend_label,
+            "kb_compile_backend": "json_ir",
+            "extraction_backend": "json_ir",
+            "pipeline_backend_mode": "json_ir",
             "kb_compile_flags": {
                 "use_le": ul,
-                "two_phase": tp,
                 "uses_translation": translate,
                 "json_ir_generation": spec.json_ir_generation,
             },
@@ -329,8 +255,14 @@ def run_json_mode(
             "questions": [],
         }
 
+        from pipeline.kb.factual_criteria import (
+            collect_case_asserted_factual_criteria,
+            pragmatic_factual_criteria_mode_enabled,
+        )
+
         score = {
             "id": run_obj.get("id"),
+            "pragmatic_factual_criteria_mode": pragmatic_factual_criteria_mode_enabled(),
             "total": 0,
             "correct": 0,
             "correct_decisive": 0,
@@ -339,8 +271,8 @@ def run_json_mode(
             "scoring_mode": "decisive",
             "items": [],
             "kb_compile_strategy": strategy_label,
-            "pipeline_backend_mode": pipeline_backend_label,
-            "extraction_backend": resolved_extraction_backend,
+            "pipeline_backend_mode": "json_ir",
+            "extraction_backend": "json_ir",
             "strategy_metadata": smeta,
         }
 
@@ -398,6 +330,20 @@ def run_json_mode(
                 )
                 score_item["id"] = qid
                 score_item["text"] = qtext
+                score_item["pragmatic_factual_criteria_mode"] = pragmatic_factual_criteria_mode_enabled()
+                fc_assert = collect_case_asserted_factual_criteria(
+                    result.get("case"),
+                    kb_schema,
+                    case_text=case_text,
+                    query_predicate=str((result.get("query") or {}).get("predicate") or ""),
+                )
+                asserted_preds = [
+                    e.get("predicate")
+                    for e in (fc_assert.get("asserted") or [])
+                    if isinstance(e, dict) and e.get("predicate")
+                ]
+                score_item["factual_criteria_used"] = bool(asserted_preds)
+                score_item["factual_criteria_predicates"] = asserted_preds
                 if isinstance(result.get("query"), dict):
                     qmeta = result["query"]
                 else:
@@ -456,12 +402,11 @@ def run_json_mode(
             run_dir,
             {
                 "kb_compile_strategy": strategy_label,
-                "kb_compile_backend": backend_label,
-                "extraction_backend": resolved_extraction_backend,
-                "pipeline_backend_mode": pipeline_backend_label,
+                "kb_compile_backend": "json_ir",
+                "extraction_backend": "json_ir",
+                "pipeline_backend_mode": "json_ir",
                 "kb_compile_flags": {
                     "use_le": ul,
-                    "two_phase": tp,
                     "uses_translation": translate,
                     "json_ir_generation": spec.json_ir_generation,
                 },
@@ -471,11 +416,8 @@ def run_json_mode(
 
         print("Wrote:", os.path.join(run_dir, "results.json"))
         print("Wrote:", os.path.join(run_dir, "score.json"))
-        print("KB strategy:", strategy_label, "(use_le=" + str(ul) + ", two_phase=" + str(tp) + ")")
+        print("KB strategy:", strategy_label, "(use_le=" + str(ul) + ")")
         print("Translation:", translate, "| json_ir_generation:", spec.json_ir_generation)
-        print("KB backend:", backend_label)
-        print("Extraction backend:", resolved_extraction_backend)
-        print("Pipeline backend mode:", pipeline_backend_label)
 
 
 def main():
@@ -496,30 +438,10 @@ def main():
         + ", ".join(STRATEGY_CHOICES)
         + ". Overrides run.json and .env for this process during the run.",
     )
-    parser.add_argument(
-        "--kb-backend",
-        metavar="NAME",
-        default=None,
-        help="KB compiler backend: one of "
-        + ", ".join(KB_BACKEND_CHOICES)
-        + ". Default: from PIPELINE_KB_BACKEND or json_ir.",
-    )
-    parser.add_argument(
-        "--pipeline-backend",
-        metavar="NAME",
-        default=None,
-        help="Unified pipeline backend: 'legacy' (legacy KB + legacy extraction) or "
-        "'json_ir' (JSON-IR KB + JSON-IR extraction). When omitted, KB and extraction "
-        "follow env (defaults: json_ir).",
-    )
     args = parser.parse_args()
 
     if args.kb_strategy is not None and args.kb_strategy not in STRATEGY_CHOICES:
         parser.error("--kb-strategy must be one of: " + ", ".join(STRATEGY_CHOICES))
-    if args.kb_backend is not None and args.kb_backend not in KB_BACKEND_CHOICES:
-        parser.error("--kb-backend must be one of: " + ", ".join(KB_BACKEND_CHOICES))
-    if args.pipeline_backend is not None and args.pipeline_backend not in ("legacy", "json_ir"):
-        parser.error("--pipeline-backend must be one of: legacy, json_ir")
 
     run_path = Path(args.run)
     if not run_path.is_absolute():
@@ -532,8 +454,6 @@ def main():
             args.provider,
             cli_no_translate=args.no_translate,
             cli_kb_strategy=args.kb_strategy,
-            cli_kb_backend=args.kb_backend,
-            cli_pipeline_backend=args.pipeline_backend,
         )
     else:
         run_json_mode(
@@ -541,8 +461,6 @@ def main():
             args.provider,
             cli_no_translate=args.no_translate,
             cli_kb_strategy=args.kb_strategy,
-            cli_kb_backend=args.kb_backend,
-            cli_pipeline_backend=args.pipeline_backend,
         )
 
 

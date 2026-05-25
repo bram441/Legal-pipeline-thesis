@@ -299,7 +299,30 @@ def _build_repair_hints(
     elif error_code == "missing_helper_definition" and missing_helper_evidence:
         import re as _re
 
+        from pipeline.kb.factual_criteria import (
+            is_factual_criteria_input_candidate,
+            missing_helper_factual_criteria_repair_hint,
+            pragmatic_factual_criteria_mode_enabled,
+        )
+
         hn = missing_helper_evidence.helper_name or ""
+        if pragmatic_factual_criteria_mode_enabled() and hn:
+            sig = None
+            for p in (st or {}).get("predicates") or []:
+                if isinstance(p, dict) and p.get("name") == hn:
+                    sig = p
+                    break
+            if sig and is_factual_criteria_input_candidate(sig, kb_schema=st):
+                parts.append(
+                    "=== PRAGMATIC FACTUAL CRITERIA (mandatory) ===\n"
+                    + missing_helper_factual_criteria_repair_hint(hn)
+                )
+                diag = (scope_metadata or {}).get("factual_criteria_diagnostics")
+                if isinstance(diag, dict):
+                    treated = list(diag.get("missing_helpers_treated_as_case_input") or [])
+                    if hn not in treated:
+                        treated.append(hn)
+                    diag["missing_helpers_treated_as_case_input"] = treated
         hk = getattr(missing_helper_evidence, "helper_kind", "predicate") or "predicate"
         sym_desc = ""
         for f in (st or {}).get("functions") or []:
@@ -419,6 +442,15 @@ def compile_json_ir_structured(
     question_text: str | None = None,
 ) -> tuple[str, dict]:
     """Run structured symbol×rules compile loop. Returns (fo_text, kb_schema)."""
+    from pipeline.kb.factual_criteria import (
+        new_factual_criteria_diagnostics,
+        pragmatic_factual_criteria_mode_enabled,
+    )
+
+    if scope_metadata is None:
+        scope_metadata = {}
+    scope_metadata.setdefault("pragmatic_factual_criteria_mode", pragmatic_factual_criteria_mode_enabled())
+    scope_metadata.setdefault("factual_criteria_diagnostics", new_factual_criteria_diagnostics())
     limits = limits or compile_loop_limits_from_env()
     art = Path(artifact_dir) if artifact_dir else None
     writer = artifact_writer or write_structured_artifact
@@ -933,6 +965,17 @@ def compile_json_ir_structured(
                     save_schema_environment(art, schema)
                 except Exception:
                     pass
+                try:
+                    from pipeline.kb.factual_criteria import write_factual_criteria_mode_diagnostics
+
+                    fc_diag = (scope_metadata or {}).get("factual_criteria_diagnostics")
+                    if isinstance(fc_diag, dict) and art:
+                        write_factual_criteria_mode_diagnostics(
+                            art / "factual_criteria_mode_diagnostics.json",
+                            fc_diag,
+                        )
+                except Exception:
+                    pass
                 return fo_text, schema
             except JSONIRCompilationError as e:
                 msg = str(e)
@@ -966,6 +1009,79 @@ def compile_json_ir_structured(
                 last_missing_helper_evidence = evidence.missing_helper
                 pending_validation_evidence = evidence
                 last_secondary_diagnostics = evidence.format_secondary_diagnostics()
+                if (
+                    code == "missing_helper_definition"
+                    and evidence.missing_helper
+                    and evidence.missing_helper.helper_name
+                ):
+                    from pipeline.kb.factual_criteria import (
+                        try_apply_pragmatic_factual_criteria_symbol_fixup,
+                    )
+
+                    hn_fc = evidence.missing_helper.helper_name
+                    if try_apply_pragmatic_factual_criteria_symbol_fixup(
+                        symbol_table,
+                        hn_fc,
+                        scope_metadata=scope_metadata,
+                    ):
+                        merged_ir_fc = {
+                            "types": symbol_table["types"],
+                            "predicates": symbol_table["predicates"],
+                            "functions": symbol_table["functions"],
+                            "rules": rules,
+                        }
+                        try:
+                            fo_text, schema = render_json_ir_to_fo_and_schema(
+                                merged_ir_fc,
+                                law_text_for_lints=src,
+                                scope_metadata=scope_metadata,
+                            )
+                            writer(
+                                art,
+                                symbol_version,
+                                rules_attempt,
+                                symbol_version,
+                                "rendered.fo",
+                                fo_text,
+                            )
+                            writer(
+                                art,
+                                symbol_version,
+                                rules_attempt,
+                                symbol_version,
+                                "error_classification.txt",
+                                "success_pragmatic_factual_criteria_fixup",
+                            )
+                            _record(
+                                phase="render",
+                                symbol_version=symbol_version,
+                                rules_attempt=rules_attempt,
+                                action="pragmatic_factual_criteria_fixup",
+                                status="ok",
+                            )
+                            history.write(art)
+                            try:
+                                from pipeline.kb.schema_environment import save_schema_environment
+
+                                save_schema_environment(art, schema)
+                            except Exception:
+                                pass
+                            try:
+                                from pipeline.kb.factual_criteria import (
+                                    write_factual_criteria_mode_diagnostics,
+                                )
+
+                                fc_diag = (scope_metadata or {}).get("factual_criteria_diagnostics")
+                                if isinstance(fc_diag, dict) and art:
+                                    write_factual_criteria_mode_diagnostics(
+                                        art / "factual_criteria_mode_diagnostics.json",
+                                        fc_diag,
+                                    )
+                            except Exception:
+                                pass
+                            return fo_text, schema
+                        except JSONIRCompilationError:
+                            pass
                 if evidence.missing_temporal_support_symbol or (
                     code == "missing_helper_definition"
                     and evidence.missing_helper
@@ -1188,6 +1304,17 @@ def compile_json_ir_structured(
     history.validation_evidence_fingerprint = evidence_state.validation_evidence_fingerprint
 
     history.write(art)
+    try:
+        from pipeline.kb.factual_criteria import write_factual_criteria_mode_diagnostics
+
+        fc_diag = (scope_metadata or {}).get("factual_criteria_diagnostics")
+        if isinstance(fc_diag, dict) and art:
+            write_factual_criteria_mode_diagnostics(
+                art / "factual_criteria_mode_diagnostics.json",
+                fc_diag,
+            )
+    except Exception:
+        pass
     ctx = repair_context_fn(
         symbol_table=symbol_table,
         symbols_obj=symbols_obj,

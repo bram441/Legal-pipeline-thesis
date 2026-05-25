@@ -6,7 +6,6 @@ from pipeline.utils.openai_sampling import chat_completion_sampling_kwargs
 from pipeline.utils.llm_call_tracker import tracked_chat_completion_create
 from pipeline.utils.prompt_loader import load_json_ir_contract, render_prompt
 from pipeline.kb.exceptions import LawCompilationError
-from pipeline.kb.compile_backend import get_kb_backend_from_env
 from pipeline.kb.json_ir import (
     JSONIRCompilationError,
     parse_json_ir,
@@ -19,12 +18,6 @@ from pipeline.utils.prompt_paths import (
     KB_JSON_IR_RULES_REPAIR,
     KB_JSON_IR_SYMBOLS,
     KB_JSON_IR_SYMBOLS_REPAIR,
-    KB_LEGACY_COMPILATION,
-    KB_LEGACY_REPAIR_SEMANTIC,
-    KB_LEGACY_REPAIR_SYMBOLIC,
-    KB_LEGACY_REPAIR_SYNTAX,
-    LE_THEORY_ONLY,
-    LE_VOCAB_ONLY,
 )
 from pipeline.kb.law_scope import select_law_text_for_compilation, write_scope_artifacts
 from pipeline.kb.repair_hints import build_json_ir_compile_hints, build_machine_repair_hints
@@ -103,55 +96,8 @@ def _json_ir_repair_context(
     return out or "(no structured context captured; rely on error_message)"
 
 
-def _kb_repair_prompt_path(error_message: str) -> str:
-    """Pick repair template: syntax (parse/lint), semantic (theory/model), symbolic fallback."""
-    e = (error_message or "").lower()
-    syntax_markers = (
-        "idp failed to parse",
-        "expected",
-        "kb lint",
-        "schema extraction failed",
-        "missing 'vocabulary v'",
-        "missing 'theory t:v'",
-    )
-    if any(m in e for m in syntax_markers):
-        return KB_LEGACY_REPAIR_SYNTAX
-    semantic_markers = (
-        "unsatisfiable",
-        "no model exists",
-        "conflicting assignments",
-        "conflicting formulas",
-        "kb theory is unsatisfiable",
-        "theory is unsatisfiable",
-        "rules led to an inconsistency",
-        "ordinal must be",
-    )
-    if any(m in e for m in semantic_markers):
-        return KB_LEGACY_REPAIR_SEMANTIC
-    return KB_LEGACY_REPAIR_SYMBOLIC
-
 # Re-export for: from pipeline.kb.compiler import LawCompilationError
 __all__ = ["compile_law_to_kb_fo", "LawCompilationError"]
-
-
-def _compile_direct_kb_single_call(law_text, client, chosen_model):
-    """Single LLM call: full vocabulary + theory (original kb_compilation.txt)."""
-    user_prompt = render_prompt(KB_LEGACY_COMPILATION, law_text=(law_text or "").strip())
-    try:
-        resp = tracked_chat_completion_create(
-            client,
-            stage="legacy_kb",
-            model=chosen_model,
-            messages=[
-                {"role": "system", "content": "You compile legal rules into FO(.) code for IDP-Z3."},
-                {"role": "user", "content": user_prompt},
-            ],
-            metadata={"phase": "direct_single_shot"},
-            **chat_completion_sampling_kwargs(),
-        )
-    except Exception as e:
-        raise LawCompilationError("OpenAI call failed: " + str(e)) from e
-    return (resp.choices[0].message.content or "").strip()
 
 
 def _json_chat_object(client, chosen_model, system_content, user_prompt, *, stage: str = "kb_symbols"):
@@ -529,20 +475,10 @@ def compile_law_to_kb_fo(
     case_text=None,
     artifact_dir=None,
 ):
-    """Compile natural-language law text into FO(.) (vocabulary + theory only).
+    """Compile natural-language law text into FO(.) via JSON-IR (symbols then rules).
 
-    Returns ``(fo_text, kb_schema_dict_or_none)``. For ``json_ir`` backend the second
-    value is the normalized symbol JSON (types, predicates, functions with metadata)
-    for canonical ``kb_schema.json``; for legacy FO compilation it is ``None``.
-
-    Compilation modes (when not repairing):
-    - PIPELINE_USE_LE=0, PIPELINE_KB_TWO_PHASE=0: law → single-shot FO (kb_compilation.txt).
-    - PIPELINE_USE_LE=0, PIPELINE_KB_TWO_PHASE=1: law → vocab → theory (kb/*_only.txt).
-    - PIPELINE_USE_LE=1, PIPELINE_KB_TWO_PHASE=0: law → LE → single-shot FO (le_to_fo.txt).
-    - PIPELINE_USE_LE=1, PIPELINE_KB_TWO_PHASE=1: law → LE → vocab → theory (le/*_only.txt).
-
-    If repair_feedback is set, uses kb_compilation_repair_symbolic.txt (parse/syntax) or
-    kb_compilation_repair_semantic.txt (unsat / semantic check), plus machine-detected hints.
+    Returns ``(fo_text, kb_schema_dict)`` where the schema is normalized symbol JSON
+    for ``kb_schema.json``. Optional LE: law → LE → JSON-IR when PIPELINE_USE_LE=1.
     """
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
@@ -559,10 +495,7 @@ def compile_law_to_kb_fo(
 
     client = OpenAI(api_key=api_key)
     chosen_model = model or os.getenv("OPENAI_MODEL") or "gpt-4.1-mini"
-    sys_msg = "You compile legal rules into FO(.) code for IDP-Z3."
 
-    kb_backend = get_kb_backend_from_env()
-    ir_schema = None
     full_law = (law_text or "").strip()
     scoped_law, scope_meta = _scope_law_text_once(
         full_law,
@@ -572,60 +505,22 @@ def compile_law_to_kb_fo(
     )
 
     if repair_feedback:
-        if kb_backend == "json_ir":
-            return _compile_json_ir_two_step(
-                scoped_law,
-                client,
-                chosen_model,
-                repair_feedback=repair_feedback,
-                artifact_dir=artifact_dir,
-                scope_metadata=scope_meta,
-                question_text=question_text,
-            )
-        err = repair_feedback.get("error_message", "") or ""
-        prev = repair_feedback.get("previous_output", "") or ""
-        prompt_name = _kb_repair_prompt_path(err)
-        machine_hints = build_machine_repair_hints(err, prev)
-        user_prompt = render_prompt(
-            prompt_name,
-            law_text=scoped_law,
-            error_message=repair_feedback["error_message"],
-            previous_output=prev,
-            machine_hints=machine_hints,
+        return _compile_json_ir_two_step(
+            scoped_law,
+            client,
+            chosen_model,
+            repair_feedback=repair_feedback,
+            artifact_dir=artifact_dir,
+            scope_metadata=scope_meta,
+            question_text=question_text,
         )
-        try:
-            resp = tracked_chat_completion_create(
-                client,
-                stage="legacy_kb",
-                model=chosen_model,
-                messages=[
-                    {"role": "system", "content": sys_msg},
-                    {"role": "user", "content": user_prompt},
-                ],
-                metadata={"phase": "legacy_repair"},
-                **chat_completion_sampling_kwargs(),
-            )
-        except Exception as e:
-            raise LawCompilationError("OpenAI call failed: " + str(e)) from e
-        text = (resp.choices[0].message.content or "").strip()
-    else:
-        use_le = False
-        try:
-            from pipeline.le import use_le_enabled, law_text_to_le, le_to_fo
-            use_le = use_le_enabled()
-        except ImportError:
-            law_text_to_le = None
-            le_to_fo = None
 
-        from pipeline.kb.staged_compile import compile_two_phase, two_phase_enabled
+    compile_src = scoped_law
+    try:
+        from pipeline.le import use_le_enabled, law_text_to_le
 
-        two_ph = two_phase_enabled()
-
-        if use_le and law_text_to_le and le_to_fo:
-            try:
-                le_text = law_text_to_le(scoped_law, client, chosen_model)
-            except Exception as e:
-                raise LawCompilationError("Logical English layer failed: " + str(e)) from e
+        if use_le_enabled():
+            le_text = law_text_to_le(scoped_law, client, chosen_model)
             if artifact_dir:
                 try:
                     Path(artifact_dir).mkdir(parents=True, exist_ok=True)
@@ -634,50 +529,18 @@ def compile_law_to_kb_fo(
                     )
                 except OSError:
                     pass
+            compile_src = le_text
+    except ImportError:
+        pass
 
-            if kb_backend == "json_ir":
-                text, ir_schema = _compile_json_ir_two_step(
-                    le_text,
-                    client,
-                    chosen_model,
-                    artifact_dir=artifact_dir,
-                    scope_metadata=scope_meta,
-                    question_text=question_text,
-                )
-            elif two_ph:
-                text = compile_two_phase(
-                    le_text,
-                    client,
-                    chosen_model,
-                    vocab_prompt=LE_VOCAB_ONLY,
-                    theory_prompt=LE_THEORY_ONLY,
-                    system_message=sys_msg,
-                    single_shot_fn=lambda: le_to_fo(le_text, client, chosen_model),
-                )
-            else:
-                try:
-                    text = le_to_fo(le_text, client, chosen_model)
-                except Exception as e:
-                    raise LawCompilationError("Logical English layer failed: " + str(e)) from e
-        elif kb_backend == "json_ir":
-            text, ir_schema = _compile_json_ir_two_step(
-                scoped_law,
-                client,
-                chosen_model,
-                artifact_dir=artifact_dir,
-                scope_metadata=scope_meta,
-                question_text=question_text,
-            )
-        elif two_ph:
-            text = compile_two_phase(
-                scoped_law,
-                client,
-                chosen_model,
-                system_message=sys_msg,
-                single_shot_fn=lambda: _compile_direct_kb_single_call(scoped_law, client, chosen_model),
-            )
-        else:
-            text = _compile_direct_kb_single_call(scoped_law, client, chosen_model)
+    text, ir_schema = _compile_json_ir_two_step(
+        compile_src,
+        client,
+        chosen_model,
+        artifact_dir=artifact_dir,
+        scope_metadata=scope_meta,
+        question_text=question_text,
+    )
 
     if not text:
         raise LawCompilationError("Empty KB output from LLM")

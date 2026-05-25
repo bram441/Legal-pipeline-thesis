@@ -1,10 +1,5 @@
-# Optional Logical English layer: text -> LE -> FO(.)
-# Enable with PIPELINE_USE_LE=1 (or true/yes).
+# Logical English layer: law text -> LE -> JSON-IR (when PIPELINE_USE_LE=1).
 
-from pipeline.le.layer import (
-    use_le_enabled,
-    law_text_to_le,
-    le_to_fo,
-)
+from pipeline.le.layer import use_le_enabled, law_text_to_le
 
-__all__ = ["use_le_enabled", "law_text_to_le", "le_to_fo"]
+__all__ = ["use_le_enabled", "law_text_to_le"]

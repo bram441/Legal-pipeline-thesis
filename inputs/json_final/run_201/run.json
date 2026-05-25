@@ -1,0 +1,20 @@
+{
+  "id": "run_201",
+  "law": {
+    "path": "example_laws/erfrecht.text"
+  },
+  "case": {
+    "text": "Peter en Sara waren gehuwd. Sara overlijdt. Peter is de langstlevende echtgenoot. Sara laat één minderjarig kind na. Er is geen testament."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Heeft Peter volgens artikel 4.17, paragraaf 1 recht op het vruchtgebruik van de gehele nalatenschap?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "Art. 4.17 par. 1: when the deceased leaves descendants, the surviving spouse obtains usufruct of the whole estate."
+      }
+    }
+  ]
+}

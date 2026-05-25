@@ -1,0 +1,849 @@
+{
+  "version": 1,
+  "description": "Tiered thesis evaluation set: core (basic pipeline checks), challenge (multi-criterion / procedural), stress (temporal / helper closure). Expected answers are unchanged from curated sources; hard runs are relabeled, not removed.",
+  "runs_dir": "inputs/json_final",
+  "source_runs_dir": "inputs/json",
+  "added_core_sanity_runs": [
+    "run_201",
+    "run_202",
+    "run_203",
+    "run_204",
+    "run_205",
+    "run_206",
+    "run_207",
+    "run_208"
+  ],
+  "counts_by_evaluation_group": {
+    "challenge": 10,
+    "core": 23,
+    "stress": 4
+  },
+  "counts_by_difficulty": {
+    "basic": 20,
+    "hard": 4,
+    "intermediate": 13
+  },
+  "counts_by_law_domain": {
+    "company": 14,
+    "immigration": 11,
+    "inheritance": 12
+  },
+  "total_runs": 37,
+  "runs": [
+    {
+      "id": "run_001",
+      "path": "run_001/run.json",
+      "law_domain": "inheritance",
+      "evaluation_group": "core",
+      "difficulty": "basic",
+      "phenomena": [
+        "legal_effect",
+        "definition"
+      ],
+      "family": "inheritance_surviving_spouse_descendants",
+      "source": "legacy",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": true
+        }
+      ],
+      "related_runs": [
+        "run_101"
+      ]
+    },
+    {
+      "id": "run_002",
+      "path": "run_002/run.json",
+      "law_domain": "immigration",
+      "evaluation_group": "core",
+      "difficulty": "basic",
+      "phenomena": [
+        "definition"
+      ],
+      "family": "immigration_foreign_national_definition",
+      "source": "legacy",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": true
+        }
+      ],
+      "related_runs": [
+        "run_107"
+      ]
+    },
+    {
+      "id": "run_003",
+      "path": "run_003/run.json",
+      "law_domain": "company",
+      "evaluation_group": "core",
+      "difficulty": "basic",
+      "phenomena": [
+        "classification",
+        "numeric_threshold"
+      ],
+      "family": "company_micro_threshold",
+      "source": "legacy",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": true
+        }
+      ],
+      "related_runs": [
+        "run_115"
+      ]
+    },
+    {
+      "id": "run_004",
+      "path": "run_004/run.json",
+      "law_domain": "inheritance",
+      "evaluation_group": "core",
+      "difficulty": "intermediate",
+      "phenomena": [
+        "legal_effect"
+      ],
+      "source": "legacy",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": true
+        }
+      ],
+      "related_runs": [
+        "run_102"
+      ]
+    },
+    {
+      "id": "run_005",
+      "path": "run_005/run.json",
+      "law_domain": "immigration",
+      "evaluation_group": "core",
+      "difficulty": "basic",
+      "phenomena": [
+        "definition"
+      ],
+      "source": "legacy",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": true
+        }
+      ],
+      "related_runs": [
+        "run_109"
+      ]
+    },
+    {
+      "id": "run_006",
+      "path": "run_006/run.json",
+      "law_domain": "company",
+      "evaluation_group": "stress",
+      "difficulty": "hard",
+      "phenomena": [
+        "temporal",
+        "numeric_threshold",
+        "legal_effect"
+      ],
+      "source": "legacy",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": true
+        }
+      ],
+      "related_runs": [
+        "run_120"
+      ]
+    },
+    {
+      "id": "run_007",
+      "path": "run_007/run.json",
+      "law_domain": "inheritance",
+      "evaluation_group": "challenge",
+      "difficulty": "intermediate",
+      "phenomena": [
+        "legal_effect",
+        "definition"
+      ],
+      "source": "legacy",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": true
+        }
+      ],
+      "related_runs": [
+        "run_104"
+      ]
+    },
+    {
+      "id": "run_008",
+      "path": "run_008/run.json",
+      "law_domain": "immigration",
+      "evaluation_group": "challenge",
+      "difficulty": "intermediate",
+      "phenomena": [
+        "case_given_criteria",
+        "definition"
+      ],
+      "source": "legacy",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": true
+        }
+      ],
+      "related_runs": [
+        "run_111"
+      ]
+    },
+    {
+      "id": "run_009",
+      "path": "run_009/run.json",
+      "law_domain": "company",
+      "evaluation_group": "challenge",
+      "difficulty": "intermediate",
+      "phenomena": [
+        "classification",
+        "numeric_threshold",
+        "negative_exclusion"
+      ],
+      "source": "legacy",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": false
+        }
+      ],
+      "related_runs": [
+        "run_114"
+      ]
+    },
+    {
+      "id": "run_101",
+      "path": "run_101/run.json",
+      "law_domain": "inheritance",
+      "evaluation_group": "core",
+      "difficulty": "basic",
+      "phenomena": [
+        "legal_effect"
+      ],
+      "source": "curated_pack",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": true
+        }
+      ],
+      "related_runs": [
+        "run_001"
+      ]
+    },
+    {
+      "id": "run_102",
+      "path": "run_102/run.json",
+      "law_domain": "inheritance",
+      "evaluation_group": "core",
+      "difficulty": "intermediate",
+      "phenomena": [
+        "legal_effect"
+      ],
+      "source": "curated_pack",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": true
+        }
+      ],
+      "related_runs": [
+        "run_004"
+      ]
+    },
+    {
+      "id": "run_103",
+      "path": "run_103/run.json",
+      "law_domain": "inheritance",
+      "evaluation_group": "challenge",
+      "difficulty": "intermediate",
+      "phenomena": [
+        "legal_effect",
+        "classification"
+      ],
+      "source": "curated_pack",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": true
+        }
+      ]
+    },
+    {
+      "id": "run_104",
+      "path": "run_104/run.json",
+      "law_domain": "inheritance",
+      "evaluation_group": "core",
+      "difficulty": "intermediate",
+      "phenomena": [
+        "legal_effect",
+        "definition"
+      ],
+      "source": "curated_pack",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": true
+        }
+      ],
+      "related_runs": [
+        "run_007"
+      ]
+    },
+    {
+      "id": "run_105",
+      "path": "run_105/run.json",
+      "law_domain": "inheritance",
+      "evaluation_group": "challenge",
+      "difficulty": "intermediate",
+      "phenomena": [
+        "negative_exclusion",
+        "legal_effect"
+      ],
+      "source": "curated_pack",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": false
+        }
+      ]
+    },
+    {
+      "id": "run_106",
+      "path": "run_106/run.json",
+      "law_domain": "inheritance",
+      "evaluation_group": "core",
+      "difficulty": "basic",
+      "phenomena": [
+        "legal_effect"
+      ],
+      "source": "curated_pack",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": true
+        }
+      ]
+    },
+    {
+      "id": "run_107",
+      "path": "run_107/run.json",
+      "law_domain": "immigration",
+      "evaluation_group": "core",
+      "difficulty": "basic",
+      "phenomena": [
+        "definition"
+      ],
+      "source": "curated_pack",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": true
+        }
+      ],
+      "related_runs": [
+        "run_002"
+      ]
+    },
+    {
+      "id": "run_108",
+      "path": "run_108/run.json",
+      "law_domain": "immigration",
+      "evaluation_group": "core",
+      "difficulty": "basic",
+      "phenomena": [
+        "definition",
+        "negative_exclusion"
+      ],
+      "source": "curated_pack",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": false
+        }
+      ],
+      "related_runs": [
+        "run_203"
+      ],
+      "notes": "Similar negative nationality case to thesis sanity run_203."
+    },
+    {
+      "id": "run_109",
+      "path": "run_109/run.json",
+      "law_domain": "immigration",
+      "evaluation_group": "core",
+      "difficulty": "basic",
+      "phenomena": [
+        "definition"
+      ],
+      "source": "curated_pack",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": true
+        }
+      ],
+      "related_runs": [
+        "run_005"
+      ]
+    },
+    {
+      "id": "run_110",
+      "path": "run_110/run.json",
+      "law_domain": "immigration",
+      "evaluation_group": "core",
+      "difficulty": "basic",
+      "phenomena": [
+        "definition"
+      ],
+      "source": "curated_pack",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": true
+        }
+      ]
+    },
+    {
+      "id": "run_111",
+      "path": "run_111/run.json",
+      "law_domain": "immigration",
+      "evaluation_group": "challenge",
+      "difficulty": "intermediate",
+      "phenomena": [
+        "case_given_criteria",
+        "definition"
+      ],
+      "source": "curated_pack",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": true
+        }
+      ],
+      "related_runs": [
+        "run_008"
+      ]
+    },
+    {
+      "id": "run_112",
+      "path": "run_112/run.json",
+      "law_domain": "immigration",
+      "evaluation_group": "stress",
+      "difficulty": "hard",
+      "phenomena": [
+        "case_given_criteria",
+        "negative_exclusion",
+        "definition"
+      ],
+      "source": "curated_pack",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": false
+        }
+      ]
+    },
+    {
+      "id": "run_113",
+      "path": "run_113/run.json",
+      "law_domain": "company",
+      "evaluation_group": "core",
+      "difficulty": "basic",
+      "phenomena": [
+        "classification",
+        "numeric_threshold"
+      ],
+      "source": "curated_pack",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": true
+        }
+      ]
+    },
+    {
+      "id": "run_114",
+      "path": "run_114/run.json",
+      "law_domain": "company",
+      "evaluation_group": "challenge",
+      "difficulty": "intermediate",
+      "phenomena": [
+        "classification",
+        "numeric_threshold",
+        "negative_exclusion"
+      ],
+      "source": "curated_pack",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": false
+        }
+      ],
+      "related_runs": [
+        "run_009",
+        "run_208"
+      ]
+    },
+    {
+      "id": "run_115",
+      "path": "run_115/run.json",
+      "law_domain": "company",
+      "evaluation_group": "core",
+      "difficulty": "basic",
+      "phenomena": [
+        "classification",
+        "numeric_threshold"
+      ],
+      "source": "curated_pack",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": true
+        }
+      ],
+      "related_runs": [
+        "run_003",
+        "run_205"
+      ]
+    },
+    {
+      "id": "run_116",
+      "path": "run_116/run.json",
+      "law_domain": "company",
+      "evaluation_group": "challenge",
+      "difficulty": "intermediate",
+      "phenomena": [
+        "classification",
+        "numeric_threshold"
+      ],
+      "source": "curated_pack",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": true
+        }
+      ]
+    },
+    {
+      "id": "run_117",
+      "path": "run_117/run.json",
+      "law_domain": "company",
+      "evaluation_group": "challenge",
+      "difficulty": "intermediate",
+      "phenomena": [
+        "classification",
+        "numeric_threshold",
+        "negative_exclusion"
+      ],
+      "source": "curated_pack",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": false
+        }
+      ],
+      "related_runs": [
+        "run_206"
+      ]
+    },
+    {
+      "id": "run_118",
+      "path": "run_118/run.json",
+      "law_domain": "company",
+      "evaluation_group": "challenge",
+      "difficulty": "intermediate",
+      "phenomena": [
+        "classification",
+        "structural_exclusion"
+      ],
+      "family": "company_parent_subsidiary_exclusion",
+      "source": "curated_pack",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": false
+        }
+      ]
+    },
+    {
+      "id": "run_119",
+      "path": "run_119/run.json",
+      "law_domain": "company",
+      "evaluation_group": "stress",
+      "difficulty": "hard",
+      "phenomena": [
+        "temporal",
+        "numeric_threshold",
+        "legal_effect"
+      ],
+      "family": "company_small_company_first_year",
+      "source": "curated_pack",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": true
+        }
+      ]
+    },
+    {
+      "id": "run_120",
+      "path": "run_120/run.json",
+      "law_domain": "company",
+      "evaluation_group": "stress",
+      "difficulty": "hard",
+      "phenomena": [
+        "temporal",
+        "numeric_threshold",
+        "legal_effect"
+      ],
+      "source": "curated_pack",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": true
+        }
+      ],
+      "related_runs": [
+        "run_006"
+      ]
+    },
+    {
+      "id": "run_201",
+      "path": "run_201/run.json",
+      "law_domain": "inheritance",
+      "evaluation_group": "core",
+      "difficulty": "basic",
+      "phenomena": [
+        "legal_effect"
+      ],
+      "source": "thesis_core_sanity_added",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": true
+        }
+      ],
+      "added_for_core_sanity": true
+    },
+    {
+      "id": "run_202",
+      "path": "run_202/run.json",
+      "law_domain": "inheritance",
+      "evaluation_group": "core",
+      "difficulty": "basic",
+      "phenomena": [
+        "legal_effect",
+        "negative_exclusion"
+      ],
+      "source": "thesis_core_sanity_added",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": false
+        }
+      ],
+      "added_for_core_sanity": true
+    },
+    {
+      "id": "run_203",
+      "path": "run_203/run.json",
+      "law_domain": "immigration",
+      "evaluation_group": "core",
+      "difficulty": "basic",
+      "phenomena": [
+        "definition",
+        "negative_exclusion"
+      ],
+      "source": "thesis_core_sanity_added",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": false
+        }
+      ],
+      "added_for_core_sanity": true
+    },
+    {
+      "id": "run_204",
+      "path": "run_204/run.json",
+      "law_domain": "immigration",
+      "evaluation_group": "core",
+      "difficulty": "basic",
+      "phenomena": [
+        "definition",
+        "negative_exclusion"
+      ],
+      "source": "thesis_core_sanity_added",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": false
+        }
+      ],
+      "added_for_core_sanity": true
+    },
+    {
+      "id": "run_205",
+      "path": "run_205/run.json",
+      "law_domain": "company",
+      "evaluation_group": "core",
+      "difficulty": "basic",
+      "phenomena": [
+        "classification",
+        "numeric_threshold"
+      ],
+      "source": "thesis_core_sanity_added",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": true
+        }
+      ],
+      "added_for_core_sanity": true
+    },
+    {
+      "id": "run_206",
+      "path": "run_206/run.json",
+      "law_domain": "company",
+      "evaluation_group": "core",
+      "difficulty": "basic",
+      "phenomena": [
+        "classification",
+        "numeric_threshold",
+        "negative_exclusion"
+      ],
+      "family": "company_micro_threshold",
+      "source": "thesis_core_sanity_added",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": false
+        }
+      ],
+      "added_for_core_sanity": true
+    },
+    {
+      "id": "run_207",
+      "path": "run_207/run.json",
+      "law_domain": "inheritance",
+      "evaluation_group": "core",
+      "difficulty": "basic",
+      "phenomena": [
+        "legal_effect"
+      ],
+      "source": "thesis_core_sanity_added",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": true
+        }
+      ],
+      "added_for_core_sanity": true
+    },
+    {
+      "id": "run_208",
+      "path": "run_208/run.json",
+      "law_domain": "company",
+      "evaluation_group": "core",
+      "difficulty": "basic",
+      "phenomena": [
+        "classification",
+        "numeric_threshold",
+        "negative_exclusion"
+      ],
+      "source": "thesis_core_sanity_added",
+      "question_count": 1,
+      "expected": [
+        {
+          "question_id": "q1",
+          "mode": "boolean",
+          "value": false
+        }
+      ],
+      "added_for_core_sanity": true
+    }
+  ]
+}

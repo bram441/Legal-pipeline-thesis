@@ -1,5 +1,5 @@
 """
-Shared helpers for KB strategy evaluation (used by run_evaluation.py and compare_kb_strategies.py).
+Shared helpers for KB strategy evaluation (used by run_evaluation.py).
 """
 
 from __future__ import annotations
@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+from typing import Any
 
 _ROOT = Path(__file__).resolve().parents[1]
 
@@ -37,16 +38,13 @@ def run_main_json(
     *,
     translate_override: bool | None = None,
     cli_no_translate: bool = False,
-    kb_backend: str | None = None,
-    pipeline_backend: str | None = None,
     belief_scoring: bool = False,
     llm_call_tracking: bool = False,
     max_llm_calls: int | None = None,
     max_llm_calls_per_cell: int | None = None,
     llm_eval_calls_before: int = 0,
 ) -> int:
-    """Invoke ``main.py --mode json``. Omit ``--kb-backend`` / ``--pipeline-backend`` when
-    arguments are ``None`` so the subprocess follows ``.env`` defaults.
+    """Invoke ``main.py --mode json`` (JSON-IR pipeline only).
 
     Translation: strategy config wins unless ``translate_override`` is set (explicit per-cell
     override) or ``cli_no_translate`` forces skip (global eval ``--no-translate``).
@@ -69,10 +67,6 @@ def run_main_json(
     ]
     if not use_translate:
         cmd.append("--no-translate")
-    if kb_backend is not None:
-        cmd.extend(["--kb-backend", kb_backend])
-    if pipeline_backend is not None:
-        cmd.extend(["--pipeline-backend", pipeline_backend])
     env = os.environ.copy()
     if belief_scoring:
         env["SCORE_TREAT_OPEN_WITH_BELIEF"] = "1"
@@ -158,6 +152,32 @@ def _classify_score_warning(message: str) -> str:
     return "other"
 
 
+def summarize_score_diagnostics(score: dict | None) -> dict[str, Any]:
+    """First-item + run-level fields for matrix reporting."""
+    if not score:
+        return {}
+    item = None
+    for it in score.get("items") or []:
+        if isinstance(it, dict):
+            item = it
+            break
+    out: dict[str, Any] = {
+        "pragmatic_factual_criteria_mode": score.get("pragmatic_factual_criteria_mode"),
+        "scoring_mode": score.get("scoring_mode"),
+    }
+    if item:
+        out.update(
+            {
+                "selected_intent": item.get("selected_intent"),
+                "detected_question_type": item.get("detected_question_type"),
+                "satisfiability_status": item.get("satisfiability_status"),
+                "symbolic_status": item.get("symbolic_status"),
+                "factual_criteria_used": item.get("factual_criteria_used"),
+            }
+        )
+    return out
+
+
 def summarize_query_targets(score: dict | None) -> dict:
     """Per-question query predicate/kind and classified score warnings."""
     if not score:
@@ -225,14 +245,10 @@ def parse_runs_selection(runs_dir: Path, spec: str) -> list[Path]:
     return out
 
 
-def parse_strategies_selection(
-    spec: str,
-    *,
-    pipeline_backend: str | None = "json_ir",
-) -> list[str]:
+def parse_strategies_selection(spec: str) -> list[str]:
     spec = (spec or "all").strip()
     if spec.lower() == "all":
-        return default_strategies_for_pipeline(pipeline_backend)
+        return default_strategies_for_pipeline()
     names = [x.strip() for x in spec.split(",") if x.strip()]
     for n in names:
         if n not in STRATEGY_CHOICES:
@@ -245,18 +261,13 @@ def parse_strategies_selection(
 def strategy_metadata_for_eval(
     strategy: str,
     *,
-    pipeline_backend: str | None,
-    kb_backend: str | None,
     belief_scoring: bool,
     translate_override: bool | None = None,
     cli_no_translate: bool = False,
 ) -> dict:
     """Matrix/report metadata; reflects effective translation after overrides."""
-    pb = pipeline_backend or "json_ir"
     return strategy_metadata(
         strategy,
-        pipeline_backend_mode=pb,
-        kb_backend=kb_backend,
         belief_scoring=belief_scoring,
         cli_no_translate=cli_no_translate,
         translate_override=translate_override,
@@ -264,24 +275,9 @@ def strategy_metadata_for_eval(
     )
 
 
-def work_dir_name(
-    run_folder: Path,
-    strategy: str,
-    *,
-    pipeline_backend: str | None = None,
-    kb_backend: str | None = None,
-) -> str:
-    """Filesystem-safe unique name, e.g. ``run_003__direct_single__json_ir``.
-
-    Includes a backend suffix so two evaluation sweeps (legacy vs json_ir) do not
-    overwrite the same work directory.
-    """
-    base = run_folder.name + "__" + strategy
-    if pipeline_backend:
-        return base + "__" + pipeline_backend.replace("/", "_")
-    if kb_backend:
-        return base + "__" + kb_backend.replace("/", "_")
-    return base
+def work_dir_name(run_folder: Path, strategy: str) -> str:
+    """Filesystem-safe unique name, e.g. ``run_003__direct_json_ir_no_translate``."""
+    return run_folder.name + "__" + strategy
 
 
 def _gather_eval_diag_text(work_dir: Path) -> str:
@@ -649,6 +645,18 @@ def build_eval_cell(
         "observable_query_target_warning_count": qt.get("observable_query_target_warning_count", 0),
         "antecedent_diagnostic_warning_count": qt.get("antecedent_diagnostic_warning_count", 0),
     }
+
+    cell.update(summarize_score_diagnostics(sc))
+    cell["llm_cell_call_count"] = read_cell_llm_call_count(work_dir)
+    llm_summary_path = work_dir / "llm_call_summary.json"
+    if llm_summary_path.is_file():
+        try:
+            llm_data = json.loads(llm_summary_path.read_text(encoding="utf-8"))
+            if isinstance(llm_data, dict):
+                cell["llm_total_tokens"] = llm_data.get("total_tokens")
+                cell["llm_estimated_cost_usd"] = llm_data.get("estimated_cost_usd")
+        except (json.JSONDecodeError, OSError):
+            pass
 
     if scored and sc:
         cell.update(

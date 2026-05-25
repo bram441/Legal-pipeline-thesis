@@ -29,9 +29,7 @@ _ENV_OVERRIDES: dict[str, tuple[str, str]] = {
     "JSON_IR_ALLOW_EVIDENCE_EXTENSION": ("json_ir", "allow_evidence_extension"),
     "JSON_IR_MAX_EVIDENCE_EXTENSION_CALLS": ("json_ir", "max_evidence_extension_calls"),
     "JSON_IR_ALLOW_OUTER_CACHE_RETRIES": ("json_ir", "allow_outer_cache_retries"),
-    "PIPELINE_USE_LE": ("legacy", "use_le"),
-    "PIPELINE_KB_TWO_PHASE": ("legacy", "use_two_phase"),
-    "PIPELINE_KB_MAX_REPAIR_ATTEMPTS": ("legacy", "max_repair_attempts"),
+    "PIPELINE_USE_LE": ("le", "use_le"),
     "PIPELINE_EXTRACTION_BACKEND": ("extraction", "backend"),
     "PIPELINE_EXTRACTOR": ("extraction", "provider"),
     "LEGAL_PIPELINE_ENABLE_DOMAIN_HEURISTICS": ("extraction", "enable_domain_heuristics"),
@@ -41,6 +39,7 @@ _ENV_OVERRIDES: dict[str, tuple[str, str]] = {
     "SCORE_TREAT_OPEN_WITH_BELIEF": ("evaluation", "belief_scoring"),
     "SCORE_BOOLEAN_BELIEF_THRESHOLD": ("evaluation", "boolean_belief_threshold"),
     "PIPELINE_OPEN_WORLD_P_YES": ("evaluation", "open_world_p_yes"),
+    "EVALUATION_PRAGMATIC_FACTUAL_CRITERIA_MODE": ("evaluation", "pragmatic_factual_criteria_mode"),
     "PIPELINE_TRACE": ("debug", "trace"),
     "PIPELINE_QUIET": ("debug", "quiet"),
     "PIPELINE_LLM_CALL_TRACKING": ("debug", "llm_call_tracking"),
@@ -55,13 +54,13 @@ def _coerce_value(key: str, raw: str) -> Any:
         "allow_evidence_extension",
         "allow_outer_cache_retries",
         "use_le",
-        "use_two_phase",
         "enable_domain_heuristics",
         "belief_scoring",
         "run_pre_query_satisfiability_check",
         "continue_if_satisfiability_unsupported",
         "continue_if_satisfiability_error",
         "enable_intent_diagnostics_on_unknown",
+        "pragmatic_factual_criteria_mode",
         "trace",
         "quiet",
         "llm_call_tracking",
@@ -74,7 +73,6 @@ def _coerce_value(key: str, raw: str) -> Any:
         "repeated_error_limit",
         "max_rules_before_symbol_escalation",
         "max_evidence_extension_calls",
-        "max_repair_attempts",
         "max_retries",
         "seed",
     }:
@@ -127,9 +125,6 @@ def apply_env_overrides(cfg: dict[str, Any]) -> dict[str, Any]:
             continue
         out.setdefault(section, {})
         out[section][field] = _coerce_value(field, raw)
-    kb_backend = (os.getenv("PIPELINE_KB_BACKEND") or "").strip().lower()
-    if kb_backend == "legacy_fo":
-        out.setdefault("legacy", {})["enabled"] = True
     return out
 
 

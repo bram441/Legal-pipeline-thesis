@@ -22,7 +22,7 @@ def law_text_to_le(law_text, client, model):
     Convert law text to Logical English (controlled natural language).
     Returns a single string of LE rules/clauses.
     """
-    from pipeline.utils.prompt_paths import LE_LAW_TO_LE, LE_TO_FO
+    from pipeline.utils.prompt_paths import LE_LAW_TO_LE
 
     user_prompt = render_prompt(LE_LAW_TO_LE, law_text=(law_text or "").strip())
     resp = tracked_chat_completion_create(
@@ -39,27 +39,4 @@ def law_text_to_le(law_text, client, model):
     text = (resp.choices[0].message.content or "").strip()
     if not text:
         raise ValueError("Empty Logical English output from LLM")
-    return text
-
-
-def le_to_fo(le_text, client, model):
-    """
-    Convert Logical English text to FO(.) (vocabulary + theory) for IDP-Z3.
-    Returns a single string of FO(.) code.
-    """
-    user_prompt = render_prompt(LE_TO_FO, le_text=(le_text or "").strip())
-    resp = tracked_chat_completion_create(
-        client,
-        stage="le",
-        model=model,
-        messages=[
-            {"role": "system", "content": "You convert Logical English rules into valid FO(.) code for IDP-Z3. Output ONLY the FO(.) code (vocabulary V { } and theory T:V { }), no explanations."},
-            {"role": "user", "content": user_prompt},
-        ],
-        metadata={"phase": "le_to_fo"},
-        **chat_completion_sampling_kwargs(),
-    )
-    text = (resp.choices[0].message.content or "").strip()
-    if not text:
-        raise ValueError("Empty FO(.) output from LE->FO step")
     return text
