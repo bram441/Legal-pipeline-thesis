@@ -129,6 +129,8 @@ class SymbolDecl:
     directly_observable: bool = False
     background: bool = False
     case_input: bool = False
+    reflexive_allowed: bool = False
+    non_reflexive: bool = False
     legal_output: bool | None = None
     output_category: str = ""
 
@@ -306,6 +308,17 @@ def _validate_symbol_decl(raw: Any, ctx: str, *, default_returns: str) -> Symbol
     if lo_raw is not None:
         legal_output = bool(lo_raw)
     output_category = str(raw_dict.get("output_category") or "").strip().lower()
+    meta = raw_dict.get("metadata") if isinstance(raw_dict.get("metadata"), dict) else {}
+    reflexive_allowed = bool(
+        raw_dict.get("reflexive") is True
+        or raw_dict.get("reflexive_allowed") is True
+        or meta.get("reflexive") is True
+        or meta.get("reflexive_allowed") is True
+    )
+    non_reflexive = bool(
+        raw_dict.get("non_reflexive") is True
+        or meta.get("non_reflexive") is True
+    )
     return SymbolDecl(
         name=name,
         args=parsed_args,
@@ -315,6 +328,8 @@ def _validate_symbol_decl(raw: Any, ctx: str, *, default_returns: str) -> Symbol
         directly_observable=symbol_directly_observable(raw_dict),
         background=symbol_background_or_case_input(raw_dict),
         case_input=bool(raw_dict.get("case_input") is True),
+        reflexive_allowed=reflexive_allowed,
+        non_reflexive=non_reflexive,
         legal_output=legal_output,
         output_category=output_category,
     )
@@ -592,7 +607,9 @@ def _validate_object_rule_schema_design(
             raise JSONIRCompilationError(
                 SCHEMA_DESIGN_TAG
                 + f": rules[{idx}] uses predicate '{name}' as a function term. "
-                "Predicates are Boolean atoms. Functions are value terms."
+                "Predicates are Boolean atoms used as P(args) or negated P(args) in IF/THEN. "
+                "Functions are value terms inside compare left/right only. "
+                "Do not write C(args) = false. Repair layer: rules."
             )
 
     shared_derived = {
@@ -844,10 +861,86 @@ def _collect_helper_symbol_usage(
             pn = str(atom.get("pred") or atom.get("symbol") or "").strip()
             if pn:
                 _note_pred(pn, in_if=False, in_then=True)
-        for fn in _iter_function_refs(then_side):
-            _note_fun(fn, in_if=False, in_then=True)
+    defined_f, _ = _helper_functions_defined_in_then(rules, fun_kinds)
+    def_then_f.update(defined_f)
 
     return in_if_p, in_if_f, def_then_p, def_then_f
+
+
+def _normalize_compare_op(op: Any) -> str:
+    return str(op or "").strip().lower().replace("==", "=")
+
+
+def _function_name_from_term(side: Any) -> str | None:
+    if isinstance(side, dict) and ("func" in side or "function" in side):
+        return str(side.get("func") or side.get("function") or "").strip() or None
+    return None
+
+
+def _is_numeric_literal_term(side: Any) -> bool:
+    if isinstance(side, bool):
+        return False
+    if isinstance(side, (int, float)):
+        return True
+    if isinstance(side, str):
+        from pipeline.kb.law_numeric_literals import parse_numeric_token
+
+        return parse_numeric_token(side) is not None
+    return False
+
+
+def _iter_rule_compare_nodes(expr: Any):
+    """Yield compare dict nodes under expr (shared shape with numeric_threshold_provenance)."""
+    if isinstance(expr, list):
+        for x in expr:
+            yield from _iter_rule_compare_nodes(x)
+        return
+    if not isinstance(expr, dict):
+        return
+    if "pred" in expr or "symbol" in expr:
+        return
+    if "not" in expr:
+        yield from _iter_rule_compare_nodes(expr.get("not"))
+        return
+    if "and" in expr:
+        for x in expr.get("and") or []:
+            yield from _iter_rule_compare_nodes(x)
+        return
+    if "or" in expr:
+        for x in expr.get("or") or []:
+            yield from _iter_rule_compare_nodes(x)
+        return
+    comp = expr.get("compare") if "compare" in expr else expr if {"left", "op", "right"}.issubset(expr.keys()) else None
+    if isinstance(comp, dict):
+        yield comp
+
+
+def _helper_functions_defined_in_then(
+    rules: list,
+    fun_kinds: dict[str, str],
+) -> tuple[set[str], dict[str, list[int]]]:
+    """
+    Helper function F is defined when THEN contains compare(F(...), =, literal) or compare(literal, =, F(...)).
+    """
+    defined: set[str] = set()
+    by_rule: dict[str, list[int]] = {}
+    for idx, raw_rule in enumerate(rules or []):
+        if not isinstance(raw_rule, dict):
+            continue
+        _, then_side = _rule_expr_sides(raw_rule)
+        for comp in _iter_rule_compare_nodes(then_side):
+            if _normalize_compare_op(comp.get("op")) != "=":
+                continue
+            left, right = comp.get("left"), comp.get("right")
+            for fn_side, lit_side in ((left, right), (right, left)):
+                fn = _function_name_from_term(fn_side)
+                if not fn or fun_kinds.get(fn) != "helper":
+                    continue
+                if not _is_numeric_literal_term(lit_side):
+                    continue
+                defined.add(fn)
+                by_rule.setdefault(fn, []).append(idx)
+    return defined, by_rule
 
 
 def _decl_by_name(
@@ -897,7 +990,11 @@ def _validate_floating_helpers(
         raise JSONIRCompilationError(
             RULE_DESIGN_TAG
             + f": Helper function '{name}' is used as a rule condition but has no defining rule. "
-            "Define it with rules from observable inputs, or reclassify as observable if case-provided."
+            "Define it in THEN with a numeric equality compare, e.g. "
+            '{"compare": {"left": {"func": "%s", "args": ["c", "fy"]}, "op": "=", "right": LAW_LITERAL}} '
+            "using a threshold literal from scoped law text. Do not use the function as a Bool predicate atom. "
+            "Do not define case-value observables (e.g. annual_average_employees_fte) from law thresholds."
+            % name
         )
 
 
@@ -907,6 +1004,8 @@ def _validate_observable_composite_symbol_declarations(predicates: list[SymbolDe
         if decl.kind != "observable":
             continue
         if decl.directly_observable:
+            continue
+        if decl.background or decl.case_input:
             continue
         if looks_computed_composite(decl.name, decl.description):
             raise JSONIRCompilationError(
@@ -1055,8 +1154,13 @@ def _validate_object_rule_role_binding(
     pred_kinds: dict[str, str],
     pred_descriptions: dict[str, str],
     fun_kinds: dict[str, str] | None = None,
+    pred_meta: dict[str, SymbolDecl] | None = None,
 ) -> None:
-    from pipeline.semantic.legal_question import is_reflexive_predicate_name, witness_modeling_hint
+    from pipeline.kb.self_relation_validation import (
+        is_suspicious_self_relation,
+        self_relation_error_message,
+    )
+    from pipeline.semantic.legal_question import witness_modeling_hint
 
     if not isinstance(raw_rule, dict):
         return
@@ -1116,14 +1220,23 @@ def _validate_object_rule_role_binding(
             if len(args) == 2 and isinstance(args[0], str) and isinstance(args[1], str):
                 if args[0].strip() == args[1].strip() and args[0].strip() in quant_env:
                     desc = pred_descriptions.get(pn, "")
-                    if not is_reflexive_predicate_name(pn, desc):
+                    meta = (pred_meta or {}).get(pn)
+                    if is_suspicious_self_relation(
+                        pn,
+                        args[0].strip(),
+                        args[1].strip(),
+                        description=desc,
+                        reflexive_allowed=bool(meta.reflexive_allowed) if meta else False,
+                        non_reflexive=bool(meta.non_reflexive) if meta else False,
+                    ):
                         raise JSONIRCompilationError(
                             RULE_DESIGN_TAG
-                            + f": rules[{idx}] predicate '{pn}' is called with the same variable twice. "
-                            "This usually creates an invalid self-relation. If the law only requires existence of "
-                            "some related entity, model that as an observable existence condition on the main "
-                            "subject. If the relation is truly reflexive/identity-like, the predicate name or "
-                            "description must make that explicit."
+                            + ": "
+                            + self_relation_error_message(
+                                rule_index=idx,
+                                pred_name=pn,
+                                var_name=args[0].strip(),
+                            )
                             + witness_modeling_hint()
                         )
 
@@ -1173,6 +1286,7 @@ def validate_combined_json_ir_schema(
     pred_names = {p.name for p in predicates}
     fun_names = {f.name for f in functions}
     pred_descriptions = {p.name: p.description for p in predicates}
+    pred_meta = {p.name: p for p in predicates}
     fun_kinds = {f.name: f.kind for f in functions}
     preflight_json_ir_rule_predicates(ir)
     _validate_observable_composite_symbol_declarations(predicates)
@@ -1211,7 +1325,9 @@ def validate_combined_json_ir_schema(
     for i, rule in enumerate(ir.get("rules") or []):
         if isinstance(rule, dict):
             _validate_object_rule_schema_design(rule, i, pred_kinds, pred_names, fun_names)
-            _validate_object_rule_role_binding(rule, i, pred_kinds, pred_descriptions, fun_kinds)
+            _validate_object_rule_role_binding(
+                rule, i, pred_kinds, pred_descriptions, fun_kinds, pred_meta=pred_meta
+            )
 
 
 def compile_validate_json_ir(
@@ -2082,7 +2198,8 @@ def preflight_json_ir_rule_predicates(ir: dict) -> None:
                 + name
                 + "' as a Bool predicate atom, but the symbol table lists it only under functions. "
                 "If this concept is yes/no, declare it as a predicate with returns Bool. "
-                "If it returns a value, use it only as a function term inside a comparison."
+                "If it returns a value, use it only as a function term inside a comparison. "
+                "Repair layer: rules."
             )
         if name in pred_returns and pred_returns[name].lower() != "bool":
             raise JSONIRCompilationError(

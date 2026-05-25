@@ -1,0 +1,91 @@
+{
+  "classification_predicate": "small_company",
+  "threshold_helpers": [
+    "employee_criterion_exceeded_small",
+    "turnover_criterion_exceeded_small",
+    "balance_sheet_criterion_exceeded_small",
+    "more_than_one_small_criterion_exceeded",
+    "second_consecutive_year_small_status_change"
+  ],
+  "threshold_helper_signatures": [
+    {
+      "name": "employee_criterion_exceeded_small",
+      "signature": "Company * FinancialYear -> Bool",
+      "kind": "helper"
+    },
+    {
+      "name": "turnover_criterion_exceeded_small",
+      "signature": "Company * FinancialYear -> Bool",
+      "kind": "helper"
+    },
+    {
+      "name": "balance_sheet_criterion_exceeded_small",
+      "signature": "Company * FinancialYear -> Bool",
+      "kind": "helper"
+    },
+    {
+      "name": "more_than_one_small_criterion_exceeded",
+      "signature": "Company * FinancialYear -> Bool",
+      "kind": "helper"
+    },
+    {
+      "name": "second_consecutive_year_small_status_change",
+      "signature": "Company * FinancialYear -> Bool",
+      "kind": "helper"
+    }
+  ],
+  "counting_helper": "more_than_one_small_criterion_exceeded",
+  "counting_helpers": [
+    "more_than_one_small_criterion_exceeded",
+    "more_than_one_micro_criterion_exceeded"
+  ],
+  "numeric_functions": [
+    "average_employee_count_fte",
+    "annual_net_turnover_excluding_vat",
+    "non_turnover_income_ratio",
+    "balance_sheet_total",
+    "estimated_average_employee_count_fte",
+    "estimated_annual_net_turnover_excluding_vat",
+    "estimated_balance_sheet_total",
+    "consolidated_average_employee_count_fte",
+    "consolidated_net_turnover_excluding_vat",
+    "consolidated_balance_sheet_total",
+    "adjusted_net_turnover_for_threshold_test",
+    "adjusted_balance_sheet_total_for_threshold_test"
+  ],
+  "law_numeric_literals": [
+    3.0,
+    4.0,
+    8.0,
+    10.0,
+    12.0,
+    19.0,
+    24.0,
+    26.0,
+    30.0,
+    38.0,
+    50.0,
+    147.0,
+    148.0,
+    1996.0,
+    2002.0,
+    2024.0,
+    450000.0,
+    900000.0,
+    6000000.0,
+    11250000.0
+  ],
+  "positive_rule_present": true,
+  "negative_rule_present": true,
+  "negative_rule_usable": true,
+  "missing_definitions": [],
+  "pred_used_as_function_errors": [],
+  "case_facts_needed_for_false": [
+    "Numeric function assignments for: employee_criterion_exceeded_small, turnover_criterion_exceeded_small, balance_sheet_criterion_exceeded_small (to derive exceeded helpers).",
+    "After exceeded helpers are known, more_than_one_small_criterion_exceeded must be derivable or asserted for false classification.",
+    "Exclusion rule should prove NOT small_company when more_than_one_small_criterion_exceeded holds."
+  ],
+  "recommended_repair_pattern": "pairwise_counting_plus_exclusion",
+  "artifact_path": "C:\\Users\\bramd\\Documents\\VUB\\Master Thesis\\Legal-pipeline\\inputs\\json\\run_009\\json_ir_compile\\symbol_v03\\rules_a03\\combined_ir.json",
+  "run_id": "run_009"
+}

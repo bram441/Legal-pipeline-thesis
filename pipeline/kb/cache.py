@@ -612,8 +612,9 @@ def _use_le_enabled():
 
 def json_ir_outer_cache_retries_enabled() -> bool:
     """When true, outer ``get_or_compile_kb`` may rerun the full JSON_IR compile loop (legacy)."""
-    v = (os.getenv("JSON_IR_ALLOW_OUTER_CACHE_RETRIES") or "").strip().lower()
-    return v in ("1", "true", "yes", "on")
+    from pipeline.config import json_ir_config
+
+    return bool(json_ir_config().allow_outer_cache_retries)
 
 
 def resolve_max_repair_attempts(kb_backend: str, default: int = 8, *, log_warnings: bool = True) -> int:
@@ -754,6 +755,13 @@ def get_or_compile_kb(
             else:
                 kb_schema = extract_schema_from_kb_fo(kb_text)
                 save_kb_schema(run_dir, kb_schema)
+            if kb_backend == "json_ir":
+                try:
+                    from pipeline.kb.schema_environment import load_schema_environment
+
+                    load_schema_environment(run_dir, kb_schema=kb_schema)
+                except Exception:
+                    pass
             if trace:
                 trace.section("KB LOADED FROM CACHE")
                 trace.log("Status", "OK (syntax and semantic checks passed)")
@@ -930,6 +938,12 @@ def get_or_compile_kb(
     save_kb_schema(run_dir, kb_schema)
     if kb_backend == "json_ir":
         write_cache_manifest(run_dir, kb_backend=kb_backend)
+        try:
+            from pipeline.kb.schema_environment import save_schema_environment
+
+            save_schema_environment(run_dir, kb_schema)
+        except Exception:
+            pass
 
     with open(log_path, "w", encoding="utf-8") as f:
         f.write("KB compiled successfully.\n")

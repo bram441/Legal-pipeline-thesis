@@ -130,11 +130,9 @@ _REFLEXIVE_MARKERS = (
 
 def domain_heuristics_enabled() -> bool:
     """Domain-specific succession/role hacks (disabled by default)."""
-    return (os.getenv("LEGAL_PIPELINE_ENABLE_DOMAIN_HEURISTICS") or "").strip().lower() in (
-        "1",
-        "true",
-        "yes",
-    )
+    from pipeline.config import config_section
+
+    return bool(config_section("extraction").get("enable_domain_heuristics"))
 
 
 def _matches_patterns(question: str, patterns: tuple[str, ...]) -> bool:

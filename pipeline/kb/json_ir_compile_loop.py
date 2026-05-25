@@ -24,6 +24,16 @@ from pipeline.kb.json_ir_repair import (
 from pipeline.kb.repair_cards import format_repair_card
 from pipeline.kb.repair_history import RepairEvent, RepairHistory
 from pipeline.kb.exclusion_repair_hints import build_missing_exclusion_repair_supplement
+from pipeline.kb.threshold_exclusion_scaffold import (
+    build_threshold_exclusion_repair_scaffold,
+    build_threshold_helper_pairwise_scaffold,
+)
+from pipeline.kb.predicate_function_repair_hints import build_predicate_function_misuse_supplement
+from pipeline.kb.threshold_numeric_helper_scaffold import (
+    build_numeric_threshold_helper_scaffold,
+    looks_like_case_value_function,
+    looks_like_threshold_helper_function,
+)
 from pipeline.kb.composite_temporal_threshold_repair_hints import (
     build_composite_temporal_threshold_supplement,
     qualifies_for_composite_temporal_threshold_card,
@@ -48,6 +58,12 @@ from pipeline.kb.threshold_repair_progress import (
     detect_threshold_cardinality_progress,
     should_stall_threshold_cardinality_repeat,
 )
+from pipeline.kb.helper_repair_progress import (
+    HelperRepairSnapshot,
+    build_helper_repair_snapshot,
+    detect_helper_definition_progress,
+    should_stall_helper_definition_repeat,
+)
 from pipeline.kb.evidence_extension import (
     evidence_extension_config_from_env,
     repair_hints_carry_validation_evidence,
@@ -70,18 +86,15 @@ class CompileLoopLimits:
 
 
 def compile_loop_limits_from_env() -> CompileLoopLimits:
-    # Structured loop uses JSON_IR_MAX_SYMBOL_VERSIONS only (not legacy COMPILE_ATTEMPTS).
-    max_sv = os.getenv("JSON_IR_MAX_SYMBOL_VERSIONS", "").strip() or "3"
+    from pipeline.config import json_ir_config
+
+    cfg = json_ir_config()
     return CompileLoopLimits(
-        max_symbol_versions=int(max_sv),
-        max_rules_attempts_per_symbol_version=int(
-            os.getenv("JSON_IR_MAX_RULES_ATTEMPTS_PER_SYMBOL_VERSION", "3")
-        ),
-        max_total_kb_llm_calls=int(os.getenv("JSON_IR_MAX_KB_LLM_CALLS", "7")),
-        repeated_error_limit=int(os.getenv("JSON_IR_REPEATED_ERROR_LIMIT", "2")),
-        max_rules_before_symbol_escalation=int(
-            os.getenv("JSON_IR_MAX_RULES_REPAIR", "2")
-        ),
+        max_symbol_versions=cfg.max_symbol_versions,
+        max_rules_attempts_per_symbol_version=cfg.max_rules_attempts_per_symbol_version,
+        max_total_kb_llm_calls=cfg.max_kb_llm_calls,
+        repeated_error_limit=cfg.repeated_error_limit,
+        max_rules_before_symbol_escalation=cfg.max_rules_before_symbol_escalation,
     )
 
 
@@ -116,6 +129,14 @@ def write_structured_artifact(
     return str(sub / name)
 
 
+def _fun_kinds_from_symbol_table(symbol_table: dict) -> dict[str, str]:
+    out: dict[str, str] = {}
+    for f in symbol_table.get("functions") or []:
+        if isinstance(f, dict) and f.get("name"):
+            out[str(f["name"])] = str(f.get("kind") or "")
+    return out
+
+
 def _pred_kinds_from_symbol_table(symbol_table: dict) -> dict[str, str]:
     out: dict[str, str] = {}
     for p in symbol_table.get("predicates") or []:
@@ -141,6 +162,8 @@ def _build_repair_hints(
     symbol_table: dict | None = None,
     missing_helper_evidence: MissingHelperEvidence | None = None,
     validation_evidence: ValidationRepairEvidence | None = None,
+    merged_ir: dict | None = None,
+    query_predicate: str | None = None,
 ) -> str:
     parts: list[str] = []
     st = symbol_table or parse_symbol_table_from_repair_context(previous_output)
@@ -200,6 +223,25 @@ def _build_repair_hints(
                 error_message,
                 law_text=law_text,
                 secondary_diagnostics=secondary_diagnostics,
+                symbol_table=st,
+                merged_ir=merged_ir,
+                query_predicate=query_predicate,
+            )
+        )
+    if error_code == "predicate_used_as_function":
+        parts.append(
+            "=== PREDICATE / FUNCTION MISUSE (mandatory) ===\n"
+            + build_predicate_function_misuse_supplement(
+                error_message,
+                symbol_table=st,
+            )
+        )
+    if error_code == "function_used_as_predicate":
+        parts.append(
+            "=== FUNCTION / PREDICATE MISUSE (mandatory) ===\n"
+            + build_predicate_function_misuse_supplement(
+                error_message,
+                symbol_table=st,
             )
         )
     if temporal_escalation:
@@ -254,6 +296,48 @@ def _build_repair_hints(
                 law_text=law_text,
             )
         )
+    elif error_code == "missing_helper_definition" and missing_helper_evidence:
+        import re as _re
+
+        hn = missing_helper_evidence.helper_name or ""
+        hk = getattr(missing_helper_evidence, "helper_kind", "predicate") or "predicate"
+        sym_desc = ""
+        for f in (st or {}).get("functions") or []:
+            if isinstance(f, dict) and f.get("name") == hn:
+                sym_desc = str(f.get("description") or "")
+                break
+        if hk == "function" and looks_like_case_value_function(hn, sym_desc):
+            parts.append(
+                "=== NUMERIC CASE-VALUE HELPER (mandatory) ===\n"
+                + build_numeric_threshold_helper_scaffold(
+                    st,
+                    helper_name=hn,
+                    law_text=law_text,
+                    merged_ir=merged_ir,
+                )
+            )
+        elif hk == "function" and looks_like_threshold_helper_function(hn, sym_desc):
+            parts.append(
+                "=== NUMERIC THRESHOLD HELPER SCAFFOLD (mandatory) ===\n"
+                + build_numeric_threshold_helper_scaffold(
+                    st,
+                    helper_name=hn,
+                    law_text=law_text,
+                    merged_ir=merged_ir,
+                )
+            )
+        elif _re.search(
+            r"(?i)(more_than_one|at_least_two|criterion_exceeded|threshold_exceeded)",
+            hn,
+        ):
+            parts.append(
+                "=== THRESHOLD HELPER PAIRWISE SCAFFOLD (mandatory) ===\n"
+                + build_threshold_helper_pairwise_scaffold(
+                    st,
+                    helper_name=hn,
+                    law_text=law_text,
+                )
+            )
     if error_code == "computed_observable_unsafe" and legal_effect_ctx:
         sec_helpers = (
             validation_evidence.secondary_missing_helpers
@@ -352,6 +436,8 @@ def compile_json_ir_structured(
     extension_llm_slots = 0
     evidence_extension_calls_used = 0
     last_threshold_snapshot: ThresholdRepairSnapshot | None = None
+    last_helper_snapshot: HelperRepairSnapshot | None = None
+    helper_no_progress_counts: dict[str, int] = {}
     last_secondary_diagnostics = ""
     last_progress_note = ""
     pending_temporal_symbol_repair = False
@@ -438,6 +524,24 @@ def compile_json_ir_structured(
                 history.repair_stalled = True
                 history.final_normalized_error_signature = sig
                 history.final_normalized_error_code = code
+                return True
+            return False
+        if code == "missing_helper_definition" and progress_verdict is not None:
+            if should_stall_helper_definition_repeat(
+                signature_repeat_count=signature_counts[sig],
+                repeated_error_limit=limits.repeated_error_limit,
+                progress=progress_verdict,
+                rules_attempt=rules_attempt,
+                max_rules_attempts=limits.max_rules_attempts_per_symbol_version,
+            ):
+                history.repeated_error_detected = True
+                history.repair_stalled = True
+                history.final_normalized_error_signature = sig
+                history.final_normalized_error_code = (
+                    "no_helper_definition_progress"
+                    if not progress_verdict.progress_detected
+                    else code
+                )
                 return True
             return False
         if signature_counts[sig] >= limits.repeated_error_limit:
@@ -702,6 +806,8 @@ def compile_json_ir_structured(
         rules_repair_streak = 0
         symbol_rules_errors: list[str] = []
         last_threshold_snapshot = None
+        last_helper_snapshot = None
+        helper_no_progress_counts = {}
         last_secondary_diagnostics = ""
         last_progress_note = ""
         last_missing_helper_evidence: MissingHelperEvidence | None = None
@@ -734,6 +840,12 @@ def compile_json_ir_structured(
                     symbol_table=symbol_table,
                     missing_helper_evidence=last_missing_helper_evidence,
                     validation_evidence=pending_validation_evidence,
+                    merged_ir={
+                        "types": (symbol_table or {}).get("types") or [],
+                        "predicates": (symbol_table or {}).get("predicates") or [],
+                        "functions": (symbol_table or {}).get("functions") or [],
+                        "rules": (rules_obj or {}).get("rules") or rules or [],
+                    },
                 )
                 if rules_repair and err_msg
                 else ""
@@ -815,6 +927,12 @@ def compile_json_ir_structured(
                     artifact_paths=[cap] if cap else [],
                 )
                 history.write(art)
+                try:
+                    from pipeline.kb.schema_environment import save_schema_environment
+
+                    save_schema_environment(art, schema)
+                except Exception:
+                    pass
                 return fo_text, schema
             except JSONIRCompilationError as e:
                 msg = str(e)
@@ -835,6 +953,7 @@ def compile_json_ir_structured(
                             kind = JsonIRErrorKind.SYMBOLS_REPAIR_REQUIRED
 
                 pred_kinds = _pred_kinds_from_symbol_table(symbol_table)
+                fun_kinds = _fun_kinds_from_symbol_table(symbol_table)
                 evidence = collect_validation_repair_evidence(
                     merged_ir,
                     pred_kinds,
@@ -930,6 +1049,54 @@ def compile_json_ir_structured(
                             "do not resubmit identical rules."
                             % progress_verdict.progress_reason
                         )
+                elif code == "missing_helper_definition" and evidence.missing_helper:
+                    helper_name = evidence.missing_helper.helper_name
+                    helper_kind = getattr(evidence.missing_helper, "helper_kind", "predicate") or "predicate"
+                    mini_snapshot = build_helper_repair_snapshot(
+                        merged_ir,
+                        helper_name=helper_name,
+                        helper_kind=helper_kind,
+                        fun_kinds=fun_kinds,
+                        primary_error_path=extract_error_path_from_message(msg),
+                    )
+                    progress_verdict = detect_helper_definition_progress(
+                        last_helper_snapshot, mini_snapshot
+                    )
+                    last_helper_snapshot = mini_snapshot
+                    if progress_verdict.progress_detected:
+                        last_progress_note = (
+                            "Helper-definition progress detected (%s). Continue until '%s' "
+                            "appears in THEN."
+                            % (progress_verdict.progress_reason, helper_name)
+                        )
+                    else:
+                        last_progress_note = (
+                            "No helper-definition progress (%s). Add a rule defining '%s' "
+                            "in THEN; do not resubmit identical rules."
+                            % (progress_verdict.progress_reason, helper_name)
+                        )
+                    if progress_verdict and not progress_verdict.progress_detected:
+                        helper_no_progress_counts[helper_name] = (
+                            helper_no_progress_counts.get(helper_name, 0) + 1
+                        )
+                    elif progress_verdict and progress_verdict.progress_detected:
+                        helper_no_progress_counts.pop(helper_name, None)
+
+                if (
+                    code == "missing_helper_definition"
+                    and evidence.missing_helper
+                    and helper_no_progress_counts.get(evidence.missing_helper.helper_name, 0) >= 2
+                ):
+                    history.repeated_error_detected = True
+                    history.repair_stalled = True
+                    hk = getattr(evidence.missing_helper, "helper_kind", "predicate") or "predicate"
+                    history.final_normalized_error_code = (
+                        "repeated_missing_numeric_helper_definition"
+                        if hk == "function"
+                        else "repeated_missing_helper_definition"
+                    )
+                    history.final_normalized_error_signature = normalize_error_signature(msg)
+                    break
 
                 writer(
                     art, symbol_version, rules_attempt, symbol_version,
@@ -960,7 +1127,7 @@ def compile_json_ir_structured(
                         progress_verdict.current_error_path if progress_verdict else None
                     ),
                     threshold_cardinality_violation_count=(
-                        progress_verdict.threshold_cardinality_violation_count
+                        getattr(progress_verdict, "threshold_cardinality_violation_count", None)
                         if progress_verdict
                         else None
                     ),

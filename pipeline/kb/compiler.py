@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 
 from pipeline.utils.openai_sampling import chat_completion_sampling_kwargs
+from pipeline.utils.llm_call_tracker import tracked_chat_completion_create
 from pipeline.utils.prompt_loader import load_json_ir_contract, render_prompt
 from pipeline.kb.exceptions import LawCompilationError
 from pipeline.kb.compile_backend import get_kb_backend_from_env
@@ -137,12 +138,15 @@ def _compile_direct_kb_single_call(law_text, client, chosen_model):
     """Single LLM call: full vocabulary + theory (original kb_compilation.txt)."""
     user_prompt = render_prompt(KB_LEGACY_COMPILATION, law_text=(law_text or "").strip())
     try:
-        resp = client.chat.completions.create(
+        resp = tracked_chat_completion_create(
+            client,
+            stage="legacy_kb",
             model=chosen_model,
             messages=[
                 {"role": "system", "content": "You compile legal rules into FO(.) code for IDP-Z3."},
                 {"role": "user", "content": user_prompt},
             ],
+            metadata={"phase": "direct_single_shot"},
             **chat_completion_sampling_kwargs(),
         )
     except Exception as e:
@@ -150,7 +154,7 @@ def _compile_direct_kb_single_call(law_text, client, chosen_model):
     return (resp.choices[0].message.content or "").strip()
 
 
-def _json_chat_object(client, chosen_model, system_content, user_prompt):
+def _json_chat_object(client, chosen_model, system_content, user_prompt, *, stage: str = "kb_symbols"):
     try:
         req = {
             "model": chosen_model,
@@ -162,17 +166,24 @@ def _json_chat_object(client, chosen_model, system_content, user_prompt):
         }
         # Prefer strict JSON object output when model/API supports it.
         try:
-            resp = client.chat.completions.create(
+            resp = tracked_chat_completion_create(
+                client,
+                stage=stage,
+                metadata={"response_format": "json_object"},
                 **req,
                 response_format={"type": "json_object"},
             )
         except TypeError:
-            resp = client.chat.completions.create(**req)
+            resp = tracked_chat_completion_create(
+                client, stage=stage, metadata={"response_format": "fallback"}, **req
+            )
         except Exception as fmt_exc:
             # Some models reject response_format; fall back to normal call.
             msg = str(fmt_exc).lower()
             if "response_format" in msg or "json_object" in msg:
-                resp = client.chat.completions.create(**req)
+                resp = tracked_chat_completion_create(
+                    client, stage=stage, metadata={"response_format": "fallback"}, **req
+                )
             else:
                 raise
     except Exception as e:
@@ -288,14 +299,17 @@ def _json_chat_kb_rules(client, chosen_model, system_content, user_prompt):
         **chat_completion_sampling_kwargs(),
     }
     try:
-        resp = client.chat.completions.create(
+        resp = tracked_chat_completion_create(
+            client,
+            stage="kb_rules",
+            metadata={"response_format": "json_schema"},
             **req,
             response_format=_kb_rules_response_format(),
         )
     except Exception as fmt_exc:
         msg = str(fmt_exc).lower()
         if "response_format" in msg or "json_schema" in msg:
-            return _json_chat_object(client, chosen_model, system_content, user_prompt)
+            return _json_chat_object(client, chosen_model, system_content, user_prompt, stage="kb_rules")
         raise LawCompilationError("OpenAI KB rules call failed: " + str(fmt_exc)) from fmt_exc
     raw = (resp.choices[0].message.content or "").strip()
     try:
@@ -319,14 +333,17 @@ def _json_chat_kb_symbols(client, chosen_model, system_content, user_prompt):
         **chat_completion_sampling_kwargs(),
     }
     try:
-        resp = client.chat.completions.create(
+        resp = tracked_chat_completion_create(
+            client,
+            stage="kb_symbols",
+            metadata={"response_format": "json_schema"},
             **req,
             response_format=_kb_symbols_response_format(),
         )
     except Exception as fmt_exc:
         msg = str(fmt_exc).lower()
         if "response_format" in msg or "json_schema" in msg:
-            return _json_chat_object(client, chosen_model, system_content, user_prompt)
+            return _json_chat_object(client, chosen_model, system_content, user_prompt, stage="kb_symbols")
         raise LawCompilationError("OpenAI KB symbols call failed: " + str(fmt_exc)) from fmt_exc
     raw = (resp.choices[0].message.content or "").strip()
     try:
@@ -577,12 +594,15 @@ def compile_law_to_kb_fo(
             machine_hints=machine_hints,
         )
         try:
-            resp = client.chat.completions.create(
+            resp = tracked_chat_completion_create(
+                client,
+                stage="legacy_kb",
                 model=chosen_model,
                 messages=[
                     {"role": "system", "content": sys_msg},
                     {"role": "user", "content": user_prompt},
                 ],
+                metadata={"phase": "legacy_repair"},
                 **chat_completion_sampling_kwargs(),
             )
         except Exception as e:

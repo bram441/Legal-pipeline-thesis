@@ -16,10 +16,12 @@ import os
 
 def open_world_p_yes() -> float:
     """Prior / credence toward Yes when the theory leaves the atom open (default 0.5)."""
-    raw = (os.getenv("PIPELINE_OPEN_WORLD_P_YES") or "0.5").strip()
+    from pipeline.config import config_section
+
+    raw = config_section("evaluation").get("open_world_p_yes", 0.5)
     try:
         v = float(raw)
-    except ValueError:
+    except (TypeError, ValueError):
         v = 0.5
     return max(0.0, min(1.0, v))
 

@@ -20,7 +20,10 @@ from pipeline.kb.legal_effect import (
 
 
 def _scope_mode() -> str:
-    return (os.getenv("JSON_IR_SCOPE_MODE") or "cited").strip().lower()
+    from pipeline.config import json_ir_config
+
+    mode = str(json_ir_config().scope_mode or "cited").strip().lower()
+    return mode if mode else "cited"
 
 
 def _select_by_keywords(law_text: str, question: str, case: str, top_k: int = 3) -> str:

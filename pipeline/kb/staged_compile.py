@@ -16,6 +16,7 @@ import os
 import re
 
 from pipeline.utils.openai_sampling import chat_completion_sampling_kwargs
+from pipeline.utils.llm_call_tracker import tracked_chat_completion_create
 from pipeline.utils.prompt_loader import render_prompt
 from pipeline.kb.exceptions import LawCompilationError
 
@@ -103,12 +104,15 @@ def compile_two_phase(
             feedback_block=feedback_vocab or "(none — first attempt.)",
         )
         try:
-            resp = client.chat.completions.create(
+            resp = tracked_chat_completion_create(
+                client,
+                stage="legacy_kb",
                 model=chosen_model,
                 messages=[
                     {"role": "system", "content": system_message},
                     {"role": "user", "content": user},
                 ],
+                metadata={"phase": "two_phase_vocab"},
                 **chat_completion_sampling_kwargs(),
             )
         except Exception as e:
@@ -149,12 +153,15 @@ def compile_two_phase(
             feedback_block=feedback_theory or "(none — first attempt.)",
         )
         try:
-            resp = client.chat.completions.create(
+            resp = tracked_chat_completion_create(
+                client,
+                stage="legacy_kb",
                 model=chosen_model,
                 messages=[
                     {"role": "system", "content": system_message},
                     {"role": "user", "content": user},
                 ],
+                metadata={"phase": "two_phase_theory"},
                 **chat_completion_sampling_kwargs(),
             )
         except Exception as e:

@@ -1,0 +1,194 @@
+{
+  "missing_numeric_helpers": [
+    {
+      "name": "adjusted_turnover_for_duration",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "helper",
+      "description": "The turnover amount adjusted for an exceptional financial-year duration.",
+      "comparison_usages": [
+        {
+          "rule_index": 6,
+          "side": "if",
+          "op": "=",
+          "compare": {
+            "left": {
+              "func": "annual_net_turnover_excluding_vat",
+              "args": [
+                "c",
+                "fy"
+              ]
+            },
+            "op": "=",
+            "right": {
+              "func": "adjusted_turnover_for_duration",
+              "args": [
+                "c",
+                "fy"
+              ]
+            }
+          }
+        },
+        {
+          "rule_index": 6,
+          "side": "then",
+          "op": "=",
+          "compare": {
+            "left": {
+              "func": "adjusted_turnover_for_duration",
+              "args": [
+                "c",
+                "fy"
+              ]
+            },
+            "op": "=",
+            "right": {
+              "func": "annual_net_turnover_excluding_vat",
+              "args": [
+                "c",
+                "fy"
+              ]
+            }
+          }
+        },
+        {
+          "rule_index": 8,
+          "side": "then",
+          "op": "=",
+          "compare": {
+            "left": {
+              "func": "relevant_turnover_amount",
+              "args": [
+                "c",
+                "fy"
+              ]
+            },
+            "op": "=",
+            "right": {
+              "func": "adjusted_turnover_for_duration",
+              "args": [
+                "c",
+                "fy"
+              ]
+            }
+          }
+        }
+      ],
+      "defined_in_then_equality": false,
+      "definition_rule_indices": [],
+      "candidate_law_literals": [
+        50.0,
+        147.0,
+        148.0,
+        1996.0,
+        2002.0,
+        2024.0,
+        450000.0,
+        900000.0,
+        6000000.0,
+        11250000.0
+      ],
+      "likely_definition_literals": [],
+      "ambiguous_threshold": true
+    }
+  ],
+  "comparison_usages": {
+    "adjusted_turnover_for_duration": [
+      {
+        "rule_index": 6,
+        "side": "if",
+        "op": "=",
+        "compare": {
+          "left": {
+            "func": "annual_net_turnover_excluding_vat",
+            "args": [
+              "c",
+              "fy"
+            ]
+          },
+          "op": "=",
+          "right": {
+            "func": "adjusted_turnover_for_duration",
+            "args": [
+              "c",
+              "fy"
+            ]
+          }
+        }
+      },
+      {
+        "rule_index": 6,
+        "side": "then",
+        "op": "=",
+        "compare": {
+          "left": {
+            "func": "adjusted_turnover_for_duration",
+            "args": [
+              "c",
+              "fy"
+            ]
+          },
+          "op": "=",
+          "right": {
+            "func": "annual_net_turnover_excluding_vat",
+            "args": [
+              "c",
+              "fy"
+            ]
+          }
+        }
+      },
+      {
+        "rule_index": 8,
+        "side": "then",
+        "op": "=",
+        "compare": {
+          "left": {
+            "func": "relevant_turnover_amount",
+            "args": [
+              "c",
+              "fy"
+            ]
+          },
+          "op": "=",
+          "right": {
+            "func": "adjusted_turnover_for_duration",
+            "args": [
+              "c",
+              "fy"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "candidate_law_literals": [
+    50.0,
+    147.0,
+    148.0,
+    1996.0,
+    2002.0,
+    2024.0,
+    450000.0,
+    900000.0,
+    6000000.0,
+    11250000.0
+  ],
+  "likely_definition_literals": {
+    "adjusted_turnover_for_duration": []
+  },
+  "ambiguous_thresholds": [
+    "adjusted_turnover_for_duration"
+  ],
+  "non_definable_case_value_functions": [
+    "consolidated_annual_average_employees",
+    "consolidated_balance_sheet_total",
+    "consolidated_relevant_turnover_amount"
+  ],
+  "recommended_repair_pattern": "numeric_threshold_ambiguous",
+  "artifact_path": "C:\\Users\\bramd\\Documents\\VUB\\Master Thesis\\Legal-pipeline\\inputs\\json\\run_009\\json_ir_compile\\symbol_v02\\rules_a03\\combined_ir.json",
+  "run_id": "run_009"
+}

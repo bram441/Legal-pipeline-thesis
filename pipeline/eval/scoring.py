@@ -9,7 +9,9 @@ from pipeline.semantic.legal_question import question_asks_legal_conclusion
 
 def belief_scoring_enabled() -> bool:
     """True only when open-world belief scoring is explicitly requested (e.g. eval --belief-scoring)."""
-    return (os.getenv("SCORE_TREAT_OPEN_WITH_BELIEF") or "").strip().lower() in ("1", "true", "yes")
+    from pipeline.config import config_section
+
+    return bool(config_section("evaluation").get("belief_scoring"))
 
 
 def _normalize_range_for_compare(range_str, entity=None):
@@ -39,7 +41,9 @@ def _belief_threshold_from_env_or_expected(expected: dict) -> float | None:
         return None
     thr_raw = expected.get("belief_match_threshold")
     if thr_raw is None:
-        thr_raw = (os.getenv("SCORE_BOOLEAN_BELIEF_THRESHOLD") or "").strip()
+        from pipeline.config import config_section
+
+        thr_raw = config_section("evaluation").get("boolean_belief_threshold")
     if thr_raw in (None, ""):
         return 0.5
     try:

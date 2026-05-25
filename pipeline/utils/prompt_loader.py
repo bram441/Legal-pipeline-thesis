@@ -16,7 +16,7 @@ PROMPTS_DIR = Path(__file__).resolve().parents[2] / "prompts"
 #   translation/  — e.g. translate_to_english
 #   nl/           — natural-language paraphrase for explanations
 #
-# Call sites use paths like render_prompt("kb/kb_compilation.txt", ...).
+# Call sites use paths like render_prompt("kb/legacy/kb_compilation.txt", ...).
 
 
 class PromptError(Exception):

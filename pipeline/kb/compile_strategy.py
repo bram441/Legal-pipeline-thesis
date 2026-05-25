@@ -263,6 +263,10 @@ def strategy_metadata(
     if kb == "json_ir" and not json_ir_gen:
         json_ir_gen = JSON_IR_GENERATION_MODE
     law_scope = (os.getenv("PIPELINE_LAW_SCOPE_MODE") or os.getenv("LAW_SCOPE_MODE") or "").strip() or None
+    if not law_scope:
+        from pipeline.config import json_ir_config
+
+        law_scope = str(json_ir_config().scope_mode or "") or None
     outer_rep = (os.getenv("PIPELINE_KB_MAX_REPAIR_ATTEMPTS") or "").strip()
     inner_rep = (os.getenv("JSON_IR_MAX_COMPILE_ATTEMPTS") or "").strip()
     repair_enabled = False

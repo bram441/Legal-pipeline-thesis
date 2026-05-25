@@ -1,0 +1,5 @@
+{
+  "json_ir": {
+    "max_kb_llm_calls": 12
+  }
+}

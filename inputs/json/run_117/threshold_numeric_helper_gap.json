@@ -1,0 +1,234 @@
+{
+  "missing_numeric_helpers": [
+    {
+      "name": "relevant_turnover_for_threshold_test",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "helper",
+      "description": "The turnover figure to be used for threshold testing in the financial year.",
+      "comparison_usages": [
+        {
+          "rule_index": 2,
+          "side": "then",
+          "op": "=",
+          "compare": {
+            "left": {
+              "func": "relevant_turnover_for_threshold_test",
+              "args": [
+                "c",
+                "y"
+              ]
+            },
+            "op": "=",
+            "right": {
+              "func": "operating_and_financial_income_excluding_non_recurring_income",
+              "args": [
+                "c",
+                "y"
+              ]
+            }
+          }
+        },
+        {
+          "rule_index": 3,
+          "side": "then",
+          "op": "=",
+          "compare": {
+            "left": {
+              "func": "relevant_turnover_for_threshold_test",
+              "args": [
+                "c",
+                "y"
+              ]
+            },
+            "op": "=",
+            "right": {
+              "func": "annual_net_turnover_excluding_vat",
+              "args": [
+                "c",
+                "y"
+              ]
+            }
+          }
+        },
+        {
+          "rule_index": 6,
+          "side": "if",
+          "op": ">",
+          "compare": {
+            "left": {
+              "func": "relevant_turnover_for_threshold_test",
+              "args": [
+                "c",
+                "y"
+              ]
+            },
+            "op": ">",
+            "right": {
+              "func": "small_turnover_threshold",
+              "args": [
+                "c",
+                "y"
+              ]
+            }
+          }
+        },
+        {
+          "rule_index": 18,
+          "side": "if",
+          "op": ">",
+          "compare": {
+            "left": {
+              "func": "relevant_turnover_for_threshold_test",
+              "args": [
+                "c",
+                "y"
+              ]
+            },
+            "op": ">",
+            "right": {
+              "func": "micro_turnover_threshold",
+              "args": [
+                "c",
+                "y"
+              ]
+            }
+          }
+        }
+      ],
+      "defined_in_then_equality": false,
+      "definition_rule_indices": [],
+      "candidate_law_literals": [
+        50.0,
+        147.0,
+        148.0,
+        1996.0,
+        2002.0,
+        2024.0,
+        450000.0,
+        900000.0,
+        6000000.0,
+        11250000.0
+      ],
+      "likely_definition_literals": [],
+      "ambiguous_threshold": true
+    }
+  ],
+  "comparison_usages": {
+    "relevant_turnover_for_threshold_test": [
+      {
+        "rule_index": 2,
+        "side": "then",
+        "op": "=",
+        "compare": {
+          "left": {
+            "func": "relevant_turnover_for_threshold_test",
+            "args": [
+              "c",
+              "y"
+            ]
+          },
+          "op": "=",
+          "right": {
+            "func": "operating_and_financial_income_excluding_non_recurring_income",
+            "args": [
+              "c",
+              "y"
+            ]
+          }
+        }
+      },
+      {
+        "rule_index": 3,
+        "side": "then",
+        "op": "=",
+        "compare": {
+          "left": {
+            "func": "relevant_turnover_for_threshold_test",
+            "args": [
+              "c",
+              "y"
+            ]
+          },
+          "op": "=",
+          "right": {
+            "func": "annual_net_turnover_excluding_vat",
+            "args": [
+              "c",
+              "y"
+            ]
+          }
+        }
+      },
+      {
+        "rule_index": 6,
+        "side": "if",
+        "op": ">",
+        "compare": {
+          "left": {
+            "func": "relevant_turnover_for_threshold_test",
+            "args": [
+              "c",
+              "y"
+            ]
+          },
+          "op": ">",
+          "right": {
+            "func": "small_turnover_threshold",
+            "args": [
+              "c",
+              "y"
+            ]
+          }
+        }
+      },
+      {
+        "rule_index": 18,
+        "side": "if",
+        "op": ">",
+        "compare": {
+          "left": {
+            "func": "relevant_turnover_for_threshold_test",
+            "args": [
+              "c",
+              "y"
+            ]
+          },
+          "op": ">",
+          "right": {
+            "func": "micro_turnover_threshold",
+            "args": [
+              "c",
+              "y"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "candidate_law_literals": [
+    50.0,
+    147.0,
+    148.0,
+    1996.0,
+    2002.0,
+    2024.0,
+    450000.0,
+    900000.0,
+    6000000.0,
+    11250000.0
+  ],
+  "likely_definition_literals": {
+    "relevant_turnover_for_threshold_test": []
+  },
+  "ambiguous_thresholds": [
+    "relevant_turnover_for_threshold_test"
+  ],
+  "non_definable_case_value_functions": [],
+  "recommended_repair_pattern": "numeric_threshold_ambiguous",
+  "artifact_path": "C:\\Users\\bramd\\Documents\\VUB\\Master Thesis\\Legal-pipeline\\inputs\\json\\run_117\\json_ir_compile\\symbol_v02\\rules_a03\\combined_ir.json",
+  "run_id": "run_117"
+}

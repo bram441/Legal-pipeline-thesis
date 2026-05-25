@@ -1,0 +1,108 @@
+{
+  "_comment": "Copy the 'expected' object into each run's questions[0]. Fill value/predicate/reason; delete keys you do not need. Do not commit this file as a run — leading underscore is intentional.",
+  "run_002": {
+    "question": "Valt Ahmed onder de definitie van een vreemdeling in de zin van artikel 1 van deze wet?",
+    "recommended": "boolean",
+    "expected": {
+      "mode": "boolean",
+      "value": null,
+      "predicate": null,
+      "target": "ahmed",
+      "reason": "Gold: Ahmed has no Belgian nationality and resides without valid permit → qualifies as foreign national under Art. 1."
+    }
+  },
+  "run_003": {
+    "question": "Is NV Delta een microvennootschap in de zin van artikel 1:25?",
+    "recommended": "boolean",
+    "expected": {
+      "mode": "boolean",
+      "value": null,
+      "predicate": null,
+      "target": "nv",
+      "reason": "Gold: check Art. 1:25 micro-enterprise criteria against stated headcount, turnover, balance total."
+    }
+  },
+  "run_004": {
+    "question": "Welk erfrecht verkrijgt de langstlevende echtgenoot volgens artikel 4.17, paragraaf 2?",
+    "recommended": "boolean (preferred — same as run_101–120)",
+    "note": "Pipeline usually asks one Bool predicate. Pick the derived predicate that encodes the Art. 4.17(2) outcome for Dirk (not whole-estate usufruct under par. 1). Set value true if that outcome holds.",
+    "expected": {
+      "mode": "boolean",
+      "value": null,
+      "predicate": null,
+      "target": "dirk",
+      "reason": "Gold: Art. 4.17(2) — deceased left ascendants/collateral; surviving spouse gets furniture usufruct + use of residence (not par. 1 whole-estate usufruct)."
+    },
+    "alternative_set_mode": {
+      "mode": "set",
+      "value": [],
+      "predicate": null,
+      "reason": "Only if extraction uses mode=set and deduction_set; list predicate names that are entailed (lowercase constants)."
+    }
+  },
+  "run_005": {
+    "question": "Wat verstaat deze wet onder illegaal verblijf?",
+    "recommended": "boolean (rephrase mentally as: do these facts constitute illegal stay?)",
+    "note": "The pipeline does not answer definitional 'what does X mean' well. Prefer gold = whether the case facts satisfy illegal stay under the law.",
+    "expected": {
+      "mode": "boolean",
+      "value": null,
+      "predicate": null,
+      "target": null,
+      "reason": "Gold: facts describe stay >3 months without lawful residence conditions → illegal stay applies."
+    }
+  },
+  "run_006": {
+    "question": "Wanneer gaan de gevolgen van die overschrijding in volgens artikel 1:24, paragraaf 2?",
+    "recommended": "boolean (simplest) OR get_range (only if you use intent query + numeric function in KB)",
+    "expected_boolean": {
+      "mode": "boolean",
+      "value": null,
+      "predicate": null,
+      "target": null,
+      "reason": "Gold: two consecutive years over thresholds → consequences triggered (Art. 1:24(2))."
+    },
+    "expected_get_range": {
+      "intent": "get_range",
+      "symbol": null,
+      "entity": null,
+      "value": null,
+      "tolerance_days": 0,
+      "reason": "Gold: numeric delay in days/months until consequences apply; symbol must match a function in kb_schema; entity = company constant if unary."
+    }
+  },
+  "run_007": {
+    "question": "Welk recht heeft de langstlevende wettelijk samenwonende op het onroerend goed ... artikel 4.23?",
+    "recommended": "boolean",
+    "note": "Pick the Bool predicate for Art. 4.23 family-home right for the surviving legal cohabitant.",
+    "expected": {
+      "mode": "boolean",
+      "value": null,
+      "predicate": null,
+      "target": null,
+      "reason": "Gold: Art. 4.23 — surviving legal cohabitant's right regarding the family's main dwelling."
+    }
+  },
+  "run_008": {
+    "question": "Kan dit een indicatie zijn voor het risico op onderduiken ... artikel 1, paragraaf 2?",
+    "recommended": "boolean",
+    "expected": {
+      "mode": "boolean",
+      "value": null,
+      "predicate": null,
+      "target": null,
+      "reason": "Gold: removal procedure + false documents → indicator for absconding risk under Art. 1(2)."
+    }
+  },
+  "run_009": {
+    "question": "Wordt deze vennootschap nog als kleine vennootschap beschouwd volgens artikel 1:24, paragraaf 1?",
+    "recommended": "boolean",
+    "expected": {
+      "mode": "boolean",
+      "value": false,
+      "predicate": null,
+      "target": null,
+      "reason": "Gold: 55 employees and €12M turnover exceed small-company thresholds → no longer 'kleine vennootschap' under Art. 1:24(1)."
+    }
+  }
+}

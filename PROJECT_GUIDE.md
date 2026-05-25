@@ -1,91 +1,84 @@
 # Project guide (sanity map)
 
-Quick map of the current architecture after the JSON-IR integration.
+Quick map of the current architecture. **JSON-IR is the primary path**; legacy direct-FO compilation remains available but is deprecated / lower priority.
 
 ## 1) Unified backend modes
 
 Use `--pipeline-backend` (preferred):
 
-- `legacy`: legacy KB + legacy extraction
-- `json_ir`: JSON-IR KB + JSON-IR extraction
+| Mode | KB | Extraction |
+|------|-----|------------|
+| `json_ir` (default) | JSON-IR structured compile | JSON-IR case/query IR |
+| `legacy` | Legacy FO compile | Legacy direct JSON extraction |
 
-`--kb-backend` still exists for backward compatibility, but unified mode is the intended switch.
+`--kb-backend` still exists for backward compatibility.
 
-## 2) End-to-end flow
+## 2) Canonical KB strategies (JSON-IR)
 
-`main.py` -> `pipeline/app/pipeline.py::answer_legal_prompt(...)`
+| Strategy | Translation | LE intermediate |
+|----------|-------------|-----------------|
+| `direct_json_ir_translate` | yes | no |
+| `direct_json_ir_no_translate` | no | no |
+| `le_json_ir_translate` | yes | yes |
+| `le_json_ir_no_translate` | no | yes |
 
-1. KB compile/load (`pipeline/kb/cache.py`)
-2. KB schema extraction (`pipeline/kb/schema.py`)
-3. Case extraction (`pipeline/extraction/extractor.py`)
-4. Query extraction (`pipeline/extraction/extractor.py`)
-5. Case/query validation (`pipeline/validation/fo_validation.py`)
-6. Symbolic routing (`pipeline/symbolic/router.py`)
-7. IDP-Z3 execution (`idp_z3/tasks.py`, `idp_z3/intents/*`)
-8. Rendering (`pipeline/rendering/answer_renderer.py`)
+Legacy aliases (`direct_single`, `le_two_phase`, …) still resolve but are deprecated.
 
-## 3) LLM vs Python vs IDP-Z3
+## 3) End-to-end flow
 
-- LLM:
-  - KB generation (or KB JSON-IR generation)
-  - Case/query extraction (legacy direct JSON or extraction JSON-IR)
-  - Repair retries (with structured feedback)
-- Python:
-  - deterministic normalization/sanitization
-  - schema enforcement, arity/type checks
-  - backend selection, retry orchestration, caching, scoring
-- IDP-Z3:
-  - FO(.) parse/type checks
-  - satisfiability and deduction checks
+`main.py` → `pipeline/app/pipeline.py::answer_legal_prompt(...)`
 
-## 4) Extraction backends
+1. Load **effective config** (`config/default.json` + optional `config/local.json` + env overrides) → `effective_config.json`
+2. KB compile/load (`pipeline/kb/cache.py`, structured repair loop)
+3. **Schema environment** (`pipeline/kb/schema_environment.py`) — typed contract for extraction + FO seeding
+4. Case extraction with strict assertability + optional **case_given_* factual inputs** (`pipeline/kb/case_given_bridge.py`)
+5. Query extraction with **legal-output target selection** (`pipeline/extraction/query_target_selection.py`)
+6. Pre-solver validation + **entity type mapping** (`pipeline/validation/`)
+7. Symbolic routing (`pipeline/symbolic/router.py`) → IDP-Z3 (`idp_z3/`)
+8. Rendering + optional NL paraphrase
+9. Optional **symbolic proof-gap** diagnostic (`pipeline/diagnostics/symbolic_proof_gap.py`)
 
-### Legacy extraction
+## 4) Configuration
 
-- LLM returns final case/query shapes directly.
-- Python validates and applies generic corrections.
+- **Secrets / machine-local:** `.env` — `OPENAI_API_KEY`, optional `OPENAI_MODEL`, debug-only overrides
+- **Versioned behavior:** `config/default.json` — JSON-IR repair limits, extraction backend, scoring, trace flags
+- **Local overrides:** `config/local.json` (gitignored; see `config/local.json.example`)
+- **Env overrides:** legacy `JSON_IR_*`, `PIPELINE_*`, `SCORE_*` still work via `pipeline/config.py`
+- **Run artifact:** `effective_config.json` written per `main.py` JSON run
 
-### JSON-IR extraction
+## 5) Case / query contract
 
-- LLM returns constrained IR:
-  - case IR: entities + assertions
-  - query IR: predicate hint + mode + args
-- Python deterministically resolves to canonical schema symbols and validated query objects.
+- **Schema environment** lists assertable symbols, factual case inputs, legal-output query targets, temporal support symbols.
+- **Case facts:** observable symbols by default; controlled helper assertions via `case_given_<pred>` + bridge rules when case text explicitly supports threshold/criterion satisfaction (with `evidence_text`; no invented numerics).
+- **Query:** must target legal-output predicates when the question asks for a legal effect; never assert the query predicate as a case fact.
 
-Files:
-- `pipeline/extraction/openai_extractor.py`
-- `pipeline/extraction/json_ir.py`
-- `pipeline/extraction/extractor.py`
+## 6) Scoring
 
-## 5) Symbolic core
+- Default: **decisive** scoring — `unknown` / open-world / inconclusive is **not** correct.
+- Optional belief scoring: `evaluation.belief_scoring` in config or eval `--belief-scoring` (env `SCORE_TREAT_OPEN_WITH_BELIEF`).
 
-- Router: `pipeline/symbolic/router.py`
-  - predicate boolean -> `deduction`
-  - predicate set -> `deduction_set`
-- Predicate solver: `idp_z3/predicate_solver.py`
-  - builds selector constraints (`__sel0`, ...)
-- Tasks: `idp_z3/tasks.py`
-  - composes KB + structure + query theory
-- Structure builder: `idp_z3/case_structure.py`
+## 7) Testing
 
-## 6) Strategy knobs
+- Pure unit tests import `pipeline.kb.schema_environment`, `case_fact_validation`, etc. **without** `idp_engine`.
+- IDP integration tests use `@pytest.mark.requires_idp` and skip when `idp_engine` is missing.
 
-- KB strategy (`--kb-strategy` / run metadata):
-  - `direct_single`, `direct_two_phase`, `le_single`, `le_two_phase`
-- Pipeline backend (`--pipeline-backend`):
-  - `legacy`, `json_ir`
+## 8) Generated artifacts
 
-Run metadata now includes:
-- `kb_compile_strategy`
-- `kb_compile_backend`
-- `kb_compile_flags`
-- `pipeline_backend_mode`
-- `extraction_backend` (after JSON runs, merged into `run.json` with the other compile fields)
+Curated inputs live under `inputs/json/run_*/run.json`. Generated outputs (results, KB cache, diagnostics) are gitignored and removable via:
 
-**Batch JSON runs:** `scripts/batch_json_runs.py` accepts `--pipeline-backend` (default `json_ir`) and optional `--kb-backend`, forwards them to every `main.py` call, and strips duplicate `--pipeline-backend` / `--kb-backend` from arguments after `--` so script flags win. Prefer explicit `--pipeline-backend legacy` for legacy sweeps instead of relying on `.env` alone.
+```bash
+python scripts/clean_generated_artifacts.py --dry-run
+python scripts/clean_generated_artifacts.py
+```
 
-## 7) Debugging
+## 9) Prompts
 
-Set `PIPELINE_DEBUG=1` to print trace logs.
+Canonical tree:
 
-`run_trace.txt` + `results.json` + `score.json` are the primary diagnostics.
+- `prompts/kb/json_ir/` — symbols + rules generation/repair
+- `prompts/kb/legacy/` — deprecated direct-FO KB prompts
+- `prompts/extraction/json_ir/` — case/query extraction
+- `prompts/extraction/legacy/` — deprecated extraction prompts
+- `prompts/le/generation/` — LE intermediate
+
+Legacy paths resolve through `pipeline/utils/prompt_paths.py` aliases (no duplicate files on disk).

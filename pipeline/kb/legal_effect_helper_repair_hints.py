@@ -8,7 +8,7 @@ from typing import Any
 from pipeline.kb.legal_effect import predicate_represents_legal_effect_output
 
 _HELPER_NAME_RE = re.compile(
-    r"Helper predicate '([^']+)'",
+    r"Helper (?:predicate|function) '([^']+)'",
     re.IGNORECASE,
 )
 
@@ -60,6 +60,12 @@ _CLASSIFICATION_MARKERS = (
     "category",
     "status",
 )
+
+
+def extract_missing_helper_kind(error_message: str | None) -> str:
+    if re.search(r"Helper function\s+'", error_message or "", re.I):
+        return "function"
+    return "predicate"
 
 
 def extract_missing_helper_name(error_message: str | None) -> str | None:

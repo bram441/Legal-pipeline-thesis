@@ -2,9 +2,15 @@
 
 import re
 
-from .idp_backend import run_idp
-from .case_structure import build_structure_block_from_facts
 from debug import debug_enabled, debug_log
+
+from .case_structure import build_structure_block_from_facts
+
+
+def _run_idp(*args, **kwargs):
+    from .idp_backend import run_idp
+
+    return run_idp(*args, **kwargs)
 
 
 def _primary_type_from_kb(kb_text):
@@ -160,7 +166,7 @@ def _inject_into_structure(fo_code, extra_struct_lines):
 def satisfiable_check(case, base_kb_text):
     fo_code = _compose_program(case, base_kb_text)
     debug_log("tasks.satisfiable_check", "theory=T")
-    result = run_idp(fo_code, max_models=1)
+    result = _run_idp(fo_code, max_models=1)
     return {"sat": bool(result.get("sat"))}
 
 
@@ -200,7 +206,7 @@ def satisfiable_check_with_constraint(case, base_kb_text, constraint_fo, extra_v
         debug_log("tasks.satisfiable_check_with_constraint", "fo_code:\n" + fo_code)
 
     debug_log("tasks.satisfiable_check_with_constraint", "theories=T+Q")
-    result = run_idp(fo_code, theory_name=["T", "Q"], max_models=1)
+    result = _run_idp(fo_code, theory_name=["T", "Q"], max_models=1)
     out = {"sat": bool(result.get("sat"))}
     if debug_enabled():
         # Large, but extremely useful while debugging symbolic behavior.

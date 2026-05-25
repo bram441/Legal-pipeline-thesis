@@ -7,6 +7,7 @@ When enabled, KB compilation goes: law text -> LE -> FO(.) instead of law text -
 import os
 
 from pipeline.utils.openai_sampling import chat_completion_sampling_kwargs
+from pipeline.utils.llm_call_tracker import tracked_chat_completion_create
 from pipeline.utils.prompt_loader import render_prompt
 
 
@@ -24,12 +25,15 @@ def law_text_to_le(law_text, client, model):
     from pipeline.utils.prompt_paths import LE_LAW_TO_LE, LE_TO_FO
 
     user_prompt = render_prompt(LE_LAW_TO_LE, law_text=(law_text or "").strip())
-    resp = client.chat.completions.create(
+    resp = tracked_chat_completion_create(
+        client,
+        stage="le",
         model=model,
         messages=[
             {"role": "system", "content": "You convert legal text into Logical English: clear, structured rules with explicit if-then, every/some, and types. Output only the Logical English text, no FO(.) code."},
             {"role": "user", "content": user_prompt},
         ],
+        metadata={"phase": "law_to_le"},
         **chat_completion_sampling_kwargs(),
     )
     text = (resp.choices[0].message.content or "").strip()
@@ -44,12 +48,15 @@ def le_to_fo(le_text, client, model):
     Returns a single string of FO(.) code.
     """
     user_prompt = render_prompt(LE_TO_FO, le_text=(le_text or "").strip())
-    resp = client.chat.completions.create(
+    resp = tracked_chat_completion_create(
+        client,
+        stage="le",
         model=model,
         messages=[
             {"role": "system", "content": "You convert Logical English rules into valid FO(.) code for IDP-Z3. Output ONLY the FO(.) code (vocabulary V { } and theory T:V { }), no explanations."},
             {"role": "user", "content": user_prompt},
         ],
+        metadata={"phase": "le_to_fo"},
         **chat_completion_sampling_kwargs(),
     )
     text = (resp.choices[0].message.content or "").strip()

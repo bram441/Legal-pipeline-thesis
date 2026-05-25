@@ -1,6 +1,7 @@
 import os
 
 from pipeline.utils.openai_sampling import chat_completion_sampling_kwargs
+from pipeline.utils.llm_call_tracker import tracked_chat_completion_create
 from pipeline.utils.prompt_loader import load_prompt, render_prompt
 
 
@@ -55,12 +56,15 @@ def paraphrase_liability_explanation(rule_line, fact_lines, conclusion_line, mod
     )
 
     try:
-        resp = client.chat.completions.create(
+        resp = tracked_chat_completion_create(
+            client,
+            stage="nl_explanation",
             model=chosen_model,
             messages=[
                 {"role": "system", "content": system},
                 {"role": "user", "content": user},
             ],
+            metadata={"kind": "liability"},
             **chat_completion_sampling_kwargs(),
         )
     except Exception as e:
@@ -109,12 +113,15 @@ def paraphrase_range_explanation(rules_block, facts_block, result_line, model=No
     )
 
     try:
-        resp = client.chat.completions.create(
+        resp = tracked_chat_completion_create(
+            client,
+            stage="nl_explanation",
             model=chosen_model,
             messages=[
                 {"role": "system", "content": system},
                 {"role": "user", "content": user},
             ],
+            metadata={"kind": "range"},
             **chat_completion_sampling_kwargs(),
         )
     except Exception as e:

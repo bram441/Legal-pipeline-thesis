@@ -226,6 +226,11 @@ def normalize_and_validate_case(raw_case, kb_schema=None):
 
     out = {"facts": deduped}
 
+    meta_keys = ("case_given_factual_inputs",)
+    for key in meta_keys:
+        if key in raw_case:
+            out[key] = raw_case[key]
+
     # Entities are optional and used for domain seeding in the symbolic layer.
     ents = raw_case.get("entities")
     if isinstance(ents, dict):

@@ -23,6 +23,7 @@ from pipeline.extraction.case_fact_validation import (
     CaseFactAssertionRejected,
     CaseFactRejectionDiagnostics,
     build_case_fact_rejection_repair_hint,
+    build_factual_case_input_diagnostics,
     build_rejection_diagnostics,
     case_fact_validation_error_matches,
     parse_rejected_predicate_from_error,
@@ -479,12 +480,24 @@ def _arity_mismatch_repair_hint(error_msg, previous_output, kb_schema):
     return "\n".join(lines)
 
 
-def _write_case_extraction_repair_artifact(path: str | None, records: list[dict]) -> None:
-    if not path or not records:
+def _write_case_extraction_repair_artifact(
+    path: str | None,
+    records: list[dict],
+    *,
+    factual_input_summary: dict | None = None,
+) -> None:
+    if not path:
         return
+    if not records and not factual_input_summary:
+        return
+    payload: dict = {}
+    if records:
+        payload["attempts"] = records
+    if factual_input_summary:
+        payload.update(factual_input_summary)
     try:
         with open(path, "w", encoding="utf-8") as f:
-            json.dump({"attempts": records}, f, ensure_ascii=False, indent=2)
+            json.dump(payload, f, ensure_ascii=False, indent=2)
             f.write("\n")
     except OSError:
         pass
@@ -592,27 +605,34 @@ def _schema_feedback_message(
 
 
 def _auto_provider():
-    forced = os.getenv("PIPELINE_EXTRACTOR", "").strip().lower()
-    if forced:
+    from pipeline.config import config_section
+
+    forced = str(config_section("extraction").get("provider") or "").strip().lower()
+    if forced and forced != "auto":
         return forced
 
     return "openai"
 
 
 def get_extraction_backend_from_env() -> str:
-    """Resolve extraction backend from env.
-
-    If ``PIPELINE_EXTRACTION_BACKEND`` is unset, pair with the KB backend from
-    ``PIPELINE_KB_BACKEND`` (default json_ir) so a legacy-only KB .env does not
-    silently mix with JSON-IR extraction.
-    """
+    """Resolve extraction backend from config (env overrides via pipeline.config)."""
+    from pipeline.config import config_section
     from pipeline.kb.compile_backend import get_kb_backend_from_env
 
-    v = (os.getenv("PIPELINE_EXTRACTION_BACKEND") or "").strip().lower()
-    if v in {"json_ir", "legacy"}:
-        return v
+    cfg_backend = str(config_section("extraction").get("backend") or "").strip().lower()
+    if cfg_backend in {"json_ir", "legacy"}:
+        return cfg_backend
     kb = get_kb_backend_from_env()
     return "json_ir" if kb == "json_ir" else "legacy"
+
+
+def get_extraction_max_retries() -> int:
+    from pipeline.config import config_section
+
+    try:
+        return max(1, int(config_section("extraction").get("max_retries") or 6))
+    except (TypeError, ValueError):
+        return 6
 
 
 def _extraction_backend():
@@ -642,6 +662,7 @@ def _run_case_extraction_loop(
     case_text: str,
     *,
     kb_schema: dict | None,
+    schema_environment: dict | None = None,
     provider: str,
     model: str,
     max_retries: int,
@@ -666,8 +687,13 @@ def _run_case_extraction_loop(
                     model=model,
                     kb_schema=kb_schema,
                     feedback=case_feedback,
+                    schema_environment=schema_environment,
                 )
-                case_obj = normalize_case_ir(case_ir, kb_schema=kb_schema)
+                case_obj = normalize_case_ir(
+                    case_ir,
+                    kb_schema=kb_schema,
+                    case_text=case_text,
+                )
                 seed_person_entities_from_case_text(case_text, case_obj, kb_schema)
             else:
                 case_obj = extract_case_only_openai(
@@ -675,6 +701,7 @@ def _run_case_extraction_loop(
                     model=model,
                     kb_schema=kb_schema,
                     feedback=case_feedback,
+                    schema_environment=schema_environment,
                 )
         except LLMExtractionError as e:
             raise ExtractionError(str(e))
@@ -716,12 +743,39 @@ def _run_case_extraction_loop(
 
         try:
             status_log("Case", "Validating")
-            case = normalize_and_validate_case(case_obj, kb_schema=kb_schema)
+            work_schema = kb_schema
+            if (
+                isinstance(case_obj, dict)
+                and case_obj.get("case_given_factual_inputs")
+                and kb_schema
+            ):
+                from pipeline.kb.case_given_bridge import (
+                    build_case_given_inputs_from_assertions,
+                    extend_kb_schema_with_case_given,
+                )
+
+                bridges = build_case_given_inputs_from_assertions(
+                    case_obj["case_given_factual_inputs"],
+                    kb_schema,
+                )
+                work_schema = extend_kb_schema_with_case_given(kb_schema, bridges)
+            case = normalize_and_validate_case(case_obj, kb_schema=work_schema)
+            if isinstance(case_obj, dict) and case_obj.get("case_given_factual_inputs"):
+                case["case_given_factual_inputs"] = list(case_obj["case_given_factual_inputs"])
+            factual_summary = build_factual_case_input_diagnostics(
+                case,
+                case_text=case_text,
+                kb_schema=work_schema or kb_schema,
+            )
             if pending_rejection_diag:
                 final_record = pending_rejection_diag.to_dict()
                 final_record["repair_succeeded"] = case_object_has_facts(case)
                 repair_records.append(final_record)
-            _write_case_extraction_repair_artifact(repair_artifact_path, repair_records)
+            _write_case_extraction_repair_artifact(
+                repair_artifact_path,
+                repair_records,
+                factual_input_summary=factual_summary,
+            )
             return case
         except ValueError as e:
             last_case_error = e
@@ -745,7 +799,16 @@ def case_object_has_facts(case_obj: dict) -> bool:
     return case_object_has_non_entity_facts(case_obj)
 
 
-def extract_case_and_query(case_text, user_question, kb_schema=None, provider="auto", model=None, max_retries=6):
+def extract_case_and_query(
+    case_text,
+    user_question,
+    kb_schema=None,
+    schema_environment=None,
+    provider="auto",
+    model=None,
+    max_retries=6,
+    run_artifact_dir=None,
+):
     """Extract raw {case, query} JSON using the configured provider.
 
     Uses schema-aware feedback loops: case and query are extracted and validated
@@ -765,10 +828,16 @@ def extract_case_and_query(case_text, user_question, kb_schema=None, provider="a
     case = _run_case_extraction_loop(
         case_text,
         kb_schema=kb_schema,
+        schema_environment=schema_environment,
         provider=provider,
         model=chosen_model,
         max_retries=max_retries,
         use_json_ir=use_json_ir,
+        repair_artifact_path=(
+            os.path.join(run_artifact_dir, CASE_EXTRACTION_REPAIR_ARTIFACT)
+            if run_artifact_dir
+            else None
+        ),
     )
 
     # --- Phase 2: Query extraction with feedback loop ---
@@ -788,6 +857,7 @@ def extract_case_and_query(case_text, user_question, kb_schema=None, provider="a
                     kb_schema=kb_schema,
                     case=case,
                     feedback=query_feedback,
+                    schema_environment=schema_environment,
                 )
                 query_obj = normalize_query_ir(query_ir, case, kb_schema, user_question)
             else:
@@ -815,6 +885,9 @@ def extract_case_and_query(case_text, user_question, kb_schema=None, provider="a
             _check_entity_consistency(user_question, query_obj, case, case_text=case_text, kb_schema=kb_schema)
             _coerce_query_args_to_schema(query_obj, case, kb_schema, user_question=user_question)
             query = normalize_and_validate_query(query_obj, case, kb_schema=kb_schema)
+            from pipeline.extraction.case_fact_validation import validate_case_facts_not_query_target
+
+            validate_case_facts_not_query_target(case, query, kb_schema=kb_schema)
             break
         except ValueError as e:
             last_query_error = e
@@ -828,6 +901,7 @@ def extract_case_and_query(case_text, user_question, kb_schema=None, provider="a
 def extract_case_only(
     case_text,
     kb_schema=None,
+    schema_environment=None,
     provider="auto",
     model=None,
     max_retries=6,
@@ -844,6 +918,7 @@ def extract_case_only(
     return _run_case_extraction_loop(
         case_text,
         kb_schema=kb_schema,
+        schema_environment=schema_environment,
         provider=provider,
         model=chosen_model,
         max_retries=max_retries,
@@ -852,7 +927,16 @@ def extract_case_only(
     )
 
 
-def extract_query_only(user_question, case, kb_schema=None, provider="auto", model=None, max_retries=6, case_text=None):
+def extract_query_only(
+    user_question,
+    case,
+    kb_schema=None,
+    schema_environment=None,
+    provider="auto",
+    model=None,
+    max_retries=6,
+    case_text=None,
+):
     """Extract and validate query only, given an already-validated case."""
     if provider == "auto":
         provider = _auto_provider()
@@ -877,6 +961,7 @@ def extract_query_only(user_question, case, kb_schema=None, provider="auto", mod
                     kb_schema=kb_schema,
                     case=case,
                     feedback=query_feedback,
+                    schema_environment=schema_environment,
                 )
                 query_obj = normalize_query_ir(query_ir, case, kb_schema, user_question)
             else:

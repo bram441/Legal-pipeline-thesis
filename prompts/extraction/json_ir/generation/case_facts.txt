@@ -57,12 +57,25 @@ CASE EXTRACTION RULES
 ================================================================================
 
 Use KB_SCHEMA as the only authority for type names, predicate names, function names, arities, argument order, and kind metadata.
+Use SCHEMA_ENVIRONMENT as the operational contract:
+- Use only listed entity types.
+- Use only listed predicate/function names.
+- Case assertions/value_assertions may use only symbols marked assertable.
+- Do not invent entity types.
 
 Prefer symbols with kind = observable.
 
 Do not assert symbols with kind = derived unless the case explicitly states that the legal conclusion has already been legally established.
 
 Do not assert symbols with kind = helper unless the case explicitly states that intermediate condition itself and it is not better represented by more basic observable facts or values.
+
+Controlled factual case input (threshold/criterion satisfaction):
+- Prefer numeric value_assertions when the case states explicit numbers.
+- If the case explicitly states that a threshold/criterion was exceeded or satisfied but gives no numbers, you MAY assert a listed factual case input predicate from SCHEMA_ENVIRONMENT with evidence_text (source phrase from the case).
+- Do NOT invent numeric values to satisfy thresholds (e.g. do not set employee count to 51 when the case only says "threshold exceeded").
+- Include evidence_text on every factual threshold/criterion assertion.
+- Do NOT assert legal-output, legal-consequence, or query-target predicates as case facts.
+- If the case only states a legal conclusion without decomposable observables, omit it and allow unknown.
 
 General rule:
 - observable symbols are case inputs;
@@ -122,6 +135,12 @@ VALIDATION FEEDBACK
 ================================================================================
 
 {feedback_block}
+
+================================================================================
+SCHEMA_ENVIRONMENT (COMPACT CONTRACT)
+================================================================================
+
+{schema_environment_view}
 
 ================================================================================
 KB_SCHEMA

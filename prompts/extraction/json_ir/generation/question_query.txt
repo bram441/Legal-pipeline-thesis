@@ -7,6 +7,7 @@ Do not answer the question.
 Do not invent facts.
 Do not invent entities.
 Use only KB_SCHEMA and the normalized case entities.
+Use SCHEMA_ENVIRONMENT as the operational contract for allowed query targets and argument types.
 
 ================================================================================
 MANDATORY OUTPUT
@@ -95,6 +96,8 @@ For query arguments:
 - if no valid entity exists, use "?" only if allowed by the contract and question shape.
 
 Do not introduce new entity names, paraphrased entity names, type names as args, or placeholders.
+Query targets must come from query_target_candidate symbols.
+Temporal/background support symbols may support reasoning but are not final legal-effect answer predicates when legal-output targets exist.
 
 ================================================================================
 LEXICAL HINTS
@@ -111,6 +114,12 @@ VALIDATION FEEDBACK
 ================================================================================
 
 {feedback_block}
+
+================================================================================
+SCHEMA_ENVIRONMENT (COMPACT CONTRACT)
+================================================================================
+
+{schema_environment_view}
 
 ================================================================================
 KB_SCHEMA

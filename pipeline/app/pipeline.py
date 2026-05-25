@@ -1,4 +1,5 @@
 import json
+import re
 
 from debug import debug_log, status_log
 
@@ -7,9 +8,16 @@ from pipeline.extraction.extractor import extract_case_and_query, extract_case_o
 from pipeline.symbolic.router import run_query
 from pipeline.rendering.answer_renderer import render_answer
 from pipeline.validation.fo_validation import normalize_and_validate_case, normalize_and_validate_query
+from pipeline.validation.pre_solver_validation import (
+    CaseSchemaValidationError,
+    PreSolverDomainValidationError,
+    prepare_case_for_symbolic,
+)
 from pipeline.utils.prompt_loader import render_prompt
 from pipeline.utils.run_trace import RunTraceWriter
 from pipeline.domain.seeding import seed_entities_from_case_text
+
+_ENTITY_NOISE_TOKENS = frozenset({"bv", "nv", "sa", "llc", "ltd", "inc"})
 
 def _build_prediction_summary(query, symbolic_result):
     """Machine-readable prediction summary for evaluation traces."""
@@ -76,9 +84,11 @@ def answer_legal_prompt(
     extractor_model=None,
     extractor_max_retries=6,
     kb_schema=None,
+    schema_environment=None,
     debug=False,
     trace_path=None,
     pre_extracted_case=None,
+    run_artifact_dir=None,
 ):
     """Run the full pipeline for a single (case_text, user_question).
 
@@ -89,6 +99,16 @@ def answer_legal_prompt(
     4) render answer + optional explanation
     """
     debug_log("pipeline.answer_legal_prompt", "start")
+
+    if run_artifact_dir:
+        try:
+            import os
+
+            from pipeline.config import save_effective_config
+
+            save_effective_config(os.path.join(run_artifact_dir, "effective_config.json"))
+        except Exception:
+            pass
 
     # --- deterministic intent forcing for text-mode experiments ---
     forced_query = None
@@ -139,6 +159,7 @@ def answer_legal_prompt(
                 user_question,
                 raw["case"],
                 kb_schema=kb_schema,
+                schema_environment=schema_environment,
                 provider=extractor_provider,
                 model=extractor_model,
                 max_retries=extractor_max_retries,
@@ -169,9 +190,11 @@ def answer_legal_prompt(
                 case_text,
                 user_question,
                 kb_schema=kb_schema,
+                schema_environment=schema_environment,
                 provider=extractor_provider,
                 model=extractor_model,
                 max_retries=extractor_max_retries,
+                run_artifact_dir=run_artifact_dir,
             )
         except ExtractionError as e:
             if trace:
@@ -198,7 +221,24 @@ def answer_legal_prompt(
 
     debug_log("pipeline.answer_legal_prompt", "normalize+validate")
     try:
-        case = normalize_and_validate_case(raw.get("case"), kb_schema=kb_schema)
+        from pipeline.kb.case_given_bridge import augment_kb_for_case_given
+        from pipeline.kb.schema_environment import build_schema_environment
+
+        raw_case = raw.get("case")
+        if (
+            kb_schema
+            and isinstance(raw_case, dict)
+            and raw_case.get("case_given_factual_inputs")
+        ):
+            base_kb_text, kb_schema = augment_kb_for_case_given(
+                base_kb_text,
+                kb_schema,
+                raw_case,
+            )
+            if schema_environment:
+                schema_environment = build_schema_environment(kb_schema)
+
+        case = normalize_and_validate_case(raw_case, kb_schema=kb_schema)
 
         # optional domain seeding (kept separate from validation)
         if isinstance(case, dict) and "entities" not in case:
@@ -218,14 +258,56 @@ def answer_legal_prompt(
                     filtered[t] = [v for v in vals if isinstance(v, str) and v.strip().lower() not in _NON_ENTITY_WORDS]
                 else:
                     filtered[t] = vals
+            for t, vals in list(filtered.items()):
+                if isinstance(vals, list):
+                    filtered[t] = [
+                        v
+                        for v in vals
+                        if isinstance(v, str)
+                        and v.strip()
+                        and v.strip().lower() not in _ENTITY_NOISE_TOKENS
+                        and not re.fullmatch(r"[a-z]{1,2}", v.strip().lower())
+                    ]
             case["entities"] = {k: v for k, v in filtered.items() if v}
 
         if forced_query is not None:
             raw["query"] = forced_query
 
         query = normalize_and_validate_query(raw.get("query"), case, kb_schema=kb_schema)
+
+        from pipeline.extraction.case_fact_validation import (
+            build_factual_case_input_diagnostics,
+            validate_case_facts_not_query_target,
+        )
+
+        validate_case_facts_not_query_target(case, query, kb_schema=kb_schema)
+        if run_artifact_dir:
+            try:
+                import os
+
+                diag_path = os.path.join(run_artifact_dir, "case_factual_input_diagnostics.json")
+                diag = build_factual_case_input_diagnostics(
+                    case,
+                    case_text=case_text,
+                    query_predicate=str(query.get("predicate") or ""),
+                    kb_schema=kb_schema,
+                )
+                with open(diag_path, "w", encoding="utf-8") as f:
+                    json.dump(diag, f, ensure_ascii=False, indent=2)
+                    f.write("\n")
+            except OSError:
+                pass
+
+        if schema_environment:
+            case, _mapping, _diag = prepare_case_for_symbolic(
+                case,
+                query,
+                schema_environment,
+                artifact_dir=run_artifact_dir,
+            )
+
         debug_log("pipeline.answer_legal_prompt", "validation ok")
-    except ValueError as e:
+    except (ValueError, CaseSchemaValidationError, PreSolverDomainValidationError) as e:
         if trace:
             trace.log_error("Validation failed (case/query)", e)
             trace.close()
@@ -289,6 +371,26 @@ def answer_legal_prompt(
         print("DEBUG symbolic_result:", result)
 
     prediction = _build_prediction_summary(query, result)
+
+    if run_artifact_dir and kb_schema:
+        try:
+            from pipeline.diagnostics.symbolic_proof_gap import (
+                build_symbolic_proof_gap_report,
+                save_symbolic_proof_gap_report,
+            )
+
+            gap_report = build_symbolic_proof_gap_report(
+                case=case,
+                query=query,
+                kb_schema=kb_schema,
+                schema_environment=schema_environment,
+                symbolic_result=result,
+                case_text=case_text,
+                user_question=original_question,
+            )
+            save_symbolic_proof_gap_report(run_artifact_dir, gap_report)
+        except Exception:
+            pass
 
     return {
         "sat": sat,

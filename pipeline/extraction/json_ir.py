@@ -33,8 +33,18 @@ from pipeline.semantic.legal_question import (
 from pipeline.extraction.case_fact_validation import (
     CaseFactAssertionRejected,
     build_case_predicate_rejection_message,
+    case_fact_assertion_exempt,
     case_function_may_be_asserted,
     case_predicate_may_be_asserted,
+    case_predicate_may_be_asserted_as_factual_input,
+    case_text_has_numeric_values,
+)
+from pipeline.kb.factual_case_input import case_given_predicate_name, is_factual_case_input_candidate
+from pipeline.extraction.ir_utils import (
+    question_tokens as _question_tokens,
+    safe_entity as _safe_entity,
+    safe_value as _safe_value,
+    symbol_tokens as _symbol_tokens,
 )
 from pipeline.extraction.query_role_resolve import apply_role_arg_consistency
 from pipeline.symbolic.intent_registry import list_public_intents
@@ -78,53 +88,6 @@ _IDENT_RE = re.compile(r"^[A-Za-z_]\w*$")
 
 def _norm_name(s: Any) -> str:
     return (str(s or "").strip().lower().replace("_", "").replace("-", ""))
-
-
-def _symbol_tokens(name: Any) -> list[str]:
-    s = str(name or "").strip()
-    if not s:
-        return []
-    s = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", s)
-    s = s.replace("_", " ").replace("-", " ")
-    return [t.lower() for t in s.split() if t.strip()]
-
-
-def _question_tokens(text: Any) -> set[str]:
-    s = str(text or "").strip().lower()
-    if not s:
-        return set()
-    s = re.sub(r"[^a-z0-9_ ]+", " ", s)
-    toks = [t for t in s.split() if len(t) >= 3]
-    stop = {
-        "the", "and", "for", "with", "from", "that", "this", "have", "has", "had",
-        "does", "did", "what", "which", "when", "where", "why", "who", "according",
-        "article", "under", "into", "onto", "about", "your", "their", "will", "shall",
-        "can", "may", "must", "een", "het", "dat", "die", "wat", "welke", "volgens",
-    }
-    return {t[:-1] if t.endswith("s") and len(t) > 3 else t for t in toks if t not in stop}
-
-
-def _safe_entity(value: Any) -> str:
-    s = str(value or "").strip().lower()
-    s = re.sub(r"[^a-z0-9_]+", "_", s).strip("_")
-    if not s:
-        return ""
-    if s[0].isdigit():
-        s = "e_" + s
-    return s
-
-
-def _safe_value(value: Any) -> str:
-    if isinstance(value, bool):
-        return "true" if value else "false"
-    if isinstance(value, (int, float)):
-        return str(value)
-    s = str(value or "").strip()
-    if not s:
-        return ""
-    if _NUMBER_RE.match(s) or s.lower() in {"true", "false"}:
-        return s.lower()
-    return _safe_entity(s)
 
 
 def _all_symbols(kb_schema: dict, *, bool_only: bool | None = None) -> list[dict]:
@@ -602,10 +565,16 @@ def _render_func_fact(fun: str, args: list[str], value: Any) -> str:
     return fun + "(" + ",".join(args) + ") = " + rhs + "."
 
 
-def normalize_case_ir(case_ir: dict, kb_schema: dict) -> dict:
+def normalize_case_ir(
+    case_ir: dict,
+    kb_schema: dict,
+    *,
+    case_text: str | None = None,
+    query_predicate: str | None = None,
+) -> dict:
     if not isinstance(case_ir, dict):
         raise ExtractionIRValidationError("case IR must be an object")
-    out = {"facts": [], "entities": {}}
+    out: dict[str, Any] = {"facts": [], "entities": {}, "case_given_factual_inputs": []}
 
     ents = case_ir.get("entities") or {}
     if isinstance(ents, dict):
@@ -634,7 +603,37 @@ def normalize_case_ir(case_ir: dict, kb_schema: dict) -> dict:
         if not pred:
             raise ExtractionIRValidationError(f"Could not resolve predicate assertion symbol: {sym}")
         sig = _symbol_sig(kb_schema, pred)
-        allowed, rejection_code = case_predicate_may_be_asserted(sig)
+        evidence_text = str(a.get("evidence_text") or a.get("source_text") or "").strip() or None
+        allowed, rejection_code = case_predicate_may_be_asserted(
+            sig,
+            case_text=case_text,
+            evidence_text=evidence_text,
+            query_predicate=query_predicate,
+            kb_schema=kb_schema,
+        )
+        render_pred = pred
+        case_given_meta: dict[str, Any] | None = None
+        if allowed:
+            factual_ok, _factual_code, snippet = case_predicate_may_be_asserted_as_factual_input(
+                sig,
+                case_text=case_text,
+                evidence_text=evidence_text,
+                query_predicate=query_predicate,
+                kb_schema=kb_schema,
+            )
+            if (
+                factual_ok
+                and is_factual_case_input_candidate(sig, kb_schema)
+                and not case_fact_assertion_exempt(sig)
+            ):
+                render_pred = case_given_predicate_name(pred)
+                case_given_meta = {
+                    "target_predicate": pred,
+                    "input_predicate": render_pred,
+                    "source": str(a.get("source") or "case_given"),
+                    "evidence_text": snippet or evidence_text or "",
+                    "assertion_kind": "factual_threshold_satisfaction",
+                }
         if not allowed:
             raise CaseFactAssertionRejected(
                 build_case_predicate_rejection_message(pred, rejection_code),
@@ -647,7 +646,10 @@ def normalize_case_ir(case_ir: dict, kb_schema: dict) -> dict:
             raise ExtractionIRValidationError(f"Predicate assertion {pred} expects {arity} args, got {a.get('args')}")
         for typ, arg in zip(sig.get("args") or [], args):
             _merge_typed_entity(out["entities"], str(typ), arg)
-        fact = _render_pred_fact(pred, args, bool(a.get("negated", False)))
+        if case_given_meta is not None:
+            case_given_meta["args"] = list(args)
+            out["case_given_factual_inputs"].append(case_given_meta)
+        fact = _render_pred_fact(render_pred, args, bool(a.get("negated", False)))
         if fact not in facts_seen:
             out["facts"].append(fact)
             facts_seen.add(fact)
@@ -681,6 +683,16 @@ def normalize_case_ir(case_ir: dict, kb_schema: dict) -> dict:
             _merge_typed_entity(out["entities"], str(typ), arg)
         ret = (sig.get("returns") or "Int") if sig else "Int"
         _validate_value_for_function_return(a.get("value"), str(ret))
+        if not case_text_has_numeric_values(case_text):
+            val_s = str(a.get("value") or "").strip()
+            if val_s and case_text and val_s not in case_text.replace(",", "").replace(" ", ""):
+                raise ExtractionIRValidationError(
+                    "Case extraction cannot invent numeric value "
+                    + val_s
+                    + " for "
+                    + fun
+                    + " when the case text provides no explicit numbers."
+                )
         fact = _render_func_fact(fun, args, a.get("value"))
         if fact not in facts_seen:
             out["facts"].append(fact)
@@ -882,6 +894,10 @@ def normalize_query_ir(query_ir: dict, case: dict, kb_schema: dict, user_questio
         apply_generic_query_arg_fill(user_question, query_obj, case, kb_schema)
 
     _ensure_singleton_query_args(pred, query_obj["args"], case, kb_schema)
+
+    from pipeline.extraction.query_period_binding import apply_query_period_binding
+
+    apply_query_period_binding(query_obj, case, kb_schema, user_question)
 
     if mode == "boolean":
         _validate_query_target_for_legal_question(pred, user_question, kb_schema)

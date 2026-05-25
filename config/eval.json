@@ -1,0 +1,7 @@
+{
+  "json_ir": {
+    "max_kb_llm_calls": 14,
+    "max_symbol_versions": 4,
+    "max_rules_attempts_per_symbol_version": 3
+  }
+}

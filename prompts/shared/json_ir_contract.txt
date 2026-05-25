@@ -147,6 +147,14 @@ Do not place Boolean legal conclusions under functions.
 Do not use a function name as a predicate atom.
 Do not use a predicate name as a function term.
 
+Helper numeric functions (thresholds, limits, adjusted thresholds):
+- Define in rule THEN with compare equality to a numeric literal from scoped law text only.
+- Pattern: {"compare": {"left": {"func": "threshold_fn", "args": [...]}, "op": "=", "right": LAW_LITERAL}}
+- Use in IF as compare(metric(...), op, threshold_fn(...)) or compare(metric(...), op, LAW_LITERAL) when no adjustment is required.
+- Do not define case-value observables (annual averages, turnover amounts) from law thresholds.
+- Do not use numeric functions as Bool predicate atoms.
+- Do not assign false to predicates as if they were functions.
+
 ================================================================================
 5. KB SYMBOLS PHASE RULES
 ================================================================================
@@ -180,6 +188,15 @@ General ontology rules:
 - Do not make final legal consequences observable.
 - Do not make raw case facts derived.
 - Ensure the law’s important legal questions are answerable through derived predicates or derived functions.
+
+Temporal support (symbols + rules):
+- When the scoped law or question requires consecutive periods, a following/previous/next period, or a second time a condition holds, the symbol table must include at least one reusable period-to-period relation (e.g. next_period(p1, p2), previous_period(p1, p2)) over an existing period type.
+- Such relations are observable structural support; they are not final legal conclusions.
+- Rules may quantify over two period variables linked by these relations when expressing consecutive-year logic.
+
+Helper closure (rules phase):
+- Every helper predicate or helper function referenced in any rule IF must be defined by at least one rule whose THEN contains that symbol.
+- Do not reference a helper in IF without adding its defining rule in the same rules output.
 
 ================================================================================
 6. KB RULES PHASE RULES

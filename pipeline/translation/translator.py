@@ -3,6 +3,7 @@
 import os
 
 from pipeline.utils.openai_sampling import chat_completion_sampling_kwargs
+from pipeline.utils.llm_call_tracker import tracked_chat_completion_create
 from pipeline.utils.prompt_loader import render_prompt
 
 
@@ -30,7 +31,9 @@ def translate_to_english(text, model=None):
     user_prompt = render_prompt("translation/translate_to_english.txt", text=(text or "").strip())
 
     try:
-        resp = client.chat.completions.create(
+        resp = tracked_chat_completion_create(
+            client,
+            stage="translation",
             model=chosen_model,
             messages=[
                 {"role": "system", "content": "You translate legal and case text to English. Output only the translation."},
