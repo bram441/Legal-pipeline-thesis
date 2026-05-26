@@ -32,23 +32,27 @@ cp config/local.json.example config/local.json
 
 Edit `local.json` with partial overrides only; unspecified keys fall back to `default.json`.
 
-### Config profiles (manual merge)
+### Config profiles (CLI overlay)
 
-Profiles are **not** loaded automatically. Copy sections into `config/local.json` before a run:
+Merge order: **`default.json`** → **`local.json`** (if present) → **profile** (optional) → **environment variables**.
+
+Pass a profile on evaluation or a single run (no need to edit `local.json`):
+
+```powershell
+python scripts/run_evaluation.py --config config/final.json --runs-dir inputs/json_final --runs run_001 --strategies direct_json_ir_no_translate
+python main.py --mode json --run inputs/json_final/run_001 --config config/ablation_balanced.json --kb-strategy direct_json_ir_no_translate --no-translate
+```
+
+When `--config` is omitted, `run_evaluation.py` uses **default + local only** (and clears a stale `PIPELINE_CONFIG_PROFILE` from the shell). `main.py` without `--config` still respects `PIPELINE_CONFIG_PROFILE` if you export it.
+
+**`--ignore-local-config`** skips `config/local.json` so only **default → profile → env** apply. Use for reproducible ablations (`run_config_ablation.py` passes this automatically).
 
 | File | Purpose |
 |------|---------|
-| `config/cheap.json` | Debugging / smoke — low LLM budget (`max_kb_llm_calls: 6`) |
-| `config/eval.json` | Medium reproducible evaluation (`max_kb_llm_calls: 14`) |
-| `config/final.json` | Final thesis run — higher budget, trace off, LLM tracking on |
-
-Example:
-
-```bash
-# Merge final profile into local overrides (PowerShell)
-Get-Content config/default.json, config/final.json | ConvertFrom-Json  # inspect manually
-# Or copy keys from config/final.json into config/local.json by hand
-```
+| `config/cheap.json` | Debugging / smoke — low LLM budget |
+| `config/eval.json` | Medium reproducible evaluation |
+| `config/final.json` | Final thesis run — higher budget |
+| `config/ablation_balanced.json` | Balanced ablation profile |
 
 ### Evaluation keys (`evaluation` section)
 

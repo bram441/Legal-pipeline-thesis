@@ -1,7 +1,7 @@
 {
   "id": "run_202",
   "law": {
-    "path": "example_laws/erfrecht.text"
+    "path": "example_laws/erfrecht.txt"
   },
   "case": {
     "text": "Tom en Ulla leefden samen zonder huwelijk en zonder wettelijke samenwoonst. Tom overlijdt en laat één kind na."

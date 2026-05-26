@@ -8,9 +8,7 @@ Do not change arities or types.
 Do not assume a concrete case.
 Do not include concrete names, organizations, dates, objects, IDs, or expected answers.
 
-================================================================================
-MANDATORY OUTPUT
-================================================================================
+## MANDATORY OUTPUT
 
 Return ONLY one JSON object.
 No markdown.
@@ -23,15 +21,11 @@ The root object must contain exactly one key:
 
 No other top-level keys.
 
-================================================================================
-CONTRACT
-================================================================================
+## CONTRACT
 
 {json_ir_contract}
 
-================================================================================
-OUTPUT SHAPE
-================================================================================
+## OUTPUT SHAPE
 
 Use this shape:
 
@@ -52,9 +46,7 @@ Use this shape:
 
 The example names are placeholders only. Every actual symbol and type MUST come from SYMBOL_TABLE.
 
-================================================================================
-HIGH-PRIORITY RULE RULES
-================================================================================
+## HIGH-PRIORITY RULE RULES
 
 1. Use the frozen symbol table exactly.
 - Every predicate atom must use a predicate from SYMBOL_TABLE.
@@ -121,9 +113,7 @@ HIGH-PRIORITY RULE RULES
 - Every rule must be object-shaped JSON_IR.
 - Do not output raw FO strings.
 
-================================================================================
-ALLOWED EXPRESSIONS
-================================================================================
+## ALLOWED EXPRESSIONS
 
 Predicate atom:
 {"pred": "predicate_name", "args": ["x"], "negated": false}
@@ -151,9 +141,7 @@ Function term:
 
 Function terms may appear inside comparisons or where a term is valid. They are not Boolean expressions.
 
-================================================================================
-SELF-CHECK BEFORE RETURNING
-================================================================================
+## SELF-CHECK BEFORE RETURNING
 
 Before returning JSON, verify:
 - root key is exactly rules;
@@ -168,9 +156,7 @@ Before returning JSON, verify:
 - no circular or tautological rule appears;
 - every rule expresses reusable law, not a case-specific answer.
 
-================================================================================
-CRITICAL CONSEQUENT RULE
-================================================================================
+## CRITICAL CONSEQUENT RULE
 
 The `then` part of a rule should normally contain derived predicates.
 
@@ -184,14 +170,10 @@ If no suitable derived symbol exists, the symbol table must be repaired before r
 
 Helper predicates may be defined by rules, but they should not be the only final legal output of the KB.
 
-================================================================================
-SYMBOL_TABLE
-================================================================================
+## SYMBOL_TABLE
 
 {symbol_table_json}
 
-================================================================================
-LAW TEXT
-================================================================================
+## LAW TEXT
 
 {law_text}

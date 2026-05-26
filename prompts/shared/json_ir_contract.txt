@@ -2,9 +2,7 @@ GLOBAL JSON_IR CONTRACT — LAW-AGNOSTIC
 
 Use this contract only for the current phase. Do not mix responsibilities between phases.
 
-================================================================================
-0. PHASE RESPONSIBILITIES
-================================================================================
+## 0. PHASE RESPONSIBILITIES
 
 KB symbols phase:
 - Model the reusable vocabulary of the law only.
@@ -32,9 +30,7 @@ Python validator/renderer:
 - Python is responsible for FO(.) syntax, arity checking, type checking, and IDP-Z3 rendering.
 - The model must output valid JSON_IR only.
 
-================================================================================
-1. IDENTIFIERS
-================================================================================
+## 1. IDENTIFIERS
 
 Types:
 - Use clear singular type names.
@@ -60,9 +56,7 @@ JSON output:
 - No commentary before or after the JSON.
 - No extra top-level keys unless the current prompt explicitly allows them.
 
-================================================================================
-2. SYMBOL KINDS
-================================================================================
+## 2. SYMBOL KINDS
 
 Every predicate and function must have exactly one kind:
 
@@ -97,9 +91,7 @@ Do not use: input, conclusion, unknown, fact, result, output.
 Use observable instead of input.
 Use derived instead of conclusion.
 
-================================================================================
-3. TYPE VS ROLE / STATUS
-================================================================================
+## 3. TYPE VS ROLE / STATUS
 
 Use a type for a stable domain of entities, such as a legal actor, object, act, event, decision, period, document, procedure, relationship, or other reusable legal sort.
 
@@ -121,9 +113,7 @@ Bad generic pattern:
 
 JSON_IR has no implicit subtype system. If one concept is merely a subset or role of another, prefer one broader type plus a predicate marking the subset/role.
 
-================================================================================
-4. PREDICATE VS FUNCTION
-================================================================================
+## 4. PREDICATE VS FUNCTION
 
 Use predicates for yes/no conditions.
 A symbol should be a predicate when it means whether:
@@ -155,9 +145,7 @@ Helper numeric functions (thresholds, limits, adjusted thresholds):
 - Do not use numeric functions as Bool predicate atoms.
 - Do not assign false to predicates as if they were functions.
 
-================================================================================
-5. KB SYMBOLS PHASE RULES
-================================================================================
+## 5. KB SYMBOLS PHASE RULES
 
 The symbols phase must output exactly:
 {
@@ -198,9 +186,7 @@ Helper closure (rules phase):
 - Every helper predicate or helper function referenced in any rule IF must be defined by at least one rule whose THEN contains that symbol.
 - Do not reference a helper in IF without adding its defining rule in the same rules output.
 
-================================================================================
-6. KB RULES PHASE RULES
-================================================================================
+## 6. KB RULES PHASE RULES
 
 Rules must express reusable legal logic only.
 
@@ -281,9 +267,7 @@ Threshold and combination rules:
 - For “at most one of A, B, C”, use the negation of the “at least two” condition.
 - Do not count Boolean conditions with arithmetic unless the renderer explicitly supports it.
 
-================================================================================
-7. CASE EXTRACTION RULES
-================================================================================
+## 7. CASE EXTRACTION RULES
 
 Case extraction must output observable facts and values only.
 
@@ -306,9 +290,7 @@ value_assertions:
 
 Case extraction must not answer the legal question.
 
-================================================================================
-8. QUERY EXTRACTION RULES
-================================================================================
+## 8. QUERY EXTRACTION RULES
 
 Query extraction maps the user question to the KB predicate that directly represents the requested legal answer.
 

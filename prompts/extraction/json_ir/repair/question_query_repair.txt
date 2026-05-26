@@ -3,9 +3,7 @@ You are repairing legal query JSON_IR.
 Your previous query JSON failed strict validation.
 Return corrected JSON only.
 
-================================================================================
-MANDATORY OUTPUT
-================================================================================
+## MANDATORY OUTPUT
 
 Return ONLY JSON matching the structured-output schema for this call.
 No markdown.
@@ -14,23 +12,17 @@ No keys other than those required by the schema.
 First character MUST be `{`.
 Last character MUST be `}`.
 
-================================================================================
-PRIMARY ERROR REPORT
-================================================================================
+## PRIMARY ERROR REPORT
 
 You MUST fix every issue described here. Partial fixes fail.
 
 {validation_feedback}
 
-================================================================================
-CONTRACT
-================================================================================
+## CONTRACT
 
 {json_ir_contract}
 
-================================================================================
-REPAIR PRIORITIES
-================================================================================
+## REPAIR PRIORITIES
 
 Fix all applicable issues:
 - unknown predicate;
@@ -62,32 +54,22 @@ If args are invalid:
 If kind is unsupported:
 - Use kind = "predicate" unless the system explicitly supports the intent.
 
-================================================================================
-KB_SCHEMA
-================================================================================
+## KB_SCHEMA
 
 {kb_schema_json}
 
-================================================================================
-NORMALIZED CASE FACTS
-================================================================================
+## NORMALIZED CASE FACTS
 
 {case_facts_json}
 
-================================================================================
-NORMALIZED CASE ENTITIES
-================================================================================
+## NORMALIZED CASE ENTITIES
 
 {case_entities_json}
 
-================================================================================
-PREVIOUS QUERY JSON OR RAW OUTPUT
-================================================================================
+## PREVIOUS QUERY JSON OR RAW OUTPUT
 
 {previous_output}
 
-================================================================================
-QUESTION
-================================================================================
+## QUESTION
 
 {user_question}

@@ -1,7 +1,7 @@
 {
   "id": "run_007",
   "law": {
-    "path": "example_laws/erfrecht.text"
+    "path": "example_laws/erfrecht.txt"
   },
   "case": {
     "text": "Mira en Noor waren wettelijk samenwonend. Mira overlijdt. Noor is de langstlevende wettelijk samenwonende, komt tot de nalatenschap, en is geen afstammeling van Mira. De woning was hun voornaamste gezinswoning."

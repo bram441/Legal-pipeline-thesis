@@ -1,0 +1,20 @@
+{
+  "id": "run_119",
+  "law": {
+    "path": "example_laws_clean/microvennootschappen_clean.txt"
+  },
+  "case": {
+    "text": "BV Start begint met haar bedrijf. Bij het begin van het eerste boekjaar schat zij te goeder trouw 55 werknemers, 12.000.000 euro netto-omzet exclusief btw en 5.000.000 euro balanstotaal."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Moet BV Start volgens artikel 1:24, paragraaf 3 meteen rekening houden met het overschrijden van meer dan één criterium in het eerste boekjaar?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "Under Article 1:24, a small company may exceed at most one threshold (50 employees, 11,250,000 euro turnover, 6,000,000 euro balance sheet). For a starting company, Article 1:24 par. 3 requires immediate account when the good-faith estimate exceeds more than one criterion in the first year: here 55 employees and 12,000,000 euro turnover, while the balance sheet total of 5,000,000 does not exceed 6,000,000."
+      }
+    }
+  ]
+}

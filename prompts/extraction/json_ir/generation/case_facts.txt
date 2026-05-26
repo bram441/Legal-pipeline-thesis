@@ -7,9 +7,7 @@ Do not infer final legal conclusions.
 Do not invent facts.
 Do not invent entities not supported by the case.
 
-================================================================================
-MANDATORY OUTPUT
-================================================================================
+## MANDATORY OUTPUT
 
 Return ONLY JSON matching the structured-output schema for this call.
 No markdown.
@@ -18,15 +16,11 @@ No keys other than those required by the schema.
 First character MUST be `{`.
 Last character MUST be `}`.
 
-================================================================================
-CONTRACT
-================================================================================
+## CONTRACT
 
 {json_ir_contract}
 
-================================================================================
-OUTPUT FIELDS
-================================================================================
+## OUTPUT FIELDS
 
 entities:
 - Required.
@@ -52,9 +46,7 @@ value_assertions:
 - args must match the function arity and type order.
 - value must match the function return type.
 
-================================================================================
-CASE EXTRACTION RULES
-================================================================================
+## CASE EXTRACTION RULES
 
 Use KB_SCHEMA as the only authority for type names, predicate names, function names, arities, argument order, and kind metadata.
 Use SCHEMA_ENVIRONMENT as the operational contract:
@@ -106,9 +98,7 @@ Uncertainty:
 - If no valid schema symbol exists for a case detail, omit that detail.
 - Never invent a symbol.
 
-================================================================================
-EXISTENTIAL FACT EXTRACTION RULE
-================================================================================
+## EXISTENTIAL FACT EXTRACTION RULE
 
 When the case states that qualifying entities or conditions exist, but does not name every individual witness, prefer the KB schema's observable existence/condition predicate if available.
 
@@ -120,9 +110,7 @@ If the KB schema contains both:
 
 prefer the simpler observable existence predicate when the case only states existence.
 
-================================================================================
-LEXICAL HINTS
-================================================================================
+## LEXICAL HINTS
 
 The block below may help map ordinary language to existing KB_SCHEMA symbols only.
 It must not introduce new symbols or facts.
@@ -130,26 +118,18 @@ If it conflicts with KB_SCHEMA or the case text, ignore it.
 
 {world_knowledge_lexical}
 
-================================================================================
-VALIDATION FEEDBACK
-================================================================================
+## VALIDATION FEEDBACK
 
 {feedback_block}
 
-================================================================================
-SCHEMA_ENVIRONMENT (COMPACT CONTRACT)
-================================================================================
+## SCHEMA_ENVIRONMENT (COMPACT CONTRACT)
 
 {schema_environment_view}
 
-================================================================================
-KB_SCHEMA
-================================================================================
+## KB_SCHEMA
 
 {kb_schema_json}
 
-================================================================================
-CASE
-================================================================================
+## CASE
 
 {case_text}

@@ -1,0 +1,20 @@
+{
+  "id": "run_119",
+  "law": {
+    "path": "inputs/json_focused_examples/run_119/article.txt"
+  },
+  "case": {
+    "text": "BV Start begint met haar bedrijf. Bij het begin van het eerste boekjaar schat zij te goeder trouw 55 werknemers, 12.000.000 euro netto-omzet exclusief btw en 5.000.000 euro balanstotaal."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Moet BV Start volgens artikel 1:24, paragraaf 3 meteen rekening houden met het overschrijden van meer dan één criterium in het eerste boekjaar?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "Voor startende vennootschappen moet meteen rekening worden gehouden met de schatting bij het begin van het eerste boekjaar. De schatting overschrijdt meer dan één criterium van artikel 1:24: werknemers > 50 en netto-omzet > 11.250.000 euro."
+      }
+    }
+  ]
+}

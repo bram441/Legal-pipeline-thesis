@@ -9,9 +9,7 @@ Do not create rules in this step.
 Do not assume a concrete case.
 Do not include concrete names, organizations, dates, objects, IDs, or expected answers.
 
-================================================================================
-MANDATORY OUTPUT
-================================================================================
+## MANDATORY OUTPUT
 
 Return ONLY one JSON object.
 No markdown.
@@ -26,23 +24,17 @@ The root object must contain exactly these keys:
 
 Do not include a "rules" key.
 
-================================================================================
-PRIMARY ERROR REPORT
-================================================================================
+## PRIMARY ERROR REPORT
 
 You MUST fix every issue described here. Partial fixes fail.
 
 {error_message}
 
-================================================================================
-CONTRACT
-================================================================================
+## CONTRACT
 
 {json_ir_contract}
 
-================================================================================
-REPAIR PRIORITIES
-================================================================================
+## REPAIR PRIORITIES
 
 Fix all applicable issues:
 - invalid JSON;
@@ -73,32 +65,22 @@ If rules validation failed because an observable predicate was used in `then`:
 - Add or repair a derived predicate representing the legal consequence, or change the symbol kind/signature if it was incorrectly marked observable.
 - Do not force the rule to derive an observable case fact.
 
-================================================================================
-RULES THAT EXPOSED THE SYMBOL PROBLEM
-================================================================================
+## RULES THAT EXPOSED THE SYMBOL PROBLEM
 
 {rules_json}
 
-================================================================================
-VALIDATION ERROR FROM COMBINED SYMBOLS+RULES
-================================================================================
+## VALIDATION ERROR FROM COMBINED SYMBOLS+RULES
 
 {rules_exposed_error}
 
-================================================================================
-PREVIOUS ATTEMPT
-================================================================================
+## PREVIOUS ATTEMPT
 
 {previous_output}
 
-================================================================================
-DETERMINISTIC HINTS
-================================================================================
+## DETERMINISTIC HINTS
 
 {machine_hints}
 
-================================================================================
-LAW TEXT
-================================================================================
+## LAW TEXT
 
 {law_text}

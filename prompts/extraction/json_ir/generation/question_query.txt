@@ -9,9 +9,7 @@ Do not invent entities.
 Use only KB_SCHEMA and the normalized case entities.
 Use SCHEMA_ENVIRONMENT as the operational contract for allowed query targets and argument types.
 
-================================================================================
-MANDATORY OUTPUT
-================================================================================
+## MANDATORY OUTPUT
 
 Return ONLY JSON matching the structured-output schema for this call.
 No markdown.
@@ -20,15 +18,11 @@ No keys other than those required by the schema.
 First character MUST be `{`.
 Last character MUST be `}`.
 
-================================================================================
-CONTRACT
-================================================================================
+## CONTRACT
 
 {json_ir_contract}
 
-================================================================================
-QUERY FIELD RULES
-================================================================================
+## QUERY FIELD RULES
 
 kind:
 - Use "predicate" for yes/no (mode=boolean) or which-entities (mode=set) questions about a concrete predicate.
@@ -74,9 +68,7 @@ explain:
 - true only if the user explicitly asks for explanation, reasons, or why.
 - otherwise false.
 
-================================================================================
-QUERY SELECTION RULES
-================================================================================
+## QUERY SELECTION RULES
 
 Choose the symbol that directly represents the requested legal answer.
 
@@ -99,9 +91,7 @@ Do not introduce new entity names, paraphrased entity names, type names as args,
 Query targets must come from query_target_candidate symbols.
 Temporal/background support symbols may support reasoning but are not final legal-effect answer predicates when legal-output targets exist.
 
-================================================================================
-LEXICAL HINTS
-================================================================================
+## LEXICAL HINTS
 
 The block below may help map ordinary language to existing KB_SCHEMA symbols only.
 It must not introduce new symbols or new constants.
@@ -109,38 +99,26 @@ All non-"?" args must still come from Normalized case entities.
 
 {world_knowledge_lexical}
 
-================================================================================
-VALIDATION FEEDBACK
-================================================================================
+## VALIDATION FEEDBACK
 
 {feedback_block}
 
-================================================================================
-SCHEMA_ENVIRONMENT (COMPACT CONTRACT)
-================================================================================
+## SCHEMA_ENVIRONMENT (COMPACT CONTRACT)
 
 {schema_environment_view}
 
-================================================================================
-KB_SCHEMA
-================================================================================
+## KB_SCHEMA
 
 {kb_schema_json}
 
-================================================================================
-NORMALIZED CASE FACTS
-================================================================================
+## NORMALIZED CASE FACTS
 
 {case_facts_json}
 
-================================================================================
-NORMALIZED CASE ENTITIES
-================================================================================
+## NORMALIZED CASE ENTITIES
 
 {case_entities_json}
 
-================================================================================
-QUESTION
-================================================================================
+## QUESTION
 
 {user_question}

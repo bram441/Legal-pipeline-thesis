@@ -438,7 +438,28 @@ def main():
         + ", ".join(STRATEGY_CHOICES)
         + ". Overrides run.json and .env for this process during the run.",
     )
+    parser.add_argument(
+        "--config",
+        metavar="PATH",
+        default=None,
+        help="Optional config profile JSON merged on top of config/default.json and "
+        "config/local.json (e.g. config/final.json). Omitted: default + local only "
+        "(unless PIPELINE_CONFIG_PROFILE is already set in the environment).",
+    )
+    parser.add_argument(
+        "--ignore-local-config",
+        action="store_true",
+        help="Do not load config/local.json (default + --config profile + env only).",
+    )
     args = parser.parse_args()
+
+    if args.config is not None or args.ignore_local_config:
+        from pipeline.config import activate_config_profile, set_ignore_local_config
+
+        if args.config is not None:
+            activate_config_profile(args.config)
+        if args.ignore_local_config:
+            set_ignore_local_config(True)
 
     if args.kb_strategy is not None and args.kb_strategy not in STRATEGY_CHOICES:
         parser.error("--kb-strategy must be one of: " + ", ".join(STRATEGY_CHOICES))

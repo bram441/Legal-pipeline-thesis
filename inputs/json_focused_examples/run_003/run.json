@@ -1,0 +1,21 @@
+{
+  "id": "run_003",
+  "law": {
+    "path": "inputs/json_focused_examples/run_003/article.txt"
+  },
+  "case": {
+    "text": "NV Delta heeft rechtspersoonlijkheid. NV Delta heeft op balansdatum van het laatst afgesloten boekjaar 9 voltijdse equivalenten, een jaarlijkse netto-omzet van 800.000 euro (exclusief btw) en een balanstotaal van 400.000 euro. De vennootschap is geen moeder- of dochtervennootschap."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Is NV Delta een microvennootschap in de zin van artikel 1:25?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "target": "nv_delta",
+        "reason": "NV Delta is an NV, so it has legal personality. It is neither a parent nor a subsidiary and exceeds none of the micro-company thresholds: 9 <= 10 employees, 800000 <= 900000 turnover, and 400000 <= 450000 balance sheet total."
+      }
+    }
+  ]
+}

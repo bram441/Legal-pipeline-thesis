@@ -1,7 +1,7 @@
 {
   "id": "run_207",
   "law": {
-    "path": "example_laws/erfrecht.text"
+    "path": "example_laws/erfrecht.txt"
   },
   "case": {
     "text": "Willem en Yara waren gehuwd. Yara overlijdt. Het appartement in Gent was bij het openvallen van de nalatenschap de voornaamste gezinswoning."

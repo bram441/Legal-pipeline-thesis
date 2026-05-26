@@ -1,7 +1,7 @@
 {
   "id": "run_201",
   "law": {
-    "path": "example_laws/erfrecht.text"
+    "path": "example_laws/erfrecht.txt"
   },
   "case": {
     "text": "Peter en Sara waren gehuwd. Sara overlijdt. Peter is de langstlevende echtgenoot. Sara laat één minderjarig kind na. Er is geen testament."

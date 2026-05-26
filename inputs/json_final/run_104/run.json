@@ -1,7 +1,7 @@
 {
   "id": "run_104",
   "law": {
-    "path": "example_laws/erfrecht.text"
+    "path": "example_laws/erfrecht.txt"
   },
   "case": {
     "text": "Greet en Hannah waren wettelijk samenwonend. Greet overlijdt. Hannah komt tot de nalatenschap, is geen afstammeling van Greet, en de woning in Leuven was hun voornaamste gezinswoning met huisraad."

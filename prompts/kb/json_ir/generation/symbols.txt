@@ -9,9 +9,7 @@ Do not create rules in this step.
 Do not assume a concrete case.
 Do not include concrete names, organizations, dates, objects, IDs, or expected answers.
 
-================================================================================
-MANDATORY OUTPUT
-================================================================================
+## MANDATORY OUTPUT
 
 Return ONLY one JSON object.
 No markdown.
@@ -26,15 +24,11 @@ The root object must contain exactly these keys:
 
 Do not include a "rules" key.
 
-================================================================================
-CONTRACT
-================================================================================
+## CONTRACT
 
 {json_ir_contract}
 
-================================================================================
-OUTPUT SHAPE
-================================================================================
+## OUTPUT SHAPE
 
 Use this shape exactly:
 
@@ -69,9 +63,7 @@ Use this shape exactly:
 
 The example names are placeholders only. Choose names and types from the LAW TEXT.
 
-================================================================================
-HIGH-PRIORITY DECISION RULES
-================================================================================
+## HIGH-PRIORITY DECISION RULES
 
 1. Type versus role/status:
 - Use types for stable domains (Person, Company, LegalEntity)—not for legal statuses, eligibility labels, or defined categories.
@@ -127,9 +119,7 @@ HIGH-PRIORITY DECISION RULES
 - Do not mark exceeds_*, more_than_one_*, threshold_*, or good_faith_estimate_shows_* style conditions as observable unless a case could literally assert that composite sentence verbatim (rare).
 - Prefer observable numeric functions plus helper threshold predicates defined later in rules.
 
-================================================================================
-EXISTENTIAL CONDITION MODELING RULE
-================================================================================
+## EXISTENTIAL CONDITION MODELING RULE
 
 If the legal text requires that some qualifying actor, object, event, document, relationship, or condition exists, and the exact identity of that witness is not needed for the legal consequence, model the condition as an observable Boolean predicate on the main legal subject.
 
@@ -145,9 +135,7 @@ Avoid generic pattern:
 - observable: qualifying_witness(witness, subject)
 when the witness identity is not needed by the legal answer.
 
-================================================================================
-ROUND CONTEXT
-================================================================================
+## ROUND CONTEXT
 
 If this is the first attempt, the sections below may be empty. Ignore empty sections.
 
@@ -162,8 +150,6 @@ DETERMINISTIC_HINTS:
 
 If ERROR is non-empty, fix the root cause of every issue. Do not repeat the same invalid structure.
 
-================================================================================
-LAW TEXT
-================================================================================
+## LAW TEXT
 
 {law_text}

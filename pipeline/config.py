@@ -13,6 +13,8 @@ from typing import Any
 _PROJECT_ROOT = Path(__file__).resolve().parents[1]
 _DEFAULT_CONFIG_PATH = _PROJECT_ROOT / "config" / "default.json"
 _LOCAL_CONFIG_PATH = _PROJECT_ROOT / "config" / "local.json"
+CONFIG_PROFILE_ENV = "PIPELINE_CONFIG_PROFILE"
+IGNORE_LOCAL_CONFIG_ENV = "PIPELINE_IGNORE_LOCAL_CONFIG"
 
 # Env var -> (section, key). Secrets stay in env only (OPENAI_API_KEY, models).
 _ENV_OVERRIDES: dict[str, tuple[str, str]] = {
@@ -100,13 +102,58 @@ def _deep_merge(base: dict[str, Any], overlay: dict[str, Any]) -> dict[str, Any]
     return out
 
 
-def load_config_files() -> dict[str, Any]:
-    """Load default.json + optional config/local.json (gitignored)."""
+def resolve_config_path(path: str | Path) -> Path:
+    """Resolve a config profile path (absolute or relative to project root)."""
+    p = Path(path)
+    if not p.is_absolute():
+        p = _PROJECT_ROOT / p
+    p = p.resolve()
+    if not p.is_file():
+        raise FileNotFoundError("Config file not found: " + str(p))
+    return p
+
+
+def _profile_path_from_env() -> Path | None:
+    raw = (os.environ.get(CONFIG_PROFILE_ENV) or "").strip()
+    if not raw:
+        return None
+    p = Path(raw)
+    if p.is_file():
+        return p.resolve()
+    try:
+        return resolve_config_path(p)
+    except FileNotFoundError:
+        return None
+
+
+def ignore_local_config_enabled() -> bool:
+    """True when ``PIPELINE_IGNORE_LOCAL_CONFIG`` is set (CLI ``--ignore-local-config``)."""
+    v = (os.environ.get(IGNORE_LOCAL_CONFIG_ENV) or "").strip().lower()
+    return v in ("1", "true", "yes", "on")
+
+
+def load_config_files(
+    profile_path: str | Path | None = None,
+    *,
+    ignore_local: bool | None = None,
+) -> dict[str, Any]:
+    """Load default.json + optional local.json + optional profile overlay.
+
+    Merge order before env overrides:
+    default → local (unless ``ignore_local``) → profile.
+
+    Profile overlay resolution:
+    1. ``profile_path`` argument when provided
+    2. else ``PIPELINE_CONFIG_PROFILE`` environment variable when set
+
+    ``ignore_local`` defaults to ``ignore_local_config_enabled()``.
+    """
     if not _DEFAULT_CONFIG_PATH.is_file():
         raise FileNotFoundError("Missing config file: " + str(_DEFAULT_CONFIG_PATH))
     with open(_DEFAULT_CONFIG_PATH, encoding="utf-8") as f:
         cfg = json.load(f)
-    if _LOCAL_CONFIG_PATH.is_file():
+    skip_local = ignore_local if ignore_local is not None else ignore_local_config_enabled()
+    if not skip_local and _LOCAL_CONFIG_PATH.is_file():
         try:
             with open(_LOCAL_CONFIG_PATH, encoding="utf-8") as f:
                 local = json.load(f)
@@ -114,7 +161,71 @@ def load_config_files() -> dict[str, Any]:
                 cfg = _deep_merge(cfg, local)
         except (OSError, json.JSONDecodeError):
             pass
+    overlay_path: Path | None = None
+    if profile_path is not None:
+        overlay_path = resolve_config_path(profile_path)
+    else:
+        overlay_path = _profile_path_from_env()
+    if overlay_path is not None:
+        try:
+            with open(overlay_path, encoding="utf-8") as f:
+                overlay = json.load(f)
+            if isinstance(overlay, dict):
+                cfg = _deep_merge(cfg, overlay)
+        except (OSError, json.JSONDecodeError) as e:
+            raise ValueError("Invalid config profile: " + str(overlay_path) + ": " + str(e)) from e
     return cfg
+
+
+def get_active_config_profile() -> Path | None:
+    """Return the active profile path from ``PIPELINE_CONFIG_PROFILE``, if any."""
+    return _profile_path_from_env()
+
+
+def activate_config_profile(path: str | Path | None) -> Path | None:
+    """Set or clear the active config profile and reload the cached effective config.
+
+    When ``path`` is None, clears ``PIPELINE_CONFIG_PROFILE``.
+    """
+    get_effective_config.cache_clear()
+    if path is None:
+        os.environ.pop(CONFIG_PROFILE_ENV, None)
+        get_effective_config.cache_clear()
+        return None
+    resolved = resolve_config_path(path)
+    os.environ[CONFIG_PROFILE_ENV] = str(resolved)
+    get_effective_config.cache_clear()
+    return resolved
+
+
+def set_ignore_local_config(enabled: bool) -> None:
+    """Enable or disable skipping ``config/local.json`` for this process."""
+    get_effective_config.cache_clear()
+    if enabled:
+        os.environ[IGNORE_LOCAL_CONFIG_ENV] = "1"
+    else:
+        os.environ.pop(IGNORE_LOCAL_CONFIG_ENV, None)
+    get_effective_config.cache_clear()
+
+
+def configure_runtime(
+    config_profile: str | Path | None = None,
+    *,
+    ignore_local_config: bool = False,
+) -> Path | None:
+    """Apply evaluation/main CLI config switches and reload the effective config cache."""
+    get_effective_config.cache_clear()
+    if config_profile is not None:
+        resolved = resolve_config_path(config_profile)
+        os.environ[CONFIG_PROFILE_ENV] = str(resolved)
+    else:
+        os.environ.pop(CONFIG_PROFILE_ENV, None)
+    if ignore_local_config:
+        os.environ[IGNORE_LOCAL_CONFIG_ENV] = "1"
+    else:
+        os.environ.pop(IGNORE_LOCAL_CONFIG_ENV, None)
+    get_effective_config.cache_clear()
+    return _profile_path_from_env()
 
 
 def apply_env_overrides(cfg: dict[str, Any]) -> dict[str, Any]:
@@ -147,12 +258,18 @@ def config_section(name: str) -> dict[str, Any]:
 def save_effective_config(path: str | Path) -> dict[str, Any]:
     """Write merged effective config for reproducibility artifacts."""
     cfg = get_effective_config()
+    prof = get_active_config_profile()
+    artifact: dict[str, Any] = {
+        "ignore_local_config": ignore_local_config_enabled(),
+        "config_profile": str(prof) if prof else None,
+        **cfg,
+    }
     p = Path(path)
     p.parent.mkdir(parents=True, exist_ok=True)
     with open(p, "w", encoding="utf-8") as f:
-        json.dump(cfg, f, ensure_ascii=False, indent=2)
+        json.dump(artifact, f, ensure_ascii=False, indent=2)
         f.write("\n")
-    return cfg
+    return artifact
 
 
 @dataclass(frozen=True)

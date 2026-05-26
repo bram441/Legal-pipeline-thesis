@@ -1,7 +1,7 @@
 {
   "id": "run_001",
   "law": {
-    "path": "example_laws/erfrecht.text"
+    "path": "example_laws/erfrecht.txt"
   },
   "case": {
     "text": "Anna en Bert waren gehuwd. Bert overlijdt en laat twee minderjarige kinderen na. Er is geen testament. Anna leeft nog."

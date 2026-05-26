@@ -39,6 +39,8 @@ def run_main_json(
     translate_override: bool | None = None,
     cli_no_translate: bool = False,
     belief_scoring: bool = False,
+    config_profile: str | None = None,
+    ignore_local_config: bool = False,
     llm_call_tracking: bool = False,
     max_llm_calls: int | None = None,
     max_llm_calls_per_cell: int | None = None,
@@ -67,6 +69,10 @@ def run_main_json(
     ]
     if not use_translate:
         cmd.append("--no-translate")
+    if config_profile:
+        cmd.extend(["--config", config_profile])
+    if ignore_local_config:
+        cmd.append("--ignore-local-config")
     env = os.environ.copy()
     if belief_scoring:
         env["SCORE_TREAT_OPEN_WITH_BELIEF"] = "1"

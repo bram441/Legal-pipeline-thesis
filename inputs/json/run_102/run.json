@@ -1,7 +1,7 @@
 {
   "id": "run_102",
   "law": {
-    "path": "example_laws/erfrecht.text"
+    "path": "example_laws/erfrecht.txt"
   },
   "case": {
     "text": "Carla en Dirk waren gehuwd. Carla overlijdt zonder afstammelingen, maar zij laat haar vader en haar broer na. Dirk leeft nog."

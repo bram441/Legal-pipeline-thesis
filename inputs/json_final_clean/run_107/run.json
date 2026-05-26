@@ -1,0 +1,20 @@
+{
+  "id": "run_107",
+  "law": {
+    "path": "example_laws_clean/vreemdelingenwet_clean.txt"
+  },
+  "case": {
+    "text": "Ahmed kan niet bewijzen dat hij de Belgische nationaliteit bezit."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Valt Ahmed onder de definitie van een vreemdeling in artikel 1, paragraaf 1, punt 1?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "A foreigner is anyone who does not provide proof of Belgian nationality."
+      }
+    }
+  ]
+}
