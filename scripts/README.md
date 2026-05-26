@@ -14,6 +14,16 @@ Run from the **project root**.
 
 ```powershell
 python scripts/run_evaluation.py --runs-dir inputs/json_final --runs all --strategies direct_json_ir_no_translate
+# (--input-dir is an alias for --runs-dir)
+```
+
+Optional config profile (merged on top of `config/default.json` + `config/local.json`):
+
+```powershell
+python scripts/run_evaluation.py --config config/final.json --runs-dir inputs/json_final --runs run_001 --strategies direct_json_ir_no_translate
+
+# Reproducible profile without local.json overrides:
+python scripts/run_evaluation.py --config config/ablation_balanced.json --ignore-local-config --runs-dir inputs/json_final --runs run_001 --strategies direct_json_ir_no_translate
 ```
 
 ### Unit tests

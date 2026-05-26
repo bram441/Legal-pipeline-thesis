@@ -1,0 +1,122 @@
+{
+  "description": "Focused-law diagnostic subset. Each run uses a manually selected article.txt extract as an oracle article-selection upper-bound. Not intended as the main benchmark.",
+  "runs": [
+    {
+      "id": "run_001",
+      "law_domain": "inheritance",
+      "evaluation_group": "focused_oracle",
+      "difficulty": "basic",
+      "phenomena": [
+        "inheritance",
+        "usufruct",
+        "direct_legal_effect"
+      ],
+      "family": "inheritance_surviving_spouse_descendants",
+      "law_path": "inputs/json_focused_examples/run_001/article.txt"
+    },
+    {
+      "id": "run_004",
+      "law_domain": "inheritance",
+      "evaluation_group": "focused_oracle",
+      "difficulty": "intermediate",
+      "phenomena": [
+        "inheritance",
+        "ascendants",
+        "usufruct",
+        "direct_legal_effect"
+      ],
+      "family": "inheritance_surviving_spouse_ascendants",
+      "law_path": "inputs/json_focused_examples/run_004/article.txt"
+    },
+    {
+      "id": "run_007",
+      "law_domain": "inheritance",
+      "evaluation_group": "focused_oracle",
+      "difficulty": "intermediate",
+      "phenomena": [
+        "inheritance",
+        "legal_cohabitation",
+        "family_home",
+        "exception"
+      ],
+      "family": "inheritance_legal_cohabitant_family_home",
+      "law_path": "inputs/json_focused_examples/run_007/article.txt"
+    },
+    {
+      "id": "run_002",
+      "law_domain": "immigration",
+      "evaluation_group": "focused_oracle",
+      "difficulty": "basic",
+      "phenomena": [
+        "definition",
+        "foreign_national"
+      ],
+      "family": "immigration_foreigner_definition",
+      "law_path": "inputs/json_focused_examples/run_002/article.txt"
+    },
+    {
+      "id": "run_005",
+      "law_domain": "immigration",
+      "evaluation_group": "focused_oracle",
+      "difficulty": "basic",
+      "phenomena": [
+        "definition",
+        "illegal_stay"
+      ],
+      "family": "immigration_illegal_stay",
+      "law_path": "inputs/json_focused_examples/run_005/article.txt"
+    },
+    {
+      "id": "run_008",
+      "law_domain": "immigration",
+      "evaluation_group": "focused_oracle",
+      "difficulty": "intermediate",
+      "phenomena": [
+        "risk_of_absconding",
+        "case_given_criteria"
+      ],
+      "family": "immigration_risk_absconding_false_documents",
+      "law_path": "inputs/json_focused_examples/run_008/article.txt"
+    },
+    {
+      "id": "run_003",
+      "law_domain": "company",
+      "evaluation_group": "focused_oracle",
+      "difficulty": "intermediate",
+      "phenomena": [
+        "classification",
+        "numeric_threshold",
+        "micro_company"
+      ],
+      "family": "company_micro_threshold_positive",
+      "law_path": "inputs/json_focused_examples/run_003/article.txt"
+    },
+    {
+      "id": "run_009",
+      "law_domain": "company",
+      "evaluation_group": "focused_oracle",
+      "difficulty": "intermediate",
+      "phenomena": [
+        "classification",
+        "numeric_threshold",
+        "negative_exclusion"
+      ],
+      "family": "company_small_threshold_negative",
+      "law_path": "inputs/json_focused_examples/run_009/article.txt"
+    },
+    {
+      "id": "run_119",
+      "law_domain": "company",
+      "evaluation_group": "focused_oracle",
+      "difficulty": "hard",
+      "phenomena": [
+        "classification",
+        "numeric_threshold",
+        "starting_company",
+        "first_financial_year"
+      ],
+      "family": "company_starting_company_estimate",
+      "law_path": "inputs/json_focused_examples/run_119/article.txt"
+    }
+  ]
+}

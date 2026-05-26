@@ -1,7 +1,7 @@
 {
   "id": "run_103",
   "law": {
-    "path": "example_laws/erfrecht.text"
+    "path": "example_laws/erfrecht.txt"
   },
   "case": {
     "text": "Els en Filip waren gehuwd. Els overlijdt zonder afstammelingen, zonder verwanten in de opgaande lijn, zonder nauwe zijverwanten en zonder andere erfgenamen. Filip leeft nog."

@@ -169,8 +169,7 @@ def _write_markdown(path: Path, matrix: dict) -> None:
                 "",
                 "## Strategy configuration",
                 "",
-                "JSON_IR backend always compiles via ``symbols_then_rules`` (symbols then rules). "
-                "they are deprecated for JSON_IR sweeps.",
+                "JSON_IR backend always compiles via ``symbols_then_rules`` (symbols then rules).",
                 "",
                 "| Strategy | Canonical | LE | Config trans | Effective trans | Source | JSON IR | Depr |",
                 "|---|:---|:---:|:---:|:---:|:---|:---|:---:|",
@@ -458,8 +457,10 @@ def main() -> int:
     )
     p.add_argument(
         "--runs-dir",
+        "--input-dir",
+        dest="runs_dir",
         default="inputs/json",
-        help="Directory containing run folders (each with run.json). Default: inputs/json",
+        help="Directory containing run folders (each with run.json). Alias: --input-dir. Default: inputs/json",
     )
     p.add_argument(
         "--runs",
@@ -477,6 +478,20 @@ def main() -> int:
         "--output-dir",
         default=None,
         help="Report folder (default: results/reports/evaluation_<timestamp>)",
+    )
+    p.add_argument(
+        "--config",
+        metavar="PATH",
+        default=None,
+        help="Optional config profile JSON merged on top of config/default.json and "
+        "config/local.json (e.g. config/ablation_balanced.json). When omitted, uses "
+        "default + local only (ignores any stale PIPELINE_CONFIG_PROFILE in the shell).",
+    )
+    p.add_argument(
+        "--ignore-local-config",
+        action="store_true",
+        help="Skip config/local.json (default + --config profile + env only). "
+        "Recommended for reproducible ablations.",
     )
     p.add_argument(
         "--no-translate",
@@ -526,6 +541,18 @@ def main() -> int:
         help="Stop a cell with failure_category=llm_budget_guard after N OpenAI calls in that cell.",
     )
     args = p.parse_args()
+
+    from pipeline.config import configure_runtime, get_active_config_profile
+
+    try:
+        active_profile = configure_runtime(
+            args.config,
+            ignore_local_config=bool(args.ignore_local_config),
+        )
+    except (FileNotFoundError, ValueError) as e:
+        print(e, file=sys.stderr)
+        return 1
+
     runs_dir = Path(args.runs_dir)
     if not runs_dir.is_absolute():
         runs_dir = _ROOT / runs_dir
@@ -584,6 +611,14 @@ def main() -> int:
     print("Runs:", ", ".join(run_ids))
     print("Strategies:", ", ".join(strategies))
     print("Pipeline: json_ir")
+    if active_profile:
+        print("Config profile:", active_profile)
+    else:
+        print("Config profile: (none)")
+    if args.ignore_local_config:
+        print("Local config: ignored (default + profile + env)")
+    else:
+        print("Local config: config/local.json merged when present")
     print("Output:", out)
     print()
 
@@ -637,6 +672,8 @@ def main() -> int:
                     strategy,
                     cli_no_translate=args.no_translate,
                     belief_scoring=args.belief_scoring,
+                    config_profile=str(active_profile) if active_profile else None,
+                    ignore_local_config=bool(args.ignore_local_config),
                     llm_call_tracking=True,
                     max_llm_calls=args.max_llm_calls,
                     max_llm_calls_per_cell=args.max_llm_calls_per_cell,
@@ -744,6 +781,8 @@ def main() -> int:
             "timing": timing_summary,
             "evaluation_cli": {
                 "pipeline_backend": "json_ir",
+                "config_profile": str(active_profile) if active_profile else None,
+                "ignore_local_config": bool(args.ignore_local_config),
                 "no_translate_global": args.no_translate,
                 "belief_scoring": bool(args.belief_scoring),
                 "max_failures": max_failures,

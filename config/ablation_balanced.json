@@ -1,0 +1,23 @@
+{
+  "json_ir": {
+    "max_kb_llm_calls": 6,
+    "max_symbol_versions": 2,
+    "max_rules_attempts_per_symbol_version": 2,
+    "repeated_error_limit": 2,
+    "allow_evidence_extension": true,
+    "max_evidence_extension_calls": 1
+  },
+  "extraction": {
+    "max_retries": 2
+  },
+  "evaluation": {
+    "run_pre_query_satisfiability_check": true,
+    "enable_intent_diagnostics_on_unknown": false,
+    "pragmatic_factual_criteria_mode": false
+  },
+  "debug": {
+    "trace": false,
+    "quiet": true,
+    "llm_call_tracking": true
+  }
+}

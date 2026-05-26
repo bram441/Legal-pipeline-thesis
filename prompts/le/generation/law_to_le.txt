@@ -1,129 +1,120 @@
-You are converting legal text into Logical English (LE): a controlled, explicit, law-agnostic natural-language representation that will later be compiled into a formal knowledge base.
+You convert legal text into a controlled legal rule representation that will later be converted into JSON_IR and FO(.).
 
-Your task:
-- Restate the legal rules in a structured, unambiguous way.
-- Preserve the legal meaning.
-- Do not add concrete case facts.
-- Do not answer any future question.
-- Do not write FO(.), JSON, XML, markdown, or code.
+Your goal is not to summarize. Your goal is to make the law easier to formalize.
 
-MANDATORY OUTPUT:
-Output ONLY Logical English sentences.
-No headings.
-No bullet lists unless the law itself is naturally enumerated and bullets improve clarity.
-No preamble.
-No commentary.
+Output only controlled legal sentences.
+No JSON.
+No FO(.).
 No markdown fences.
+No commentary.
 
-================================================================================
-GENERAL LE STYLE
-================================================================================
+## Core rules
 
-Use controlled natural-language sentences with clear logical structure.
-Prefer these forms:
+Preserve article and paragraph references where useful.
 
-- A [legal subject] has [legal status/result] if [conditions].
-- A [legal subject] has [legal status/result] if and only if [conditions].
-- A [legal subject] does not have [legal status/result] if [exception conditions].
-- A [legal value] for [legal subject] is [number/value] if [conditions].
-- A [condition] holds for [legal subject] if [subconditions].
+Write one sentence per legal rule, definition, exception, threshold condition, or legal effect.
 
-Use explicit connectives:
-- and
-- or
-- not
-- if
-- if and only if
-- unless
-- except when
+Use stable names for legal concepts. Reuse the same wording for the same concept throughout the output.
 
-Avoid vague references:
-- Do not use “the above”, “this”, “that condition”, or “the latter” when a named condition is clearer.
-- Repeat the legal concept explicitly when needed.
+Do not introduce concrete case facts, persons, companies, years, dates, or identifiers unless they are legal categories in the law.
 
-================================================================================
-LEGAL MODELING RULES
-================================================================================
+Do not answer any future question.
 
-Model only the law.
-Do not introduce concrete persons, organizations, objects, dates, periods, or IDs unless they are explicitly law-level categories in the legal text.
+## Distinguish concept types
 
-Distinguish these concept types:
+Clearly distinguish:
 
-1. Observable factual conditions:
-   Facts that a future case could state directly.
-   Examples in abstract form: a relationship exists, an event occurred, a document was submitted, a value is known, a period applies.
+1. Factual case conditions
+These are conditions that a future case may state directly.
+Examples:
+- a person has a valid passport;
+- a person used false documents;
+- a company has a certain number of employees;
+- a criterion is exceeded;
+- a person failed to comply with a measure.
 
-2. Derived legal results:
-   Legal statuses, classifications, rights, obligations, permissions, prohibitions, sanctions, validity results, exclusions, exceptions, entitlements, or legal effects that follow from the law.
+2. Derived helper conditions
+These combine factual conditions.
+Examples:
+- more than one criterion is exceeded;
+- at least two objective criteria are present;
+- a condition holds for two consecutive financial years.
 
-3. Helper conditions:
-   Intermediate conditions used to express thresholds, exceptions, temporal requirements, combinations of criteria, or repeated subconditions.
+3. Legal results
+These are legal statuses, classifications, rights, obligations, exclusions, sanctions, consequences, or effects.
+Examples:
+- a company is a micro-company;
+- a person is a foreigner;
+- a risk of absconding exists;
+- legal consequences apply from a financial year;
+- a spouse acquires usufruct.
 
-Use separate sentences for each important derived legal result.
-Do not collapse many different legal effects into one vague sentence.
+Do not write legal results as if they were factual case conditions.
 
-================================================================================
-ROLES AND RELATIONS
-================================================================================
+## Definitions
 
-When a rule involves multiple roles, name the roles explicitly.
-Do not use one generic subject for incompatible roles.
+For legal definitions, write:
 
-Good pattern:
-- A legal result holds for actor A with respect to actor/object/event B if A has a required relation to B and B satisfies the required condition.
+A subject has defined legal concept X if factual condition A holds.
+A subject has defined legal concept X if factual condition B holds.
 
-Bad pattern:
-- A person has the legal result if the person is both role A and role B, when role A and role B are usually different participants.
+If the definition has alternatives, write the alternatives separately or with clear “or”.
 
-Use stable role wording throughout the LE text.
-If the law uses several terms for the same role, choose one clear term and use it consistently.
+## Threshold rules
 
-================================================================================
-THRESHOLDS, VALUES, DATES, AND PERIODS
-================================================================================
+For threshold provisions, use this canonical pattern.
 
-For measurable legal criteria, state the raw value and comparison clearly:
-- the number of X is less than or equal to N;
-- the amount of Y is greater than N;
-- the period lasts at least N days;
-- the event occurs before/after/on a relevant date.
+First define atomic criterion-exceeded conditions:
+- The employee criterion is exceeded for a company in a financial year if the employee number is greater than the employee threshold.
+- The turnover criterion is exceeded for a company in a financial year if the turnover is greater than the turnover threshold.
+- The balance sheet criterion is exceeded for a company in a financial year if the balance sheet total is greater than the balance sheet threshold.
 
-Use one unit consistently for each quantity type when conversion is obvious from the law.
-Do not invent conversions if the legal meaning depends on the original unit.
+Then define counting helpers explicitly:
+- More than one criterion is exceeded if the employee criterion and the turnover criterion are exceeded.
+- More than one criterion is exceeded if the employee criterion and the balance sheet criterion are exceeded.
+- More than one criterion is exceeded if the turnover criterion and the balance sheet criterion are exceeded.
 
-For “at least two of A, B, C”, write the condition explicitly:
-- A and B, or A and C, or B and C.
+For “not more than one criterion”, write:
+- Not more than one criterion is exceeded if more than one criterion is not exceeded.
 
-For “at most one of A, B, C”, write:
-- not at least two of A, B, and C hold.
+For exclusions, write the negative legal result explicitly:
+- A company is not a small company if more than one small-company criterion is exceeded and the law says this excludes small-company status.
 
-================================================================================
-EXCEPTIONS AND DEFINITIONS
-================================================================================
+Do not invent adjusted threshold functions unless the law explicitly requires an adjustment.
+If an adjustment is needed, state it directly with the law number.
 
-For definitions:
-- State the defined legal concept explicitly.
-- State the factual or helper conditions that define it.
+## Temporal rules
 
-For exceptions:
-- State the main rule.
-- State the exception separately.
-- Make clear whether the exception blocks, removes, limits, suspends, or modifies the legal result.
+For “the following financial year”, introduce an explicit temporal relation:
+- A financial year Y2 is the following financial year after financial year Y1.
 
-Do not assume an exception applies unless the legal text says so.
+Do not encode “following” only inside the name of a legal result.
 
-================================================================================
-MINIMALITY AND FAITHFULNESS
-================================================================================
+For rules that apply from a following period, distinguish:
+- the anchor period in which a condition occurs;
+- the effect period in which the consequence applies.
 
-Include only concepts supported by the law text.
-Do not add policy assumptions, common-sense exceptions, or external legal knowledge.
-If the law text is ambiguous, preserve the ambiguity rather than inventing a precise rule.
-If a provision cannot be formalized cleanly, state the closest explicit legal condition without guessing.
+## Exceptions and exclusions
 
-================================================================================
-LAW TEXT
-================================================================================
+State the main rule and the exception separately.
+
+Use:
+- A legal result holds if conditions hold.
+- A legal result does not hold if exclusion conditions hold.
+- An exception blocks a legal result if exception conditions hold.
+
+Do not rely on absence of evidence to prove a negative legal result.
+
+## Avoid overcomplication
+
+Prefer direct factual criteria and simple helpers.
+
+Avoid creating chains such as:
+adjusted threshold → relevant value → consolidated value → duration-adjusted value
+unless the law text and the question require that chain.
+
+If a condition can be treated as a case-stated factual criterion, write it as a factual case condition rather than deriving it from unspecified lower-level facts.
+
+## Law text
 
 {law_text}

@@ -3,9 +3,7 @@ You are repairing legal case JSON_IR.
 Your previous case JSON failed strict validation.
 Return corrected JSON only.
 
-================================================================================
-MANDATORY OUTPUT
-================================================================================
+## MANDATORY OUTPUT
 
 Return ONLY JSON matching the structured-output schema for this call.
 No markdown.
@@ -14,23 +12,17 @@ No keys other than those required by the schema.
 First character MUST be `{`.
 Last character MUST be `}`.
 
-================================================================================
-PRIMARY ERROR REPORT
-================================================================================
+## PRIMARY ERROR REPORT
 
 You MUST fix every issue described here. Partial fixes fail.
 
 {validation_feedback}
 
-================================================================================
-CONTRACT
-================================================================================
+## CONTRACT
 
 {json_ir_contract}
 
-================================================================================
-REPAIR PRIORITIES
-================================================================================
+## REPAIR PRIORITIES
 
 Fix all applicable issues:
 - unknown type, predicate, or function;
@@ -64,20 +56,14 @@ If an argument has the wrong type:
 - Otherwise remove the invalid assertion/value_assertion.
 - Do not move a constant to an incorrect type just to satisfy validation.
 
-================================================================================
-KB_SCHEMA
-================================================================================
+## KB_SCHEMA
 
 {kb_schema_json}
 
-================================================================================
-PREVIOUS CASE JSON OR RAW OUTPUT
-================================================================================
+## PREVIOUS CASE JSON OR RAW OUTPUT
 
 {previous_output}
 
-================================================================================
-CASE
-================================================================================
+## CASE
 
 {case_text}
