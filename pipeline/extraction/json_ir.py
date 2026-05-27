@@ -836,7 +836,7 @@ def normalize_query_ir(query_ir: dict, case: dict, kb_schema: dict, user_questio
     if not pred:
         raise ExtractionIRValidationError("Could not resolve query predicate from IR")
 
-    if question_has_legal_effect_language(user_question):
+    if question_asks_legal_conclusion(user_question):
         from pipeline.extraction.query_target_selection import apply_query_target_selection
 
         pred, query_target_selection_diag = apply_query_target_selection(

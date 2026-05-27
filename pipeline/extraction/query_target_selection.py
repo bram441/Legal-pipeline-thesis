@@ -1,8 +1,9 @@
-"""Generic query-target selection: prefer legal-output predicates over temporal support."""
+"""Generic query-target selection with semantic question-category preference."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import re
 from typing import Any
 
 from pipeline.kb.composite_predicate_heuristics import (
@@ -10,12 +11,16 @@ from pipeline.kb.composite_predicate_heuristics import (
     symbol_directly_observable,
 )
 from pipeline.kb.legal_effect import (
+    predicate_looks_like_classification_output,
     predicate_represents_legal_effect_output,
     question_has_legal_effect_language,
     schema_has_legal_effect_output_predicate,
 )
 from pipeline.kb.temporal_support import temporal_support_exempt_from_helper_definition
-from pipeline.semantic.legal_question import question_asks_legal_conclusion
+from pipeline.semantic.legal_question import (
+    question_asks_legal_conclusion,
+    question_asks_legal_definition,
+)
 
 
 def _bool_predicates(kb_schema: dict) -> list[dict]:
@@ -76,6 +81,8 @@ def _score_candidate(
     user_question: str,
     *,
     pred_hint: str,
+    prefer_effect: bool,
+    prefer_classification: bool,
 ) -> tuple[float, list[str]]:
     from pipeline.extraction.json_ir import (
         _derived_predicate_specificity_score,
@@ -90,6 +97,25 @@ def _score_candidate(
     if is_legal_output_query_target(sym):
         score += 0.4
         reasons.append("legal_output_target")
+    cat = str(sym.get("output_category") or "").strip().lower()
+    if prefer_classification:
+        if predicate_looks_like_classification_output(
+            name,
+            description=str(sym.get("description") or ""),
+            kind=str(sym.get("kind") or ""),
+            legal_output=sym.get("legal_output")
+            if isinstance(sym.get("legal_output"), bool)
+            else None,
+            output_category=cat,
+        ) or cat in {"classification", "status"}:
+            score += 1.0
+            reasons.append("classification_question_match")
+        elif is_legal_output_query_target(sym):
+            score -= 1.0
+            reasons.append("deprioritized_non_classification_for_classification_question")
+    if prefer_effect and is_legal_output_query_target(sym):
+        score += 0.25
+        reasons.append("effect_question_match")
     hint = str(pred_hint or "").strip()
     if hint and (_norm_name(hint) == _norm_name(name) or hint == name):
         score += 0.15
@@ -97,6 +123,18 @@ def _score_candidate(
     if _lexical_overlap_score(sym, user_question) > 0.35:
         reasons.append("lexical_overlap_with_question")
     return score, reasons
+
+
+def _looks_like_classification_question(question: str) -> bool:
+    qtxt = (question or "").strip()
+    if question_asks_legal_definition(qtxt):
+        return True
+    return bool(
+        re.search(
+            r"(?i)\b(?:is|does)\b.+\b(?:a|an|as|qualif(?:y|ies)\s+as|status|classification|category)\b",
+            qtxt,
+        )
+    )
 
 
 def select_boolean_query_predicate(
@@ -118,11 +156,18 @@ def select_boolean_query_predicate(
     diag = QueryTargetSelectionDiagnostics()
     preds = _bool_predicates(kb_schema)
     effect_q = question_has_legal_effect_language(user_question)
+    classification_q = _looks_like_classification_question(user_question) and not effect_q
     conclusion_q = question_asks_legal_conclusion(user_question)
 
     scored_all: list[tuple[float, dict, list[str]]] = []
     for sym in preds:
-        sc, reasons = _score_candidate(sym, user_question, pred_hint=pred_hint)
+        sc, reasons = _score_candidate(
+            sym,
+            user_question,
+            pred_hint=pred_hint,
+            prefer_effect=effect_q,
+            prefer_classification=classification_q,
+        )
         scored_all.append((sc, sym, reasons))
 
     for sc, sym, reasons in sorted(scored_all, key=lambda x: -x[0]):
@@ -151,7 +196,13 @@ def select_boolean_query_predicate(
         if legal_outputs:
             scored_lo = []
             for sym in legal_outputs:
-                sc, reasons = _score_candidate(sym, user_question, pred_hint=pred_hint)
+                sc, reasons = _score_candidate(
+                    sym,
+                    user_question,
+                    pred_hint=pred_hint,
+                    prefer_effect=effect_q,
+                    prefer_classification=classification_q,
+                )
                 scored_lo.append((sc, sym, reasons))
             scored_lo.sort(key=lambda x: -x[0])
             best_sc, best_sym, best_reasons = scored_lo[0]
@@ -183,6 +234,17 @@ def select_boolean_query_predicate(
         diag.warning = "no_legal_output_predicate_available"
         return diag
 
+    if classification_q:
+        scored_cl = [x for x in scored_all if x[1] in [p for p in preds]]
+        scored_cl.sort(key=lambda x: -x[0])
+        if scored_cl:
+            best_sc, best_sym, best_reasons = scored_cl[0]
+            diag.chosen_predicate = str(best_sym.get("name") or current_pred or "")
+            diag.chosen_reason = "classification_best_match"
+            if best_reasons:
+                diag.chosen_reason += ": " + ",".join(best_reasons)
+            return diag
+
     if current_pred:
         diag.chosen_predicate = current_pred
         diag.chosen_reason = "unchanged_non_effect_question"
@@ -202,11 +264,13 @@ def apply_query_target_selection(
     kb_schema: dict,
     current_pred: str | None,
 ) -> tuple[str | None, dict[str, Any]]:
-    """Return (predicate_name, diagnostics). May replace temporal/observable with legal-output target."""
+    """Return (predicate_name, diagnostics). Applies semantic predicate-category selection."""
     if not current_pred:
         return current_pred, {}
-    effect_q = question_has_legal_effect_language(user_question)
-    if not effect_q:
+    if not (
+        question_asks_legal_conclusion(user_question)
+        or _looks_like_classification_question(user_question)
+    ):
         return current_pred, {"chosen_predicate": current_pred, "chosen_reason": "not_legal_effect_question"}
 
     diag = select_boolean_query_predicate(

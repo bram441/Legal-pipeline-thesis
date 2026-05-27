@@ -82,7 +82,10 @@ _DIRECTLY_OBSERVABLE_FACTUAL_RE = re.compile(
     r"refused_to_comply_with(?:_measure|_order)?|"
     r"unwillingness_to_comply(?:_with(?:_measure|_order))?|"
     r"did_not_comply_with(?:_measure|_order)?|"
-    r"non_compliance_with(?:_measure|_order)?"
+    r"non_compliance_with(?:_measure|_order)?|"
+    r"no_residence_application_filed|"
+    r"criterion_no_residence_application|"
+    r"does_not_meet_entry_conditions"
     r")"
 )
 
@@ -103,6 +106,24 @@ _COMPUTED_CATEGORY_FACTUAL = "directly_observable_factual"
 _COMPUTED_CATEGORY_LEGAL = "legal_conclusion_computed"
 _COMPUTED_CATEGORY_THRESHOLD = "threshold_counting_composite"
 _COMPUTED_CATEGORY_NONE = "none"
+
+
+def looks_status_classification_name(name: str, description: str = "") -> bool:
+    """Generic status/classification-style predicate name (not a hardcoded allowlist)."""
+    n = (name or "").strip()
+    if not n:
+        return False
+    if re.match(r"(?i)^is_[a-z]", n):
+        return True
+    if re.search(
+        r"(?i)(?:^has_[a-z]|(?:^|_)(?:status|national|citizen|member|resident|foreigner|eligible)(?:_|$))",
+        n,
+    ):
+        return True
+    blob = ((name or "") + " " + (description or "")).lower()
+    if re.search(r"\b(?:status|classification|nationality|citizenship|residence status)\b", blob):
+        return True
+    return False
 
 
 def looks_directly_observable_factual(name: str, description: str = "") -> bool:
@@ -162,8 +183,10 @@ def suggest_computed_observable_repair(name: str, description: str = "") -> str:
     cat = classify_computed_observable_subject(name, description)
     if cat == _COMPUTED_CATEGORY_FACTUAL:
         return (
-            "Predicate '%s' is a documentary/status/behavior fact: keep kind=observable and set "
-            "directly_observable=true and/or case_input=true (not helper/derived)."
+            "Predicate '%s' is a documentary/status/behavior or entry-stay condition: if the scoped "
+            "law does not define internal subconditions and cases may state it directly, keep "
+            "kind=observable with directly_observable=true (not helper/derived). Otherwise define "
+            "with helper/derived rules."
             % name
         )
     if cat == _COMPUTED_CATEGORY_LEGAL:
@@ -180,8 +203,10 @@ def suggest_computed_observable_repair(name: str, description: str = "") -> str:
             % name
         )
     return (
-        "Predicate '%s': reclassify as helper/derived with defining rules, or set "
-        "directly_observable=true only if cases may state the fact verbatim."
+        "Predicate '%s': if the scoped law defines subconditions, reclassify as helper/derived "
+        "with defining rules. If the case can state it directly and the law does not define it "
+        "further, keep kind=observable and set directly_observable=true (not legal_output). "
+        "Do not mark final legal conclusions directly_observable."
         % name
     )
 

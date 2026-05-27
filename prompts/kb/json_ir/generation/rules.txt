@@ -84,6 +84,14 @@ The example names are placeholders only. Every actual symbol and type MUST come 
 - Include BOTH qualification AND exclusion for at-most-one criterion laws:
   (1) qualification: NOT H plus other conditions => classification (non-negated in THEN);
   (2) exclusion: H => NOT classification (use "negated": true in THEN — never C = false).
+- Safe negative/exclusion rules:
+  Do not create a negative classification/legal-output rule by mechanically negating every condition
+  of the positive rule. Under open-world semantics, absence of an observable prerequisite is not
+  proof of its negation.
+  Prefer: disqualifying_condition(x) => not legal_classification(x)
+  Avoid: not prerequisite_condition(x) => not legal_classification(x)
+  Avoid OR-rules that mix missing prerequisites with true disqualifiers unless every OR branch is
+  explicitly a legal exclusion supported by law.
 - Never use a function name as a Bool predicate atom; use compare(func(...), op, value) instead.
 - Never use `not helper_predicate(x)` when helper_predicate has no defining rule.
 - When the law says not more than one criterion is exceeded: NEVER derive a favorable status from `A_exceeded OR B_exceeded OR C_exceeded` alone.
@@ -95,6 +103,18 @@ The example names are placeholders only. Every actual symbol and type MUST come 
 5b. Helper closure (critical):
 - Before finishing, list every helper predicate or helper-valued function used in any rule IF-condition.
 - Each such symbol MUST also appear in at least one rule THEN (defining it from observable functions/comparisons or simpler helpers).
+
+Prerequisite status/classification closure:
+- Do not use a derived status/classification predicate in IF unless it is defined in THEN, or is observable/background in SYMBOL_TABLE.
+- If a prerequisite status can be directly asserted by the case and is not the final legal output, reclassify it as observable with directly_observable=true instead of leaving it derived-but-undefined.
+- If the scoped law defines the status from subconditions, add THEN rules from observable facts/functions.
+- If the law does not define it and it is not a case-supplied background fact, remove it from IF and encode only locally available conditions in the target rule.
+- Do not use an observable broader classification/status in IF as a blocking prerequisite for the target classification unless the case can directly assert it or the scoped law defines it.
+- If the broader status is not defined in scope and not case-supplied, remove it from IF and use only locally available legal conditions.
+- Never compensate for a missing broader prerequisite by adding a negative rule from not broader_status to not target_classification.
+- Do not define prerequisite statuses circularly (A from B while B also depends on undefined A).
+- Never leave a derived/helper status used in IF without a corresponding THEN definition or observable/background declaration.
+
 - Helper predicates: define in THEN as P(args) or negated P(args) from compares or simpler helpers.
 - Helper functions (Real/Int thresholds): define in THEN with compare equality to a law-text literal, e.g.
   {"compare": {"left": {"func": "adjusted_employee_threshold", "args": ["c", "fy"]}, "op": "=", "right": 50}}
@@ -173,6 +193,385 @@ Helper predicates may be defined by rules, but they should not be the only final
 ## SYMBOL_TABLE
 
 {symbol_table_json}
+
+# ILLUSTRATIVE EXAMPLES APPENDIX — RULE GENERATION
+
+The examples below are illustrative patterns only.
+
+The current LAW TEXT and the current JSON_IR symbols are always authoritative.
+Do not copy rule names, predicate names, thresholds, or conclusions unless they match the current LAW TEXT and the provided symbol table.
+Do not invent symbols that were not provided by the symbol-generation step.
+Do not force the current law into one of these examples.
+Use these examples only to understand the intended JSON_IR rule modeling style.
+
+Very important:
+- The names in these examples are placeholders.
+- Do not copy example names like is_small_company, is_micro_company, or loses_small_company_status_from unless the current LAW TEXT and SYMBOL_TABLE actually define that exact status or legal effect.
+- The classification predicate name must follow the current law and the provided SYMBOL_TABLE.
+- If the law defines micro-company status, the final derived predicate should be about micro-company status.
+- If the law defines small-company status, the final derived predicate should be about small-company status.
+- If the law defines a different statutory classification, use the predicate from the SYMBOL_TABLE for that classification.
+- Do not introduce both is_small_company and is_micro_company unless the current law actually defines both and both are present in the SYMBOL_TABLE.
+
+Important reminders:
+- Use existing symbols from the symbol table.
+- Derived legal consequences should be concluded by rules.
+- Observable input facts and input functions should appear in conditions, not as derived conclusions.
+- For threshold rules, derive helper threshold predicates from numeric input functions.
+- For “more than one” conditions, use pairwise combinations.
+- For explicit negative legal consequences, use a negated derived predicate in THEN only when the law supports it.
+- For temporal effects, bind the anchor period and effect period explicitly.
+- Do not infer false merely from missing information under open-world semantics.
+
+## Example A — Legal role and legal consequence
+
+LAW FRAGMENT:
+If a person is the surviving spouse of the deceased, and the deceased leaves descendants, the surviving spouse receives a usufruct over the deceased's share of the family home.
+
+AVAILABLE SYMBOLS:
+- Person
+- Asset
+- is_surviving_spouse_of(Person, Person) observable predicate
+- deceased_leaves_descendants(Person) observable predicate
+- is_family_home_of(Asset, Person) observable predicate
+- receives_usufruct_over(Person, Asset) derived predicate
+
+EXPECTED RULE PATTERN:
+{
+  "rules": [
+    {
+      "forall": [
+        {"var": "spouse", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "home", "type": "Asset"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_surviving_spouse_of", "args": ["spouse", "deceased"], "negated": false},
+            {"pred": "deceased_leaves_descendants", "args": ["deceased"], "negated": false},
+            {"pred": "is_family_home_of", "args": ["home", "deceased"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "receives_usufruct_over", "args": ["spouse", "home"], "negated": false}
+      ],
+      "operator": "implies"
+    }
+  ]
+}
+
+Why this is good:
+- The legal role is a condition.
+- The legal effect is the conclusion.
+- No concrete case names appear in the reusable rule.
+- The rule is reusable for any spouse, deceased person, and asset.
+
+## Example B — Threshold classification with pairwise “more than one”
+
+LAW FRAGMENT:
+An undertaking qualifies for a statutory company-size status if it does not exceed more than one of the following criteria:
+1. annual average employees: 50;
+2. annual turnover excluding VAT: 9,000,000 EUR;
+3. balance sheet total: 4,500,000 EUR.
+If more than one criterion is exceeded, the undertaking does not qualify for that statutory company-size status.
+
+AVAILABLE SYMBOLS:
+- Company
+- FinancialYear
+- annual_average_employees(Company, FinancialYear) observable function returning Int
+- annual_turnover_excluding_vat(Company, FinancialYear) observable function returning Real
+- balance_sheet_total(Company, FinancialYear) observable function returning Real
+- employee_threshold_exceeded(Company, FinancialYear) helper predicate
+- turnover_threshold_exceeded(Company, FinancialYear) helper predicate
+- balance_sheet_threshold_exceeded(Company, FinancialYear) helper predicate
+- more_than_one_criterion_exceeded(Company, FinancialYear) helper predicate
+- qualifies_for_statutory_company_size_status(Company, FinancialYear) derived predicate
+
+EXPECTED RULE PATTERN:
+{
+  "rules": [
+    {
+      "forall": [
+        {"var": "company", "type": "Company"},
+        {"var": "year", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"compare": {"left": {"func": "annual_average_employees", "args": ["company", "year"]}, "op": ">", "right": 50}}
+      ],
+      "then": [
+        {"pred": "employee_threshold_exceeded", "args": ["company", "year"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "company", "type": "Company"},
+        {"var": "year", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"compare": {"left": {"func": "annual_turnover_excluding_vat", "args": ["company", "year"]}, "op": ">", "right": 9000000.0}}
+      ],
+      "then": [
+        {"pred": "turnover_threshold_exceeded", "args": ["company", "year"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "company", "type": "Company"},
+        {"var": "year", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"compare": {"left": {"func": "balance_sheet_total", "args": ["company", "year"]}, "op": ">", "right": 4500000.0}}
+      ],
+      "then": [
+        {"pred": "balance_sheet_threshold_exceeded", "args": ["company", "year"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "company", "type": "Company"},
+        {"var": "year", "type": "FinancialYear"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "employee_threshold_exceeded", "args": ["company", "year"], "negated": false},
+            {"pred": "turnover_threshold_exceeded", "args": ["company", "year"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "more_than_one_criterion_exceeded", "args": ["company", "year"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "company", "type": "Company"},
+        {"var": "year", "type": "FinancialYear"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "employee_threshold_exceeded", "args": ["company", "year"], "negated": false},
+            {"pred": "balance_sheet_threshold_exceeded", "args": ["company", "year"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "more_than_one_criterion_exceeded", "args": ["company", "year"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "company", "type": "Company"},
+        {"var": "year", "type": "FinancialYear"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "turnover_threshold_exceeded", "args": ["company", "year"], "negated": false},
+            {"pred": "balance_sheet_threshold_exceeded", "args": ["company", "year"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "more_than_one_criterion_exceeded", "args": ["company", "year"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "company", "type": "Company"},
+        {"var": "year", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"pred": "more_than_one_criterion_exceeded", "args": ["company", "year"], "negated": true}
+      ],
+      "then": [
+        {"pred": "qualifies_for_statutory_company_size_status", "args": ["company", "year"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "company", "type": "Company"},
+        {"var": "year", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"pred": "more_than_one_criterion_exceeded", "args": ["company", "year"], "negated": false}
+      ],
+      "then": [
+        {"pred": "qualifies_for_statutory_company_size_status", "args": ["company", "year"], "negated": true}
+      ],
+      "operator": "implies"
+    }
+  ]
+}
+
+Why this is good:
+- Numeric thresholds are derived from observable functions.
+- “More than one” is modeled through pairwise conjunctions.
+- The positive classification is derived when the exclusion helper is negated.
+- The negative classification is represented as a negated derived predicate in THEN when the law explicitly supports exclusion.
+- The classification predicate name must be replaced by the actual predicate from the SYMBOL_TABLE.
+- If the SYMBOL_TABLE contains is_micro_company, use is_micro_company.
+- If the SYMBOL_TABLE contains is_small_company, use is_small_company.
+- Do not introduce a new classification predicate in the rules phase.
+- This example does not license copying small-company symbols into micro-company laws.
+
+## Example C — Temporal legal effect with anchor year and effect year
+
+LAW FRAGMENT:
+The fact that an undertaking exceeds more than one criterion only has consequences when this occurs for two consecutive financial years. The consequences apply from the financial year following the year in which more than one criterion was exceeded for the second time.
+
+AVAILABLE SYMBOLS:
+- Company
+- FinancialYear
+- more_than_one_criterion_exceeded(Company, FinancialYear) helper predicate
+- more_than_one_criterion_exceeded_for_two_consecutive_years(Company, FinancialYear) helper predicate
+- legal_consequence_applies_from(Company, FinancialYear) derived predicate
+- previous_financial_year(FinancialYear, FinancialYear) observable predicate
+- next_financial_year(FinancialYear, FinancialYear) observable predicate
+
+EXPECTED RULE PATTERN:
+{
+  "rules": [
+    {
+      "forall": [
+        {"var": "company", "type": "Company"},
+        {"var": "second_year", "type": "FinancialYear"},
+        {"var": "first_year", "type": "FinancialYear"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "more_than_one_criterion_exceeded", "args": ["company", "first_year"], "negated": false},
+            {"pred": "more_than_one_criterion_exceeded", "args": ["company", "second_year"], "negated": false},
+            {"pred": "previous_financial_year", "args": ["second_year", "first_year"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "more_than_one_criterion_exceeded_for_two_consecutive_years", "args": ["company", "second_year"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "company", "type": "Company"},
+        {"var": "second_year", "type": "FinancialYear"},
+        {"var": "effect_year", "type": "FinancialYear"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "more_than_one_criterion_exceeded_for_two_consecutive_years", "args": ["company", "second_year"], "negated": false},
+            {"pred": "next_financial_year", "args": ["second_year", "effect_year"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "legal_consequence_applies_from", "args": ["company", "effect_year"], "negated": false}
+      ],
+      "operator": "implies"
+    }
+  ]
+}
+
+Why this is good:
+- The second consecutive year is the anchor year.
+- The following year is the effect year.
+- The final legal consequence is a derived predicate over the effect year.
+- The exact name of the legal-effect predicate must be replaced by the actual predicate from the SYMBOL_TABLE.
+- If the SYMBOL_TABLE contains loses_small_company_status_from, use that.
+- If the SYMBOL_TABLE contains loses_micro_company_status_from, use that.
+- If the SYMBOL_TABLE contains another legal-effect predicate, use that.
+- The final query should not target next_financial_year itself.
+
+## Example D — Risk or criteria with safeguards
+
+LAW FRAGMENT:
+A foreign national may be considered a serious threat to public order only if their individual conduct represents a genuine, present and sufficiently serious threat affecting a fundamental interest of society. The assessment must be based on an individual examination. A previous conviction alone is not sufficient.
+
+AVAILABLE SYMBOLS:
+- Person
+- has_previous_conviction(Person) observable predicate
+- individual_examination_performed(Person) observable predicate
+- conduct_represents_genuine_present_serious_threat(Person) observable predicate
+- serious_threat_to_public_order(Person) derived predicate
+
+EXPECTED RULE PATTERN:
+{
+  "rules": [
+    {
+      "forall": [
+        {"var": "person", "type": "Person"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "individual_examination_performed", "args": ["person"], "negated": false},
+            {"pred": "conduct_represents_genuine_present_serious_threat", "args": ["person"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "serious_threat_to_public_order", "args": ["person"], "negated": false}
+      ],
+      "operator": "implies"
+    }
+  ]
+}
+
+Why this is good:
+- The rule does not derive serious_threat_to_public_order from has_previous_conviction alone.
+- The safeguard conditions are necessary conditions in the positive derivation.
+- If the law says a previous conviction alone is insufficient, do not create a rule where previous conviction alone implies the legal conclusion.
+
+## Example E — Incomplete information under open-world semantics
+
+LAW FRAGMENT:
+A person is eligible for benefit X if the person is resident in Belgium and has submitted the required application.
+
+AVAILABLE SYMBOLS:
+- Person
+- resident_in_belgium(Person) observable predicate
+- submitted_required_application(Person) observable predicate
+- eligible_for_benefit_x(Person) derived predicate
+
+EXPECTED RULE PATTERN:
+{
+  "rules": [
+    {
+      "forall": [
+        {"var": "person", "type": "Person"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "resident_in_belgium", "args": ["person"], "negated": false},
+            {"pred": "submitted_required_application", "args": ["person"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "eligible_for_benefit_x", "args": ["person"], "negated": false}
+      ],
+      "operator": "implies"
+    }
+  ]
+}
+
+Why this is good:
+- The positive legal consequence requires both conditions.
+- If the case only gives resident_in_belgium(person), the system should normally answer unknown for eligible_for_benefit_x(person), not false.
+- Do not add a negative rule unless the law explicitly defines a negative legal consequence.
 
 ## LAW TEXT
 

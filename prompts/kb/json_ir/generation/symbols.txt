@@ -102,6 +102,32 @@ The example names are placeholders only. Choose names and types from the LAW TEX
 - Prefer numeric functions plus comparisons in rules over undefined threshold observables.
 - Set directly_observable=true only when a case text could directly state the composite fact verbatim (rare).
 
+Controlled directly-observable exception:
+- A computed/composite-looking condition should normally be helper or derived.
+- It may be observable if the scoped law does not define its internal subconditions and a future case can directly state the fact.
+- In that rare case, set directly_observable=true (Bool, not legal_output).
+- Examples: no_residence_application_filed(person); does_not_meet_entry_conditions(person); satisfies_entry_conditions(person) only when the scoped law does not define entry conditions further.
+- Do not mark final legal conclusions directly_observable.
+- Prefer one final derived predicate for the classification actually asked or defined by the scoped law.
+
+5c. Directly assertable status/classification facts (generic):
+- Some predicates look like legal statuses or classifications. They may be final legal conclusions (derived) OR background/case facts (observable).
+- Use kind=observable with directly_observable=true (Bool, not legal_output) only when ALL apply:
+  (1) it is not the final legal output being asked;
+  (2) a case can directly assert the status (nationality, legal capacity, residence category, membership in a broad regime, etc.);
+  (3) the scoped law does not define it further, or the provision only uses it as a prerequisite;
+  (4) the name is status/classification-like (is_*, has_*_status, nationality-style names).
+- Use kind=derived when:
+  (1) the scoped law defines the status from subconditions;
+  (2) it is the legal conclusion of the provision;
+  (3) it is queried as the final legal answer;
+  (4) it is not supplied directly as a factual/background status.
+
+Unsupported broader classification prerequisites:
+- Do not introduce a separate broader classification/status predicate merely because the law text uses a label, unless the scoped law defines it or a case can directly assert it as a background fact.
+- If the current provision defines the target classification using local operational conditions, model those local conditions directly for the target classification.
+- Avoid making the target legal output depend on an observable broader classification that will not be available in the case.
+
 6. Legal effects, timing, and definitions:
 - When a provision states consequences, effects, applicability, timing, cessation, immediate account, rights, obligations, permissions, prohibitions, or exceptions, add an explicit derived legal-output predicate (not only is_* classifications or threshold helpers).
 - When a provision only defines a status/classification, add a derived classification predicate; do not invent a separate effect predicate unless the law states one.
@@ -149,6 +175,307 @@ DETERMINISTIC_HINTS:
 {machine_hints}
 
 If ERROR is non-empty, fix the root cause of every issue. Do not repeat the same invalid structure.
+
+# ILLUSTRATIVE EXAMPLES APPENDIX — SYMBOL GENERATION
+
+The examples below are illustrative patterns only.
+
+The current LAW TEXT is always authoritative.
+Do not copy symbols, predicates, thresholds, roles, or conclusions from these examples unless the current LAW TEXT actually contains the same legal content.
+Do not force the current law into one of these examples.
+Use these examples only to understand the intended JSON_IR modeling style.
+
+Very important:
+- The names in these examples are placeholders.
+- Do not copy example names like is_small_company, is_micro_company, or loses_small_company_status_from unless the current LAW TEXT actually defines that exact status or legal effect.
+- If the current law defines micro-company status, use a micro-company predicate.
+- If the current law defines small-company status, use a small-company predicate.
+- If the current law defines another statutory classification, name the derived predicate after that classification.
+- Do not introduce both small-company and micro-company predicates unless the current LAW TEXT actually defines both and both are needed.
+
+Important reminders:
+- A legal role or status is usually a predicate, not a type.
+- A final legal consequence should be represented as a derived predicate.
+- Observable facts from the case should be observable predicates or observable functions.
+- Helper predicates are allowed when they make the law clearer.
+- Do not include concrete case names, party names, or example individuals in the reusable legal KB.
+- Do not model “not X” as a separate type.
+- Do not derive a legal conclusion merely from missing information under open-world semantics.
+- Temporal support relations may be needed when the law connects an anchor period to a later legal effect period.
+
+## Example A — Legal role and legal consequence
+
+LAW FRAGMENT:
+If a person is the surviving spouse of the deceased, and the deceased leaves descendants, the surviving spouse receives a usufruct over the deceased's share of the family home.
+
+EXPECTED SYMBOL PATTERN:
+{
+  "types": ["Person", "Asset"],
+  "predicates": [
+    {
+      "name": "is_surviving_spouse_of",
+      "args": ["Person", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person is the surviving spouse of the second person."
+    },
+    {
+      "name": "deceased_leaves_descendants",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The deceased person leaves descendants."
+    },
+    {
+      "name": "is_family_home_of",
+      "args": ["Asset", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The asset is the family home of the deceased person."
+    },
+    {
+      "name": "receives_usufruct_over",
+      "args": ["Person", "Asset"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The person receives usufruct over the asset as a legal consequence."
+    }
+  ],
+  "functions": []
+}
+
+Why this is good:
+- “Surviving spouse” is modeled as a predicate, not as a type.
+- The legal consequence is a derived predicate.
+- The KB does not contain concrete names such as Alice, Bob, claimant, or applicant.
+- The rule generator can later derive receives_usufruct_over from the legal conditions.
+
+## Example B — Threshold classification with explicit exclusion
+
+LAW FRAGMENT:
+An undertaking qualifies for a statutory company-size status if, on the balance sheet date of the last closed financial year, it does not exceed more than one of the following criteria:
+1. annual average number of employees: 50;
+2. annual turnover excluding VAT: 9,000,000 EUR;
+3. balance sheet total: 4,500,000 EUR.
+If more than one criterion is exceeded, the undertaking does not qualify for that statutory company-size status.
+
+EXPECTED SYMBOL PATTERN:
+{
+  "types": ["Company", "FinancialYear"],
+  "predicates": [
+    {
+      "name": "employee_threshold_exceeded",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds the employee threshold in the financial year."
+    },
+    {
+      "name": "turnover_threshold_exceeded",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds the turnover threshold in the financial year."
+    },
+    {
+      "name": "balance_sheet_threshold_exceeded",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds the balance sheet total threshold in the financial year."
+    },
+    {
+      "name": "more_than_one_criterion_exceeded",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds more than one of the listed criteria in the financial year."
+    },
+    {
+      "name": "qualifies_for_statutory_company_size_status",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The company qualifies for the statutory company-size status in the financial year."
+    }
+  ],
+  "functions": [
+    {
+      "name": "annual_average_employees",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Int",
+      "kind": "observable",
+      "description": "The annual average number of employees of the company in the financial year."
+    },
+    {
+      "name": "annual_turnover_excluding_vat",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The annual turnover excluding VAT of the company in the financial year."
+    },
+    {
+      "name": "balance_sheet_total",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The balance sheet total of the company in the financial year."
+    }
+  ]
+}
+
+Why this is good:
+- Raw numeric values are observable functions.
+- Threshold-exceeded concepts are helper predicates, because they must be defined by rules from numeric comparisons.
+- The final company-size classification is a derived predicate, not a type.
+- The exact name of the derived classification predicate must follow the current LAW TEXT.
+- If the current law defines micro-company status, use a micro-company predicate.
+- If the current law defines small-company status, use a small-company predicate.
+- Do not copy qualifies_for_statutory_company_size_status literally unless that generic name is actually the best match for the current law.
+- The final query should normally target the legal classification or legal consequence, not merely a helper threshold predicate.
+
+## Example C — Temporal legal effect
+
+LAW FRAGMENT:
+The fact that an undertaking exceeds or ceases to exceed more than one criterion only has consequences when this occurs for two consecutive financial years. The consequences apply from the financial year following the year in which more than one criterion was exceeded or ceased to be exceeded for the second time.
+
+EXPECTED SYMBOL PATTERN:
+{
+  "types": ["Company", "FinancialYear"],
+  "predicates": [
+    {
+      "name": "more_than_one_criterion_exceeded",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds more than one criterion in the financial year."
+    },
+    {
+      "name": "more_than_one_criterion_exceeded_for_two_consecutive_years",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds more than one criterion in this financial year and in the immediately previous financial year."
+    },
+    {
+      "name": "legal_consequence_applies_from",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The statutory consequence applies to the company from this financial year."
+    },
+    {
+      "name": "previous_financial_year",
+      "args": ["FinancialYear", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The second financial year is immediately before the first financial year."
+    },
+    {
+      "name": "next_financial_year",
+      "args": ["FinancialYear", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The second financial year is immediately after the first financial year."
+    }
+  ],
+  "functions": []
+}
+
+Why this is good:
+- The anchor year and the legal-effect year are distinct.
+- The final legal effect is not the temporal relation itself.
+- previous_financial_year and next_financial_year are support relations.
+- The exact name of the derived legal-effect predicate must follow the current LAW TEXT.
+- For example, if the current law says that small-company status is lost from the following year, a specific predicate like loses_small_company_status_from may be appropriate.
+- If the current law says that micro-company status is lost or gained, the predicate name should reflect micro-company status instead.
+- The final query should target the legal consequence, not next_financial_year(anchor, effect_year).
+
+## Example D — Risk or criteria with safeguards
+
+LAW FRAGMENT:
+A foreign national may be considered a serious threat to public order only if their individual conduct represents a genuine, present and sufficiently serious threat affecting a fundamental interest of society. The assessment must be based on an individual examination. A previous conviction alone is not sufficient.
+
+EXPECTED SYMBOL PATTERN:
+{
+  "types": ["Person"],
+  "predicates": [
+    {
+      "name": "has_previous_conviction",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person has a previous conviction."
+    },
+    {
+      "name": "individual_examination_performed",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "An individual examination of the person has been performed."
+    },
+    {
+      "name": "conduct_represents_genuine_present_serious_threat",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person's individual conduct represents a genuine, present and sufficiently serious threat."
+    },
+    {
+      "name": "serious_threat_to_public_order",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The person is legally considered a serious threat to public order."
+    }
+  ],
+  "functions": []
+}
+
+Why this is good:
+- A previous conviction is an observable fact, not by itself the final legal conclusion.
+- The final legal status is derived.
+- The law's safeguards are represented as separate necessary conditions.
+- Do not derive serious_threat_to_public_order from has_previous_conviction alone when the law says that a previous conviction alone is insufficient.
+
+## Example E — Incomplete information under open-world semantics
+
+LAW FRAGMENT:
+A person is eligible for benefit X if the person is resident in Belgium and has submitted the required application.
+
+EXPECTED SYMBOL PATTERN:
+{
+  "types": ["Person"],
+  "predicates": [
+    {
+      "name": "resident_in_belgium",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person is resident in Belgium."
+    },
+    {
+      "name": "submitted_required_application",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person submitted the required application."
+    },
+    {
+      "name": "eligible_for_benefit_x",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The person is legally eligible for benefit X."
+    }
+  ],
+  "functions": []
+}
+
+Why this is good:
+- The positive legal consequence is derived only when the required conditions are known.
+- If the case gives resident_in_belgium(person) but says nothing about submitted_required_application(person), the result should normally be unknown, not false.
+- Do not create a negative legal predicate merely because information is missing, unless the law explicitly defines the negative consequence.
 
 ## LAW TEXT
 

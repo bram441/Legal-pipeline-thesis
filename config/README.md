@@ -8,6 +8,10 @@ Most former `.env` pipeline knobs now live in **`default.json`** or **`local.jso
 
 Environment variables listed in `pipeline/config.py` still override config when set (optional escape hatch).
 
+## JSON-IR KB prompts
+
+KB symbol and rule generation always use the canonical files under `prompts/kb/json_ir/generation/` (`symbols.txt`, `rules.txt`). There is no `prompt_profile` config key — prompt ablation variants were merged into those files before the thesis merge.
+
 ## `json_ir.scope_mode`
 
 Controls how much law text is passed to KB compilation before symbol/rules generation (`pipeline/kb/law_scope.py`).
@@ -52,7 +56,8 @@ When `--config` is omitted, `run_evaluation.py` uses **default + local only** (a
 | `config/cheap.json` | Debugging / smoke — low LLM budget |
 | `config/eval.json` | Medium reproducible evaluation |
 | `config/final.json` | Final thesis run — higher budget |
-| `config/ablation_balanced.json` | Balanced ablation profile |
+| `config/ablation_balanced.json` | Balanced ablation profile (LLM budget, not prompts) |
+| `config/final_best_strategy.json` | Final thesis strategy/config overlay |
 
 ### Evaluation keys (`evaluation` section)
 
