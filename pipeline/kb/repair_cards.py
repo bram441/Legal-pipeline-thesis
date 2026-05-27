@@ -97,10 +97,14 @@ _CARDS: dict[str, RepairCard] = {
             "Keep documentary/status facts (passport, travel document, comply/unwillingness with measure) "
             "as kind=observable with directly_observable=true and/or case_input=true.",
             "Keep legal conclusions/effects as derived (or helper+rules), not observable.",
-            "Use directly_observable=true only when a case can state the composite fact verbatim.",
+            "If the scoped law defines subconditions, use helper/derived with defining rules.",
+            "If the case can state the fact directly and the law does not define it further, "
+            "keep kind=observable and set directly_observable=true.",
+            "Use directly_observable=true only for Bool observables that are not legal_output.",
         ),
         do_not_items=(
             "Use observable kind merely to avoid defining rules for threshold helpers.",
+            "Mark legal-output/effect/classification predicates as directly_observable.",
             "Mark legal-output/effect predicates as observable.",
             "Force passport/compliance behavior facts into helper/derived unless they are rule-derived.",
         ),
@@ -151,6 +155,22 @@ _CARDS: dict[str, RepairCard] = {
         preferred_pattern=(
             "((A_exceeded AND B_exceeded) OR (A_exceeded AND C_exceeded) OR (B_exceeded AND C_exceeded)) "
             "=> NOT classification (negated: true in THEN)."
+        ),
+    ),
+    "unsafe_inverse_negative_legal_output": RepairCard(
+        card_id="unsafe_inverse_negative_legal_output",
+        title="Unsafe inverse negative legal-output rule",
+        layer="rules",
+        do_items=(
+            "Keep negated legal-output rules only for explicit positive disqualifying facts/helpers.",
+            "Remove IF branches that infer NOT legal_output from not prerequisite/background conditions.",
+            "For OR exclusions, keep only branches that are explicit legal exclusions supported by law.",
+            "If a positive legal-output rule already has local operational criteria, remove unsupported broader "
+            "observable status prerequisites instead of adding inverse negative exclusions.",
+        ),
+        do_not_items=(
+            "Mechanically invert a positive rule with De Morgan to build a negative legal-output rule.",
+            "Infer NOT legal_output from missing observable/background prerequisites under open-world semantics.",
         ),
     ),
     "numeric_threshold_not_in_law_text": RepairCard(
@@ -280,9 +300,14 @@ _CARDS: dict[str, RepairCard] = {
         do_items=(
             "Add at least one rule with the derived predicate in THEN.",
             "Define legal-output predicates from the law's antecedents.",
+            "For prerequisite statuses used in IF: reclassify as observable/directly_observable when "
+            "the case may assert them and they are not the final output; otherwise define in THEN "
+            "from observable subconditions or remove from IF.",
         ),
         do_not_items=(
             "Remove the derived predicate if it is legally necessary.",
+            "Leave derived/helper statuses used in IF without THEN definition or observable declaration.",
+            "Define prerequisite statuses circularly from each other.",
         ),
     ),
     "ungrounded_variable": RepairCard(

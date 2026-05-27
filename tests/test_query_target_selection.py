@@ -134,6 +134,102 @@ def test_classification_question_unchanged():
     assert chosen == "is_small_company"
 
 
+def test_classification_question_prefers_classification_over_timing_output():
+    schema = {
+        "predicates": [
+            {
+                "name": "classification_status",
+                "kind": "derived",
+                "args": ["Company", "FinancialYear"],
+                "returns": "Bool",
+                "output_category": "classification",
+                "description": "Company has the requested classification.",
+            },
+            {
+                "name": "classification_status_change_applies_from",
+                "kind": "derived",
+                "args": ["Company", "FinancialYear"],
+                "returns": "Bool",
+                "legal_output": True,
+                "output_category": "legal_effect",
+                "description": "Change in classification applies from this year.",
+            },
+        ],
+        "functions": [],
+    }
+    q = "Is ACME a classification_status company in 2025?"
+    chosen, _diag = apply_query_target_selection(
+        pred_hint="classification_status_change_applies_from",
+        user_question=q,
+        kb_schema=schema,
+        current_pred="classification_status_change_applies_from",
+    )
+    assert chosen == "classification_status"
+
+
+def test_timing_question_prefers_timing_effect_predicate():
+    schema = {
+        "predicates": [
+            {
+                "name": "classification_status",
+                "kind": "derived",
+                "args": ["Company", "FinancialYear"],
+                "returns": "Bool",
+                "output_category": "classification",
+            },
+            {
+                "name": "classification_status_change_applies_from",
+                "kind": "derived",
+                "args": ["Company", "FinancialYear"],
+                "returns": "Bool",
+                "legal_output": True,
+                "output_category": "legal_effect",
+            },
+        ],
+        "functions": [],
+    }
+    q = "Does the classification status change apply from financial year 2026?"
+    chosen, _diag = apply_query_target_selection(
+        pred_hint="classification_status",
+        user_question=q,
+        kb_schema=schema,
+        current_pred="classification_status",
+    )
+    assert chosen == "classification_status_change_applies_from"
+
+
+def test_timing_legal_output_does_not_override_classification_question_semantics():
+    schema = {
+        "predicates": [
+            {
+                "name": "is_target_status",
+                "kind": "derived",
+                "args": ["Company", "FinancialYear"],
+                "returns": "Bool",
+                "output_category": "status",
+            },
+            {
+                "name": "target_status_change_applies_from",
+                "kind": "derived",
+                "args": ["Company", "FinancialYear"],
+                "returns": "Bool",
+                "legal_output": True,
+                "output_category": "legal_effect",
+            },
+        ],
+        "functions": [],
+    }
+    q = "Does ACME qualify as target status in 2025?"
+    chosen, diag = apply_query_target_selection(
+        pred_hint="target_status_change_applies_from",
+        user_question=q,
+        kb_schema=schema,
+        current_pred="target_status_change_applies_from",
+    )
+    assert chosen == "is_target_status"
+    assert diag.get("chosen_predicate") == "is_target_status"
+
+
 def test_validate_rejects_temporal_when_legal_output_exists():
     with pytest.raises(ExtractionIRValidationError) as exc:
         from pipeline.extraction.json_ir import _validate_query_target_for_legal_question

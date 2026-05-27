@@ -462,6 +462,8 @@ def validate_json_ir_symbols(
             following_missing_temporal_support_repair=following_missing_temporal_support_repair,
         )
 
+    _validate_observable_composite_symbol_declarations(predicates)
+
     return predicates, functions, types
 
 
@@ -1007,9 +1009,53 @@ def _validate_floating_helpers(
         )
 
 
+_DIRECTLY_OBSERVABLE_FORBIDDEN_OUTPUT_CATEGORIES = frozenset(
+    {"legal_effect", "classification", "final_answer", "status"}
+)
+
+
+def _validate_directly_observable_flag(predicates: list[SymbolDecl]) -> None:
+    """Allow directly_observable only on Bool observables that are not legal outputs."""
+    for decl in predicates:
+        if not decl.directly_observable:
+            continue
+        if decl.kind != "observable":
+            raise JSONIRCompilationError(
+                SCHEMA_DESIGN_TAG
+                + f": Predicate '{decl.name}' has directly_observable=true but kind={decl.kind!r}. "
+                "Only kind=observable Bool predicates may use directly_observable. Repair layer: symbols."
+            )
+        if (decl.returns or "Bool") != "Bool":
+            raise JSONIRCompilationError(
+                SCHEMA_DESIGN_TAG
+                + f": Predicate '{decl.name}' has directly_observable=true but returns "
+                f"{decl.returns!r}. Only Bool predicates may use directly_observable. Repair layer: symbols."
+            )
+        if decl.legal_output:
+            raise JSONIRCompilationError(
+                SCHEMA_DESIGN_TAG
+                + f": Predicate '{decl.name}' has directly_observable=true and legal_output=true. "
+                "Do not mark legal-output or final-conclusion predicates directly_observable. "
+                "Use kind=derived/helper with defining rules instead. Repair layer: symbols."
+            )
+        cat = (decl.output_category or "").strip().lower()
+        if cat in _DIRECTLY_OBSERVABLE_FORBIDDEN_OUTPUT_CATEGORIES:
+            raise JSONIRCompilationError(
+                SCHEMA_DESIGN_TAG
+                + f": Predicate '{decl.name}' has directly_observable=true with "
+                f"output_category={decl.output_category!r}. "
+                "Do not mark classification/legal-effect/final-answer predicates directly_observable. "
+                "Repair layer: symbols."
+            )
+
+
 def _validate_observable_composite_symbol_declarations(predicates: list[SymbolDecl]) -> None:
     """Reject computed-looking observables unless explicitly marked case-direct."""
     from pipeline.kb.factual_criteria import decl_exempt_from_computed_observable_checks
+
+    from pipeline.kb.composite_predicate_heuristics import looks_status_classification_name
+
+    _validate_directly_observable_flag(predicates)
 
     for decl in predicates:
         if decl.kind != "observable":
@@ -1020,14 +1066,24 @@ def _validate_observable_composite_symbol_declarations(predicates: list[SymbolDe
             continue
         if decl_exempt_from_computed_observable_checks(decl):
             continue
+        if looks_status_classification_name(decl.name, decl.description) and not decl.legal_output:
+            raise JSONIRCompilationError(
+                SCHEMA_DESIGN_TAG
+                + f": Predicate '{decl.name}' (kind=observable) looks like a status/classification name. "
+                "Background/prerequisite statuses that cases may assert directly must set "
+                "directly_observable=true (Bool, not legal_output). "
+                "Final legal conclusions defined by the scoped law must be kind=derived with defining rules. "
+                "Repair layer: symbols."
+            )
         if looks_computed_composite(decl.name, decl.description):
             raise JSONIRCompilationError(
                 SCHEMA_DESIGN_TAG
                 + f": Predicate '{decl.name}' (kind=observable) looks computed/composite "
                 "(threshold, count, exceeds/meets/satisfies-style condition). "
                 "Reclassify as kind=helper or derived and define it with rules from numeric functions "
-                "or comparisons, or set directly_observable=true only when case texts may directly state "
-                "this composite fact. Repair layer: symbols."
+                "or comparisons, or set directly_observable=true only when the scoped law does not define "
+                "internal subconditions and case texts may directly state this composite fact. "
+                "Do not mark legal-output predicates directly_observable. Repair layer: symbols."
             )
 
 
@@ -1066,8 +1122,9 @@ def _validate_composite_predicate_rule_safety(
                     "Under closed-world reasoning, an undefined atom is false, so negation can "
                     "spuriously entail legal conclusions. Repair: reclassify as helper/derived and add "
                     "defining rules from numeric functions/comparisons, or set directly_observable=true "
-                    "only if cases may directly state this composite fact. Do not rename the predicate "
-                    "or delete the negated condition. Repair layer: symbols."
+                    "only if the scoped law does not define internal subconditions and cases may directly "
+                    "state this composite fact. Do not mark legal-output predicates directly_observable. "
+                    "Do not rename the predicate or delete the negated condition. Repair layer: symbols."
                 )
 
         if kind == "helper" and u.side == "if" and not defined:
@@ -1087,12 +1144,16 @@ def _validate_composite_predicate_rule_safety(
                 "Repair layer: rules."
             )
 
-        if kind in _DERIVED_OUTPUT_KINDS and u.side == "if" and u.negated and not defined:
+        if kind in _DERIVED_OUTPUT_KINDS and u.side == "if" and not defined:
+            neg_phrase = "negated " if u.negated else ""
             raise JSONIRCompilationError(
                 RULE_DESIGN_TAG
-                + f": Derived predicate '{u.name}' is negated in rules[{u.rule_index}].if without "
-                "a defining rule. Derived symbols must be defined in rule THEN clauses, not assumed "
-                "false when absent. Repair layer: rules."
+                + f": Derived predicate '{u.name}' is used {neg_phrase}in rules[{u.rule_index}].if "
+                "without a defining rule (never in any rule THEN). If it is a prerequisite/background "
+                "status the case can assert and it is not the final legal output, reclassify as "
+                "observable with directly_observable=true. If the scoped law defines it, add THEN "
+                "rules from observable subconditions. Otherwise remove it from IF and use only "
+                "locally available conditions. Repair layer: rules."
             )
 
 
@@ -1260,6 +1321,76 @@ def _validate_object_rule_role_binding(
                         )
 
 
+def _negated_if_risky_prerequisites(
+    if_side: Any,
+    pred_kinds: dict[str, str],
+    pred_meta: dict[str, SymbolDecl],
+) -> list[str]:
+    """Negated IF atoms that are observable/background/case-input/directly-observable."""
+    pseudo_rule = {"if": if_side, "then": []}
+    out: list[str] = []
+    for u in _collect_pred_atom_usages([pseudo_rule]):
+        if u.side != "if" or not u.negated:
+            continue
+        meta = pred_meta.get(u.name)
+        kind = pred_kinds.get(u.name, "")
+        if not meta:
+            continue
+        risky = (
+            kind in {"observable", "input", "background"}
+            or bool(meta.background)
+            or bool(meta.case_input)
+            or bool(meta.directly_observable)
+        )
+        if risky:
+            out.append(u.name)
+    return sorted(set(out))
+
+
+def _validate_negative_legal_output_rule_safety(
+    rules: list,
+    pred_kinds: dict[str, str],
+    pred_meta: dict[str, SymbolDecl],
+) -> None:
+    """
+    Block unsafe inverse/De Morgan negative legal-output rules under open-world semantics.
+    """
+    for idx, raw_rule in enumerate(rules or []):
+        if not isinstance(raw_rule, dict):
+            continue
+        if_side, then_side = _rule_expr_sides(raw_rule)
+        then_atoms = list(_iter_pred_atoms_with_args(then_side))
+        negated_outputs = []
+        for atom in then_atoms:
+            name = str(atom.get("pred") or atom.get("symbol") or "").strip()
+            if not name:
+                continue
+            if not bool(atom.get("negated") or atom.get("neg")):
+                continue
+            if pred_kinds.get(name) in _DERIVED_OUTPUT_KINDS:
+                negated_outputs.append(name)
+        if not negated_outputs:
+            continue
+
+        negated_prereq = _negated_if_risky_prerequisites(if_side, pred_kinds, pred_meta)
+        if not negated_prereq:
+            continue
+
+        outputs = ", ".join(sorted(set(negated_outputs)))
+        bad = ", ".join(negated_prereq)
+        raise JSONIRCompilationError(
+            RULE_DESIGN_TAG
+            + f": rules[{idx}] has a negated legal-output THEN ({outputs}) with IF condition(s) "
+            f"negating observable/background/case-input/directly-observable prerequisite(s) ({bad}). "
+            "Under open-world semantics, absence of an observable prerequisite is not proof of negation. "
+            "Do not create inverse/De Morgan negative rules from missing prerequisites (including inside "
+            "OR/AND branches). Keep only explicit positive disqualifying facts/helpers supported by law "
+            "for negated THEN conclusions. If a broader observable status is unsupported, remove it from "
+            "the positive rule and use locally defined operational criteria instead of adding unsafe "
+            "negative exclusions. Repair layer: rules."
+        )
+
+
 def _derived_predicates_defined_in_rules(rules: list, pred_kinds: dict[str, str]) -> set[str]:
     defined: set[str] = set()
     for rule in rules or []:
@@ -1283,12 +1414,31 @@ def _validate_derived_predicates_have_defining_rules(
     defined = _derived_predicates_defined_in_rules(ir.get("rules") or [], pred_kinds)
     missing = sorted(derived_names - defined)
     if missing:
+        usages = _collect_pred_atom_usages(ir.get("rules") or [])
+        if_lines: list[str] = []
+        for u in usages:
+            if u.side == "if" and u.name in missing:
+                if_lines.append("rules[%d].if" % u.rule_index)
+        hint = (
+            " Every derived symbol used in IF must also be defined in at least one rule THEN "
+            "(or be observable/background in the symbol table)."
+        )
+        from pipeline.kb.composite_predicate_heuristics import looks_status_classification_name
+
+        if any(looks_status_classification_name(n) for n in missing):
+            hint += (
+                " For status/classification-style prerequisites: reclassify as observable/"
+                "directly_observable when the case may assert the fact, define from observable "
+                "subconditions when the law supports it, or remove from IF when unsupported."
+            )
+        if if_lines:
+            hint += " Used in IF at: " + ", ".join(sorted(set(if_lines))) + "."
         raise JSONIRCompilationError(
             SCHEMA_DESIGN_TAG
             + ": derived predicate(s) "
             + ", ".join(missing)
-            + " never appear in any rule THEN. Every derived legal-output symbol must be "
-            "defined by at least one rule."
+            + " never appear in any rule THEN."
+            + hint
         )
 
 
@@ -1341,6 +1491,7 @@ def validate_combined_json_ir_schema(
 
     validate_status_as_type_rules(ir.get("rules") or [], pred_kinds=pred_kinds)
     _validate_derived_predicates_have_defining_rules(ir, pred_kinds)
+    _validate_negative_legal_output_rule_safety(ir.get("rules") or [], pred_kinds, pred_meta)
     for i, rule in enumerate(ir.get("rules") or []):
         if isinstance(rule, dict):
             _validate_object_rule_schema_design(rule, i, pred_kinds, pred_names, fun_names)

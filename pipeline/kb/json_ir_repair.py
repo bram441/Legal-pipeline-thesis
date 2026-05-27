@@ -61,6 +61,8 @@ def normalize_error_code(msg: str) -> str:
         return "json_parse_error"
     if "helper predicate" in sl and ("defining rule" in sl or "never defined" in sl or "no defining rule" in sl):
         return "missing_helper_definition"
+    if "derived predicate" in sl and ("without a defining rule" in sl or "no defining rule" in sl):
+        return "missing_helper_definition"
     if "helper function" in sl and ("defining rule" in sl or "never defined" in sl):
         return "missing_helper_definition"
     if "computed-looking observable" in sl or "looks computed/composite" in sl:
@@ -69,6 +71,8 @@ def normalize_error_code(msg: str) -> str:
         return "numeric_threshold_not_in_law_text"
     if "cannot prove disqualification" in sl or "exclusion rule such as" in sl:
         return "missing_threshold_classification_exclusion"
+    if "inverse/de morgan negative rules" in sl or "negating observable/background prerequisites" in sl:
+        return "unsafe_inverse_negative_legal_output"
     if "uses predicate" in sl and "as a function term" in sl:
         return "predicate_used_as_function"
     if "as a bool predicate atom" in sl and "only under functions" in sl:
@@ -153,6 +157,8 @@ def normalize_error_signature(msg: str) -> str:
             return "schema::status_as_type"
         if "at-most-one" in sl or "simple or over individual" in sl:
             return "schema::threshold_cardinality"
+        if "inverse/de morgan negative rules" in sl:
+            return "rule::unsafe_inverse_negative"
         if "helper predicate" in sl and "never defined" in sl:
             m = re.search(r"helper predicate\s+'([^']+)'", s, re.I)
             return "schema::floating_helper_pred::" + (m.group(1) if m else "?")

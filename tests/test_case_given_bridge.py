@@ -9,6 +9,7 @@ from pipeline.kb.case_given_bridge import (
     CaseGivenBridgeArityError,
     _bridge_rule_line,
     build_case_given_inputs_from_assertions,
+    extend_kb_schema_with_case_given,
     inject_case_given_bridges_into_fo,
     structure_asserts_only_case_given,
 )
@@ -148,3 +149,47 @@ def test_bridge_arity_above_limit_raises_structured_error():
     types = [f"T{i}" for i in range(9)]
     with pytest.raises(CaseGivenBridgeArityError, match="maximum supported arity"):
         _bridge_rule_line("case_given_big", "big", types)
+
+
+def test_duplicate_case_given_bridges_are_deduplicated_by_signature():
+    base = _fo_base()
+    bridges = [
+        {
+            "input_predicate": "case_given_more_than_one_criterion_exceeded",
+            "target_predicate": "more_than_one_criterion_exceeded",
+            "args_types": ["Company", "FinancialYear"],
+        },
+        {
+            "input_predicate": "case_given_more_than_one_criterion_exceeded",
+            "target_predicate": "more_than_one_criterion_exceeded",
+            "args_types": ["Company", "FinancialYear"],
+        },
+    ]
+    out = inject_case_given_bridges_into_fo(base, bridges)
+    assert out.count("case_given_more_than_one_criterion_exceeded: Company * FinancialYear -> Bool") == 1
+    assert out.count(
+        "case_given_more_than_one_criterion_exceeded(c, fy)) => (more_than_one_criterion_exceeded(c, fy))"
+    ) == 1
+
+
+def test_extend_schema_deduplicates_case_given_bridge_rules_by_signature():
+    schema = {
+        "predicates": [
+            {"name": "more_than_one_criterion_exceeded", "args": ["Company", "FinancialYear"], "returns": "Bool"}
+        ]
+    }
+    case_given_inputs = [
+        {
+            "input_predicate": "case_given_more_than_one_criterion_exceeded",
+            "target_predicate": "more_than_one_criterion_exceeded",
+            "target_signature": {"args": ["Company", "FinancialYear"]},
+        },
+        {
+            "input_predicate": "case_given_more_than_one_criterion_exceeded",
+            "target_predicate": "more_than_one_criterion_exceeded",
+            "target_signature": {"args": ["Company", "FinancialYear"]},
+        },
+    ]
+    out = extend_kb_schema_with_case_given(schema, case_given_inputs)
+    bridge_rules = out.get("case_given_bridge_rules") or []
+    assert len(bridge_rules) == 1

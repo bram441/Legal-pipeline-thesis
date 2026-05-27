@@ -91,6 +91,11 @@ Do not introduce new entity names, paraphrased entity names, type names as args,
 Query targets must come from query_target_candidate symbols.
 Temporal/background support symbols may support reasoning but are not final legal-effect answer predicates when legal-output targets exist.
 
+Classification vs timing selection:
+- If the question is of the form "Is X a Y?", "Does X qualify as Y?", "valt X onder Y?", or asks for legal status/classification/category, choose the classification/status predicate that matches Y.
+- Do not choose a timing/effect predicate for a classification question, even if that timing/effect predicate is marked legal_output=true.
+- Choose timing/effect predicates only when the question asks when something applies, from which period a consequence starts, whether a status change takes effect, or other temporal applicability language.
+
 ## LEXICAL HINTS
 
 The block below may help map ordinary language to existing KB_SCHEMA symbols only.
