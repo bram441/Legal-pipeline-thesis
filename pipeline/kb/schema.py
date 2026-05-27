@@ -11,7 +11,7 @@ _VOCAB_RE = re.compile(r"vocabulary\s+V\s*\{(.*?)\}\s*", re.DOTALL | re.IGNORECA
 _TYPE_RE = re.compile(r"^\s*type\s+([A-Za-z_]\w*)\s*$", re.IGNORECASE)
 
 _SIG_RE = re.compile(
-    r"^\s*([A-Za-z_]\w*)\s*:\s*([A-Za-z_]\w*(?:\s*\*\s*[A-Za-z_]\w*)*)\s*->\s*([A-Za-z_]\w*)\s*$"
+    r"^\s*([A-Za-z_]\w*)\s*:\s*(?:\(\)|([A-Za-z_]\w*(?:\s*\*\s*[A-Za-z_]\w*)*))\s*->\s*([A-Za-z_]\w*)\s*$"
 )
 
 
@@ -80,7 +80,7 @@ def extract_schema_from_kb_fo(kb_text):
         ms = _SIG_RE.match(line)
         if ms:
             name = ms.group(1)
-            arg_blob = ms.group(2).strip()
+            arg_blob = (ms.group(2) or "").strip()
             ret = ms.group(3).strip()
             args = [a.strip() for a in arg_blob.split("*")] if arg_blob else []
 

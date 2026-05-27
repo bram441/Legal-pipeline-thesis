@@ -1,0 +1,9 @@
+{
+  "Q1": {
+    "question": "Heeft Noor volgens artikel 4.23, paragraaf 1 het vruchtgebruik van de gezinswoning?",
+    "answer": "True",
+    "multi": false,
+    "inference": "entailment",
+    "source_question_id": "q1"
+  }
+}

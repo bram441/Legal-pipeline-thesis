@@ -1,0 +1,29 @@
+{
+  "run_id": "run_205",
+  "source_run_json": "inputs\\json_final_clean\\run_205\\run.json",
+  "kb_file": "runs\\run_205\\kb.txt",
+  "questions_file": "runs\\run_205\\questions.json",
+  "law": {
+    "path": "example_laws_clean/microvennootschappen_clean.txt",
+    "resolved_path": "example_laws_clean\\microvennootschappen_clean.txt"
+  },
+  "case": {
+    "text": "BV Pico heeft rechtspersoonlijkheid. Op balansdatum van het laatst afgesloten boekjaar: 8 voltijdse equivalenten, jaarlijkse netto-omzet 700.000 euro (exclusief btw), balanstotaal 300.000 euro. BV Pico is geen moeder- of dochtervennootschap."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Is BV Pico een microvennootschap volgens artikel 1:25, paragraaf 1?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "Micro-company: legal personality, not parent/subsidiary, and exceeds none of the three micro thresholds (10 employees, 900000 turnover, 450000 balance sheet)."
+      },
+      "verus_key": "Q1",
+      "verus_answer": "True"
+    }
+  ],
+  "metadata": {
+    "id": "run_205"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "Q1": {
+    "question": "Valt Sofie onder de definitie van een vreemdeling in artikel 1, paragraaf 1, punt 1?",
+    "answer": "False",
+    "multi": false,
+    "inference": "entailment",
+    "source_question_id": "q1"
+  }
+}

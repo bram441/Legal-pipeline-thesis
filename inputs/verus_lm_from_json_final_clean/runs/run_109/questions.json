@@ -1,0 +1,9 @@
+{
+  "Q1": {
+    "question": "Is er sprake van illegaal verblijf in de zin van artikel 1, paragraaf 1, punt 4?",
+    "answer": "True",
+    "multi": false,
+    "inference": "entailment",
+    "source_question_id": "q1"
+  }
+}

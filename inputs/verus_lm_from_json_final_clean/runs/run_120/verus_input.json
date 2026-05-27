@@ -1,0 +1,29 @@
+{
+  "run_id": "run_120",
+  "source_run_json": "inputs\\json_final_clean\\run_120\\run.json",
+  "kb_file": "runs\\run_120\\kb.txt",
+  "questions_file": "runs\\run_120\\questions.json",
+  "law": {
+    "path": "example_laws_clean/microvennootschappen_clean.txt",
+    "resolved_path": "example_laws_clean\\microvennootschappen_clean.txt"
+  },
+  "case": {
+    "text": "BV Horizon overschreed gedurende twee achtereenvolgende boekjaren telkens meer dan één criterium uit artikel 1:24, paragraaf 1. Het tweede jaar van overschrijding is boekjaar 2025."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Gaan de gevolgen volgens artikel 1:24, paragraaf 2 in vanaf het boekjaar dat volgt op boekjaar 2025?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "When more than one criterion is exceeded for two consecutive financial years, the effects start in the financial year following the year in which the criteria were exceeded for the second time."
+      },
+      "verus_key": "Q1",
+      "verus_answer": "True"
+    }
+  ],
+  "metadata": {
+    "id": "run_120"
+  }
+}

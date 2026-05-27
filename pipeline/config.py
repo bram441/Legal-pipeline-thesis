@@ -35,6 +35,9 @@ _ENV_OVERRIDES: dict[str, tuple[str, str]] = {
     "PIPELINE_EXTRACTION_BACKEND": ("extraction", "backend"),
     "PIPELINE_EXTRACTOR": ("extraction", "provider"),
     "LEGAL_PIPELINE_ENABLE_DOMAIN_HEURISTICS": ("extraction", "enable_domain_heuristics"),
+    "LLM_PROVIDER": ("llm", "provider"),
+    "LLM_MODEL": ("llm", "model"),
+    "LLM_BASE_URL": ("llm", "base_url"),
     "OPENAI_TEMPERATURE": ("openai", "temperature"),
     "OPENAI_TOP_P": ("openai", "top_p"),
     "OPENAI_SEED": ("openai", "seed"),
@@ -66,6 +69,9 @@ def _coerce_value(key: str, raw: str) -> Any:
         "trace",
         "quiet",
         "llm_call_tracking",
+        "use_seed",
+        "use_response_format",
+        "use_reasoning_effort",
     }:
         return s.lower() in ("1", "true", "yes", "on")
     if key in {
@@ -77,6 +83,7 @@ def _coerce_value(key: str, raw: str) -> Any:
         "max_evidence_extension_calls",
         "max_retries",
         "seed",
+        "timeout_seconds",
     }:
         if not s:
             return None
@@ -257,12 +264,15 @@ def config_section(name: str) -> dict[str, Any]:
 
 def save_effective_config(path: str | Path) -> dict[str, Any]:
     """Write merged effective config for reproducibility artifacts."""
+    from pipeline.llm.client import llm_config_for_artifact
+
     cfg = get_effective_config()
     prof = get_active_config_profile()
     artifact: dict[str, Any] = {
         "ignore_local_config": ignore_local_config_enabled(),
         "config_profile": str(prof) if prof else None,
         **cfg,
+        "llm_runtime": llm_config_for_artifact(),
     }
     p = Path(path)
     p.parent.mkdir(parents=True, exist_ok=True)

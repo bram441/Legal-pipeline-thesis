@@ -51,12 +51,12 @@ Outputs:
 
 | Source | Purpose |
 |--------|---------|
-| `.env` | Secrets only: `OPENAI_API_KEY`, optional model names |
+| `.env` | Secrets: `OPENAI_API_KEY` or `OPENROUTER_API_KEY`; optional `LLM_PROVIDER`, `LLM_MODEL`, `OPENAI_MODEL` |
 | `config/default.json` | Versioned pipeline behavior (JSON-IR repair limits, extraction backend, scoring, trace) |
 | `config/local.json` | Optional gitignored local overrides |
 | Environment variables | Backward-compatible overrides (`JSON_IR_*`, `PIPELINE_*`, `SCORE_*`) merged by `pipeline/config.py` |
 
-Each JSON benchmark run writes **`effective_config.json`** (merged config actually used).
+Each JSON benchmark run writes **`effective_config.json`** (merged config + `llm_runtime` provider/model; no API keys).
 
 **Primary path:** JSON-IR (`--pipeline-backend json_ir`). Legacy direct-FO is **deprecated** — see `docs/DEPRECATED_COMPONENTS.md`.
 
@@ -91,6 +91,21 @@ python scripts/run_evaluation.py --runs-dir inputs/json_final --runs all --strat
 ```
 
 Reports: `results/reports/evaluation_<timestamp>/` — see `grouped_summary.json` for tier metrics.
+
+**Compare models** (same strategies/config/test set; use a subset first):
+
+```powershell
+$env:LLM_PROVIDER="openrouter"
+$env:OPENROUTER_API_KEY="..."
+python scripts/run_model_sweep.py --provider openrouter `
+  --models-file config/model_sweep_models.txt `
+  --input-dir inputs/json_final_clean `
+  --strategies direct_json_ir_no_translate le_json_ir_no_translate `
+  --config config/ablation_balanced.json --ignore-local-config --clean `
+  --no-fail-on-missing-score --output-root results/reports/model_sweep_clean_law
+```
+
+See `scripts/README.md` and `config/README.md` for OpenAI vs OpenRouter env vars.
 
 ### Scoring warnings
 

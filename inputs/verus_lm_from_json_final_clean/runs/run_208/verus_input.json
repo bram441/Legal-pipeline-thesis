@@ -1,0 +1,29 @@
+{
+  "run_id": "run_208",
+  "source_run_json": "inputs\\json_final_clean\\run_208\\run.json",
+  "kb_file": "runs\\run_208\\kb.txt",
+  "questions_file": "runs\\run_208\\questions.json",
+  "law": {
+    "path": "example_laws_clean/microvennootschappen_clean.txt",
+    "resolved_path": "example_laws_clean\\microvennootschappen_clean.txt"
+  },
+  "case": {
+    "text": "NV Tango heeft rechtspersoonlijkheid. Op balansdatum van het laatst afgesloten boekjaar: 60 voltijdse equivalenten, jaarlijkse netto-omzet 12.000.000 euro (exclusief btw), balanstotaal 5.000.000 euro."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Is NV Tango een kleine vennootschap volgens artikel 1:24, paragraaf 1?",
+      "expected": {
+        "mode": "boolean",
+        "value": false,
+        "reason": "Under Art. 1:24 par. 1 a small company may exceed at most one threshold; Tango exceeds employees (>50) and turnover (>11250000)."
+      },
+      "verus_key": "Q1",
+      "verus_answer": "False"
+    }
+  ],
+  "metadata": {
+    "id": "run_208"
+  }
+}

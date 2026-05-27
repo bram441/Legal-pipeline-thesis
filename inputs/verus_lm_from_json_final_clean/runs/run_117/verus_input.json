@@ -1,0 +1,29 @@
+{
+  "run_id": "run_117",
+  "source_run_json": "inputs\\json_final_clean\\run_117\\run.json",
+  "kb_file": "runs\\run_117\\kb.txt",
+  "questions_file": "runs\\run_117\\questions.json",
+  "law": {
+    "path": "example_laws_clean/microvennootschappen_clean.txt",
+    "resolved_path": "example_laws_clean\\microvennootschappen_clean.txt"
+  },
+  "case": {
+    "text": "BV Sigma heeft rechtspersoonlijkheid. Zij is geen dochtervennootschap en geen moedervennootschap. Op balansdatum heeft zij 11 voltijdse equivalenten, een jaarlijkse netto-omzet van 1.000.000 euro exclusief btw en een balanstotaal van 420.000 euro."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Is BV Sigma een microvennootschap volgens artikel 1:25, paragraaf 1?",
+      "expected": {
+        "mode": "boolean",
+        "value": false,
+        "reason": "Sigma exceeds two micro thresholds: employees > 10 and turnover > 900,000. A micro-company may exceed no more than one."
+      },
+      "verus_key": "Q1",
+      "verus_answer": "False"
+    }
+  ],
+  "metadata": {
+    "id": "run_117"
+  }
+}

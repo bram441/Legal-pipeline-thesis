@@ -1,0 +1,29 @@
+{
+  "run_id": "run_108",
+  "source_run_json": "inputs\\json_final_clean\\run_108\\run.json",
+  "kb_file": "runs\\run_108\\kb.txt",
+  "questions_file": "runs\\run_108\\questions.json",
+  "law": {
+    "path": "example_laws_clean/vreemdelingenwet_clean.txt",
+    "resolved_path": "example_laws_clean\\vreemdelingenwet_clean.txt"
+  },
+  "case": {
+    "text": "Sofie legt een geldige Belgische identiteitskaart voor en bewijst daarmee dat zij de Belgische nationaliteit bezit."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Valt Sofie onder de definitie van een vreemdeling in artikel 1, paragraaf 1, punt 1?",
+      "expected": {
+        "mode": "boolean",
+        "value": false,
+        "reason": "If the person proves Belgian nationality, the statutory definition of foreigner is not met."
+      },
+      "verus_key": "Q1",
+      "verus_answer": "False"
+    }
+  ],
+  "metadata": {
+    "id": "run_108"
+  }
+}

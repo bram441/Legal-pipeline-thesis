@@ -1,8 +1,9 @@
 import json
-import os
 
-from pipeline.utils.openai_sampling import chat_completion_sampling_kwargs
+from pipeline.llm.client import get_llm_client, get_llm_model
+from pipeline.llm.request import build_chat_completion_kwargs
 from pipeline.utils.llm_call_tracker import tracked_chat_completion_create
+from pipeline.utils.llm_response_json import parse_chat_completion_json
 from pipeline.utils.prompt_loader import (
     PromptError,
     load_json_ir_contract,
@@ -168,14 +169,11 @@ def _schema_environment_view(kb_schema, schema_environment=None) -> str:
 
 
 def extract_case_ir_only_openai(case_text, model, kb_schema=None, feedback=None, schema_environment=None):
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise LLMExtractionError("Missing OPENAI_API_KEY environment variable")
     try:
-        from openai import OpenAI
+        client = get_llm_client()
     except Exception as e:
-        raise LLMExtractionError("OpenAI SDK not installed or not importable: " + str(e))
-    client = OpenAI(api_key=api_key)
+        raise LLMExtractionError(str(e)) from e
+    chosen_model = model or get_llm_model()
     kb_schema_json = json.dumps(kb_schema or {}, ensure_ascii=False, indent=2)
     user_msg = _json_ir_extraction_repair_preamble(True, feedback) + render_prompt(
         EXTRACTION_JSON_IR_CASE,
@@ -186,30 +184,32 @@ def extract_case_ir_only_openai(case_text, model, kb_schema=None, feedback=None,
         world_knowledge_lexical=_lexical_world_knowledge_block(),
         json_ir_contract=load_json_ir_contract(),
     )
-    resp = tracked_chat_completion_create(
-        client,
-        stage="case_extraction",
-        model=model,
+    req = build_chat_completion_kwargs(
+        model=chosen_model,
         messages=[
             {"role": "system", "content": "Extract case IR only."},
             {"role": "user", "content": user_msg},
         ],
-        metadata={"backend": "json_ir"},
-        **chat_completion_sampling_kwargs(),
         response_format=_case_ir_schema(),
     )
-    return json.loads(resp.choices[0].message.content)
+    try:
+        resp = tracked_chat_completion_create(
+            client,
+            stage="case_extraction",
+            metadata={"backend": "json_ir"},
+            **req,
+        )
+        return parse_chat_completion_json(resp)
+    except ValueError as e:
+        raise LLMExtractionError(str(e)) from e
 
 
 def extract_query_ir_only_openai(user_question, model, kb_schema=None, case=None, feedback=None, schema_environment=None):
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise LLMExtractionError("Missing OPENAI_API_KEY environment variable")
     try:
-        from openai import OpenAI
+        client = get_llm_client()
     except Exception as e:
-        raise LLMExtractionError("OpenAI SDK not installed or not importable: " + str(e))
-    client = OpenAI(api_key=api_key)
+        raise LLMExtractionError(str(e)) from e
+    chosen_model = model or get_llm_model()
     kb_schema_json = json.dumps(kb_schema or {}, ensure_ascii=False, indent=2)
     case_obj = case or {}
     case_facts_json = json.dumps((case_obj.get("facts") or []), ensure_ascii=False, indent=2)
@@ -225,17 +225,22 @@ def extract_query_ir_only_openai(user_question, model, kb_schema=None, case=None
         world_knowledge_lexical=_lexical_world_knowledge_block(),
         json_ir_contract=load_json_ir_contract(),
     )
-    resp = tracked_chat_completion_create(
-        client,
-        stage="query_extraction",
-        model=model,
+    req = build_chat_completion_kwargs(
+        model=chosen_model,
         messages=[
             {"role": "system", "content": "Extract query IR only."},
             {"role": "user", "content": user_msg},
         ],
-        metadata={"backend": "json_ir"},
-        **chat_completion_sampling_kwargs(),
         response_format=_query_ir_schema(),
     )
-    return json.loads(resp.choices[0].message.content)
+    try:
+        resp = tracked_chat_completion_create(
+            client,
+            stage="query_extraction",
+            metadata={"backend": "json_ir"},
+            **req,
+        )
+        return parse_chat_completion_json(resp)
+    except ValueError as e:
+        raise LLMExtractionError(str(e)) from e
 

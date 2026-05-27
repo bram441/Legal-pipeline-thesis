@@ -1,0 +1,29 @@
+{
+  "run_id": "run_118",
+  "source_run_json": "inputs\\json_final_clean\\run_118\\run.json",
+  "kb_file": "runs\\run_118\\kb.txt",
+  "questions_file": "runs\\run_118\\questions.json",
+  "law": {
+    "path": "example_laws_clean/microvennootschappen_clean.txt",
+    "resolved_path": "example_laws_clean\\microvennootschappen_clean.txt"
+  },
+  "case": {
+    "text": "BV ParentCo heeft rechtspersoonlijkheid. Zij is een moedervennootschap. Op balansdatum heeft zij 5 voltijdse equivalenten, een jaarlijkse netto-omzet van 300.000 euro exclusief btw en een balanstotaal van 200.000 euro."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Is BV ParentCo een microvennootschap volgens artikel 1:25, paragraaf 1?",
+      "expected": {
+        "mode": "boolean",
+        "value": false,
+        "reason": "Even with low thresholds, Article 1:25 excludes parent companies and subsidiaries from micro-company status."
+      },
+      "verus_key": "Q1",
+      "verus_answer": "False"
+    }
+  ],
+  "metadata": {
+    "id": "run_118"
+  }
+}

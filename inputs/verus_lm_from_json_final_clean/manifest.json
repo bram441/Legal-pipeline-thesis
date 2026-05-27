@@ -1,0 +1,489 @@
+{
+  "source_input_dir": "inputs\\json_final_clean",
+  "output_dir": "inputs\\verus_lm_from_json_final_clean",
+  "runs": [
+    {
+      "run_id": "run_001",
+      "source_run_json": "inputs\\json_final_clean\\run_001\\run.json",
+      "adapter_file": "runs\\run_001\\verus_input.json",
+      "kb_file": "runs\\run_001\\kb.txt",
+      "questions_file": "runs\\run_001\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_001.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_001.json",
+      "question_count": 1,
+      "expected_values": [
+        "True"
+      ]
+    },
+    {
+      "run_id": "run_002",
+      "source_run_json": "inputs\\json_final_clean\\run_002\\run.json",
+      "adapter_file": "runs\\run_002\\verus_input.json",
+      "kb_file": "runs\\run_002\\kb.txt",
+      "questions_file": "runs\\run_002\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_002.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_002.json",
+      "question_count": 1,
+      "expected_values": [
+        "True"
+      ]
+    },
+    {
+      "run_id": "run_003",
+      "source_run_json": "inputs\\json_final_clean\\run_003\\run.json",
+      "adapter_file": "runs\\run_003\\verus_input.json",
+      "kb_file": "runs\\run_003\\kb.txt",
+      "questions_file": "runs\\run_003\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_003.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_003.json",
+      "question_count": 1,
+      "expected_values": [
+        "True"
+      ]
+    },
+    {
+      "run_id": "run_004",
+      "source_run_json": "inputs\\json_final_clean\\run_004\\run.json",
+      "adapter_file": "runs\\run_004\\verus_input.json",
+      "kb_file": "runs\\run_004\\kb.txt",
+      "questions_file": "runs\\run_004\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_004.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_004.json",
+      "question_count": 1,
+      "expected_values": [
+        "True"
+      ]
+    },
+    {
+      "run_id": "run_005",
+      "source_run_json": "inputs\\json_final_clean\\run_005\\run.json",
+      "adapter_file": "runs\\run_005\\verus_input.json",
+      "kb_file": "runs\\run_005\\kb.txt",
+      "questions_file": "runs\\run_005\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_005.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_005.json",
+      "question_count": 1,
+      "expected_values": [
+        "True"
+      ]
+    },
+    {
+      "run_id": "run_006",
+      "source_run_json": "inputs\\json_final_clean\\run_006\\run.json",
+      "adapter_file": "runs\\run_006\\verus_input.json",
+      "kb_file": "runs\\run_006\\kb.txt",
+      "questions_file": "runs\\run_006\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_006.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_006.json",
+      "question_count": 1,
+      "expected_values": [
+        "True"
+      ]
+    },
+    {
+      "run_id": "run_007",
+      "source_run_json": "inputs\\json_final_clean\\run_007\\run.json",
+      "adapter_file": "runs\\run_007\\verus_input.json",
+      "kb_file": "runs\\run_007\\kb.txt",
+      "questions_file": "runs\\run_007\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_007.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_007.json",
+      "question_count": 1,
+      "expected_values": [
+        "True"
+      ]
+    },
+    {
+      "run_id": "run_008",
+      "source_run_json": "inputs\\json_final_clean\\run_008\\run.json",
+      "adapter_file": "runs\\run_008\\verus_input.json",
+      "kb_file": "runs\\run_008\\kb.txt",
+      "questions_file": "runs\\run_008\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_008.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_008.json",
+      "question_count": 1,
+      "expected_values": [
+        "True"
+      ]
+    },
+    {
+      "run_id": "run_009",
+      "source_run_json": "inputs\\json_final_clean\\run_009\\run.json",
+      "adapter_file": "runs\\run_009\\verus_input.json",
+      "kb_file": "runs\\run_009\\kb.txt",
+      "questions_file": "runs\\run_009\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_009.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_009.json",
+      "question_count": 1,
+      "expected_values": [
+        "False"
+      ]
+    },
+    {
+      "run_id": "run_101",
+      "source_run_json": "inputs\\json_final_clean\\run_101\\run.json",
+      "adapter_file": "runs\\run_101\\verus_input.json",
+      "kb_file": "runs\\run_101\\kb.txt",
+      "questions_file": "runs\\run_101\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_101.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_101.json",
+      "question_count": 1,
+      "expected_values": [
+        "True"
+      ]
+    },
+    {
+      "run_id": "run_102",
+      "source_run_json": "inputs\\json_final_clean\\run_102\\run.json",
+      "adapter_file": "runs\\run_102\\verus_input.json",
+      "kb_file": "runs\\run_102\\kb.txt",
+      "questions_file": "runs\\run_102\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_102.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_102.json",
+      "question_count": 1,
+      "expected_values": [
+        "True"
+      ]
+    },
+    {
+      "run_id": "run_103",
+      "source_run_json": "inputs\\json_final_clean\\run_103\\run.json",
+      "adapter_file": "runs\\run_103\\verus_input.json",
+      "kb_file": "runs\\run_103\\kb.txt",
+      "questions_file": "runs\\run_103\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_103.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_103.json",
+      "question_count": 1,
+      "expected_values": [
+        "True"
+      ]
+    },
+    {
+      "run_id": "run_104",
+      "source_run_json": "inputs\\json_final_clean\\run_104\\run.json",
+      "adapter_file": "runs\\run_104\\verus_input.json",
+      "kb_file": "runs\\run_104\\kb.txt",
+      "questions_file": "runs\\run_104\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_104.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_104.json",
+      "question_count": 1,
+      "expected_values": [
+        "True"
+      ]
+    },
+    {
+      "run_id": "run_105",
+      "source_run_json": "inputs\\json_final_clean\\run_105\\run.json",
+      "adapter_file": "runs\\run_105\\verus_input.json",
+      "kb_file": "runs\\run_105\\kb.txt",
+      "questions_file": "runs\\run_105\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_105.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_105.json",
+      "question_count": 1,
+      "expected_values": [
+        "False"
+      ]
+    },
+    {
+      "run_id": "run_106",
+      "source_run_json": "inputs\\json_final_clean\\run_106\\run.json",
+      "adapter_file": "runs\\run_106\\verus_input.json",
+      "kb_file": "runs\\run_106\\kb.txt",
+      "questions_file": "runs\\run_106\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_106.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_106.json",
+      "question_count": 1,
+      "expected_values": [
+        "True"
+      ]
+    },
+    {
+      "run_id": "run_107",
+      "source_run_json": "inputs\\json_final_clean\\run_107\\run.json",
+      "adapter_file": "runs\\run_107\\verus_input.json",
+      "kb_file": "runs\\run_107\\kb.txt",
+      "questions_file": "runs\\run_107\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_107.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_107.json",
+      "question_count": 1,
+      "expected_values": [
+        "True"
+      ]
+    },
+    {
+      "run_id": "run_108",
+      "source_run_json": "inputs\\json_final_clean\\run_108\\run.json",
+      "adapter_file": "runs\\run_108\\verus_input.json",
+      "kb_file": "runs\\run_108\\kb.txt",
+      "questions_file": "runs\\run_108\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_108.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_108.json",
+      "question_count": 1,
+      "expected_values": [
+        "False"
+      ]
+    },
+    {
+      "run_id": "run_109",
+      "source_run_json": "inputs\\json_final_clean\\run_109\\run.json",
+      "adapter_file": "runs\\run_109\\verus_input.json",
+      "kb_file": "runs\\run_109\\kb.txt",
+      "questions_file": "runs\\run_109\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_109.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_109.json",
+      "question_count": 1,
+      "expected_values": [
+        "True"
+      ]
+    },
+    {
+      "run_id": "run_110",
+      "source_run_json": "inputs\\json_final_clean\\run_110\\run.json",
+      "adapter_file": "runs\\run_110\\verus_input.json",
+      "kb_file": "runs\\run_110\\kb.txt",
+      "questions_file": "runs\\run_110\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_110.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_110.json",
+      "question_count": 1,
+      "expected_values": [
+        "True"
+      ]
+    },
+    {
+      "run_id": "run_111",
+      "source_run_json": "inputs\\json_final_clean\\run_111\\run.json",
+      "adapter_file": "runs\\run_111\\verus_input.json",
+      "kb_file": "runs\\run_111\\kb.txt",
+      "questions_file": "runs\\run_111\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_111.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_111.json",
+      "question_count": 1,
+      "expected_values": [
+        "True"
+      ]
+    },
+    {
+      "run_id": "run_112",
+      "source_run_json": "inputs\\json_final_clean\\run_112\\run.json",
+      "adapter_file": "runs\\run_112\\verus_input.json",
+      "kb_file": "runs\\run_112\\kb.txt",
+      "questions_file": "runs\\run_112\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_112.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_112.json",
+      "question_count": 1,
+      "expected_values": [
+        "False"
+      ]
+    },
+    {
+      "run_id": "run_113",
+      "source_run_json": "inputs\\json_final_clean\\run_113\\run.json",
+      "adapter_file": "runs\\run_113\\verus_input.json",
+      "kb_file": "runs\\run_113\\kb.txt",
+      "questions_file": "runs\\run_113\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_113.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_113.json",
+      "question_count": 1,
+      "expected_values": [
+        "True"
+      ]
+    },
+    {
+      "run_id": "run_114",
+      "source_run_json": "inputs\\json_final_clean\\run_114\\run.json",
+      "adapter_file": "runs\\run_114\\verus_input.json",
+      "kb_file": "runs\\run_114\\kb.txt",
+      "questions_file": "runs\\run_114\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_114.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_114.json",
+      "question_count": 1,
+      "expected_values": [
+        "False"
+      ]
+    },
+    {
+      "run_id": "run_115",
+      "source_run_json": "inputs\\json_final_clean\\run_115\\run.json",
+      "adapter_file": "runs\\run_115\\verus_input.json",
+      "kb_file": "runs\\run_115\\kb.txt",
+      "questions_file": "runs\\run_115\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_115.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_115.json",
+      "question_count": 1,
+      "expected_values": [
+        "True"
+      ]
+    },
+    {
+      "run_id": "run_116",
+      "source_run_json": "inputs\\json_final_clean\\run_116\\run.json",
+      "adapter_file": "runs\\run_116\\verus_input.json",
+      "kb_file": "runs\\run_116\\kb.txt",
+      "questions_file": "runs\\run_116\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_116.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_116.json",
+      "question_count": 1,
+      "expected_values": [
+        "True"
+      ]
+    },
+    {
+      "run_id": "run_117",
+      "source_run_json": "inputs\\json_final_clean\\run_117\\run.json",
+      "adapter_file": "runs\\run_117\\verus_input.json",
+      "kb_file": "runs\\run_117\\kb.txt",
+      "questions_file": "runs\\run_117\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_117.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_117.json",
+      "question_count": 1,
+      "expected_values": [
+        "False"
+      ]
+    },
+    {
+      "run_id": "run_118",
+      "source_run_json": "inputs\\json_final_clean\\run_118\\run.json",
+      "adapter_file": "runs\\run_118\\verus_input.json",
+      "kb_file": "runs\\run_118\\kb.txt",
+      "questions_file": "runs\\run_118\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_118.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_118.json",
+      "question_count": 1,
+      "expected_values": [
+        "False"
+      ]
+    },
+    {
+      "run_id": "run_119",
+      "source_run_json": "inputs\\json_final_clean\\run_119\\run.json",
+      "adapter_file": "runs\\run_119\\verus_input.json",
+      "kb_file": "runs\\run_119\\kb.txt",
+      "questions_file": "runs\\run_119\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_119.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_119.json",
+      "question_count": 1,
+      "expected_values": [
+        "True"
+      ]
+    },
+    {
+      "run_id": "run_120",
+      "source_run_json": "inputs\\json_final_clean\\run_120\\run.json",
+      "adapter_file": "runs\\run_120\\verus_input.json",
+      "kb_file": "runs\\run_120\\kb.txt",
+      "questions_file": "runs\\run_120\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_120.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_120.json",
+      "question_count": 1,
+      "expected_values": [
+        "True"
+      ]
+    },
+    {
+      "run_id": "run_201",
+      "source_run_json": "inputs\\json_final_clean\\run_201\\run.json",
+      "adapter_file": "runs\\run_201\\verus_input.json",
+      "kb_file": "runs\\run_201\\kb.txt",
+      "questions_file": "runs\\run_201\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_201.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_201.json",
+      "question_count": 1,
+      "expected_values": [
+        "True"
+      ]
+    },
+    {
+      "run_id": "run_202",
+      "source_run_json": "inputs\\json_final_clean\\run_202\\run.json",
+      "adapter_file": "runs\\run_202\\verus_input.json",
+      "kb_file": "runs\\run_202\\kb.txt",
+      "questions_file": "runs\\run_202\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_202.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_202.json",
+      "question_count": 1,
+      "expected_values": [
+        "False"
+      ]
+    },
+    {
+      "run_id": "run_203",
+      "source_run_json": "inputs\\json_final_clean\\run_203\\run.json",
+      "adapter_file": "runs\\run_203\\verus_input.json",
+      "kb_file": "runs\\run_203\\kb.txt",
+      "questions_file": "runs\\run_203\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_203.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_203.json",
+      "question_count": 1,
+      "expected_values": [
+        "False"
+      ]
+    },
+    {
+      "run_id": "run_204",
+      "source_run_json": "inputs\\json_final_clean\\run_204\\run.json",
+      "adapter_file": "runs\\run_204\\verus_input.json",
+      "kb_file": "runs\\run_204\\kb.txt",
+      "questions_file": "runs\\run_204\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_204.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_204.json",
+      "question_count": 1,
+      "expected_values": [
+        "False"
+      ]
+    },
+    {
+      "run_id": "run_205",
+      "source_run_json": "inputs\\json_final_clean\\run_205\\run.json",
+      "adapter_file": "runs\\run_205\\verus_input.json",
+      "kb_file": "runs\\run_205\\kb.txt",
+      "questions_file": "runs\\run_205\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_205.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_205.json",
+      "question_count": 1,
+      "expected_values": [
+        "True"
+      ]
+    },
+    {
+      "run_id": "run_206",
+      "source_run_json": "inputs\\json_final_clean\\run_206\\run.json",
+      "adapter_file": "runs\\run_206\\verus_input.json",
+      "kb_file": "runs\\run_206\\kb.txt",
+      "questions_file": "runs\\run_206\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_206.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_206.json",
+      "question_count": 1,
+      "expected_values": [
+        "False"
+      ]
+    },
+    {
+      "run_id": "run_207",
+      "source_run_json": "inputs\\json_final_clean\\run_207\\run.json",
+      "adapter_file": "runs\\run_207\\verus_input.json",
+      "kb_file": "runs\\run_207\\kb.txt",
+      "questions_file": "runs\\run_207\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_207.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_207.json",
+      "question_count": 1,
+      "expected_values": [
+        "True"
+      ]
+    },
+    {
+      "run_id": "run_208",
+      "source_run_json": "inputs\\json_final_clean\\run_208\\run.json",
+      "adapter_file": "runs\\run_208\\verus_input.json",
+      "kb_file": "runs\\run_208\\kb.txt",
+      "questions_file": "runs\\run_208\\questions.json",
+      "verus_custom_kb": "verus_lm_custom/kb/run_208.txt",
+      "verus_custom_questions": "verus_lm_custom/questions/run_208.json",
+      "question_count": 1,
+      "expected_values": [
+        "False"
+      ]
+    }
+  ],
+  "total_runs": 37,
+  "total_questions": 37
+}

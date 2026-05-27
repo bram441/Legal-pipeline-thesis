@@ -1,0 +1,30 @@
+{
+  "run_id": "run_008",
+  "source_run_json": "inputs\\json_final_clean\\run_008\\run.json",
+  "kb_file": "runs\\run_008\\kb.txt",
+  "questions_file": "runs\\run_008\\questions.json",
+  "law": {
+    "path": "example_laws_clean/vreemdelingenwet_clean.txt",
+    "resolved_path": "example_laws_clean\\vreemdelingenwet_clean.txt"
+  },
+  "case": {
+    "text": "Rami is een vreemdeling. Hij maakt het voorwerp uit van een verwijderingsprocedure en heeft valse documenten gebruikt in een verblijfsaanvraag."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Kan het gebruik van valse documenten door Rami een objectief criterium zijn voor risico op onderduiken in de zin van artikel 1, paragraaf 2, punt 2?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "Art. 1 par. 2 point 2 lists the use of false or falsified documents in a residence, international-protection, removal, or refusal-of-entry procedure as an objective criterion for risk of absconding.",
+        "target": "rami"
+      },
+      "verus_key": "Q1",
+      "verus_answer": "True"
+    }
+  ],
+  "metadata": {
+    "id": "run_008"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "Q1": {
+    "question": "Is er volgens artikel 1, paragraaf 1, punt 11 en paragraaf 2 een risico op onderduiken vastgesteld?",
+    "answer": "False",
+    "multi": false,
+    "inference": "entailment",
+    "source_question_id": "q1"
+  }
+}

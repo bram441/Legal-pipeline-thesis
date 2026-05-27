@@ -1,0 +1,9 @@
+{
+  "Q1": {
+    "question": "Verkrijgt Lotte volgens artikel 4.20 als enige het recht op de huur van de gezinswoning?",
+    "answer": "True",
+    "multi": false,
+    "inference": "entailment",
+    "source_question_id": "q1"
+  }
+}

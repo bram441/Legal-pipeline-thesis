@@ -1,0 +1,29 @@
+{
+  "run_id": "run_104",
+  "source_run_json": "inputs\\json_final_clean\\run_104\\run.json",
+  "kb_file": "runs\\run_104\\kb.txt",
+  "questions_file": "runs\\run_104\\questions.json",
+  "law": {
+    "path": "example_laws_clean/erfrecht_clean.txt",
+    "resolved_path": "example_laws_clean\\erfrecht_clean.txt"
+  },
+  "case": {
+    "text": "Greet en Hannah waren wettelijk samenwonend. Greet overlijdt. Hannah komt tot de nalatenschap, is geen afstammeling van Greet, en de woning in Leuven was hun voornaamste gezinswoning met huisraad."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Heeft Hannah volgens artikel 4.23, paragraaf 1 het vruchtgebruik van de gezinswoning en het daarin aanwezige huisraad?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "Art. 4.23 par. 1: the surviving legal cohabitant receives usufruct of the family home and household goods, regardless of the other heirs."
+      },
+      "verus_key": "Q1",
+      "verus_answer": "True"
+    }
+  ],
+  "metadata": {
+    "id": "run_104"
+  }
+}

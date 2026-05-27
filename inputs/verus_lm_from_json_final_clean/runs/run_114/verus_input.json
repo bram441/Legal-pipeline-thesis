@@ -1,0 +1,29 @@
+{
+  "run_id": "run_114",
+  "source_run_json": "inputs\\json_final_clean\\run_114\\run.json",
+  "kb_file": "runs\\run_114\\kb.txt",
+  "questions_file": "runs\\run_114\\questions.json",
+  "law": {
+    "path": "example_laws_clean/microvennootschappen_clean.txt",
+    "resolved_path": "example_laws_clean\\microvennootschappen_clean.txt"
+  },
+  "case": {
+    "text": "NV Atlas heeft rechtspersoonlijkheid. Op balansdatum van het laatst afgesloten boekjaar heeft zij 55 voltijdse equivalenten, een jaarlijkse netto-omzet van 12.000.000 euro exclusief btw en een balanstotaal van 5.500.000 euro."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Is NV Atlas nog een kleine vennootschap volgens artikel 1:24, paragraaf 1?",
+      "expected": {
+        "mode": "boolean",
+        "value": false,
+        "reason": "Under Art. 1:24 par. 1, a small company may exceed no more than one of the three thresholds. Atlas exceeds two: employees > 50 and turnover > 11,250,000, so direct par. 1 classification is false."
+      },
+      "verus_key": "Q1",
+      "verus_answer": "False"
+    }
+  ],
+  "metadata": {
+    "id": "run_114"
+  }
+}

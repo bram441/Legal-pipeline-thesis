@@ -1,0 +1,9 @@
+{
+  "Q1": {
+    "question": "Is NV Delta een microvennootschap volgens artikel 1:25, paragraaf 1?",
+    "answer": "True",
+    "multi": false,
+    "inference": "entailment",
+    "source_question_id": "q1"
+  }
+}

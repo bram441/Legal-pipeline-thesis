@@ -1,0 +1,9 @@
+{
+  "Q1": {
+    "question": "Kan het gebruik van valse documenten door Rami een objectief criterium zijn voor risico op onderduiken in de zin van artikel 1, paragraaf 2, punt 2?",
+    "answer": "True",
+    "multi": false,
+    "inference": "entailment",
+    "source_question_id": "q1"
+  }
+}
