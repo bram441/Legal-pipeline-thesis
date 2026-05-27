@@ -230,6 +230,113 @@ def test_directly_observable_composite_used_negated_passes() -> None:
     compile_validate_json_ir(ir)
 
 
+def test_observable_composite_without_directly_observable_rejected() -> None:
+    ir = _company_kb(
+        predicates=[
+            {
+                "name": "meets_entry_or_stay_conditions",
+                "args": ["Company"],
+                "returns": "Bool",
+                "kind": "observable",
+                "description": "Meets entry or stay conditions",
+            },
+            {
+                "name": "is_eligible",
+                "args": ["Company"],
+                "returns": "Bool",
+                "kind": "derived",
+            },
+        ],
+        rules=[
+            _implies_rule(
+                if_expr={"pred": "meets_entry_or_stay_conditions", "args": ["c"]},
+                then_pred="is_eligible",
+            )
+        ],
+    )
+    with pytest.raises(JSONIRCompilationError) as exc:
+        compile_validate_json_ir(ir)
+    assert "meets_entry_or_stay_conditions" in str(exc.value)
+    assert "computed/composite" in str(exc.value).lower()
+
+
+def test_directly_observable_immigration_style_predicate_accepted() -> None:
+    ir = _company_kb(
+        predicates=[
+            {
+                "name": "no_residence_application_filed",
+                "args": ["Company"],
+                "returns": "Bool",
+                "kind": "observable",
+                "directly_observable": True,
+                "description": "No residence application filed",
+            },
+            {
+                "name": "is_eligible",
+                "args": ["Company"],
+                "returns": "Bool",
+                "kind": "derived",
+            },
+        ],
+        rules=[
+            _implies_rule(
+                if_expr={"pred": "no_residence_application_filed", "args": ["c"]},
+                then_pred="is_eligible",
+            )
+        ],
+    )
+    compile_validate_json_ir(ir)
+
+
+def test_directly_observable_with_legal_output_rejected() -> None:
+    from pipeline.kb.json_ir import validate_json_ir_symbols
+
+    with pytest.raises(JSONIRCompilationError) as exc:
+        validate_json_ir_symbols(
+            {
+                "types": ["Company"],
+                "predicates": [
+                    {
+                        "name": "meets_residence_conditions",
+                        "args": ["Company"],
+                        "returns": "Bool",
+                        "kind": "observable",
+                        "directly_observable": True,
+                        "legal_output": True,
+                        "output_category": "classification",
+                    },
+                    {
+                        "name": "is_eligible",
+                        "args": ["Company"],
+                        "returns": "Bool",
+                        "kind": "derived",
+                        "legal_output": True,
+                    },
+                ],
+                "functions": [],
+            }
+        )
+    assert "directly_observable" in str(exc.value)
+    assert "legal_output" in str(exc.value)
+
+
+def test_exceeds_employee_threshold_still_rejected_without_directly_observable() -> None:
+    ir = _company_kb(
+        predicates=[
+            {
+                "name": "exceeds_employee_threshold",
+                "args": ["Company"],
+                "returns": "Bool",
+                "kind": "observable",
+                "description": "Exceeds employee threshold",
+            },
+        ],
+        rules=[],
+    )
+    with pytest.raises(JSONIRCompilationError):
+        compile_validate_json_ir(ir)
+
+
 def test_absent_threshold_helpers_cannot_prove_status_via_negation_pattern() -> None:
     """Validator blocks KB that would derive status solely from negating undefined threshold helper."""
     ir = _company_kb(

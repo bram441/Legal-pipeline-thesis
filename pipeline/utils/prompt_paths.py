@@ -64,3 +64,8 @@ REQUIRED_PROMPT_PATHS: tuple[str, ...] = (
 def resolve_prompt_path(relative_path: str) -> str:
     rel = (relative_path or "").replace("\\", "/").strip()
     return PROMPT_ALIASES.get(rel, rel)
+
+
+def json_ir_generation_prompts() -> tuple[str, str]:
+    """Return canonical JSON-IR symbol and rule generation prompt paths."""
+    return KB_JSON_IR_SYMBOLS, KB_JSON_IR_RULES

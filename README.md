@@ -198,7 +198,7 @@ Goals:
 - Prompts are editable without code changes
 - Prompts enforce FO(.) output constraints (especially for KB compilation)
 
-**KB compilation** uses JSON-IR symbols-then-rules (`prompts/kb/json_ir/`). Optional LE: set `PIPELINE_USE_LE=1` or use `le_json_ir_*` strategies (law → LE → JSON-IR).
+**KB compilation** uses a single canonical symbols-then-rules prompt pair (`prompts/kb/json_ir/generation/symbols.txt` and `rules.txt`), including an illustrative examples appendix and open-world guidance (directly observable status facts, prerequisite closure, safe negative legal-output rules). Optional LE: set `PIPELINE_USE_LE=1` or use `le_json_ir_*` strategies (law → LE → JSON-IR).
 
 CLI:
 ```text

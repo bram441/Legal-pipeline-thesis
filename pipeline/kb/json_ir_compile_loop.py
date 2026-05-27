@@ -387,6 +387,18 @@ def _build_repair_hints(
         )
     if progress_note.strip():
         parts.append("=== REPAIR PROGRESS (continue improving; do not repeat identical rules) ===\n" + progress_note)
+    if error_code in ("derived_predicate_not_defined", "missing_helper_definition"):
+        from pipeline.kb.prerequisite_classification_repair_hints import (
+            build_prerequisite_classification_supplement,
+        )
+
+        prereq = build_prerequisite_classification_supplement(
+            error_message=error_message,
+            symbol_table=st,
+            merged_ir=merged_ir,
+        )
+        if prereq.strip():
+            parts.append(prereq)
     if secondary_diagnostics.strip() and error_code != "missing_threshold_classification_exclusion":
         parts.append("=== SECONDARY VALIDATION DIAGNOSTICS ===\n" + secondary_diagnostics)
     machine = build_machine_repair_hints(error_message, previous_output)

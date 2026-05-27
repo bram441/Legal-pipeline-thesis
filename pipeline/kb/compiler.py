@@ -19,6 +19,7 @@ from pipeline.utils.prompt_paths import (
     KB_JSON_IR_RULES_REPAIR,
     KB_JSON_IR_SYMBOLS,
     KB_JSON_IR_SYMBOLS_REPAIR,
+    json_ir_generation_prompts,
 )
 from pipeline.kb.law_scope import select_law_text_for_compilation, write_scope_artifacts
 from pipeline.kb.repair_hints import build_json_ir_compile_hints, build_machine_repair_hints
@@ -338,7 +339,10 @@ def _call_symbols_llm(
     machine_hints: str,
 ) -> tuple[dict, str]:
     contract = load_json_ir_contract()
-    prompt_name = KB_JSON_IR_SYMBOLS_REPAIR if repair else KB_JSON_IR_SYMBOLS
+    from pipeline.config import json_ir_config
+
+    symbols_prompt_name, _rules_prompt_name = json_ir_generation_prompts()
+    prompt_name = KB_JSON_IR_SYMBOLS_REPAIR if repair else symbols_prompt_name
     err_block = error_message
     if repair and rules_json.strip():
         err_block = format_symbol_repair_error(error_message)
@@ -370,6 +374,9 @@ def _call_rules_llm(
     machine_hints: str,
 ) -> tuple[dict, str]:
     contract = load_json_ir_contract()
+    from pipeline.config import json_ir_config
+
+    _symbols_prompt_name, rules_prompt_name = json_ir_generation_prompts()
     st_json = json.dumps(symbol_table, ensure_ascii=False, indent=2)
     if repair:
         rules_prompt = render_prompt(
@@ -383,7 +390,7 @@ def _call_rules_llm(
         )
     else:
         rules_prompt = render_prompt(
-            KB_JSON_IR_RULES,
+            rules_prompt_name,
             law_text=law_text,
             symbol_table_json=st_json,
             json_ir_contract=contract,
@@ -419,8 +426,11 @@ def _compile_json_ir_two_step(
     scope_metadata: dict | None = None,
     question_text: str | None = None,
 ):
+    from pipeline.config import json_ir_config
+
     src = (source_text or "").strip()
     art = Path(artifact_dir) if artifact_dir else None
+    cfg = json_ir_config()
 
     def _symbols_llm(
         law_text: str,

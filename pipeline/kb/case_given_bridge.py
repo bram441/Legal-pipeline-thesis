@@ -78,21 +78,29 @@ def inject_case_given_bridges_into_fo(fo_text: str, bridges: list[dict[str, Any]
 
     vocab_lines: list[str] = []
     theory_lines: list[str] = []
+    seen_bridge_keys: set[tuple[str, str, tuple[str, ...]]] = set()
+    seen_vocab_names: set[str] = set()
+    seen_theory_lines: set[str] = set()
     for b in bridges:
         inp = str(b.get("input_predicate") or "").strip()
         tgt = str(b.get("target_predicate") or "").strip()
         args = list(b.get("args_types") or b.get("arg_types") or [])
         if not inp or not tgt:
             continue
-        if re.search(rf"\b{re.escape(inp)}\s*:", fo_text):
+        key = (inp, tgt, tuple(str(a) for a in args))
+        if key in seen_bridge_keys:
             continue
+        seen_bridge_keys.add(key)
         try:
-            vocab_lines.append(f"  {inp}: {_fo_domain_sig(args)} -> Bool")
+            if inp not in seen_vocab_names and not re.search(rf"\b{re.escape(inp)}\s*:", fo_text):
+                vocab_lines.append(f"  {inp}: {_fo_domain_sig(args)} -> Bool")
+                seen_vocab_names.add(inp)
             line = _bridge_rule_line(inp, tgt, args)
         except CaseGivenBridgeArityError:
             raise
-        if line and line.strip() not in fo_text:
+        if line and line.strip() not in fo_text and line.strip() not in seen_theory_lines:
             theory_lines.append(line)
+            seen_theory_lines.add(line.strip())
 
     if not vocab_lines and not theory_lines:
         return fo_text
@@ -132,44 +140,47 @@ def extend_kb_schema_with_case_given(
     preds = list(schema.get("predicates") or [])
     existing = {str(p.get("name")) for p in preds if isinstance(p, dict) and p.get("name")}
 
+    bridge_rules: list[dict[str, Any]] = []
+    seen_bridge_keys: set[tuple[str, str, tuple[str, ...]]] = set()
+
     for entry in case_given_inputs or []:
         inp = str(entry.get("input_predicate") or "").strip()
         tgt = str(entry.get("target_predicate") or "").strip()
         if not inp or inp in existing:
-            continue
+            pass
         sig = entry.get("target_signature") or {}
         args = list(sig.get("args") or entry.get("args_types") or [])
-        preds.append(
-            {
-                "name": inp,
-                "kind": "input",
-                "args": args,
-                "returns": "Bool",
-                "description": (
-                    "Case-given factual input for "
-                    + tgt
-                    + " (externally asserted from case text, not a legal conclusion)."
-                ),
-                "case_input": True,
-                "directly_observable": True,
-            }
-        )
-        existing.add(inp)
+        if inp and inp not in existing:
+            preds.append(
+                {
+                    "name": inp,
+                    "kind": "input",
+                    "args": args,
+                    "returns": "Bool",
+                    "description": (
+                        "Case-given factual input for "
+                        + tgt
+                        + " (externally asserted from case text, not a legal conclusion)."
+                    ),
+                    "case_input": True,
+                    "directly_observable": True,
+                }
+            )
+            existing.add(inp)
+        if inp and tgt:
+            key = (inp, tgt, tuple(str(a) for a in args))
+            if key not in seen_bridge_keys:
+                seen_bridge_keys.add(key)
+                bridge_rules.append(
+                    {
+                        "input_predicate": inp,
+                        "target_predicate": tgt,
+                        "args_types": args,
+                    }
+                )
 
     schema["predicates"] = preds
-    schema["case_given_bridge_rules"] = [
-        {
-            "input_predicate": e.get("input_predicate"),
-            "target_predicate": e.get("target_predicate"),
-            "args_types": list(
-                (e.get("target_signature") or {}).get("args")
-                or e.get("args_types")
-                or []
-            ),
-        }
-        for e in (case_given_inputs or [])
-        if e.get("input_predicate") and e.get("target_predicate")
-    ]
+    schema["case_given_bridge_rules"] = bridge_rules
     return schema
 
 
