@@ -80,15 +80,36 @@ Example (raises KB compile LLM budget):
 
 | Variable | Purpose |
 |----------|---------|
-| `OPENAI_API_KEY` | Required API secret |
-| `OPENAI_MODEL` | Optional default model for extraction/KB/translation |
+| `OPENAI_API_KEY` | API secret (OpenAI direct) |
+| `OPENAI_MODEL` | Optional default model |
 | `OPENAI_EXPLAINER_MODEL` | Optional model for NL paraphrase |
+| `LLM_PROVIDER` | `openai` (default) or `openrouter` |
+| `LLM_API_KEY` | Provider-neutral API key override |
+| `LLM_MODEL` | Provider-neutral model override (wins over `OPENAI_MODEL`) |
+| `LLM_BASE_URL` | Custom API base URL |
+| `OPENROUTER_API_KEY` | OpenRouter secret |
+| `OPENROUTER_MODEL` | OpenRouter model id (e.g. `openai/gpt-5.5`) |
+| `OPENROUTER_BASE_URL` | Default `https://openrouter.ai/api/v1` |
+| `OPENROUTER_HTTP_REFERER` | Optional OpenRouter header |
+| `OPENROUTER_APP_TITLE` | Optional OpenRouter header |
 | `PIPELINE_USE_LLM_EXPLANATIONS` | Enable LLM explanations (not in JSON config yet) |
 | `PIPELINE_KB_COMPILER` | KB LLM provider (`openai` only) |
 | `PIPELINE_DEBUG` | Extra debug logging to console |
+
+### `llm` section (`default.json`)
+
+| Key | Purpose |
+|-----|---------|
+| `provider` | `openai` or `openrouter` (overridable via `LLM_PROVIDER`) |
+| `model` | Default model when env vars unset |
+| `base_url` | API base URL |
+| `use_seed` | Pass `seed` to chat completions (default off for OpenRouter) |
+| `use_response_format` | Pass `response_format` (default off for OpenRouter) |
+| `use_reasoning_effort` | Pass `reasoning_effort` when supported |
+| `timeout_seconds` | OpenAI SDK client timeout |
 
 Everything else (JSON-IR repair limits, scope mode, extraction backend, trace via config, legacy LE flags, scoring) belongs in **`default.json`** / **`local.json`**.
 
 ## Run artifacts
 
-Each JSON benchmark run writes **`effective_config.json`** (merged default + local + env overrides) next to other run outputs.
+Each JSON benchmark run writes **`effective_config.json`** (merged default + local + env overrides, plus **`llm_runtime`** with provider/model/host only — never API keys) next to other run outputs.

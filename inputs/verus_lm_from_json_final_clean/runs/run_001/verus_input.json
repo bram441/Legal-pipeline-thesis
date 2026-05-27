@@ -1,0 +1,29 @@
+{
+  "run_id": "run_001",
+  "source_run_json": "inputs\\json_final_clean\\run_001\\run.json",
+  "kb_file": "runs\\run_001\\kb.txt",
+  "questions_file": "runs\\run_001\\questions.json",
+  "law": {
+    "path": "example_laws_clean/erfrecht_clean.txt",
+    "resolved_path": "example_laws_clean\\erfrecht_clean.txt"
+  },
+  "case": {
+    "text": "Anna en Bert waren gehuwd. Bert overlijdt en laat twee minderjarige kinderen na. Er is geen testament. Anna leeft nog."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Heeft de langstlevende echtgenoot recht op vruchtgebruik van de gehele nalatenschap volgens artikel 4.17?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "The case states that the deceased leaves a surviving spouse and descendants. Under the scoped inheritance rule, the surviving spouse acquires the usufruct of the entire estate."
+      },
+      "verus_key": "Q1",
+      "verus_answer": "True"
+    }
+  ],
+  "metadata": {
+    "id": "run_001"
+  }
+}

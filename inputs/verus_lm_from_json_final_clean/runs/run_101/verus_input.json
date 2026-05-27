@@ -1,0 +1,29 @@
+{
+  "run_id": "run_101",
+  "source_run_json": "inputs\\json_final_clean\\run_101\\run.json",
+  "kb_file": "runs\\run_101\\kb.txt",
+  "questions_file": "runs\\run_101\\questions.json",
+  "law": {
+    "path": "example_laws_clean/erfrecht_clean.txt",
+    "resolved_path": "example_laws_clean\\erfrecht_clean.txt"
+  },
+  "case": {
+    "text": "Anna en Bert waren gehuwd. Bert overlijdt zonder testament en laat twee kinderen na. Anna leeft nog en is niet uitgesloten van haar erfrecht."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Heeft Anna als langstlevende echtgenoot recht op het vruchtgebruik van de gehele nalatenschap volgens artikel 4.17, paragraaf 1?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "Art. 4.17 par. 1: if the deceased leaves descendants, the surviving spouse obtains usufruct of the whole estate."
+      },
+      "verus_key": "Q1",
+      "verus_answer": "True"
+    }
+  ],
+  "metadata": {
+    "id": "run_101"
+  }
+}

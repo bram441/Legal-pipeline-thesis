@@ -100,9 +100,9 @@ def _lint_duplicate_vocab_signatures(vocab_body: str) -> List[str]:
         if not ms:
             continue
         name = ms.group(1)
-        arg_blob = ms.group(2).strip()
+        arg_blob = (ms.group(2) or "").strip()
         ret = ms.group(3).strip()
-        sig = arg_blob + " -> " + ret
+        sig = (arg_blob + " -> " + ret) if arg_blob else ("() -> " + ret)
         if name in seen and seen[name] != sig:
             issues.append(
                 "Duplicate vocabulary symbol %r with conflicting signatures: %r vs %r"

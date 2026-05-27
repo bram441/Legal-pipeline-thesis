@@ -1,6 +1,7 @@
 import os
 
-from pipeline.utils.openai_sampling import chat_completion_sampling_kwargs
+from pipeline.llm.client import get_llm_client, get_llm_model
+from pipeline.llm.request import build_chat_completion_kwargs
 from pipeline.utils.llm_call_tracker import tracked_chat_completion_create
 from pipeline.utils.prompt_loader import load_prompt, render_prompt
 
@@ -18,7 +19,7 @@ def _provider():
 
 
 def _model():
-    return (os.getenv("OPENAI_EXPLAINER_MODEL") or os.getenv("OPENAI_MODEL") or "gpt-4.1-mini").strip()
+    return get_llm_model(stage="nl_explanation")
 
 
 def paraphrase_liability_explanation(rule_line, fact_lines, conclusion_line, model=None):
@@ -33,17 +34,12 @@ def paraphrase_liability_explanation(rule_line, fact_lines, conclusion_line, mod
     if provider != "openai":
         raise NLExplanationError("PIPELINE_NL_EXPLAINER_PROVIDER must be 'openai' for now (got: " + provider + ")")
 
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise NLExplanationError("Missing OPENAI_API_KEY environment variable")
-
     try:
-        from openai import OpenAI
+        client = get_llm_client()
     except Exception as e:
-        raise NLExplanationError("OpenAI SDK not installed/importable: " + str(e))
+        raise NLExplanationError(str(e)) from e
 
     chosen_model = model or _model()
-    client = OpenAI(api_key=api_key)
 
     facts_block = "\n".join(["- " + f for f in (fact_lines or [])]) or "(no facts provided)"
 
@@ -55,17 +51,19 @@ def paraphrase_liability_explanation(rule_line, fact_lines, conclusion_line, mod
         conclusion_line=(conclusion_line or "(missing conclusion)"),
     )
 
+    req = build_chat_completion_kwargs(
+        model=chosen_model,
+        messages=[
+            {"role": "system", "content": system},
+            {"role": "user", "content": user},
+        ],
+    )
     try:
         resp = tracked_chat_completion_create(
             client,
             stage="nl_explanation",
-            model=chosen_model,
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user", "content": user},
-            ],
             metadata={"kind": "liability"},
-            **chat_completion_sampling_kwargs(),
+            **req,
         )
     except Exception as e:
         raise NLExplanationError("OpenAI call failed: " + str(e))
@@ -88,17 +86,12 @@ def paraphrase_range_explanation(rules_block, facts_block, result_line, model=No
     if provider != "openai":
         raise NLExplanationError("PIPELINE_NL_EXPLAINER_PROVIDER must be 'openai' for now")
 
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise NLExplanationError("Missing OPENAI_API_KEY")
-
     try:
-        from openai import OpenAI
+        client = get_llm_client()
     except Exception as e:
-        raise NLExplanationError("OpenAI SDK not installed: " + str(e))
+        raise NLExplanationError(str(e)) from e
 
     chosen_model = model or _model()
-    client = OpenAI(api_key=api_key)
 
     system = (
         "You paraphrase formal logic into plain language. You MUST use ONLY the provided "
@@ -112,17 +105,19 @@ def paraphrase_range_explanation(rules_block, facts_block, result_line, model=No
         result_line=(result_line or "(no result)"),
     )
 
+    req = build_chat_completion_kwargs(
+        model=chosen_model,
+        messages=[
+            {"role": "system", "content": system},
+            {"role": "user", "content": user},
+        ],
+    )
     try:
         resp = tracked_chat_completion_create(
             client,
             stage="nl_explanation",
-            model=chosen_model,
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user", "content": user},
-            ],
             metadata={"kind": "range"},
-            **chat_completion_sampling_kwargs(),
+            **req,
         )
     except Exception as e:
         raise NLExplanationError("OpenAI call failed: " + str(e))

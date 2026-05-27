@@ -1,0 +1,9 @@
+{
+  "Q1": {
+    "question": "Verkrijgt Filip volgens artikel 4.17, paragraaf 3 de volle eigendom van de gehele nalatenschap?",
+    "answer": "True",
+    "multi": false,
+    "inference": "entailment",
+    "source_question_id": "q1"
+  }
+}

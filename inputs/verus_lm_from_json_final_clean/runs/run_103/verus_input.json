@@ -1,0 +1,29 @@
+{
+  "run_id": "run_103",
+  "source_run_json": "inputs\\json_final_clean\\run_103\\run.json",
+  "kb_file": "runs\\run_103\\kb.txt",
+  "questions_file": "runs\\run_103\\questions.json",
+  "law": {
+    "path": "example_laws_clean/erfrecht_clean.txt",
+    "resolved_path": "example_laws_clean\\erfrecht_clean.txt"
+  },
+  "case": {
+    "text": "Els en Filip waren gehuwd. Els overlijdt zonder afstammelingen, zonder verwanten in de opgaande lijn, zonder nauwe zijverwanten en zonder andere erfgenamen. Filip leeft nog."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Verkrijgt Filip volgens artikel 4.17, paragraaf 3 de volle eigendom van de gehele nalatenschap?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "Art. 4.17 par. 3: if the deceased leaves other heirs or no heirs, the surviving spouse obtains full ownership of the whole estate."
+      },
+      "verus_key": "Q1",
+      "verus_answer": "True"
+    }
+  ],
+  "metadata": {
+    "id": "run_103"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "run_id": "run_203",
+  "source_run_json": "inputs\\json_final_clean\\run_203\\run.json",
+  "kb_file": "runs\\run_203\\kb.txt",
+  "questions_file": "runs\\run_203\\questions.json",
+  "law": {
+    "path": "example_laws_clean/vreemdelingenwet_clean.txt",
+    "resolved_path": "example_laws_clean\\vreemdelingenwet_clean.txt"
+  },
+  "case": {
+    "text": "Nina legt een geldige Belgische identiteitskaart voor en bewijst daarmee de Belgische nationaliteit."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Valt Nina onder de definitie van een vreemdeling in artikel 1, paragraaf 1, punt 1?",
+      "expected": {
+        "mode": "boolean",
+        "value": false,
+        "reason": "A foreigner is anyone who does not provide proof of Belgian nationality; Nina proved Belgian nationality."
+      },
+      "verus_key": "Q1",
+      "verus_answer": "False"
+    }
+  ],
+  "metadata": {
+    "id": "run_203"
+  }
+}

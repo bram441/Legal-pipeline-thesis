@@ -1,0 +1,9 @@
+{
+  "Q1": {
+    "question": "Verkrijgt Dirk volgens artikel 4.17, paragraaf 2 het vruchtgebruik van de overige goederen van Carla's eigen vermogen?",
+    "answer": "True",
+    "multi": false,
+    "inference": "entailment",
+    "source_question_id": "q1"
+  }
+}

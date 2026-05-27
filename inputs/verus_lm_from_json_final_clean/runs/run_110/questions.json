@@ -1,0 +1,9 @@
+{
+  "Q1": {
+    "question": "Is Carlos een onderdaan van een derde land volgens artikel 1, paragraaf 1, punt 3?",
+    "answer": "True",
+    "multi": false,
+    "inference": "entailment",
+    "source_question_id": "q1"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "run_id": "run_007",
+  "source_run_json": "inputs\\json_final_clean\\run_007\\run.json",
+  "kb_file": "runs\\run_007\\kb.txt",
+  "questions_file": "runs\\run_007\\questions.json",
+  "law": {
+    "path": "example_laws_clean/erfrecht_clean.txt",
+    "resolved_path": "example_laws_clean\\erfrecht_clean.txt"
+  },
+  "case": {
+    "text": "Mira en Noor waren wettelijk samenwonend. Mira overlijdt. Noor is de langstlevende wettelijk samenwonende, komt tot de nalatenschap, en is geen afstammeling van Mira. De woning was hun voornaamste gezinswoning."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Heeft Noor volgens artikel 4.23, paragraaf 1 het vruchtgebruik van de gezinswoning?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "Art. 4.23 par. 1 gives the surviving legal cohabitant usufruct of the real estate that served as the family home, unless the par. 4 descendant exclusion applies. The case states Noor is not a descendant.",
+        "target": "noor"
+      },
+      "verus_key": "Q1",
+      "verus_answer": "True"
+    }
+  ],
+  "metadata": {
+    "id": "run_007"
+  }
+}

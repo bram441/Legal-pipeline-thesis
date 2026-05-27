@@ -1,0 +1,9 @@
+{
+  "Q1": {
+    "question": "Gaan de gevolgen volgens artikel 1:24, paragraaf 2 in vanaf het boekjaar dat volgt op boekjaar 2025?",
+    "answer": "True",
+    "multi": false,
+    "inference": "entailment",
+    "source_question_id": "q1"
+  }
+}

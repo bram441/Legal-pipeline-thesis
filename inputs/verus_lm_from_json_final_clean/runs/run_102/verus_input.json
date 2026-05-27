@@ -1,0 +1,29 @@
+{
+  "run_id": "run_102",
+  "source_run_json": "inputs\\json_final_clean\\run_102\\run.json",
+  "kb_file": "runs\\run_102\\kb.txt",
+  "questions_file": "runs\\run_102\\questions.json",
+  "law": {
+    "path": "example_laws_clean/erfrecht_clean.txt",
+    "resolved_path": "example_laws_clean\\erfrecht_clean.txt"
+  },
+  "case": {
+    "text": "Carla en Dirk waren gehuwd. Carla overlijdt zonder afstammelingen, maar zij laat haar vader en haar broer na. Dirk leeft nog."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Verkrijgt Dirk volgens artikel 4.17, paragraaf 2 het vruchtgebruik van de overige goederen van Carla's eigen vermogen?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "Art. 4.17 par. 2: with ascendants or close collateral relatives, the surviving spouse gets usufruct of the remaining goods of the deceased's own property."
+      },
+      "verus_key": "Q1",
+      "verus_answer": "True"
+    }
+  ],
+  "metadata": {
+    "id": "run_102"
+  }
+}

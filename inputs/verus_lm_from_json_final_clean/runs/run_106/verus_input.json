@@ -1,0 +1,29 @@
+{
+  "run_id": "run_106",
+  "source_run_json": "inputs\\json_final_clean\\run_106\\run.json",
+  "kb_file": "runs\\run_106\\kb.txt",
+  "questions_file": "runs\\run_106\\questions.json",
+  "law": {
+    "path": "example_laws_clean/erfrecht_clean.txt",
+    "resolved_path": "example_laws_clean\\erfrecht_clean.txt"
+  },
+  "case": {
+    "text": "Lotte en Milan waren gehuwd. Milan overlijdt. Op het ogenblik van zijn overlijden huurden zij een appartement dat als voornaamste gezinswoning diende. Lotte leeft nog."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Verkrijgt Lotte volgens artikel 4.20 als enige het recht op de huur van de gezinswoning?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "Art. 4.20: the surviving spouse exclusively obtains the rental right of the real estate that served as the family home."
+      },
+      "verus_key": "Q1",
+      "verus_answer": "True"
+    }
+  ],
+  "metadata": {
+    "id": "run_106"
+  }
+}

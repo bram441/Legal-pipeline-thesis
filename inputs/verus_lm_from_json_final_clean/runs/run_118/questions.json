@@ -1,0 +1,9 @@
+{
+  "Q1": {
+    "question": "Is BV ParentCo een microvennootschap volgens artikel 1:25, paragraaf 1?",
+    "answer": "False",
+    "multi": false,
+    "inference": "entailment",
+    "source_question_id": "q1"
+  }
+}

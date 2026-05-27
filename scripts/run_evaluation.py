@@ -73,6 +73,19 @@ from pipeline.utils.llm_call_tracker import (  # noqa: E402
 )
 
 
+def _llm_eval_cli_fields() -> dict[str, str | None]:
+    try:
+        from pipeline.llm.client import base_url_host, get_llm_model, get_llm_provider
+
+        return {
+            "provider": get_llm_provider(),
+            "model": get_llm_model(),
+            "base_url_host": base_url_host(),
+        }
+    except Exception:
+        return {"provider": None, "model": None, "base_url_host": None}
+
+
 def _format_duration(seconds: float | None) -> str:
     if seconds is None:
         return ""
@@ -764,6 +777,7 @@ def main() -> int:
             "avg_sec_per_cell": round(sum(durations) / len(durations), 2) if durations else None,
         }
         status_summary = summarize_matrix_status(cells, run_ids, strategies)
+        llm_cli = _llm_eval_cli_fields()
         llm_summary = write_eval_summary(out, work_root=work_root)
         status_summary["llm_eval_call_count"] = count_eval_llm_calls(work_root)
         if llm_summary:
@@ -781,6 +795,9 @@ def main() -> int:
             "timing": timing_summary,
             "evaluation_cli": {
                 "pipeline_backend": "json_ir",
+                "provider": llm_cli.get("provider"),
+                "model": llm_cli.get("model"),
+                "base_url_host": llm_cli.get("base_url_host"),
                 "config_profile": str(active_profile) if active_profile else None,
                 "ignore_local_config": bool(args.ignore_local_config),
                 "no_translate_global": args.no_translate,

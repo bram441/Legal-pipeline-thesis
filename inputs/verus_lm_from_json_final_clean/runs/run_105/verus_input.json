@@ -1,0 +1,29 @@
+{
+  "run_id": "run_105",
+  "source_run_json": "inputs\\json_final_clean\\run_105\\run.json",
+  "kb_file": "runs\\run_105\\kb.txt",
+  "questions_file": "runs\\run_105\\questions.json",
+  "law": {
+    "path": "example_laws_clean/erfrecht_clean.txt",
+    "resolved_path": "example_laws_clean\\erfrecht_clean.txt"
+  },
+  "case": {
+    "text": "Joris en Karin waren wettelijk samenwonend. Joris overlijdt. Karin is de langstlevende wettelijk samenwonende. Karin is geen afstammeling van Joris. De woning was hun voornaamste gezinswoning."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Is artikel 4.23, paragraaf 4 een reden om Karin het vruchtgebruik van de gezinswoning te weigeren?",
+      "expected": {
+        "mode": "boolean",
+        "value": false,
+        "reason": "Art. 4.23 par. 4 excludes the right only when the surviving legal cohabitant is a descendant of the predeceased cohabitant. The case states Karin is not a descendant of Joris, so that exclusion does not apply."
+      },
+      "verus_key": "Q1",
+      "verus_answer": "False"
+    }
+  ],
+  "metadata": {
+    "id": "run_105"
+  }
+}

@@ -287,23 +287,36 @@ def _record_call(
     stage: str,
     model: str,
     messages: Any,
-    resp: Any,
+    resp: Any | None,
     metadata: dict[str, Any] | None,
     call_index: int,
+    error: str | None = None,
 ) -> dict[str, Any]:
     stage_norm = stage if stage in VALID_STAGES else "unknown"
     in_chars = _messages_char_count(messages)
     out_chars = _output_char_count(resp)
-    usage = _usage_fields(resp)
-    est_usd = _estimate_cost_usd(model, usage)
+    usage = _usage_fields(resp) if resp is not None else {
+        "prompt_tokens": None,
+        "completion_tokens": None,
+        "total_tokens": None,
+    }
+    est_usd = _estimate_cost_usd(model, usage) if resp is not None else None
+    try:
+        from pipeline.llm.client import get_llm_provider
+
+        provider = get_llm_provider()
+    except Exception:
+        provider = "unknown"
     rec = {
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "call_index": call_index,
         "stage": stage_norm,
         "run_id": _ctx_run_id.get(),
         "strategy": _ctx_strategy.get(),
+        "provider": provider,
         "model": model,
         "metadata": metadata or {},
+        "error": (error[:500] if error else None),
         "input_char_count": in_chars,
         "approx_input_tokens": _approx_tokens_from_chars(in_chars),
         "output_char_count": out_chars,
@@ -335,6 +348,8 @@ def tracked_chat_completion_create(
     Drop-in wrapper around client.chat.completions.create with accounting.
     """
     apply_budget_from_env()
+    chosen_model = str(model or kwargs.get("model") or "unknown")
+
     if not tracking_enabled():
         return client.chat.completions.create(
             model=model,
@@ -344,16 +359,26 @@ def tracked_chat_completion_create(
 
     _check_budget_before_call()
     call_index = _increment_budget_counters()
-    chosen_model = model or kwargs.get("model") or "unknown"
-
-    resp = client.chat.completions.create(
-        model=model,
-        messages=messages,
-        **kwargs,
-    )
+    try:
+        resp = client.chat.completions.create(
+            model=model,
+            messages=messages,
+            **kwargs,
+        )
+    except Exception as exc:
+        _record_call(
+            stage=stage,
+            model=chosen_model,
+            messages=messages,
+            resp=None,
+            metadata=metadata,
+            call_index=call_index,
+            error=str(exc),
+        )
+        raise
     _record_call(
         stage=stage,
-        model=str(chosen_model),
+        model=chosen_model,
         messages=messages,
         resp=resp,
         metadata=metadata,

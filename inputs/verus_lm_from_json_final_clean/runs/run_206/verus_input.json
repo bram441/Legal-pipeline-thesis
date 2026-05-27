@@ -1,0 +1,29 @@
+{
+  "run_id": "run_206",
+  "source_run_json": "inputs\\json_final_clean\\run_206\\run.json",
+  "kb_file": "runs\\run_206\\kb.txt",
+  "questions_file": "runs\\run_206\\questions.json",
+  "law": {
+    "path": "example_laws_clean/microvennootschappen_clean.txt",
+    "resolved_path": "example_laws_clean\\microvennootschappen_clean.txt"
+  },
+  "case": {
+    "text": "BV Quarto heeft rechtspersoonlijkheid. Op balansdatum van het laatst afgesloten boekjaar: 15 voltijdse equivalenten, jaarlijkse netto-omzet 1.200.000 euro (exclusief btw), balanstotaal 500.000 euro. BV Quarto is geen moeder- of dochtervennootschap."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Is BV Quarto een microvennootschap volgens artikel 1:25, paragraaf 1?",
+      "expected": {
+        "mode": "boolean",
+        "value": false,
+        "reason": "A micro-company may exceed at most one threshold; Quarto exceeds all three: employees (15 > 10), turnover (1,200,000 > 900,000), and balance sheet total (500,000 > 450,000), so it is not a micro-company."
+      },
+      "verus_key": "Q1",
+      "verus_answer": "False"
+    }
+  ],
+  "metadata": {
+    "id": "run_206"
+  }
+}

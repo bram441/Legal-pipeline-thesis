@@ -1,0 +1,9 @@
+{
+  "Q1": {
+    "question": "Heeft Anna als langstlevende echtgenoot recht op het vruchtgebruik van de gehele nalatenschap volgens artikel 4.17, paragraaf 1?",
+    "answer": "True",
+    "multi": false,
+    "inference": "entailment",
+    "source_question_id": "q1"
+  }
+}

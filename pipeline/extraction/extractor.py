@@ -4,6 +4,7 @@ import re
 from contextlib import contextmanager
 
 from debug import status_log
+from pipeline.llm.client import get_llm_model
 from pipeline.extraction.openai_extractor import (
     extract_case_ir_only_openai,
     extract_query_ir_only_openai,
@@ -649,6 +650,20 @@ def extraction_backend_env_override(backend: str | None):
             os.environ[key] = saved
 
 
+def _repairable_llm_format_error(exc: BaseException) -> bool:
+    """True when the model returned empty or non-JSON text (retry with repair prompt)."""
+    msg = str(exc).lower()
+    markers = (
+        "empty model response",
+        "invalid json",
+        "no parseable",
+        "json root",
+        "expecting value",
+        "json object",
+    )
+    return any(m in msg for m in markers)
+
+
 def _run_case_extraction_loop(
     case_text: str,
     *,
@@ -685,6 +700,14 @@ def _run_case_extraction_loop(
             )
             seed_person_entities_from_case_text(case_text, case_obj, kb_schema)
         except LLMExtractionError as e:
+            if _repairable_llm_format_error(e):
+                last_case_error = e
+                case_feedback = (
+                    "Model output was not valid JSON. Return exactly one JSON object "
+                    "(parseable by json.loads), no markdown fences, no commentary.\n"
+                    + str(e)
+                )
+                continue
             raise ExtractionError(str(e))
         except (ExtractionIRValidationError, CaseFactAssertionRejected) as e:
             last_case_error = e
@@ -802,7 +825,7 @@ def extract_case_and_query(
     if provider != "openai":
         raise ExtractionError("Unsupported provider: " + str(provider))
 
-    chosen_model = model or os.getenv("OPENAI_MODEL") or "gpt-4.1-mini"
+    chosen_model = model or get_llm_model()
 
     case = _run_case_extraction_loop(
         case_text,
@@ -838,6 +861,14 @@ def extract_case_and_query(
             )
             query_obj = normalize_query_ir(query_ir, case, kb_schema, user_question)
         except LLMExtractionError as e:
+            if _repairable_llm_format_error(e):
+                last_query_error = e
+                query_feedback = (
+                    "Model output was not valid JSON. Return exactly one JSON object "
+                    "(parseable by json.loads), no markdown fences, no commentary.\n"
+                    + str(e)
+                )
+                continue
             raise ExtractionError(str(e))
         except ExtractionIRValidationError as e:
             last_query_error = e
@@ -882,7 +913,7 @@ def extract_case_only(
     if provider != "openai":
         raise ExtractionError("Unsupported provider: " + str(provider))
 
-    chosen_model = model or os.getenv("OPENAI_MODEL") or "gpt-4.1-mini"
+    chosen_model = model or get_llm_model()
     return _run_case_extraction_loop(
         case_text,
         kb_schema=kb_schema,
@@ -910,7 +941,7 @@ def extract_query_only(
     if provider != "openai":
         raise ExtractionError("Unsupported provider: " + str(provider))
 
-    chosen_model = model or os.getenv("OPENAI_MODEL") or "gpt-4.1-mini"
+    chosen_model = model or get_llm_model()
     query_feedback = None
     query_obj = None
     last_query_error = None
@@ -930,6 +961,14 @@ def extract_query_only(
             )
             query_obj = normalize_query_ir(query_ir, case, kb_schema, user_question)
         except LLMExtractionError as e:
+            if _repairable_llm_format_error(e):
+                last_query_error = e
+                query_feedback = (
+                    "Model output was not valid JSON. Return exactly one JSON object "
+                    "(parseable by json.loads), no markdown fences, no commentary.\n"
+                    + str(e)
+                )
+                continue
             raise ExtractionError(str(e))
         except ExtractionIRValidationError as e:
             last_query_error = e

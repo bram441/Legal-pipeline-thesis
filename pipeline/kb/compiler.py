@@ -2,7 +2,8 @@ import os
 import json
 from pathlib import Path
 
-from pipeline.utils.openai_sampling import chat_completion_sampling_kwargs
+from pipeline.llm.client import get_llm_client, get_llm_model
+from pipeline.llm.request import build_chat_completion_kwargs
 from pipeline.utils.llm_call_tracker import tracked_chat_completion_create
 from pipeline.utils.prompt_loader import load_json_ir_contract, render_prompt
 from pipeline.kb.exceptions import LawCompilationError
@@ -102,14 +103,14 @@ __all__ = ["compile_law_to_kb_fo", "LawCompilationError"]
 
 def _json_chat_object(client, chosen_model, system_content, user_prompt, *, stage: str = "kb_symbols"):
     try:
-        req = {
-            "model": chosen_model,
-            "messages": [
+        req = build_chat_completion_kwargs(
+            model=chosen_model,
+            messages=[
                 {"role": "system", "content": system_content},
                 {"role": "user", "content": user_prompt},
             ],
-            **chat_completion_sampling_kwargs(),
-        }
+            response_format={"type": "json_object"},
+        )
         # Prefer strict JSON object output when model/API supports it.
         try:
             resp = tracked_chat_completion_create(
@@ -117,18 +118,25 @@ def _json_chat_object(client, chosen_model, system_content, user_prompt, *, stag
                 stage=stage,
                 metadata={"response_format": "json_object"},
                 **req,
-                response_format={"type": "json_object"},
             )
         except TypeError:
+            req_fallback = build_chat_completion_kwargs(
+                model=chosen_model,
+                messages=req["messages"],
+            )
             resp = tracked_chat_completion_create(
-                client, stage=stage, metadata={"response_format": "fallback"}, **req
+                client, stage=stage, metadata={"response_format": "fallback"}, **req_fallback
             )
         except Exception as fmt_exc:
             # Some models reject response_format; fall back to normal call.
             msg = str(fmt_exc).lower()
             if "response_format" in msg or "json_object" in msg:
+                req_fallback = build_chat_completion_kwargs(
+                    model=chosen_model,
+                    messages=req["messages"],
+                )
                 resp = tracked_chat_completion_create(
-                    client, stage=stage, metadata={"response_format": "fallback"}, **req
+                    client, stage=stage, metadata={"response_format": "fallback"}, **req_fallback
                 )
             else:
                 raise
@@ -236,21 +244,21 @@ def _kb_rules_response_format() -> dict:
 
 def _json_chat_kb_rules(client, chosen_model, system_content, user_prompt):
     """Rules phase: prefer json_schema envelope; fall back to json_object. Returns (parsed_dict, raw_text)."""
-    req = {
-        "model": chosen_model,
-        "messages": [
-            {"role": "system", "content": system_content},
-            {"role": "user", "content": user_prompt},
-        ],
-        **chat_completion_sampling_kwargs(),
-    }
+    messages = [
+        {"role": "system", "content": system_content},
+        {"role": "user", "content": user_prompt},
+    ]
+    req = build_chat_completion_kwargs(
+        model=chosen_model,
+        messages=messages,
+        response_format=_kb_rules_response_format(),
+    )
     try:
         resp = tracked_chat_completion_create(
             client,
             stage="kb_rules",
             metadata={"response_format": "json_schema"},
             **req,
-            response_format=_kb_rules_response_format(),
         )
     except Exception as fmt_exc:
         msg = str(fmt_exc).lower()
@@ -270,21 +278,21 @@ def _json_chat_kb_rules(client, chosen_model, system_content, user_prompt):
 
 def _json_chat_kb_symbols(client, chosen_model, system_content, user_prompt):
     """Symbols phase with json_schema when supported; else json_object. Returns (parsed_dict, raw_text)."""
-    req = {
-        "model": chosen_model,
-        "messages": [
-            {"role": "system", "content": system_content},
-            {"role": "user", "content": user_prompt},
-        ],
-        **chat_completion_sampling_kwargs(),
-    }
+    messages = [
+        {"role": "system", "content": system_content},
+        {"role": "user", "content": user_prompt},
+    ]
+    req = build_chat_completion_kwargs(
+        model=chosen_model,
+        messages=messages,
+        response_format=_kb_symbols_response_format(),
+    )
     try:
         resp = tracked_chat_completion_create(
             client,
             stage="kb_symbols",
             metadata={"response_format": "json_schema"},
             **req,
-            response_format=_kb_symbols_response_format(),
         )
     except Exception as fmt_exc:
         msg = str(fmt_exc).lower()
@@ -480,21 +488,15 @@ def compile_law_to_kb_fo(
     Returns ``(fo_text, kb_schema_dict)`` where the schema is normalized symbol JSON
     for ``kb_schema.json``. Optional LE: law → LE → JSON-IR when PIPELINE_USE_LE=1.
     """
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise LawCompilationError("Missing OPENAI_API_KEY environment variable")
-
     provider = (os.getenv("PIPELINE_KB_COMPILER") or "openai").strip().lower()
     if provider != "openai":
         raise LawCompilationError("PIPELINE_KB_COMPILER must be 'openai' for now (got: " + provider + ")")
 
     try:
-        from openai import OpenAI
+        client = get_llm_client()
     except Exception as e:
-        raise LawCompilationError("OpenAI SDK not installed/importable: " + str(e))
-
-    client = OpenAI(api_key=api_key)
-    chosen_model = model or os.getenv("OPENAI_MODEL") or "gpt-4.1-mini"
+        raise LawCompilationError(str(e)) from e
+    chosen_model = model or get_llm_model()
 
     full_law = (law_text or "").strip()
     scoped_law, scope_meta = _scope_law_text_once(
