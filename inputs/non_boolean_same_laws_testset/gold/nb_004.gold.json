@@ -1,0 +1,7 @@
+{
+  "run_id": "nb_004",
+  "gold_type": "list",
+  "expected_answer": "Het vruchtgebruik heeft betrekking op het onroerend goed dat als voornaamste gezinswoning diende en op het daarin aanwezige huisraad.",
+  "law_source": "erfrecht_clean.txt",
+  "notes": "Gold is separated from plain_inputs and must not be included in model prompts."
+}

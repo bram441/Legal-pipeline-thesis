@@ -1,0 +1,7 @@
+{
+  "run_id": "nb_015",
+  "gold_type": "classification",
+  "expected_answer": "Nora bevindt zich in illegaal verblijf.",
+  "law_source": "vreemdelingenwet_clean.txt",
+  "notes": "Gold is separated from plain_inputs and must not be included in model prompts."
+}

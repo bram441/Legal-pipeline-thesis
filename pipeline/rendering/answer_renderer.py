@@ -14,7 +14,7 @@ def render_answer(case, query, sat, result, base_kb_text=None, kb_schema=None):
         elif result.get("output_kind") == "explanation":
             explanation = result.get("explanation")
         elif query and query.get("explain"):
-            explanation = explain_on_demand(case, query, sat, result, base_kb_text=base_kb_text)
+            explanation = explain_on_demand(case, query, result, base_kb_text=base_kb_text)
         if result.get("status") in ("unsupported", "error"):
             return {"answer": answer, "explanation": explanation}
         return {"answer": answer, "explanation": explanation}

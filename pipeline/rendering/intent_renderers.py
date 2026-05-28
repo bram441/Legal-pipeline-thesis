@@ -132,7 +132,16 @@ def render_relevance(result: dict) -> str:
 def render_explanation(result: dict) -> str:
     if result.get("status") == "unsupported":
         return "Explanation is not available: " + str(result.get("message", ""))
-    text = result.get("explanation") or ""
+    raw_text = result.get("explanation")
+    if isinstance(raw_text, str):
+        text = raw_text
+    elif isinstance(raw_text, dict):
+        # Some explain paths return structured payloads with an "answer" field.
+        text = str(raw_text.get("answer") or raw_text.get("message") or raw_text)
+    elif isinstance(raw_text, list):
+        text = "; ".join(str(x) for x in raw_text if x is not None)
+    else:
+        text = str(raw_text or "")
     support = result.get("support") or []
     lines = [text]
     if support:
@@ -140,6 +149,8 @@ def render_explanation(result: dict) -> str:
         for item in support:
             if isinstance(item, dict):
                 lines.append("- " + _fmt_atom(item))
+            else:
+                lines.append("- " + str(item))
     if not text:
         lines[0] = "No detailed explanation is available from the solver."
     return "\n".join(lines)

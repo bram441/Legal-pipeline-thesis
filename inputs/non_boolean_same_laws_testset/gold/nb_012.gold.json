@@ -1,0 +1,7 @@
+{
+  "run_id": "nb_012",
+  "gold_type": "list",
+  "expected_answer": "Jaargemiddelde werknemers: 10; jaarlijkse netto-omzet exclusief btw: 900.000 euro; balanstotaal: 450.000 euro.",
+  "law_source": "microvennootschappen_clean.txt",
+  "notes": "Gold is separated from plain_inputs and must not be included in model prompts."
+}

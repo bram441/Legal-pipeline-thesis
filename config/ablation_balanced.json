@@ -8,7 +8,7 @@
     "max_evidence_extension_calls": 1
   },
   "extraction": {
-    "max_retries": 2
+    "max_retries": 4
   },
   "evaluation": {
     "run_pre_query_satisfiability_check": true,

@@ -1,0 +1,7 @@
+{
+  "run_id": "nb_010",
+  "gold_type": "period",
+  "expected_answer": "Vanaf boekjaar 2026, het boekjaar dat volgt op het boekjaar waarin de criteria voor de tweede keer werden overschreden.",
+  "law_source": "microvennootschappen_clean.txt",
+  "notes": "Gold is separated from plain_inputs and must not be included in model prompts."
+}

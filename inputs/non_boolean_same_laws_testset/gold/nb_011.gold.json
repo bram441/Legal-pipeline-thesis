@@ -1,0 +1,7 @@
+{
+  "run_id": "nb_011",
+  "gold_type": "short_text",
+  "expected_answer": "Netto-omzet en balanstotaal worden op geconsolideerde basis berekend; het aantal werknemers wordt opgeteld over de betrokken verbonden vennootschappen.",
+  "law_source": "microvennootschappen_clean.txt",
+  "notes": "Gold is separated from plain_inputs and must not be included in model prompts."
+}

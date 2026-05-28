@@ -1,0 +1,7 @@
+{
+  "run_id": "nb_009",
+  "gold_type": "number",
+  "expected_answer": "16.875.000 euro, namelijk 11.250.000 × 18/12.",
+  "law_source": "microvennootschappen_clean.txt",
+  "notes": "Gold is separated from plain_inputs and must not be included in model prompts."
+}
