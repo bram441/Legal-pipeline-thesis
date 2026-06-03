@@ -1,6 +1,6 @@
 # Project guide
 
-Quick map for developers and thesis reproducibility. Stack: **JSON-IR KB compile + schema-driven extraction + IDP-Z3**.
+Quick map for developers and thesis reproducibility. Stack: **JSON-IR KB compilation + schema-driven extraction + IDP-Z3**.
 
 ## 1. First run checklist
 
@@ -9,110 +9,195 @@ python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 copy .env.example .env          # add API key + LLM_MODEL
+
 python scripts/validate_test_set.py --input-dir inputs/json_final_clean
-python main.py --mode json --run inputs/json_final_clean/run_001 `
-  --config config/heavy.json --ignore-local-config `
-  --kb-strategy direct_json_ir_no_translate --no-translate
+
+python main.py `
+  --mode json `
+  --run inputs/json_final_clean/run_001 `
+  --config config/heavy.json `
+  --ignore-local-config `
+  --kb-strategy direct_json_ir_no_translate `
+  --no-translate
 ```
 
 ## 2. KB strategies
 
-| Strategy | Translation | LE intermediate |
-|----------|:-----------:|:---------------:|
+| Strategy | Translation | Logical English intermediate |
+|----------|:-----------:|:----------------------------:|
 | `direct_json_ir_no_translate` | no | no |
 | `direct_json_ir_translate` | yes | no |
 | `le_json_ir_no_translate` | no | yes |
 | `le_json_ir_translate` | yes | yes |
 
-Canonical list: `pipeline/kb/compile_strategy.py` → `STRATEGY_CHOICES`.
+`LE` refers to the optional **Logical English** preprocessing layer before JSON-IR generation.
+
+Canonical strategy list:
+
+```text
+pipeline/kb/compile_strategy.py → STRATEGY_CHOICES
+```
 
 ## 3. End-to-end flow
 
-`main.py` → `pipeline/app/pipeline.py::answer_legal_prompt(...)`
+Entrypoint:
 
-1. **Effective config** — `default.json` + optional `local.json` + `--config` + `.env`
-2. **Law scoping** — `json_ir.scope_mode` (`cited` / `full` / `retrieve`)
-3. **Optional translation** — NL → EN (`pipeline/translation/`)
-4. **Optional Legal English** — `le_json_ir_*` only (`pipeline/le/`)
-5. **JSON-IR KB compile** — symbols LLM → rules LLM → validation/repair (`json_ir_compile_loop.py`)
-6. **Schema environment** — assertable symbols, factual inputs, query targets
-7. **Case extraction** — JSON-IR → validated facts (`extraction/json_ir.py`)
-8. **Query extraction** — target selection for legal-output predicates (`query_target_selection.py`)
-9. **Pre-query SAT check** — intent routing + consistency (`semantic/`, `symbolic/`)
-10. **Pre-solver validation** — entity types, domain seeding (`validation/`)
-11. **Symbolic execution** — intent → IDP-Z3 (`symbolic/router.py`, `idp_z3/`)
-12. **Render + score** — answer text, diagnostics, decisive Boolean scoring
+```text
+main.py → pipeline/app/pipeline.py::answer_legal_prompt(...)
+```
+
+Processing steps:
+
+1. **Effective configuration** — `default.json` + optional `local.json` + `--config` + `.env`.
+2. **Law scoping** — `json_ir.scope_mode` selects cited, retrieved or full supplied law text.
+3. **Optional translation** — Dutch to English via `pipeline/translation/`.
+4. **Optional Logical English** — only for `le_json_ir_*` strategies via `pipeline/le/`.
+5. **JSON-IR KB compilation** — symbol generation, rule generation, validation and repair.
+6. **Deterministic FO(.) rendering** — valid JSON-IR is rendered into an executable knowledge base.
+7. **Schema environment** — allowed symbols, factual inputs and query targets are exposed.
+8. **Case extraction** — case text becomes validated formal facts.
+9. **Query extraction** — the question is mapped to a valid legal-output target or supported intent.
+10. **Pre-query satisfiability check** — KB and case are checked before answer generation.
+11. **Pre-solver validation** — entity types, signatures and domain seeding are checked.
+12. **Symbolic execution** — the selected intent is executed in IDP-Z3.
+13. **Rendering and scoring** — answers, diagnostics and decisive Boolean scores are written.
 
 ## 4. Configuration
 
-| Layer | File / flag |
-|-------|-------------|
+| Layer | File or flag |
+|-------|--------------|
 | Secrets | `.env` — `OPENROUTER_API_KEY` or `OPENAI_API_KEY`, `LLM_PROVIDER`, `LLM_MODEL` |
 | Baseline | `config/default.json` |
-| Thesis overlay | `config/heavy.json` (final LLM budgets) |
-| Local dev | `config/local.json` (gitignored; copy from `local.json.example`) |
+| Selected thesis profile | `config/heavy.json` |
+| Local development | `config/local.json`, gitignored and copied from `local.json.example` |
 | Reproducible runs | `--config config/heavy.json --ignore-local-config` |
 
-Budget profiles for ablation: `cheap.json`, `balanced.json`, `heavy.json`. Details: **`config/README.md`**.
+Budget profiles for comparison:
+
+| Technical file | Thesis description |
+|----------------|-------------------|
+| `config/cheap.json` | beperkte configuratie |
+| `config/balanced.json` | gebalanceerde configuratie |
+| `config/heavy.json` | ruime configuratie; selected final thesis profile |
+
+Details are documented in **`config/README.md`**.
 
 ## 5. Benchmark inputs
 
 | Folder | Use |
 |--------|-----|
-| `inputs/json_final_clean/` | **Primary** — 37 tiered runs, `example_laws_clean/` paths |
-| `inputs/json_final/` | Same run ids, raw `example_laws/` paths (optional) |
-| `inputs/non_boolean_same_laws_testset/` | Non-boolean intent probe |
-| `inputs/verus_lm_from_json_final_clean/` | Pre-converted VERUS-LM layout |
+| `inputs/json_final_clean/` | **Primary benchmark** — 37 runs using `example_laws_clean/` paths |
+| `inputs/json_final/` | Equivalent raw-law-path variant, retained for optional comparison |
+| `inputs/non_boolean_same_laws_testset/` | Non-Boolean capability probe |
+| `inputs/verus_lm_from_json_final_clean/` | Converted input layout for the VERUS-LM comparison |
 
-Manifest + tier labels: `inputs/json_final_clean/manifest.json`.
+Primary benchmark manifest:
+
+```text
+inputs/json_final_clean/manifest.json
+```
+
+The primary benchmark contains Boolean gold labels (`TRUE` / `FALSE`). The symbolic pipeline may additionally output `UNKNOWN` when neither the queried conclusion nor its explicit negation is entailed.
 
 ## 6. Evaluation scripts
 
-| Goal | Command entrypoint |
-|------|-------------------|
+| Goal | Entrypoint |
+|------|------------|
 | Single run | `main.py --mode json --run ...` |
-| Matrix eval | `scripts/run_evaluation.py` |
-| Config compare | `scripts/run_config_ablation.py` |
-| Model compare | `scripts/run_model_sweep.py` |
+| Matrix evaluation | `scripts/run_evaluation.py` |
+| Budget-profile comparison | `scripts/run_config_ablation.py` |
+| Model comparison | `scripts/run_model_sweep.py` |
 | Plain LLM baseline | `scripts/run_plain_llm_baseline.py` |
-| Non-boolean probe | `scripts/run_non_boolean_probe.py` |
+| Non-Boolean probe | `scripts/run_non_boolean_probe.py` |
+| VERUS-LM conversion | `scripts/convert_json_final_to_verus_lm.py` |
+| VERUS-LM evaluation | `scripts/run_verus_lm_evaluation.py` |
+| Test-set validation | `scripts/validate_test_set.py` |
 
-Full command reference: **`scripts/README.md`**.
+Full command reference:
 
-Default benchmark directory in scripts: **`inputs/json_final_clean`**.
+```text
+scripts/README.md
+```
+
+Default primary benchmark directory:
+
+```text
+inputs/json_final_clean/
+```
 
 ## 7. Prompts
 
 | Area | Path |
 |------|------|
-| KB symbols + rules | `prompts/kb/json_ir/generation/` |
+| KB symbol and rule generation | `prompts/kb/json_ir/generation/` |
 | KB repair | `prompts/kb/json_ir/repair/` |
-| Case / query extraction | `prompts/extraction/json_ir/` |
-| LE layer | `prompts/le/generation/law_to_le.txt` |
-| NL paraphrase | `prompts/nl/` |
+| Case and query extraction | `prompts/extraction/json_ir/` |
+| Logical English layer | `prompts/le/generation/law_to_le.txt` |
+| Translation | `prompts/translation/translate_to_english.txt` |
+| Optional natural-language rendering | `prompts/nl/` |
 
-Registry: `pipeline/utils/prompt_paths.py`. Loader: `pipeline/utils/prompt_loader.py`.
+Registry:
 
-## 8. Key artifacts per run
+```text
+pipeline/utils/prompt_paths.py
+```
 
-Written next to the run working directory:
+Loader:
 
-- `effective_config.json` — merged config (no secrets)
-- `results.json`, `score.json` — answer + evaluation
-- `kb.fo`, `kb_schema.json` — compiled KB
-- `schema_environment.json`, `symbolic_proof_gap.json` — diagnostics
-- `llm_call_summary.json` — token/cost tracking when enabled
+```text
+pipeline/utils/prompt_loader.py
+```
 
-## 9. Deprecated / removed
+## 8. Key artefacts per run
 
-See **`docs/DEPRECATED_COMPONENTS.md`** (`rule_plan`, `prompt_profile`, `inputs/json/`, legacy FO compile, old strategy names).
+Written under the run working directory or evaluation cell folder:
+
+- `effective_config.json` — merged configuration without API keys.
+- `results.json` — normalized output.
+- `score.json` — evaluation outcome when scoring is available.
+- `kb.fo` — rendered FO(.) knowledge base.
+- `kb_schema.json` / `schema_environment.json` — symbol and extraction constraints.
+- `symbolic_proof_gap.json` — missing-support diagnostics when generated.
+- `llm_call_summary.json` — call and token tracking when enabled.
+
+## 9. Reported result artefacts and fresh reruns
+
+The committed folders under:
+
+```text
+results/final/
+```
+
+contain the artefacts used for the reported thesis evaluation. Fresh reruns can use a separate output root, while the committed thesis artefacts remain available under `results/final/`, for example:
+
+```text
+results/reproduction/
+```
+
+The reported thesis model comparison uses three models:
+
+- `anthropic/claude-sonnet-4.6`
+- `openai/gpt-5.5`
+- `google/gemini-3.1-pro-preview`
+
+In the reported artefacts, Claude Sonnet 4.6 was reused from the strategy-selection run because it had already been evaluated under the identical selected configuration and strategy. The file:
+
+```text
+config/model_sweep_top3.txt
+```
+
+now contains all three models so that a new user can execute a complete fresh model-comparison rerun.
 
 ## 10. Tests
 
-Thesis-critical smoke:
+Thesis-critical smoke tests:
 
 ```powershell
 python -m pytest tests/test_json_ir_prompts.py tests/test_negative_legal_output_rule_safety.py tests/test_query_target_selection.py -q
 ```
 
-Overview: **`tests/README.md`**.
+Test overview:
+
+```text
+tests/README.md
+```

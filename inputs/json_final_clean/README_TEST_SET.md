@@ -1,53 +1,110 @@
 # Final thesis evaluation test set (`inputs/json_final_clean`)
 
-This folder is the **clean, tiered** benchmark input for thesis evaluation. Law texts use **`example_laws_clean/`** paths. It contains only curated inputs:
+This folder is the **clean, tiered primary benchmark** used for the thesis evaluation. Law texts use paths under:
 
-- `manifest.json` — run metadata (group, difficulty, domain, phenomena, optional `family`)
-- `run_XXX/run.json` — law path, case text, questions with expected answers and `expected.reason`
-- `README_TEST_SET.md` — this file
+```text
+example_laws_clean/
+```
 
-The pipeline writes all generated artifacts under `results/` during evaluation. **Do not** store `results.json`, `kb.fo`, `score.json`, or similar files here.
+The folder contains curated benchmark inputs only:
+
+- `manifest.json` — run metadata, including group, difficulty, domain, phenomena and optional family information.
+- `run_XXX/run.json` — law path, case text, questions, expected Boolean answers and `expected.reason`.
+- `README_TEST_SET.md` — this documentation file.
+
+The primary benchmark contains 37 runs from three legal domains:
+
+| Domain | Runs |
+|--------|-----:|
+| Inheritance law | 12 |
+| Immigration law | 11 |
+| Company law | 14 |
+| **Total** | **37** |
+
+The gold labels are Boolean (`TRUE` / `FALSE`). The symbolic pipeline may additionally output `UNKNOWN` when neither the queried conclusion nor its explicit negation is entailed; `UNKNOWN` is not a gold-label category in this primary benchmark.
+
+Generated evaluation artefacts, such as `results.json`, `kb.fo` and `score.json`, are written to separate evaluation output directories and are not part of this benchmark input folder.
 
 ## Tiered groups
 
 | Group | Purpose |
 |-------|---------|
-| **core** | Basic functioning: definitions, direct legal effects, simple thresholds |
-| **challenge** | Richer reasoning: multi-criterion cases, procedural rules, structural exclusions |
-| **stress** | Intentionally difficult: temporal rules, first-year estimates, helper closure, hard thresholds |
-| **external_verus_lm** | Reserved for future VERUS-LM comparison (empty for now) |
+| **core** | Basic functioning: definitions, direct legal effects and simple thresholds |
+| **challenge** | Richer reasoning: multi-criterion cases, procedural rules and structural exclusions |
+| **stress** | Intentionally difficult cases: temporal rules, first-year estimates, helper closure and hard thresholds |
+| **external_verus_lm** | Reserved metadata category; the completed VERUS-LM comparison uses `inputs/verus_lm_from_json_final_clean/` and `results/final/verus_lm_test/`, rather than additional primary-benchmark runs |
 
-Report results **per group** (and per difficulty / domain / phenomenon), not only as one aggregate score.
+Results should be reportable per group, difficulty, domain and phenomenon, rather than only as one aggregate score.
 
 ## Design choices
 
-- **Hard runs were not removed.** Stress-tier cases (e.g. temporal company law, immigration edge cases) remain; they were relabeled so the thesis can show where the pipeline struggles.
-- **New core runs (`run_201`–`run_208`)** are explicit sanity checks added for the thesis. They demonstrate basic pipeline behaviour; they are **not** hidden replacements for hard benchmarks.
-- **Legacy duplicate runs** (e.g. `run_001` / `run_101`) stay documented via `related_runs` in the manifest for transparency.
+- **Hard runs were not removed.** Stress-tier cases remain in the benchmark so the thesis can show where the pipeline struggles.
+- **New core runs (`run_201`–`run_208`)** are explicit sanity checks added for the thesis. They demonstrate basic pipeline behaviour; they are not hidden replacements for difficult benchmark cases.
+- **Legacy duplicate runs**, such as `run_001` and `run_101`, remain documented through `related_runs` metadata for transparency.
+- **Cleaned law excerpts** remove editorial noise and historical markup while preserving the normative content used for the evaluated questions.
 
 ## Validate before evaluating
 
-Static check (no LLM, no IDP):
+Static validation, without LLM calls or IDP-Z3 execution:
 
-```bash
+```powershell
 python scripts/validate_test_set.py --input-dir inputs/json_final_clean
 ```
 
-Use `--strict` to fail on warnings, or `--json-output path/to/validation_summary.json` for a machine-readable summary.
+To fail on warnings:
 
-## Run evaluation
+```powershell
+python scripts/validate_test_set.py --input-dir inputs/json_final_clean --strict
+```
 
-```bash
+To write a machine-readable validation summary:
+
+```powershell
+python scripts/validate_test_set.py `
+  --input-dir inputs/json_final_clean `
+  --json-output results/reproduction/testset_validation.json
+```
+
+## Run the selected JSON-IR setting
+
+Use a separate reproduction output folder so that the committed thesis artefacts remain unchanged:
+
+```powershell
 python scripts/run_evaluation.py `
   --config config/heavy.json `
   --ignore-local-config `
   --runs-dir inputs/json_final_clean `
   --runs all `
-  --strategies direct_json_ir_no_translate
+  --strategies direct_json_ir_no_translate `
+  --output-dir results/reproduction/final_json_ir `
+  --clean `
+  --no-fail-on-missing-score
 ```
 
-Grouped metrics: `results/reports/evaluation_*/grouped_summary.json` when `manifest.json` is present.
+When `manifest.json` is present, grouped metrics are written to:
 
-## Maintenance
+```text
+grouped_summary.json
+```
 
-Edit `run.json` and `manifest.json` directly. After changes, re-run `validate_test_set.py`. Keep counts in `manifest.json` (`counts_by_*`) aligned with the `runs` list.
+under the chosen evaluation output directory.
+
+The committed artefacts used for the thesis tables are retained under:
+
+```text
+results/final/
+```
+
+## VERUS-LM comparison
+
+The VERUS-LM comparison does not add extra runs to the primary benchmark. Instead, the same benchmark content is converted into the technical layout required by VERUS-LM:
+
+```text
+inputs/verus_lm_from_json_final_clean/
+```
+
+The committed comparison results are stored in:
+
+```text
+results/final/verus_lm_test/
+```

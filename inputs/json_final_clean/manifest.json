@@ -1,7 +1,7 @@
 {
   "version": 1,
   "description": "Tiered thesis evaluation set: core (basic pipeline checks), challenge (multi-criterion / procedural), stress (temporal / helper closure). Expected answers are unchanged from curated sources; hard runs are relabeled, not removed.",
-  "runs_dir": "inputs/json_final",
+  "runs_dir": "inputs/json_final_clean",
   "source_runs_dir": "inputs/json",
   "added_core_sanity_runs": [
     "run_201",

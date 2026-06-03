@@ -1,44 +1,82 @@
 # Pipeline configuration
 
-Versioned behavior lives in **`default.json`**. Optional machine-local overrides go in **`local.json`** (gitignored — copy from `local.json.example`).
+Versioned behaviour lives in:
 
-Secrets (`OPENAI_API_KEY`, model names) stay in **`.env`** only.
+```text
+config/default.json
+```
 
-Most pipeline knobs live in **`default.json`** or **`local.json`**. Keep `.env` minimal; use `local.json` for machine-specific overrides (e.g. `debug.trace`, `json_ir.max_kb_llm_calls`).
+Optional machine-local overrides go in:
 
-Environment variables listed in `pipeline/config.py` still override config when set (optional escape hatch).
+```text
+config/local.json
+```
+
+`config/local.json` is gitignored and can be copied from `config/local.json.example`.
+
+Secrets such as API keys remain in `.env` only.
+
+Most pipeline options live in `default.json` or in an optional local override. Keep `.env` minimal and use `local.json` only for machine-specific development overrides such as tracing or temporary budget changes.
+
+Environment variables listed in `pipeline/config.py` may still override configuration values when explicitly set.
 
 ## JSON-IR KB prompts
 
-KB symbol and rule generation always use the canonical files under `prompts/kb/json_ir/generation/` (`symbols.txt`, `rules.txt`). There is no `prompt_profile` config key.
+Knowledge-base symbol and rule generation always use the canonical files:
+
+```text
+prompts/kb/json_ir/generation/symbols.txt
+prompts/kb/json_ir/generation/rules.txt
+```
+
+There is no `prompt_profile` configuration key.
 
 ## `json_ir.scope_mode`
 
-Controls how much law text is passed to KB compilation before symbol/rules generation (`pipeline/kb/law_scope.py`).
+`json_ir.scope_mode` controls how much supplied law text is passed to knowledge-base compilation before symbol and rule generation.
 
-| Value | Behavior |
-|-------|----------|
-| **`cited`** (default) | Prefer citation-based chunk selection when the question cites articles/paragraphs; otherwise keyword retrieval or full law fallback |
-| **`full`** | Always use the entire law text |
-| **`retrieve`** | Keyword-based chunk retrieval from question + case text |
+Implementation:
 
-Override via config, `config/local.json`, or env: `JSON_IR_SCOPE_MODE`, `PIPELINE_LAW_SCOPE_MODE`, or `LAW_SCOPE_MODE`.
+```text
+pipeline/kb/law_scope.py
+```
+
+| Value | Behaviour |
+|-------|-----------|
+| `cited` | Prefer citation-based chunk selection when the question cites articles or paragraphs; otherwise use keyword retrieval or the full supplied law excerpt as fallback |
+| `full` | Always use the entire supplied law excerpt |
+| `retrieve` | Use keyword-based chunk retrieval from question and case text |
+
+Possible environment-variable overrides:
+
+```text
+JSON_IR_SCOPE_MODE
+PIPELINE_LAW_SCOPE_MODE
+LAW_SCOPE_MODE
+```
 
 ## Local overrides
 
-Copy the example file:
+Create a local override file only when needed:
 
-```bash
-cp config/local.json.example config/local.json
+```powershell
+copy config\local.json.example config\local.json
 ```
 
-Edit `local.json` with partial overrides only; unspecified keys fall back to `default.json`.
+Use partial overrides only; unspecified keys continue to fall back to `default.json`.
 
-### Config profiles (CLI overlay)
+## Configuration merge order
 
-Merge order: **`default.json`** → **`local.json`** (if present) → **profile** (optional) → **environment variables**.
+Configuration is applied in this order:
 
-For reproducible thesis runs, pass a profile and skip local overrides:
+```text
+config/default.json
+→ config/local.json, when present
+→ --config profile, when supplied
+→ environment variables
+```
+
+For reproducible thesis runs, pass the selected profile and disable local overrides:
 
 ```powershell
 python scripts/run_evaluation.py `
@@ -46,8 +84,15 @@ python scripts/run_evaluation.py `
   --ignore-local-config `
   --runs-dir inputs/json_final_clean `
   --runs all `
-  --strategies direct_json_ir_no_translate
+  --strategies direct_json_ir_no_translate `
+  --output-dir results/reproduction/final_json_ir `
+  --clean `
+  --no-fail-on-missing-score
+```
 
+Single-run equivalent:
+
+```powershell
 python main.py `
   --mode json `
   --run inputs/json_final_clean/run_001 `
@@ -57,21 +102,35 @@ python main.py `
   --no-translate
 ```
 
-When `--config` is omitted, `run_evaluation.py` uses **default + local only**. `main.py` without `--config` still respects `PIPELINE_CONFIG_PROFILE` if you export it.
+When `--config` is omitted, `run_evaluation.py` uses the default configuration plus optional local overrides. `main.py` without `--config` may also respect `PIPELINE_CONFIG_PROFILE` when exported.
 
-**`--ignore-local-config`** skips `config/local.json` so only **default → profile → env** apply. `run_config_ablation.py` passes this automatically.
+`--ignore-local-config` skips `config/local.json`, so only the repository baseline, selected profile and explicit environment overrides apply.
 
-### Thesis LLM budget profiles
+## Thesis LLM budget profiles
 
-These files are **partial overlays** on top of `default.json`. They only tune JSON-IR compile budgets, extraction retries, and debug flags — not prompts or scoring semantics.
+The three thesis budget profiles are partial overlays on top of `default.json`. They modify JSON-IR compilation budgets, extraction retry budgets and related debugging behaviour; they do not redefine prompts or scoring semantics.
 
-| File | Purpose |
-|------|---------|
-| `config/cheap.json` | Low LLM budget — smoke tests and quick debugging |
-| `config/balanced.json` | Medium LLM budget — config ablation middle tier |
-| `config/heavy.json` | Higher LLM budget — selected final thesis profile |
+| Technical file | Thesis description | Purpose |
+|----------------|-------------------|---------|
+| `config/cheap.json` | beperkte configuratie | Low LLM budget for quick evaluation and comparison |
+| `config/balanced.json` | gebalanceerde configuratie | Middle budget-comparison profile |
+| `config/heavy.json` | ruime configuratie | Higher LLM budget selected for the final thesis pipeline |
 
-Compare all three without editing `local.json`:
+The committed thesis artefacts under:
+
+```text
+results/final/
+```
+
+preserve the runs reported in the thesis. New reproduction runs should use output folders under:
+
+```text
+results/reproduction/
+```
+
+so that the original artefacts remain unchanged.
+
+### Fresh budget-profile comparison
 
 ```powershell
 python scripts/run_config_ablation.py `
@@ -79,29 +138,64 @@ python scripts/run_config_ablation.py `
   --runs all `
   --runs-dir inputs/json_final_clean `
   --strategies direct_json_ir_no_translate `
-  --output-root results/final/config_selection
+  --output-root results/reproduction/config_selection_rerun
 ```
 
-### Other files in this folder
+The committed profile-selection artefacts used in the thesis are stored in:
+
+```text
+results/final/config_selection_final/
+```
+
+## Model-comparison file
+
+The file:
+
+```text
+config/model_sweep_top3.txt
+```
+
+contains all three models required for a complete fresh rerun of the selected-model comparison:
+
+```text
+anthropic/claude-sonnet-4.6
+openai/gpt-5.5
+google/gemini-3.1-pro-preview
+```
+
+In the reported thesis results, the Claude observation was reused from strategy selection because it had already been evaluated under the identical selected configuration and strategy. Including all three models in the current configuration file makes the repository easier to reproduce from scratch.
+
+Custom model lists can be based on:
+
+```text
+config/model_sweep_models.example.txt
+```
+
+## Other files in this folder
 
 | File | Purpose |
 |------|---------|
-| `config/default.json` | Required repo baseline (always loaded first) |
-| `config/local.json.example` | Template for optional gitignored `local.json` |
-| `config/model_sweep_top3.txt` | Short model list for thesis model selection |
-| `config/model_sweep_models.example.txt` | Example model list — copy and edit for custom sweeps |
+| `config/default.json` | Required repository baseline, always loaded first |
+| `config/local.json.example` | Template for optional gitignored local overrides |
+| `config/cheap.json` | Restricted LLM budget profile |
+| `config/balanced.json` | Balanced LLM budget profile |
+| `config/heavy.json` | Selected final thesis budget profile |
+| `config/model_sweep_top3.txt` | Complete three-model list for a fresh final model-comparison rerun |
+| `config/model_sweep_models.example.txt` | Example custom model-list template |
 
-### Evaluation keys (`evaluation` section)
+## Evaluation keys
+
+Relevant keys in the `evaluation` section include:
 
 | Key | Default | Meaning |
 |-----|---------|---------|
-| `belief_scoring` | `false` | When true, open-world may score via belief threshold |
-| `boolean_belief_threshold` | `0.5` | Threshold when belief scoring enabled |
-| `run_pre_query_satisfiability_check` | `true` | SAT check before query |
-| `pragmatic_factual_criteria_mode` | `false` | Allow factual criteria as case inputs (thesis comparison) |
-| `model_expansion_max_models` | `3` | Cap for model-expansion diagnostics (not Boolean entailment) |
+| `belief_scoring` | `false` | When enabled, open-world answers may be scored using a belief threshold |
+| `boolean_belief_threshold` | `0.5` | Threshold used only when belief scoring is enabled |
+| `run_pre_query_satisfiability_check` | `true` | Run a satisfiability check before evaluating the query |
+| `pragmatic_factual_criteria_mode` | `false` | Allow factual criteria as case inputs in the relevant comparison mode |
+| `model_expansion_max_models` | `3` | Cap for model-expansion diagnostics; not Boolean entailment scoring |
 
-Example overlay snippet (raises KB compile LLM budget):
+Example partial overlay increasing the KB compilation LLM budget:
 
 ```json
 {
@@ -111,39 +205,47 @@ Example overlay snippet (raises KB compile LLM budget):
 }
 ```
 
-## `.env` (minimal)
+## `.env`
+
+Common variables:
 
 | Variable | Purpose |
 |----------|---------|
-| `OPENAI_API_KEY` | API secret (OpenAI direct) |
-| `OPENAI_MODEL` | Optional default model |
-| `OPENAI_EXPLAINER_MODEL` | Optional model for NL paraphrase only |
-| `LLM_PROVIDER` | `openai` (default) or `openrouter` |
-| `LLM_API_KEY` | Provider-neutral API key override |
-| `LLM_MODEL` | Provider-neutral model override (wins over `OPENAI_MODEL`) |
+| `OPENAI_API_KEY` | API secret for OpenAI-direct execution |
+| `OPENAI_MODEL` | Optional default OpenAI model |
+| `OPENAI_EXPLAINER_MODEL` | Optional model used for natural-language paraphrase only |
+| `LLM_PROVIDER` | `openai` or `openrouter` |
+| `LLM_API_KEY` | Provider-neutral API-key override |
+| `LLM_MODEL` | Provider-neutral model override |
 | `LLM_BASE_URL` | Custom API base URL |
-| `OPENROUTER_API_KEY` | OpenRouter secret |
-| `OPENROUTER_MODEL` | OpenRouter model id (e.g. `anthropic/claude-sonnet-4.6`) |
-| `OPENROUTER_BASE_URL` | Default `https://openrouter.ai/api/v1` |
+| `OPENROUTER_API_KEY` | OpenRouter API secret |
+| `OPENROUTER_MODEL` | OpenRouter model id, for example `anthropic/claude-sonnet-4.6` |
+| `OPENROUTER_BASE_URL` | Usually `https://openrouter.ai/api/v1` |
 | `OPENROUTER_HTTP_REFERER` | Optional OpenRouter header |
 | `OPENROUTER_APP_TITLE` | Optional OpenRouter header |
-| `PIPELINE_USE_LLM_EXPLANATIONS` | Enable LLM NL paraphrase for explanations |
-| `PIPELINE_DEBUG` | Extra debug logging to console |
+| `PIPELINE_USE_LLM_EXPLANATIONS` | Enable optional natural-language explanation rendering |
+| `PIPELINE_DEBUG` | Enable additional console debugging |
 
-### `llm` section (`default.json`)
+## `llm` section in `default.json`
 
 | Key | Purpose |
 |-----|---------|
-| `provider` | `openai` or `openrouter` (overridable via `LLM_PROVIDER`) |
-| `model` | Default model when env vars unset |
+| `provider` | `openai` or `openrouter`, overridable through environment variables |
+| `model` | Default model when no environment override is supplied |
 | `base_url` | API base URL |
-| `use_seed` | Pass `seed` to chat completions (default off for OpenRouter) |
-| `use_response_format` | Pass `response_format` (default off for OpenRouter) |
-| `use_reasoning_effort` | Pass `reasoning_effort` when supported |
-| `timeout_seconds` | OpenAI SDK client timeout |
+| `use_seed` | Pass a seed to compatible chat-completion calls |
+| `use_response_format` | Pass structured-response settings when supported |
+| `use_reasoning_effort` | Pass a reasoning-effort setting when supported |
+| `timeout_seconds` | Client timeout |
 
-Everything else (JSON-IR repair limits, scope mode, extraction backend, trace, legacy LE flags, scoring) belongs in **`default.json`** / **`local.json`**.
+Everything else, including JSON-IR repair limits, scope mode, extraction backend, trace behaviour, Logical English flags and scoring options, belongs in `default.json` or an explicit local/profile override.
 
-## Run artifacts
+## Run artefacts
 
-Each JSON benchmark run writes **`effective_config.json`** (merged default + local + profile + env overrides, plus **`llm_runtime`** with provider/model/host only — never API keys) next to other run outputs.
+Each JSON benchmark run writes:
+
+```text
+effective_config.json
+```
+
+This file contains the merged configuration and an `llm_runtime` block with provider, model and host information only. API keys are never written to the artefact.
