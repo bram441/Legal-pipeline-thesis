@@ -1,0 +1,250 @@
+{
+  "types": [
+    "Person",
+    "Asset"
+  ],
+  "predicates": [
+    {
+      "name": "is_surviving_legal_cohabitant_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the surviving legal cohabitant of the second person (the deceased)."
+    },
+    {
+      "name": "is_immovable_property",
+      "args": [
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset is an immovable property."
+    },
+    {
+      "name": "served_as_principal_family_residence",
+      "args": [
+        "Asset",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The asset served as the principal family residence of the person at the time of the opening of the estate."
+    },
+    {
+      "name": "is_household_goods",
+      "args": [
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset consists of household goods."
+    },
+    {
+      "name": "is_present_in",
+      "args": [
+        "Asset",
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first asset is present in the second asset."
+    },
+    {
+      "name": "subject_to_right_of_legal_return",
+      "args": [
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset is subject to a right of legal return under article 4.24 or 4.25."
+    },
+    {
+      "name": "qualifies_for_cohabitant_usufruct",
+      "args": [
+        "Asset",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The asset qualifies for the surviving legal cohabitant's usufruct from the deceased person's estate."
+    },
+    {
+      "name": "obtains_usufruct",
+      "args": [
+        "Person",
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "output_category": "right",
+      "description": "The person obtains the usufruct of the asset."
+    }
+  ],
+  "functions": [],
+  "rules": [
+    {
+      "forall": [
+        {
+          "var": "asset",
+          "type": "Asset"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_immovable_property",
+              "args": [
+                "asset"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "served_as_principal_family_residence",
+              "args": [
+                "asset",
+                "deceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "qualifies_for_cohabitant_usufruct",
+          "args": [
+            "asset",
+            "deceased"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "asset",
+          "type": "Asset"
+        },
+        {
+          "var": "home",
+          "type": "Asset"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_household_goods",
+              "args": [
+                "asset"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_immovable_property",
+              "args": [
+                "home"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "served_as_principal_family_residence",
+              "args": [
+                "home",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_present_in",
+              "args": [
+                "asset",
+                "home"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "qualifies_for_cohabitant_usufruct",
+          "args": [
+            "asset",
+            "deceased"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "survivor",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "asset",
+          "type": "Asset"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_legal_cohabitant_of",
+              "args": [
+                "survivor",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "qualifies_for_cohabitant_usufruct",
+              "args": [
+                "asset",
+                "deceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "obtains_usufruct",
+          "args": [
+            "survivor",
+            "asset"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    }
+  ]
+}

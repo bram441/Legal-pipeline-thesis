@@ -1,0 +1,130 @@
+{
+  "query": {
+    "predicate": "acquires_right_to_lease",
+    "args": [
+      "lotte",
+      "appartement"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "entailed",
+    "certain": true,
+    "possible": true,
+    "certainty_class": "decisive"
+  },
+  "extracted_case": {
+    "facts": [
+      "is_surviving_spouse_of(lotte,milan).",
+      "is_rented_property(appartement).",
+      "served_as_main_family_residence_at_opening_of_estate(appartement,milan)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "Property": [
+        "appartement"
+      ],
+      "Person": [
+        "lotte",
+        "milan"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 0,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_surviving_spouse_of",
+            "args": [
+              "spouse",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "is_rented_property",
+            "args": [
+              "prop"
+            ]
+          },
+          {
+            "predicate": "served_as_main_family_residence_at_opening_of_estate",
+            "args": [
+              "prop",
+              "deceased"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "acquires_right_to_lease"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 0,
+      "target": "acquires_right_to_lease(lotte,appartement)",
+      "conditions": [
+        {
+          "atom": "is_surviving_spouse_of(lotte,milan)",
+          "status": "present"
+        },
+        {
+          "atom": "is_rented_property(appartement)",
+          "status": "present"
+        },
+        {
+          "atom": "served_as_main_family_residence_at_opening_of_estate(appartement,milan)",
+          "status": "present"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "is_surviving_spouse_of",
+      "symbol_type": "predicate",
+      "atom": "is_surviving_spouse_of(lotte,milan)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "is_rented_property",
+      "symbol_type": "predicate",
+      "atom": "is_rented_property(appartement)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "served_as_main_family_residence_at_opening_of_estate",
+      "symbol_type": "predicate",
+      "atom": "served_as_main_family_residence_at_opening_of_estate(appartement,milan)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "genuinely_under_specified_case",
+    "secondary": [],
+    "rationale": "No single blocking category identified; case may lack explicit observables for a decisive proof."
+  }
+}

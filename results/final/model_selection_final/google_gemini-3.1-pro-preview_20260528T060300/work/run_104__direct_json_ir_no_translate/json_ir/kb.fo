@@ -1,0 +1,18 @@
+vocabulary V {
+  type Person
+  type Asset
+  is_surviving_legal_cohabitant_of: Person * Person -> Bool
+  is_immovable_property: Asset -> Bool
+  served_as_principal_family_residence: Asset * Person -> Bool
+  is_household_goods: Asset -> Bool
+  is_present_in: Asset * Asset -> Bool
+  subject_to_right_of_legal_return: Asset -> Bool
+  qualifies_for_cohabitant_usufruct: Asset * Person -> Bool
+  obtains_usufruct: Person * Asset -> Bool
+}
+
+theory T:V {
+  ! asset in Asset, deceased in Person: (((is_immovable_property(asset)) & (served_as_principal_family_residence(asset,deceased)))) => ((qualifies_for_cohabitant_usufruct(asset,deceased))).
+  ! asset in Asset, home in Asset, deceased in Person: (((is_household_goods(asset)) & (is_immovable_property(home)) & (served_as_principal_family_residence(home,deceased)) & (is_present_in(asset,home)))) => ((qualifies_for_cohabitant_usufruct(asset,deceased))).
+  ! survivor in Person, deceased in Person, asset in Asset: (((is_surviving_legal_cohabitant_of(survivor,deceased)) & (qualifies_for_cohabitant_usufruct(asset,deceased)))) => ((obtains_usufruct(survivor,asset))).
+}

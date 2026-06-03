@@ -15,6 +15,7 @@ vocabulary V {
 
 theory T:V {
   !a in Actor, b in Actor: relation(a,b) & condition_exists(b) => legal_result(a).
+  !a in Actor: legal_result(a) => (?b in Actor: relation(a,b) & condition_exists(b)).
 }
 """.strip()
 
@@ -23,8 +24,20 @@ def _kb_schema(*, with_rules=True):
     schema = {
         "types": ["Actor"],
         "predicates": [
-            {"name": "relation", "args": ["Actor", "Actor"], "returns": "Bool", "kind": "observable"},
-            {"name": "condition_exists", "args": ["Actor"], "returns": "Bool", "kind": "observable"},
+            {
+                "name": "relation",
+                "args": ["Actor", "Actor"],
+                "returns": "Bool",
+                "kind": "observable",
+                "directly_observable": True,
+            },
+            {
+                "name": "condition_exists",
+                "args": ["Actor"],
+                "returns": "Bool",
+                "kind": "observable",
+                "directly_observable": True,
+            },
             {"name": "legal_result", "args": ["Actor"], "returns": "Bool", "kind": "derived"},
         ],
         "functions": [],

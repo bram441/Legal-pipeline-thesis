@@ -1,0 +1,1 @@
+JSON_IR_SCHEMA_DESIGN_ERROR: Predicate 'is_legally_cohabiting_survivor_of' (kind=observable) looks like a status/classification name. Background/prerequisite statuses that cases may assert directly must set directly_observable=true (Bool, not legal_output). Final legal conclusions defined by the scoped law must be kind=derived with defining rules. Repair layer: symbols.

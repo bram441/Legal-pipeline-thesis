@@ -1,0 +1,363 @@
+{
+  "types": {
+    "Company": {
+      "name": "Company",
+      "kind": "entity",
+      "aliases": [],
+      "source": "kb_symbol_table"
+    },
+    "FinancialYear": {
+      "name": "FinancialYear",
+      "kind": "period",
+      "aliases": [],
+      "source": "kb_symbol_table"
+    }
+  },
+  "predicates": {
+    "has_legal_personality": {
+      "name": "has_legal_personality",
+      "args": [
+        "Company"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The company has legal personality (rechtspersoonlijkheid).",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "employee_criterion_exceeded": {
+      "name": "employee_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds the annual average employee threshold in the financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": true,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": "case_given_employee_criterion_exceeded",
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "turnover_criterion_exceeded": {
+      "name": "turnover_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds the annual net turnover threshold (excluding VAT) in the financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": true,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": "case_given_turnover_criterion_exceeded",
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "balance_sheet_criterion_exceeded": {
+      "name": "balance_sheet_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds the balance sheet total threshold in the financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": true,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": "case_given_balance_sheet_criterion_exceeded",
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "more_than_one_criterion_exceeded": {
+      "name": "more_than_one_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds more than one of the three size criteria in the financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": true,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": "case_given_more_than_one_criterion_exceeded",
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "more_than_one_criterion_exceeded_two_consecutive_years": {
+      "name": "more_than_one_criterion_exceeded_two_consecutive_years",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds more than one criterion in this financial year and in the immediately preceding financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": true,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": "case_given_more_than_one_criterion_exceeded_two_consecutive_years",
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "no_longer_exceeds_more_than_one_criterion_two_consecutive_years": {
+      "name": "no_longer_exceeds_more_than_one_criterion_two_consecutive_years",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company no longer exceeds more than one criterion in this financial year and in the immediately preceding financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": true,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": "case_given_no_longer_exceeds_more_than_one_criterion_two_consecutive_years",
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "is_kleine_vennootschap": {
+      "name": "is_kleine_vennootschap",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The company qualifies as a kleine vennootschap (small company) as of the given financial year.",
+      "legal_output": null,
+      "output_category": "classification",
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "loses_kleine_vennootschap_status_from": {
+      "name": "loses_kleine_vennootschap_status_from",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The company loses kleine vennootschap status starting from this financial year due to exceeding more than one criterion for two consecutive years.",
+      "legal_output": true,
+      "output_category": "legal_effect",
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": true,
+      "temporal_support": false
+    },
+    "gains_kleine_vennootschap_status_from": {
+      "name": "gains_kleine_vennootschap_status_from",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The company gains kleine vennootschap status starting from this financial year because it no longer exceeds more than one criterion for two consecutive years.",
+      "legal_output": true,
+      "output_category": "legal_effect",
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": true,
+      "temporal_support": false
+    },
+    "previous_financial_year": {
+      "name": "previous_financial_year",
+      "args": [
+        "FinancialYear",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The second financial year is the immediately preceding financial year relative to the first.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": true
+    },
+    "next_financial_year": {
+      "name": "next_financial_year",
+      "args": [
+        "FinancialYear",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The second financial year is the immediately following financial year relative to the first.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": true
+    }
+  },
+  "functions": {
+    "annual_average_employees": {
+      "name": "annual_average_employees",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Int",
+      "kind": "observable",
+      "description": "The annual average number of employees of the company in the financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "annual_net_turnover_excl_vat": {
+      "name": "annual_net_turnover_excl_vat",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The annual net turnover excluding VAT of the company in the financial year, in euros.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "balance_sheet_total": {
+      "name": "balance_sheet_total",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The balance sheet total of the company in the financial year, in euros.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    }
+  },
+  "assertable_case_symbols": {
+    "predicates": [
+      "has_legal_personality",
+      "next_financial_year",
+      "previous_financial_year"
+    ],
+    "functions": [
+      "annual_average_employees",
+      "annual_net_turnover_excl_vat",
+      "balance_sheet_total"
+    ]
+  },
+  "factual_case_input_predicates": [
+    "balance_sheet_criterion_exceeded",
+    "employee_criterion_exceeded",
+    "more_than_one_criterion_exceeded",
+    "more_than_one_criterion_exceeded_two_consecutive_years",
+    "no_longer_exceeds_more_than_one_criterion_two_consecutive_years",
+    "turnover_criterion_exceeded"
+  ],
+  "factual_criteria_input_predicates": [],
+  "legal_output_query_targets": [
+    "gains_kleine_vennootschap_status_from",
+    "loses_kleine_vennootschap_status_from"
+  ],
+  "temporal_support_symbols": [
+    "next_financial_year",
+    "previous_financial_year"
+  ]
+}

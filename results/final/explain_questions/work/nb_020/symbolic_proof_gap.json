@@ -1,0 +1,311 @@
+{
+  "query": {
+    "predicate": "risk_of_absconding",
+    "args": [
+      "yara"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "unknown",
+    "certain": false,
+    "possible": true,
+    "certainty_class": "inconclusive"
+  },
+  "extracted_case": {
+    "facts": [
+      "not is_belgian_national(yara).",
+      "not meets_entry_or_residence_conditions(yara)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "Person": [
+        "yara",
+        "zij"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 6,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "no_residence_application_filed_after_illegal_entry_or_during_illegal_stay",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 7,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "used_false_information_or_documents_in_procedure",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 8,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "failed_to_cooperate_with_authorities",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 9,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "indicated_unwillingness_to_comply_with_measure",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 10,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "subject_to_active_entry_ban",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 11,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "filed_new_application_immediately_after_negative_decision",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 12,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "concealed_prior_fingerprints_in_other_state",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 13,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "multiple_applications_with_negative_outcomes",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 14,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "concealed_prior_international_protection_request_in_other_state",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 15,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "came_for_purposes_other_than_stated_in_application",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 16,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "subject_to_fine_for_manifestly_unfounded_appeal",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 17,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "at_least_one_absconding_criterion_met",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "individual_examination_performed",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "subject_to_removal_procedure",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "subject_to_international_protection_procedure",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "subject_to_responsibility_determination_procedure",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "risk_of_absconding_is_current_and_real"
+      ]
+    },
+    {
+      "rule_index": 18,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "risk_of_absconding_is_current_and_real",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "risk_of_absconding"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 18,
+      "target": "risk_of_absconding(yara)",
+      "conditions": [
+        {
+          "atom": "risk_of_absconding_is_current_and_real(yara)",
+          "status": "helper_defined"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "risk_of_absconding_is_current_and_real",
+      "symbol_type": "predicate",
+      "atom": "risk_of_absconding_is_current_and_real(yara)",
+      "kind": "helper",
+      "gap_status": "derivable_from_rules",
+      "assertable_in_case": false,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        17
+      ]
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "extraction_gap",
+    "secondary": [],
+    "rationale": "Symbolic result is inconclusive and antecedents are not fully grounded in case facts."
+  }
+}

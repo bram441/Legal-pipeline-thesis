@@ -1,0 +1,141 @@
+{
+  "cardinality_violations": [],
+  "numeric_provenance_issues": [],
+  "law_thresholds": [
+    10.0,
+    11.0,
+    14.0
+  ],
+  "missing_helper": {
+    "helper_name": "risk_of_absconding_is_current_and_real",
+    "helper_signature": "Person -> Bool",
+    "helper_kind": "predicate",
+    "helper_kind_hint": "unknown",
+    "helper_kind_hints": [
+      "unknown"
+    ],
+    "used_in_rules": [
+      {
+        "rule_index": 20,
+        "side": "if",
+        "negated": false,
+        "then_predicates": [
+          "risk_of_absconding"
+        ],
+        "then_legal_output_predicates": [
+          "risk_of_absconding"
+        ]
+      }
+    ],
+    "derives_legal_output": true,
+    "used_in_legal_output_rule": true,
+    "legal_output_predicates_in_then": [
+      "risk_of_absconding"
+    ],
+    "candidate_lower_level_symbols": [
+      {
+        "name": "risk_of_absconding",
+        "kind": "derived",
+        "description": "There is a risk of absconding: reasons exist to believe the person will abscond, established after individual examinatio"
+      },
+      {
+        "name": "at_least_one_absconding_criterion_met",
+        "kind": "helper",
+        "description": "At least one of the objective criteria for risk of absconding is met for the person."
+      },
+      {
+        "name": "is_belgian_national",
+        "kind": "observable",
+        "description": "The person can prove they hold Belgian nationality."
+      },
+      {
+        "name": "is_eu_citizen",
+        "kind": "observable",
+        "description": "The person is a citizen of the European Union."
+      },
+      {
+        "name": "falls_under_eu_free_movement_law",
+        "kind": "observable",
+        "description": "The person falls under EU law on free movement as defined in Article 2(5) of the Schengen Borders Code."
+      },
+      {
+        "name": "meets_entry_or_residence_conditions",
+        "kind": "observable",
+        "description": "The person currently meets the conditions for entry to or residence on the territory."
+      },
+      {
+        "name": "subject_to_removal_procedure",
+        "kind": "observable",
+        "description": "The person is subject to a removal procedure."
+      },
+      {
+        "name": "subject_to_international_protection_procedure",
+        "kind": "observable",
+        "description": "The person is subject to a procedure for granting international protection."
+      },
+      {
+        "name": "subject_to_responsibility_determination_procedure",
+        "kind": "observable",
+        "description": "The person is subject to a procedure to determine or transfer to the responsible Member State for processing an internat"
+      },
+      {
+        "name": "individual_examination_performed",
+        "kind": "observable",
+        "description": "An individual examination of the person has been performed."
+      },
+      {
+        "name": "holds_valid_travel_document",
+        "kind": "observable",
+        "description": "The person holds a valid travel document, valid passport, or valid identity document."
+      },
+      {
+        "name": "recognised_as_national_by_home_authority",
+        "kind": "observable",
+        "description": "The person has been recognised as a national by the national authority of their country, which declared willingness to i"
+      }
+    ],
+    "threshold_helper_candidates": [
+      {
+        "name": "at_least_one_absconding_criterion_met",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "At least one of the objective criteria for risk of absconding is met for the person."
+      }
+    ],
+    "temporal_relation_candidates": [],
+    "legal_output_candidates": [
+      {
+        "name": "risk_of_absconding",
+        "kind": "derived",
+        "role": "legal_output",
+        "description": "There is a risk of absconding: reasons exist to believe the person will abscond, established after individual examinatio"
+      }
+    ],
+    "missing_temporal_support_symbol": false,
+    "undeclared_temporal_funcs_in_rules": [],
+    "legal_effect_context": true,
+    "is_secondary": false
+  },
+  "secondary_missing_helpers": [],
+  "computed_observable_predicate": null,
+  "computed_observable_helper_kind_hint": null,
+  "temporal_support": {
+    "detected_temporal_terms": [],
+    "requires_temporal_support": false,
+    "legal_effect_context": true,
+    "has_period_like_types": false,
+    "has_temporal_support_symbols": false,
+    "existing_period_types": [],
+    "existing_temporal_symbols": [],
+    "legal_output_predicates": [
+      "risk_of_absconding"
+    ],
+    "missing_temporal_support_symbol": false,
+    "repair_route": null
+  },
+  "missing_temporal_support_symbol": false,
+  "repair_route": null,
+  "secondary_diagnostics_text": "missing_helper_definition (legal-effect context=True):\n  helper: risk_of_absconding_is_current_and_real (signature=Person -> Bool; kind=unknown; hints=unknown)\n  repair: define 'risk_of_absconding_is_current_and_real' in THEN with rules, or reclassify as case_input/background only if safe; do not rename without defining.\n  legal-output THEN predicate(s): risk_of_absconding\n  - rules[20].if -> THEN: risk_of_absconding\n  threshold helper candidates:\n    - at_least_one_absconding_criterion_met (helper)\n  other lower-level symbols:\n    - risk_of_absconding (derived)\n    - at_least_one_absconding_criterion_met (helper)\n    - is_belgian_national (observable)\n    - is_eu_citizen (observable)\n    - falls_under_eu_free_movement_law (observable)\n    - meets_entry_or_residence_conditions (observable)\n    - subject_to_removal_procedure (observable)\n    - subject_to_international_protection_procedure (observable)",
+  "validation_evidence_fingerprint": "cab2dd6e924a299b",
+  "evidence_consumed_by_repair": false
+}

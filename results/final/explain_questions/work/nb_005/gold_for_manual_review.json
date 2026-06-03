@@ -1,0 +1,7 @@
+{
+  "run_id": "nb_005",
+  "gold_type": "entity_plus_effect",
+  "expected_answer": "De langstlevende echtgenoot Jonas verkrijgt als enige, met uitsluiting van alle andere erfgenamen, het recht op de huur.",
+  "law_source": "erfrecht_clean.txt",
+  "notes": "Gold is separated from plain_inputs and must not be included in model prompts."
+}

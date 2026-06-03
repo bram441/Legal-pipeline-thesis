@@ -1,0 +1,19 @@
+{
+  "question": "Welke goederen vallen volgens artikel 4.23 onder het vruchtgebruik van Hana?",
+  "detected_question_type": "explanation",
+  "selected_intent": "explain",
+  "selected_reason": "extracted_intent_query",
+  "scorable": false,
+  "fallback_intent": "relevance",
+  "warnings": [],
+  "legal_output_symbols": [
+    "acquires_rental_right_of_main_residence",
+    "acquires_usufruct_from_donation",
+    "acquires_usufruct_of_household_contents",
+    "acquires_usufruct_of_main_residence",
+    "entitled_to_inventory_of_household_contents",
+    "usufruct_rules_of_surviving_spouse_apply"
+  ],
+  "query_hint_type": "explanation",
+  "expected_question_type": null
+}

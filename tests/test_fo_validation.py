@@ -1,6 +1,8 @@
 """Regression tests for case fact validation."""
+import os
 import unittest
 
+from pipeline.config import reload_config
 from pipeline.extraction import extractor
 from pipeline.validation.fo_validation import normalize_and_validate_case, normalize_and_validate_query
 
@@ -15,7 +17,7 @@ class TestQueryArityErrors(unittest.TestCase):
                 case,
                 kb_schema=schema,
             )
-        self.assertIn("expected 1 arg", str(ctx.exception))
+        self.assertIn("expected 1", str(ctx.exception))
         self.assertIn("got 0", str(ctx.exception))
 
     def test_extractor_feedback_appends_arity_remediation(self):
@@ -31,6 +33,18 @@ class TestQueryArityErrors(unittest.TestCase):
 
 
 class TestExclusiveSuccessionBranches(unittest.TestCase):
+    def setUp(self):
+        self._prev_domain_heuristics = os.environ.get("LEGAL_PIPELINE_ENABLE_DOMAIN_HEURISTICS")
+        os.environ["LEGAL_PIPELINE_ENABLE_DOMAIN_HEURISTICS"] = "1"
+        reload_config()
+
+    def tearDown(self):
+        if self._prev_domain_heuristics is None:
+            os.environ.pop("LEGAL_PIPELINE_ENABLE_DOMAIN_HEURISTICS", None)
+        else:
+            os.environ["LEGAL_PIPELINE_ENABLE_DOMAIN_HEURISTICS"] = self._prev_domain_heuristics
+        reload_config()
+
     def test_rejects_two_branches_same_entity(self):
         raw = {
             "facts": [
@@ -70,19 +84,27 @@ class TestFactArgumentValidation(unittest.TestCase):
         self.assertIn("Person", out.get("entities", {}))
         self.assertNotIn("person", out.get("entities", {}))
 
-    def test_rejects_query_when_required_type_has_no_entities(self):
-        case = {"facts": ["p(anna)."], "entities": {"Person": ["anna"]}}
+    def test_rejects_query_when_arg_not_valid_for_typed_entity_pool(self):
+        case = {
+            "facts": ["p(anna)."],
+            "entities": {"Person": ["anna"], "Estate": ["estate_bert"]},
+        }
         schema = {
             "types": ["Person", "Estate"],
             "predicates": [{"name": "q", "args": ["Person", "Estate"], "returns": "Bool"}],
         }
         with self.assertRaises(ValueError) as ctx:
             normalize_and_validate_query(
-                {"type": "predicate", "predicate": "q", "mode": "boolean", "args": ["anna", "anna"]},
+                {
+                    "type": "predicate",
+                    "predicate": "q",
+                    "mode": "boolean",
+                    "args": ["anna", "not_in_case_estate"],
+                },
                 case,
                 kb_schema=schema,
             )
-        self.assertIn("No entities declared for required query argument type", str(ctx.exception))
+        self.assertIn("not a valid Estate entity", str(ctx.exception))
 
     def test_allows_wildcard_for_missing_required_type(self):
         case = {"facts": ["p(anna)."], "entities": {"Person": ["anna"]}}

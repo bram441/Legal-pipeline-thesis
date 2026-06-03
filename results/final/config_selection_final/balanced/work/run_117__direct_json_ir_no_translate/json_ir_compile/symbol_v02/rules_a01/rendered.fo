@@ -1,0 +1,27 @@
+vocabulary V {
+  type Company
+  type FinancialYear
+  has_legal_personality: Company -> Bool
+  is_small_company: Company -> Bool
+  is_subsidiary: Company -> Bool
+  is_parent_company: Company -> Bool
+  employee_threshold_exceeded: Company * FinancialYear -> Bool
+  turnover_threshold_exceeded: Company * FinancialYear -> Bool
+  balance_sheet_threshold_exceeded: Company * FinancialYear -> Bool
+  more_than_one_criterion_exceeded: Company * FinancialYear -> Bool
+  is_micro_company: Company * FinancialYear -> Bool
+  annual_average_employees: Company * FinancialYear -> Int
+  annual_net_turnover_excl_vat: Company * FinancialYear -> Real
+  balance_sheet_total: Company * FinancialYear -> Real
+}
+
+theory T:V {
+  ! c in Company, fy in FinancialYear: ((annual_average_employees(c,fy) > 10)) => ((employee_threshold_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((annual_net_turnover_excl_vat(c,fy) > 900000.0)) => ((turnover_threshold_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((balance_sheet_total(c,fy) > 450000.0)) => ((balance_sheet_threshold_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: (((employee_threshold_exceeded(c,fy)) & (turnover_threshold_exceeded(c,fy)))) => ((more_than_one_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: (((employee_threshold_exceeded(c,fy)) & (balance_sheet_threshold_exceeded(c,fy)))) => ((more_than_one_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: (((turnover_threshold_exceeded(c,fy)) & (balance_sheet_threshold_exceeded(c,fy)))) => ((more_than_one_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: (((has_legal_personality(c)) & (is_small_company(c)) & (~is_subsidiary(c)) & (~is_parent_company(c)) & (~more_than_one_criterion_exceeded(c,fy)))) => ((is_micro_company(c,fy))).
+  ! c in Company, fy in FinancialYear: (((is_subsidiary(c)) | (is_parent_company(c)) | (more_than_one_criterion_exceeded(c,fy)))) => ((~is_micro_company(c,fy))).
+}

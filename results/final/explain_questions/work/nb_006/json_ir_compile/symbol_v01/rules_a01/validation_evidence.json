@@ -1,0 +1,244 @@
+{
+  "cardinality_violations": [],
+  "numeric_provenance_issues": [
+    {
+      "path": "rules[7].if[0].and[2]",
+      "threshold": 13500000,
+      "law_values": [
+        26.0,
+        38.0,
+        50.0,
+        1996.0,
+        2002.0,
+        6000000.0,
+        11250000.0
+      ]
+    },
+    {
+      "path": "rules[8].if[0].and[2]",
+      "threshold": 7200000,
+      "law_values": [
+        26.0,
+        38.0,
+        50.0,
+        1996.0,
+        2002.0,
+        6000000.0,
+        11250000.0
+      ]
+    }
+  ],
+  "law_thresholds": [
+    26.0,
+    38.0,
+    50.0,
+    1996.0,
+    2002.0,
+    6000000.0,
+    11250000.0
+  ],
+  "missing_helper": {
+    "helper_name": "adjusted_turnover_threshold",
+    "helper_signature": "Company * FinancialYear -> Real",
+    "helper_kind": "function",
+    "helper_kind_hint": "threshold",
+    "helper_kind_hints": [
+      "threshold"
+    ],
+    "used_in_rules": [],
+    "derives_legal_output": false,
+    "used_in_legal_output_rule": false,
+    "legal_output_predicates_in_then": [],
+    "candidate_lower_level_symbols": [
+      {
+        "name": "turnover_criterion_exceeded",
+        "kind": "helper",
+        "description": "The company exceeds the annual net turnover threshold (11,250,000 EUR excl. VAT) in the financial year."
+      },
+      {
+        "name": "revenues_majority_non_turnover",
+        "kind": "observable",
+        "description": "More than half of the company's ordinary business revenues do not qualify as net turnover (netto-omzet), triggering the "
+      },
+      {
+        "name": "annual_net_turnover_excl_vat",
+        "kind": "observable",
+        "description": "The annual net turnover excluding VAT of the company in the financial year, as defined in article 1:26/1."
+      },
+      {
+        "name": "alternative_turnover",
+        "kind": "observable",
+        "description": "Total operating and financial revenues excluding non-recurring revenues, used as turnover when more than half of ordinar"
+      },
+      {
+        "name": "consolidated_net_turnover",
+        "kind": "observable",
+        "description": "The consolidated net turnover of the company and its linked companies for the financial year."
+      },
+      {
+        "name": "employee_criterion_exceeded",
+        "kind": "helper",
+        "description": "The company exceeds the annual average employee threshold (50 FTE) in the financial year."
+      },
+      {
+        "name": "balance_sheet_criterion_exceeded",
+        "kind": "helper",
+        "description": "The company exceeds the balance sheet total threshold (6,000,000 EUR) in the financial year."
+      },
+      {
+        "name": "more_than_one_criterion_exceeded",
+        "kind": "helper",
+        "description": "The company exceeds more than one of the three size criteria in the financial year."
+      },
+      {
+        "name": "more_than_one_criterion_exceeded_two_consecutive_years",
+        "kind": "helper",
+        "description": "The company exceeds more than one criterion in this financial year and in the immediately preceding financial year."
+      },
+      {
+        "name": "no_longer_exceeds_more_than_one_criterion_two_consecutive_years",
+        "kind": "helper",
+        "description": "The company no longer exceeds more than one criterion in this financial year and in the immediately preceding financial "
+      },
+      {
+        "name": "consolidated_criteria_apply",
+        "kind": "helper",
+        "description": "The net turnover and balance sheet criteria must be calculated on a consolidated basis for this company in this financia"
+      },
+      {
+        "name": "has_legal_personality",
+        "kind": "observable",
+        "description": "The company has legal personality (rechtspersoonlijkheid)."
+      }
+    ],
+    "threshold_helper_candidates": [
+      {
+        "name": "employee_criterion_exceeded",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "The company exceeds the annual average employee threshold (50 FTE) in the financial year."
+      },
+      {
+        "name": "turnover_criterion_exceeded",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "The company exceeds the annual net turnover threshold (11,250,000 EUR excl. VAT) in the financial year."
+      },
+      {
+        "name": "balance_sheet_criterion_exceeded",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "The company exceeds the balance sheet total threshold (6,000,000 EUR) in the financial year."
+      },
+      {
+        "name": "more_than_one_criterion_exceeded",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "The company exceeds more than one of the three size criteria in the financial year."
+      },
+      {
+        "name": "more_than_one_criterion_exceeded_two_consecutive_years",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "The company exceeds more than one criterion in this financial year and in the immediately preceding financial year."
+      },
+      {
+        "name": "no_longer_exceeds_more_than_one_criterion_two_consecutive_years",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "The company no longer exceeds more than one criterion in this financial year and in the immediately preceding financial "
+      },
+      {
+        "name": "consolidated_criteria_apply",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "The net turnover and balance sheet criteria must be calculated on a consolidated basis for this company in this financia"
+      },
+      {
+        "name": "adjusted_turnover_threshold",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "The pro-rata adjusted net turnover threshold for the financial year when its duration differs from twelve months (11,250"
+      }
+    ],
+    "temporal_relation_candidates": [
+      {
+        "name": "previous_financial_year",
+        "kind": "observable",
+        "role": "temporal_relation",
+        "description": "The second financial year is the immediately preceding financial year of the first."
+      },
+      {
+        "name": "next_financial_year",
+        "kind": "observable",
+        "role": "temporal_relation",
+        "description": "The second financial year immediately follows the first financial year."
+      }
+    ],
+    "legal_output_candidates": [
+      {
+        "name": "is_kleine_vennootschap",
+        "kind": "derived",
+        "role": "legal_output",
+        "description": "The company qualifies as a kleine vennootschap (small company) for the given financial year under article 1:24."
+      },
+      {
+        "name": "loses_kleine_vennootschap_status_from",
+        "kind": "derived",
+        "role": "legal_output",
+        "description": "The company loses its kleine vennootschap status starting from this financial year, because more than one criterion was "
+      },
+      {
+        "name": "gains_kleine_vennootschap_status_from",
+        "kind": "derived",
+        "role": "legal_output",
+        "description": "The company gains kleine vennootschap status starting from this financial year, because it no longer exceeded more than "
+      }
+    ],
+    "missing_temporal_support_symbol": false,
+    "undeclared_temporal_funcs_in_rules": [],
+    "legal_effect_context": true,
+    "is_secondary": false
+  },
+  "secondary_missing_helpers": [],
+  "computed_observable_predicate": null,
+  "computed_observable_helper_kind_hint": null,
+  "temporal_support": {
+    "detected_temporal_terms": [
+      "achtereenvolgende"
+    ],
+    "requires_temporal_support": false,
+    "legal_effect_context": true,
+    "has_period_like_types": true,
+    "has_temporal_support_symbols": true,
+    "existing_period_types": [
+      "FinancialYear"
+    ],
+    "existing_temporal_symbols": [
+      {
+        "name": "previous_financial_year",
+        "kind": "observable",
+        "role": "temporal_relation",
+        "description": "The second financial year is the immediately preceding financial year of the first."
+      },
+      {
+        "name": "next_financial_year",
+        "kind": "observable",
+        "role": "temporal_relation",
+        "description": "The second financial year immediately follows the first financial year."
+      }
+    ],
+    "legal_output_predicates": [
+      "is_kleine_vennootschap",
+      "loses_kleine_vennootschap_status_from",
+      "gains_kleine_vennootschap_status_from"
+    ],
+    "missing_temporal_support_symbol": false,
+    "repair_route": null
+  },
+  "missing_temporal_support_symbol": false,
+  "repair_route": null,
+  "secondary_diagnostics_text": "numeric_threshold_not_in_law_text (secondary — fix even if cardinality is primary):\n  - Rule rules[7].if[0].and[2] uses numeric threshold 13500000, not in scoped law text.\n  - Rule rules[8].if[0].and[2] uses numeric threshold 7200000, not in scoped law text.\n  Allowed law-text thresholds: 26, 38, 50, 1996, 2002, 6000000, 11250000\nAlso fix these numeric threshold provenance issues.\nmissing_helper_definition (legal-effect context=True):\n  helper: adjusted_turnover_threshold (signature=Company * FinancialYear -> Real; kind=threshold; hints=threshold)\n  repair: define 'adjusted_turnover_threshold' in THEN with rules, or reclassify as case_input/background only if safe; do not rename without defining.\n  threshold hint: prefer pairwise/conjunctive THEN definitions ((A&B) OR (A&C) OR (B&C)) for more-than-one helpers.\n  threshold helper candidates:\n    - employee_criterion_exceeded (helper)\n    - turnover_criterion_exceeded (helper)\n    - balance_sheet_criterion_exceeded (helper)\n    - more_than_one_criterion_exceeded (helper)\n    - more_than_one_criterion_exceeded_two_consecutive_years (helper)\n    - no_longer_exceeds_more_than_one_criterion_two_consecutive_years (helper)\n  temporal relation candidates:\n    - previous_financial_year (observable)\n    - next_financial_year (observable)\n  other lower-level symbols:\n    - turnover_criterion_exceeded (helper)\n    - revenues_majority_non_turnover (observable)\n    - annual_net_turnover_excl_vat (observable)\n    - alternative_turnover (observable)\n    - consolidated_net_turnover (observable)\n    - employee_criterion_exceeded (helper)\n    - balance_sheet_criterion_exceeded (helper)\n    - more_than_one_criterion_exceeded (helper)",
+  "validation_evidence_fingerprint": "ecac34a6e63e3ce2",
+  "evidence_consumed_by_repair": false
+}

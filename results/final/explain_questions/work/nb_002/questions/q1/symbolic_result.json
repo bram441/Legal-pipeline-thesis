@@ -1,0 +1,58 @@
+{
+  "intent": "explain",
+  "symbolic_status": "error",
+  "status": "error",
+  "scorable": false,
+  "detected_question_type": "explanation",
+  "selected_intent": "explain",
+  "selected_reason": "extracted_intent_query",
+  "routing": {
+    "question": "Welke rechten verkrijgt David volgens artikel 4.17, paragraaf 2?",
+    "detected_question_type": "explanation",
+    "selected_intent": "explain",
+    "selected_reason": "extracted_intent_query",
+    "scorable": false,
+    "fallback_intent": "relevance",
+    "warnings": [],
+    "legal_output_symbols": [
+      "surviving_spouse_acquires_full_ownership_common_share",
+      "surviving_spouse_acquires_usufruct_own_property",
+      "surviving_spouse_acquires_usufruct_reversion_property"
+    ],
+    "query_hint_type": "explanation",
+    "expected_question_type": null
+  },
+  "satisfiability_check": {
+    "stage": "pre_query",
+    "kb_case_satisfiable": true,
+    "status": "ok",
+    "details": "theory satisfiable",
+    "intent_backend": "idp_z3.tasks.satisfiable_check",
+    "duration_seconds": 0.073
+  },
+  "warnings": [],
+  "deduction": null,
+  "model_expansion": null,
+  "get_range": null,
+  "satisfiable": null,
+  "explanation": {
+    "intent": "explain",
+    "answer": "explain target requires predicate and args",
+    "support": null,
+    "parsed": false,
+    "warnings": [],
+    "raw": {
+      "intent": "explain",
+      "status": "error",
+      "output_kind": "unknown",
+      "message": "explain target requires predicate and args"
+    }
+  },
+  "execution_query": {
+    "type": "intent",
+    "intent": "explain",
+    "target": null
+  },
+  "output_kind": "unknown",
+  "message": "explain target requires predicate and args"
+}

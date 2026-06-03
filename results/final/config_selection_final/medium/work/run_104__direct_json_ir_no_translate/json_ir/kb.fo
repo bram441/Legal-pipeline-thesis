@@ -1,0 +1,22 @@
+vocabulary V {
+  type Person
+  type Asset
+  is_surviving_legal_cohabitant_of: Person * Person -> Bool
+  is_heir_of: Person * Person -> Bool
+  served_as_main_family_residence_at_opening: Asset * Person -> Bool
+  is_household_contents_of: Asset * Asset -> Bool
+  subject_to_legal_reversion_4_24: Asset -> Bool
+  subject_to_legal_reversion_4_25: Asset -> Bool
+  subject_to_legal_reversion: Asset -> Bool
+  acquires_usufruct_of_main_residence: Person * Person -> Bool
+  acquires_usufruct_of_household_contents: Person * Person -> Bool
+}
+
+theory T:V {
+  ! survivor in Person, deceased in Person, asset in Asset: (((is_surviving_legal_cohabitant_of(survivor,deceased)) & (is_heir_of(survivor,deceased)) & (served_as_main_family_residence_at_opening(asset,deceased)))) => ((acquires_usufruct_of_main_residence(survivor,deceased))).
+  ! survivor in Person, deceased in Person, contents in Asset, residence in Asset: (((is_surviving_legal_cohabitant_of(survivor,deceased)) & (is_heir_of(survivor,deceased)) & (served_as_main_family_residence_at_opening(residence,deceased)) & (is_household_contents_of(contents,residence)))) => ((acquires_usufruct_of_household_contents(survivor,deceased))).
+  ! asset in Asset: ((subject_to_legal_reversion_4_24(asset))) => ((subject_to_legal_reversion(asset))).
+  ! asset in Asset: ((subject_to_legal_reversion_4_25(asset))) => ((subject_to_legal_reversion(asset))).
+  ! survivor in Person, deceased in Person, asset in Asset: (((is_surviving_legal_cohabitant_of(survivor,deceased)) & (is_heir_of(survivor,deceased)) & (served_as_main_family_residence_at_opening(asset,deceased)) & (subject_to_legal_reversion(asset)))) => ((acquires_usufruct_of_main_residence(survivor,deceased))).
+  ! survivor in Person, deceased in Person, contents in Asset, residence in Asset: (((is_surviving_legal_cohabitant_of(survivor,deceased)) & (is_heir_of(survivor,deceased)) & (served_as_main_family_residence_at_opening(residence,deceased)) & (is_household_contents_of(contents,residence)) & (subject_to_legal_reversion(contents)))) => ((acquires_usufruct_of_household_contents(survivor,deceased))).
+}

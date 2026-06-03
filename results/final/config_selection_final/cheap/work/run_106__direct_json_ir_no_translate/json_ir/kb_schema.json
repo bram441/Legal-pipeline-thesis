@@ -1,0 +1,194 @@
+{
+  "types": [
+    "Person",
+    "Property"
+  ],
+  "predicates": [
+    {
+      "name": "is_surviving_spouse_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person is the surviving spouse of the second person (the deceased).",
+      "directly_observable": true
+    },
+    {
+      "name": "is_heir_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person is an heir of the second person (the deceased).",
+      "directly_observable": true
+    },
+    {
+      "name": "served_as_main_family_residence_at_opening_of_estate",
+      "args": [
+        "Property",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The property served as the main family residence at the time the estate of the deceased opened.",
+      "directly_observable": true
+    },
+    {
+      "name": "property_is_rented",
+      "args": [
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The property is subject to a rental agreement (i.e. the deceased held it under a lease).",
+      "directly_observable": true
+    },
+    {
+      "name": "acquires_right_to_lease",
+      "args": [
+        "Person",
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The person acquires the exclusive right to the lease of the property, to the exclusion of all other heirs, as provided by Art. 4.20.",
+      "legal_output": true,
+      "output_category": "right"
+    },
+    {
+      "name": "excluded_from_lease_right",
+      "args": [
+        "Person",
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The person (heir) is excluded from the right to the lease of the property in favour of the surviving spouse.",
+      "output_category": "exception"
+    }
+  ],
+  "functions": [],
+  "rules": [
+    {
+      "forall": [
+        {
+          "var": "spouse",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "prop",
+          "type": "Property"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_spouse_of",
+              "args": [
+                "spouse",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "served_as_main_family_residence_at_opening_of_estate",
+              "args": [
+                "prop",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "property_is_rented",
+              "args": [
+                "prop"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "acquires_right_to_lease",
+          "args": [
+            "spouse",
+            "prop"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "heir",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "spouse",
+          "type": "Person"
+        },
+        {
+          "var": "prop",
+          "type": "Property"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_heir_of",
+              "args": [
+                "heir",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_surviving_spouse_of",
+              "args": [
+                "spouse",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "acquires_right_to_lease",
+              "args": [
+                "spouse",
+                "prop"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "excluded_from_lease_right",
+          "args": [
+            "heir",
+            "prop"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    }
+  ]
+}

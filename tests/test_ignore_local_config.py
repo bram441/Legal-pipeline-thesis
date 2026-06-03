@@ -91,7 +91,7 @@ def test_run_config_ablation_includes_ignore_local_config():
             sys.executable,
             str(_ABLATION_SCRIPT),
             "--profiles",
-            "config/ablation_balanced.json",
+            "config/balanced.json",
             "--runs",
             "run_001",
             "--dry-run",

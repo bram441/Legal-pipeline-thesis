@@ -1,0 +1,177 @@
+{
+  "types": ["Person", "Property", "Donation"],
+  "predicates": [
+    {
+      "name": "is_legal_cohabitant_of",
+      "args": ["Person", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the legally cohabiting partner of the second person."
+    },
+    {
+      "name": "is_surviving_cohabitant",
+      "args": ["Person", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the surviving legal cohabitant of the deceased second person."
+    },
+    {
+      "name": "is_descendant_of",
+      "args": ["Person", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is a descendant of the second person."
+    },
+    {
+      "name": "is_main_family_residence",
+      "args": ["Property", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The property served as the main family residence of the deceased at the time the estate opened."
+    },
+    {
+      "name": "is_household_contents_of",
+      "args": ["Property", "Property"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first property represents the household contents present in the second property."
+    },
+    {
+      "name": "subject_to_legal_return_right",
+      "args": ["Property"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The property is subject to a right of legal return as referred to in the applicable articles."
+    },
+    {
+      "name": "is_rented_property",
+      "args": ["Property"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The property is held under a rental agreement."
+    },
+    {
+      "name": "donation_reserved_usufruct",
+      "args": ["Donation", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The donor reserved the usufruct of the donated property at the time of the donation."
+    },
+    {
+      "name": "cohabitant_status_at_time_of_donation",
+      "args": ["Person", "Donation"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The surviving person already had the status of legal cohabitant at the time of the donation."
+    },
+    {
+      "name": "donor_remained_usufruct_holder_until_death",
+      "args": ["Person", "Donation"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The donor remained the holder of the reserved usufruct until the day of death."
+    },
+    {
+      "name": "donation_subject_property_is_main_residence",
+      "args": ["Donation", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The property subject to the donation served as the main family residence at the time the estate opened."
+    },
+    {
+      "name": "surviving_cohabitant_renounces_usufruct",
+      "args": ["Person", "Donation"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The surviving legal cohabitant renounces the usufruct arising from the donation provision."
+    },
+    {
+      "name": "renunciation_occurs_during_donors_lifetime",
+      "args": ["Person", "Donation"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The renunciation of usufruct takes place during the lifetime of the donor."
+    },
+    {
+      "name": "bare_ownership_acquired_by",
+      "args": ["Person", "Property"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The person acquires bare ownership of the property."
+    },
+    {
+      "name": "exclusion_applies_descendant",
+      "args": ["Person", "Person"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The exclusion applies because the surviving legal cohabitant is a descendant of the deceased cohabitant, blocking inheritance rights under the article."
+    },
+    {
+      "name": "acquires_usufruct_of_main_residence",
+      "args": ["Person", "Property"],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "description": "The surviving legal cohabitant acquires usufruct over the main family residence property by operation of law.",
+      "output_category": "legal_effect"
+    },
+    {
+      "name": "acquires_usufruct_of_household_contents",
+      "args": ["Person", "Property"],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "description": "The surviving legal cohabitant acquires usufruct over the household contents by operation of law.",
+      "output_category": "legal_effect"
+    },
+    {
+      "name": "acquires_usufruct_from_donation",
+      "args": ["Person", "Donation"],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "description": "The surviving legal cohabitant acquires usufruct of the donated property upon the donor's death.",
+      "output_category": "legal_effect"
+    },
+    {
+      "name": "acquires_rental_right_of_main_residence",
+      "args": ["Person", "Property"],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "description": "The surviving legal cohabitant acquires the exclusive right to the rental of the main family residence, to the exclusion of all other heirs.",
+      "output_category": "right"
+    },
+    {
+      "name": "entitled_to_inventory_of_household_contents",
+      "args": ["Person", "Property"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The bare owner is entitled to demand an inventory of the household contents and a statement of condition of the main residence.",
+      "output_category": "right"
+    },
+    {
+      "name": "usufruct_rules_of_surviving_spouse_apply",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The rules on usufruct of the surviving spouse apply by analogy to the surviving legal cohabitant.",
+      "output_category": "legal_effect"
+    }
+  ],
+  "functions": []
+}

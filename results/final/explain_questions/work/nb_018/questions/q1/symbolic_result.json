@@ -1,0 +1,134 @@
+{
+  "intent": "deduction",
+  "symbolic_status": "ok",
+  "status": "ok",
+  "scorable": true,
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "extracted_query_hint",
+  "routing": {
+    "question": "Welk objectief criterium voor risico op onderduiken is volgens artikel 1, paragraaf 2 aanwezig?",
+    "detected_question_type": "boolean",
+    "selected_intent": "deduction",
+    "selected_reason": "extracted_query_hint",
+    "scorable": true,
+    "fallback_intent": null,
+    "warnings": [],
+    "legal_output_symbols": [
+      "is_identified_foreigner",
+      "risk_of_absconding"
+    ],
+    "query_hint_type": "boolean",
+    "expected_question_type": null
+  },
+  "satisfiability_check": {
+    "stage": "pre_query",
+    "kb_case_satisfiable": true,
+    "status": "ok",
+    "details": "theory satisfiable",
+    "intent_backend": "idp_z3.tasks.satisfiable_check",
+    "duration_seconds": 0.13
+  },
+  "warnings": [],
+  "deduction": {
+    "intent": "deduction",
+    "status": "ok",
+    "output_kind": "epistemic_boolean",
+    "predicate": "risk_of_absconding",
+    "args": [
+      "rina"
+    ],
+    "possible": true,
+    "certain": false,
+    "label": "unknown",
+    "atom": "risk_of_absconding(x0)",
+    "constraint": "? x0 in Person: __sel0(x0) & risk_of_absconding(x0)",
+    "certainty_class": "inconclusive",
+    "sat": true,
+    "internal_intent": "deduction",
+    "antecedent_coverage": [
+      {
+        "rule_index": 17,
+        "target": "risk_of_absconding(rina)",
+        "conditions": [
+          {
+            "atom": "individual_examination_performed(rina)",
+            "status": "missing"
+          },
+          {
+            "atom": "absconding_criterion_met(rina)",
+            "status": "helper_defined"
+          },
+          {
+            "atom": "subject_to_removal_procedure(rina)",
+            "status": "missing"
+          },
+          {
+            "atom": "subject_to_international_protection_procedure(rina)",
+            "status": "missing"
+          },
+          {
+            "atom": "subject_to_responsibility_determination_procedure(rina)",
+            "status": "missing"
+          }
+        ]
+      }
+    ],
+    "extraction_repair_hint": "The selected legal conclusion could not be proven because an observable antecedent required by the KB rule was not asserted from the case. Re-check the case text for facts matching these observable schema symbols: individual_examination_performed: An individual examination has been performed for the person.; subject_to_removal_procedure: The person is subject to a removal procedure.; subject_to_international_protection_procedure: The person is subject to a procedure for granting international protection.; subject_to_responsibility_determination_procedure: The person is subject to a procedure to determine or transfer to the responsible member state for processing an international protection request.."
+  },
+  "model_expansion": null,
+  "get_range": null,
+  "satisfiable": null,
+  "explanation": null,
+  "execution_query": {
+    "type": "predicate",
+    "predicate": "risk_of_absconding",
+    "mode": "boolean",
+    "args": [
+      "rina"
+    ],
+    "explain": false,
+    "predicate_kind": "derived",
+    "query_type": "predicate_boolean",
+    "internal_intent": "deduction"
+  },
+  "output_kind": "epistemic_boolean",
+  "certainty_class": "inconclusive",
+  "predicate": "risk_of_absconding",
+  "args": [
+    "rina"
+  ],
+  "label": "unknown",
+  "possible": true,
+  "certain": false,
+  "sat": true,
+  "antecedent_coverage": [
+    {
+      "rule_index": 17,
+      "target": "risk_of_absconding(rina)",
+      "conditions": [
+        {
+          "atom": "individual_examination_performed(rina)",
+          "status": "missing"
+        },
+        {
+          "atom": "absconding_criterion_met(rina)",
+          "status": "helper_defined"
+        },
+        {
+          "atom": "subject_to_removal_procedure(rina)",
+          "status": "missing"
+        },
+        {
+          "atom": "subject_to_international_protection_procedure(rina)",
+          "status": "missing"
+        },
+        {
+          "atom": "subject_to_responsibility_determination_procedure(rina)",
+          "status": "missing"
+        }
+      ]
+    }
+  ],
+  "extraction_repair_hint": "The selected legal conclusion could not be proven because an observable antecedent required by the KB rule was not asserted from the case. Re-check the case text for facts matching these observable schema symbols: individual_examination_performed: An individual examination has been performed for the person.; subject_to_removal_procedure: The person is subject to a removal procedure.; subject_to_international_protection_procedure: The person is subject to a procedure for granting international protection.; subject_to_responsibility_determination_procedure: The person is subject to a procedure to determine or transfer to the responsible member state for processing an international protection request.."
+}

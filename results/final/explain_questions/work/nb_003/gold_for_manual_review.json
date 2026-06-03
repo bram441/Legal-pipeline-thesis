@@ -1,0 +1,7 @@
+{
+  "run_id": "nb_003",
+  "gold_type": "short_text",
+  "expected_answer": "Felix verkrijgt de volle eigendom van de gehele nalatenschap.",
+  "law_source": "erfrecht_clean.txt",
+  "notes": "Gold is separated from plain_inputs and must not be included in model prompts."
+}

@@ -1,0 +1,39 @@
+{
+  "entities": {
+    "boekjaar_2026": {
+      "declared_type": "FinancialYear",
+      "resolved_type": "FinancialYear",
+      "source": "fact_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "good_faith_estimate_shows_more_than_one_criterion_exceeded",
+          "arg_index": 1,
+          "expected_type": "FinancialYear"
+        }
+      ]
+    },
+    "bv_gamma": {
+      "declared_type": "Company",
+      "resolved_type": "Company",
+      "source": "fact_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_starting_company",
+          "arg_index": 0,
+          "expected_type": "Company"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "good_faith_estimate_shows_more_than_one_criterion_exceeded",
+          "arg_index": 0,
+          "expected_type": "Company"
+        }
+      ]
+    }
+  },
+  "unmapped_entities": [],
+  "conflicts": [],
+  "query_arguments_with_inferred_types": []
+}

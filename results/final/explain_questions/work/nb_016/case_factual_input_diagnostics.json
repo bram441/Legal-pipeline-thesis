@@ -1,0 +1,31 @@
+{
+  "case_given_factual_inputs": [
+    {
+      "target_predicate": "at_least_one_absconding_criterion_met",
+      "input_predicate": "case_given_at_least_one_absconding_criterion_met",
+      "source": "case_given",
+      "evidence_text": "Er zijn objectieve criteria aanwezig",
+      "assertion_kind": "factual_threshold_satisfaction",
+      "args": [
+        "omar"
+      ]
+    }
+  ],
+  "accepted_threshold_satisfaction_facts": [
+    {
+      "input_predicate": "case_given_at_least_one_absconding_criterion_met",
+      "target_predicate": "at_least_one_absconding_criterion_met",
+      "args": [
+        "omar"
+      ],
+      "evidence_text": "Er zijn objectieve criteria aanwezig",
+      "assertion_kind": "factual_threshold_satisfaction"
+    }
+  ],
+  "case_text_has_numeric_values": false,
+  "case_text_numeric_values_explicit": false,
+  "bridge_predicates_generated": true,
+  "rejected_query_predicate_assertions": [],
+  "rejected_legal_outputs": [],
+  "query_predicate": "risk_of_absconding"
+}

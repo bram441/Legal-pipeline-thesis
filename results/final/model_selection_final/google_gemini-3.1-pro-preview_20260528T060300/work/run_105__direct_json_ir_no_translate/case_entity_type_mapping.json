@@ -1,0 +1,70 @@
+{
+  "entities": {
+    "joris": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_surviving_legal_cohabitant_of",
+          "arg_index": 1,
+          "expected_type": "Person"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "is_descendant_of",
+          "arg_index": 1,
+          "expected_type": "Person"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "preceding_provisions_do_not_apply",
+          "arg_index": 1,
+          "expected_type": "Person"
+        }
+      ]
+    },
+    "karin": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_surviving_legal_cohabitant_of",
+          "arg_index": 0,
+          "expected_type": "Person"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "is_descendant_of",
+          "arg_index": 0,
+          "expected_type": "Person"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "preceding_provisions_do_not_apply",
+          "arg_index": 0,
+          "expected_type": "Person"
+        }
+      ]
+    }
+  },
+  "unmapped_entities": [],
+  "conflicts": [],
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "karin",
+      "arg_index": 0,
+      "expected_type": "Person",
+      "predicate": "preceding_provisions_do_not_apply"
+    },
+    {
+      "entity": "joris",
+      "arg_index": 1,
+      "expected_type": "Person",
+      "predicate": "preceding_provisions_do_not_apply"
+    }
+  ]
+}

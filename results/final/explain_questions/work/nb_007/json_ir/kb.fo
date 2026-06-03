@@ -1,0 +1,36 @@
+vocabulary V {
+  type Company
+  type FinancialYear
+  has_legal_personality: Company -> Bool
+  is_small_company: Company * FinancialYear -> Bool
+  is_subsidiary: Company -> Bool
+  is_parent_company: Company -> Bool
+  employee_criterion_exceeded: Company * FinancialYear -> Bool
+  turnover_criterion_exceeded: Company * FinancialYear -> Bool
+  balance_sheet_criterion_exceeded: Company * FinancialYear -> Bool
+  more_than_one_micro_criterion_exceeded: Company * FinancialYear -> Bool
+  is_micro_company: Company -> Bool
+  previous_financial_year: FinancialYear * FinancialYear -> Bool
+  next_financial_year: FinancialYear * FinancialYear -> Bool
+  is_last_closed_financial_year: Company * FinancialYear -> Bool
+  micro_status_change_for_two_consecutive_years: Company * FinancialYear -> Bool
+  micro_classification_applies_from: Company * FinancialYear -> Bool
+  annual_average_employees: Company * FinancialYear -> Int
+  annual_net_turnover_excl_vat: Company * FinancialYear -> Real
+  balance_sheet_total: Company * FinancialYear -> Real
+}
+
+theory T:V {
+  ! c in Company, fy in FinancialYear: ((annual_average_employees(c,fy) > 10)) => ((employee_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((annual_net_turnover_excl_vat(c,fy) > 900000.0)) => ((turnover_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((balance_sheet_total(c,fy) > 450000.0)) => ((balance_sheet_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: (((employee_criterion_exceeded(c,fy)) & (turnover_criterion_exceeded(c,fy)))) => ((more_than_one_micro_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: (((employee_criterion_exceeded(c,fy)) & (balance_sheet_criterion_exceeded(c,fy)))) => ((more_than_one_micro_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: (((turnover_criterion_exceeded(c,fy)) & (balance_sheet_criterion_exceeded(c,fy)))) => ((more_than_one_micro_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: (((has_legal_personality(c)) & (is_small_company(c,fy)) & (~is_subsidiary(c)) & (~is_parent_company(c)) & (is_last_closed_financial_year(c,fy)) & (~more_than_one_micro_criterion_exceeded(c,fy)))) => ((is_micro_company(c))).
+  ! c in Company, fy in FinancialYear: (((is_last_closed_financial_year(c,fy)) & (more_than_one_micro_criterion_exceeded(c,fy)))) => ((~is_micro_company(c))).
+  ! c in Company, fy in FinancialYear: (((is_last_closed_financial_year(c,fy)) & (is_subsidiary(c)))) => ((~is_micro_company(c))).
+  ! c in Company, fy in FinancialYear: (((is_last_closed_financial_year(c,fy)) & (is_parent_company(c)))) => ((~is_micro_company(c))).
+  ! c in Company, second_year in FinancialYear, first_year in FinancialYear: (((more_than_one_micro_criterion_exceeded(c,first_year)) & (more_than_one_micro_criterion_exceeded(c,second_year)) & (previous_financial_year(second_year,first_year)))) => ((micro_status_change_for_two_consecutive_years(c,second_year))).
+  ! c in Company, second_year in FinancialYear, effect_year in FinancialYear: (((micro_status_change_for_two_consecutive_years(c,second_year)) & (next_financial_year(second_year,effect_year)))) => ((micro_classification_applies_from(c,effect_year))).
+}

@@ -1,0 +1,60 @@
+vocabulary V {
+  type Company
+  type FinancialYear
+  has_legal_personality: Company -> Bool
+  employee_criterion_exceeded: Company * FinancialYear -> Bool
+  turnover_criterion_exceeded: Company * FinancialYear -> Bool
+  balance_sheet_criterion_exceeded: Company * FinancialYear -> Bool
+  more_than_one_criterion_exceeded: Company * FinancialYear -> Bool
+  more_than_one_criterion_exceeded_two_consecutive_years: Company * FinancialYear -> Bool
+  no_longer_exceeds_more_than_one_criterion_two_consecutive_years: Company * FinancialYear -> Bool
+  previous_financial_year: FinancialYear * FinancialYear -> Bool
+  next_financial_year: FinancialYear * FinancialYear -> Bool
+  is_starting_company: Company * FinancialYear -> Bool
+  good_faith_estimate_exceeds_more_than_one_criterion: Company * FinancialYear -> Bool
+  financial_year_is_non_standard_duration: Company * FinancialYear -> Bool
+  revenues_majority_non_turnover: Company * FinancialYear -> Bool
+  is_linked_company: Company * Company -> Bool
+  is_parent_company: Company -> Bool
+  forms_consortium: Company * Company -> Bool
+  incorporated_solely_to_evade_reporting: Company -> Bool
+  consolidation_eliminations_applied: Company * FinancialYear -> Bool
+  consolidated_criteria_apply: Company * FinancialYear -> Bool
+  is_kleine_vennootschap: Company * FinancialYear -> Bool
+  loses_kleine_vennootschap_status_from: Company * FinancialYear -> Bool
+  gains_kleine_vennootschap_status_from: Company * FinancialYear -> Bool
+  annual_average_employees: Company * FinancialYear -> Real
+  annual_net_turnover_excl_vat: Company * FinancialYear -> Real
+  alternative_turnover: Company * FinancialYear -> Real
+  balance_sheet_total: Company * FinancialYear -> Real
+  financial_year_duration_months: Company * FinancialYear -> Int
+  adjusted_turnover_threshold: Company * FinancialYear -> Real
+  consolidated_net_turnover: Company * FinancialYear -> Real
+  consolidated_balance_sheet_total: Company * FinancialYear -> Real
+  aggregated_employees: Company * FinancialYear -> Real
+}
+
+theory T:V {
+  ! c in Company, fy in FinancialYear: ((financial_year_is_non_standard_duration(c,fy))) => ((adjusted_turnover_threshold(c,fy) = adjusted_turnover_threshold(c,fy))).
+  ! c in Company, fy in FinancialYear: ((financial_year_is_non_standard_duration(c,fy)) & (financial_year_duration_months(c,fy) > 0)) => ((adjusted_turnover_threshold(c,fy) = 11250000.0)).
+  ! c in Company, fy in FinancialYear: ((financial_year_is_non_standard_duration(c,fy)) & (revenues_majority_non_turnover(c,fy))) => ((turnover_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((financial_year_is_non_standard_duration(c,fy)) & (revenues_majority_non_turnover(c,fy)) & (alternative_turnover(c,fy) > adjusted_turnover_threshold(c,fy))) => ((turnover_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((financial_year_is_non_standard_duration(c,fy)) & (~revenues_majority_non_turnover(c,fy)) & (consolidated_criteria_apply(c,fy)) & (consolidated_net_turnover(c,fy) > adjusted_turnover_threshold(c,fy))) => ((turnover_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((financial_year_is_non_standard_duration(c,fy)) & (~revenues_majority_non_turnover(c,fy)) & (~consolidated_criteria_apply(c,fy)) & (annual_net_turnover_excl_vat(c,fy) > adjusted_turnover_threshold(c,fy))) => ((turnover_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((~financial_year_is_non_standard_duration(c,fy)) & (revenues_majority_non_turnover(c,fy)) & (alternative_turnover(c,fy) > 11250000.0)) => ((turnover_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((~financial_year_is_non_standard_duration(c,fy)) & (~revenues_majority_non_turnover(c,fy)) & (consolidated_criteria_apply(c,fy)) & (consolidated_net_turnover(c,fy) > 11250000.0)) => ((turnover_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((~financial_year_is_non_standard_duration(c,fy)) & (~revenues_majority_non_turnover(c,fy)) & (~consolidated_criteria_apply(c,fy)) & (annual_net_turnover_excl_vat(c,fy) > 11250000.0)) => ((turnover_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((consolidated_criteria_apply(c,fy)) & (consolidated_balance_sheet_total(c,fy) > 6000000.0)) => ((balance_sheet_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((~consolidated_criteria_apply(c,fy)) & (balance_sheet_total(c,fy) > 6000000.0)) => ((balance_sheet_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((consolidated_criteria_apply(c,fy)) & (aggregated_employees(c,fy) > 50.0)) => ((employee_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((~consolidated_criteria_apply(c,fy)) & (annual_average_employees(c,fy) > 50.0)) => ((employee_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((((employee_criterion_exceeded(c,fy)) & (turnover_criterion_exceeded(c,fy))) | ((employee_criterion_exceeded(c,fy)) & (balance_sheet_criterion_exceeded(c,fy))) | ((turnover_criterion_exceeded(c,fy)) & (balance_sheet_criterion_exceeded(c,fy))))) => ((more_than_one_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear, prev_fy in FinancialYear: ((previous_financial_year(fy,prev_fy)) & (more_than_one_criterion_exceeded(c,fy)) & (more_than_one_criterion_exceeded(c,prev_fy))) => ((more_than_one_criterion_exceeded_two_consecutive_years(c,fy))).
+  ! c in Company, fy in FinancialYear, prev_fy in FinancialYear: ((previous_financial_year(fy,prev_fy)) & (~more_than_one_criterion_exceeded(c,fy)) & (~more_than_one_criterion_exceeded(c,prev_fy))) => ((no_longer_exceeds_more_than_one_criterion_two_consecutive_years(c,fy))).
+  ! c in Company, fy in FinancialYear: ((is_linked_company(c,c))) => ((consolidated_criteria_apply(c,fy))).
+  ! c in Company, c2 in Company, fy in FinancialYear: ((is_linked_company(c,c2)) & ((is_parent_company(c)) | (forms_consortium(c,c2)) | (incorporated_solely_to_evade_reporting(c)))) => ((consolidated_criteria_apply(c,fy))).
+  ! c in Company, fy in FinancialYear: ((has_legal_personality(c)) & (~more_than_one_criterion_exceeded(c,fy))) => ((is_kleine_vennootschap(c,fy))).
+  ! c in Company, fy in FinancialYear: ((has_legal_personality(c)) & (is_starting_company(c,fy)) & (good_faith_estimate_exceeds_more_than_one_criterion(c,fy))) => ((~is_kleine_vennootschap(c,fy))).
+  ! c in Company, fy in FinancialYear, next_fy in FinancialYear: ((has_legal_personality(c)) & (next_financial_year(fy,next_fy)) & (more_than_one_criterion_exceeded_two_consecutive_years(c,fy))) => ((loses_kleine_vennootschap_status_from(c,next_fy))).
+  ! c in Company, fy in FinancialYear, next_fy in FinancialYear: ((has_legal_personality(c)) & (next_financial_year(fy,next_fy)) & (no_longer_exceeds_more_than_one_criterion_two_consecutive_years(c,fy))) => ((gains_kleine_vennootschap_status_from(c,next_fy))).
+}

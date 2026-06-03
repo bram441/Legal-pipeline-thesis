@@ -1,0 +1,127 @@
+{
+  "rules": [
+    {
+      "forall": [
+        {
+          "var": "survivor",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "home",
+          "type": "Asset"
+        }
+      ],
+      "if": [
+        {
+          "pred": "is_surviving_legal_cohabitant_of",
+          "args": [
+            "survivor",
+            "deceased"
+          ],
+          "negated": false
+        },
+        {
+          "pred": "is_immovable_property",
+          "args": [
+            "home"
+          ],
+          "negated": false
+        },
+        {
+          "pred": "served_as_principal_family_residence_at_estate_opening",
+          "args": [
+            "home",
+            "deceased"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "acquires_usufruct",
+          "args": [
+            "survivor",
+            "home"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "survivor",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "home",
+          "type": "Asset"
+        },
+        {
+          "var": "goods",
+          "type": "Asset"
+        }
+      ],
+      "if": [
+        {
+          "pred": "is_surviving_legal_cohabitant_of",
+          "args": [
+            "survivor",
+            "deceased"
+          ],
+          "negated": false
+        },
+        {
+          "pred": "is_immovable_property",
+          "args": [
+            "home"
+          ],
+          "negated": false
+        },
+        {
+          "pred": "served_as_principal_family_residence_at_estate_opening",
+          "args": [
+            "home",
+            "deceased"
+          ],
+          "negated": false
+        },
+        {
+          "pred": "is_household_goods",
+          "args": [
+            "goods"
+          ],
+          "negated": false
+        },
+        {
+          "pred": "is_present_in",
+          "args": [
+            "goods",
+            "home"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "acquires_usufruct",
+          "args": [
+            "survivor",
+            "goods"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    }
+  ]
+}

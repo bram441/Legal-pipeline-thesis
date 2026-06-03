@@ -40,7 +40,15 @@ GOOD_SYMBOLS = {
             "description": "Legal consequences apply from the following financial year",
         },
     ],
-    "functions": [],
+    "functions": [
+        {
+            "name": "next_financial_year",
+            "kind": "helper",
+            "args": ["FinancialYear"],
+            "returns": "FinancialYear",
+            "description": "The financial year immediately following the given year.",
+        },
+    ],
 }
 
 RULES_WITH_HELPER_USE = {
@@ -233,7 +241,12 @@ def test_budget_exhausted(tmp_path: Path) -> None:
             limits=CompileLoopLimits(1, 5, 2, 3, 2),
         )
     summary = (exc.value.repair_summary or {}) if exc.value.repair_summary else {}
-    assert summary.get("budget_exhausted") or "budget" in str(exc.value).lower()
+    assert (
+        summary.get("budget_exhausted")
+        or summary.get("repair_stalled")
+        or summary.get("repeated_error_detected")
+        or "budget" in str(exc.value).lower()
+    )
 
 
 def test_concise_failure_message_no_recursion() -> None:

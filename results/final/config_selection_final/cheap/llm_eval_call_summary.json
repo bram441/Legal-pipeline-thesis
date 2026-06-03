@@ -1,0 +1,420 @@
+{
+  "call_count": 181,
+  "by_stage": {
+    "case_extraction": 31,
+    "kb_rules": 38,
+    "kb_symbols": 66,
+    "query_extraction": 46
+  },
+  "by_model": {
+    "anthropic/claude-sonnet-4.6": 181
+  },
+  "by_run_id": {
+    "run_001": 5,
+    "run_002": 4,
+    "run_003": 3,
+    "run_004": 10,
+    "run_005": 4,
+    "run_006": 4,
+    "run_007": 5,
+    "run_008": 4,
+    "run_009": 5,
+    "run_101": 5,
+    "run_102": 10,
+    "run_103": 5,
+    "run_104": 5,
+    "run_105": 5,
+    "run_106": 5,
+    "run_107": 5,
+    "run_108": 4,
+    "run_109": 5,
+    "run_110": 2,
+    "run_111": 5,
+    "run_112": 4,
+    "run_113": 5,
+    "run_114": 5,
+    "run_115": 5,
+    "run_116": 3,
+    "run_117": 3,
+    "run_118": 6,
+    "run_119": 3,
+    "run_120": 4,
+    "run_201": 5,
+    "run_202": 5,
+    "run_203": 4,
+    "run_204": 10,
+    "run_205": 6,
+    "run_206": 3,
+    "run_207": 5,
+    "run_208": 5
+  },
+  "by_strategy": {
+    "direct_json_ir_no_translate": 181
+  },
+  "total_prompt_tokens": 1701718,
+  "total_completion_tokens": 147025,
+  "total_tokens": 1848743,
+  "estimated_total_cost_usd": null,
+  "top_calls_by_total_tokens": [
+    {
+      "call_index": 2,
+      "stage": "kb_rules",
+      "run_id": "run_108",
+      "strategy": "direct_json_ir_no_translate",
+      "model": "anthropic/claude-sonnet-4.6",
+      "total_tokens": 17194,
+      "prompt_tokens": 14436,
+      "completion_tokens": 2758,
+      "metadata": {
+        "response_format": "json_schema"
+      }
+    },
+    {
+      "call_index": 3,
+      "stage": "kb_rules",
+      "run_id": "run_204",
+      "strategy": "direct_json_ir_no_translate",
+      "model": "anthropic/claude-sonnet-4.6",
+      "total_tokens": 17157,
+      "prompt_tokens": 14536,
+      "completion_tokens": 2621,
+      "metadata": {
+        "response_format": "json_schema"
+      }
+    },
+    {
+      "call_index": 2,
+      "stage": "kb_rules",
+      "run_id": "run_203",
+      "strategy": "direct_json_ir_no_translate",
+      "model": "anthropic/claude-sonnet-4.6",
+      "total_tokens": 16942,
+      "prompt_tokens": 14372,
+      "completion_tokens": 2570,
+      "metadata": {
+        "response_format": "json_schema"
+      }
+    },
+    {
+      "call_index": 2,
+      "stage": "kb_rules",
+      "run_id": "run_005",
+      "strategy": "direct_json_ir_no_translate",
+      "model": "anthropic/claude-sonnet-4.6",
+      "total_tokens": 16867,
+      "prompt_tokens": 14402,
+      "completion_tokens": 2465,
+      "metadata": {
+        "response_format": "json_schema"
+      }
+    },
+    {
+      "call_index": 2,
+      "stage": "kb_rules",
+      "run_id": "run_112",
+      "strategy": "direct_json_ir_no_translate",
+      "model": "anthropic/claude-sonnet-4.6",
+      "total_tokens": 16739,
+      "prompt_tokens": 14417,
+      "completion_tokens": 2322,
+      "metadata": {
+        "response_format": "json_schema"
+      }
+    },
+    {
+      "call_index": 2,
+      "stage": "kb_rules",
+      "run_id": "run_002",
+      "strategy": "direct_json_ir_no_translate",
+      "model": "anthropic/claude-sonnet-4.6",
+      "total_tokens": 16680,
+      "prompt_tokens": 14409,
+      "completion_tokens": 2271,
+      "metadata": {
+        "response_format": "json_schema"
+      }
+    },
+    {
+      "call_index": 3,
+      "stage": "kb_rules",
+      "run_id": "run_109",
+      "strategy": "direct_json_ir_no_translate",
+      "model": "anthropic/claude-sonnet-4.6",
+      "total_tokens": 16632,
+      "prompt_tokens": 14378,
+      "completion_tokens": 2254,
+      "metadata": {
+        "response_format": "json_schema"
+      }
+    },
+    {
+      "call_index": 3,
+      "stage": "kb_rules",
+      "run_id": "run_107",
+      "strategy": "direct_json_ir_no_translate",
+      "model": "anthropic/claude-sonnet-4.6",
+      "total_tokens": 16630,
+      "prompt_tokens": 14402,
+      "completion_tokens": 2228,
+      "metadata": {
+        "response_format": "json_schema"
+      }
+    },
+    {
+      "call_index": 3,
+      "stage": "kb_rules",
+      "run_id": "run_111",
+      "strategy": "direct_json_ir_no_translate",
+      "model": "anthropic/claude-sonnet-4.6",
+      "total_tokens": 16172,
+      "prompt_tokens": 14220,
+      "completion_tokens": 1952,
+      "metadata": {
+        "response_format": "json_schema"
+      }
+    },
+    {
+      "call_index": 2,
+      "stage": "kb_rules",
+      "run_id": "run_008",
+      "strategy": "direct_json_ir_no_translate",
+      "model": "anthropic/claude-sonnet-4.6",
+      "total_tokens": 16093,
+      "prompt_tokens": 14237,
+      "completion_tokens": 1856,
+      "metadata": {
+        "response_format": "json_schema"
+      }
+    }
+  ],
+  "eval_call_count": 0,
+  "budget_limits": {
+    "max_eval_calls": null,
+    "max_cell_calls": null,
+    "eval_calls_before": 0
+  },
+  "by_run_and_strategy": {
+    "run_001::direct_json_ir_no_translate": {
+      "run_id": "run_001",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 49230
+    },
+    "run_002::direct_json_ir_no_translate": {
+      "run_id": "run_002",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 4,
+      "total_tokens": 53144
+    },
+    "run_003::direct_json_ir_no_translate": {
+      "run_id": "run_003",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 3,
+      "total_tokens": 32615
+    },
+    "run_004::direct_json_ir_no_translate": {
+      "run_id": "run_004",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 10,
+      "total_tokens": 91520
+    },
+    "run_005::direct_json_ir_no_translate": {
+      "run_id": "run_005",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 4,
+      "total_tokens": 53346
+    },
+    "run_006::direct_json_ir_no_translate": {
+      "run_id": "run_006",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 4,
+      "total_tokens": 45836
+    },
+    "run_007::direct_json_ir_no_translate": {
+      "run_id": "run_007",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 44608
+    },
+    "run_008::direct_json_ir_no_translate": {
+      "run_id": "run_008",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 4,
+      "total_tokens": 50271
+    },
+    "run_009::direct_json_ir_no_translate": {
+      "run_id": "run_009",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 44907
+    },
+    "run_101::direct_json_ir_no_translate": {
+      "run_id": "run_101",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 38421
+    },
+    "run_102::direct_json_ir_no_translate": {
+      "run_id": "run_102",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 10,
+      "total_tokens": 94342
+    },
+    "run_103::direct_json_ir_no_translate": {
+      "run_id": "run_103",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 38419
+    },
+    "run_104::direct_json_ir_no_translate": {
+      "run_id": "run_104",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 43989
+    },
+    "run_105::direct_json_ir_no_translate": {
+      "run_id": "run_105",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 37920
+    },
+    "run_106::direct_json_ir_no_translate": {
+      "run_id": "run_106",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 39617
+    },
+    "run_107::direct_json_ir_no_translate": {
+      "run_id": "run_107",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 62686
+    },
+    "run_108::direct_json_ir_no_translate": {
+      "run_id": "run_108",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 4,
+      "total_tokens": 54709
+    },
+    "run_109::direct_json_ir_no_translate": {
+      "run_id": "run_109",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 62745
+    },
+    "run_110::direct_json_ir_no_translate": {
+      "run_id": "run_110",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 2,
+      "total_tokens": 23481
+    },
+    "run_111::direct_json_ir_no_translate": {
+      "run_id": "run_111",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 60913
+    },
+    "run_112::direct_json_ir_no_translate": {
+      "run_id": "run_112",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 4,
+      "total_tokens": 53567
+    },
+    "run_113::direct_json_ir_no_translate": {
+      "run_id": "run_113",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 44907
+    },
+    "run_114::direct_json_ir_no_translate": {
+      "run_id": "run_114",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 44867
+    },
+    "run_115::direct_json_ir_no_translate": {
+      "run_id": "run_115",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 46967
+    },
+    "run_116::direct_json_ir_no_translate": {
+      "run_id": "run_116",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 3,
+      "total_tokens": 29244
+    },
+    "run_117::direct_json_ir_no_translate": {
+      "run_id": "run_117",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 3,
+      "total_tokens": 29375
+    },
+    "run_118::direct_json_ir_no_translate": {
+      "run_id": "run_118",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 6,
+      "total_tokens": 61272
+    },
+    "run_119::direct_json_ir_no_translate": {
+      "run_id": "run_119",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 3,
+      "total_tokens": 31371
+    },
+    "run_120::direct_json_ir_no_translate": {
+      "run_id": "run_120",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 4,
+      "total_tokens": 45755
+    },
+    "run_201::direct_json_ir_no_translate": {
+      "run_id": "run_201",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 39027
+    },
+    "run_202::direct_json_ir_no_translate": {
+      "run_id": "run_202",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 38373
+    },
+    "run_203::direct_json_ir_no_translate": {
+      "run_id": "run_203",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 4,
+      "total_tokens": 53570
+    },
+    "run_204::direct_json_ir_no_translate": {
+      "run_id": "run_204",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 10,
+      "total_tokens": 132636
+    },
+    "run_205::direct_json_ir_no_translate": {
+      "run_id": "run_205",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 6,
+      "total_tokens": 61368
+    },
+    "run_206::direct_json_ir_no_translate": {
+      "run_id": "run_206",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 3,
+      "total_tokens": 29399
+    },
+    "run_207::direct_json_ir_no_translate": {
+      "run_id": "run_207",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 39459
+    },
+    "run_208::direct_json_ir_no_translate": {
+      "run_id": "run_208",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 44867
+    }
+  }
+}

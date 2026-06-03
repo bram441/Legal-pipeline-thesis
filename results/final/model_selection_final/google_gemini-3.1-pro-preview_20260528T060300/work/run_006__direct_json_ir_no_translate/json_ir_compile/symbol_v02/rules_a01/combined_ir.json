@@ -1,0 +1,735 @@
+{
+  "types": [
+    "Company",
+    "FinancialYear"
+  ],
+  "predicates": [
+    {
+      "name": "has_legal_personality",
+      "args": [
+        "Company"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The company has legal personality."
+    },
+    {
+      "name": "employee_threshold_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds the employee threshold in the financial year."
+    },
+    {
+      "name": "turnover_threshold_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds the turnover threshold in the financial year."
+    },
+    {
+      "name": "balance_sheet_threshold_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds the balance sheet total threshold in the financial year."
+    },
+    {
+      "name": "more_than_one_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds more than one of the listed criteria in the financial year."
+    },
+    {
+      "name": "more_than_one_criterion_exceeded_for_two_consecutive_years",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds more than one criterion in this financial year and in the immediately previous financial year."
+    },
+    {
+      "name": "not_more_than_one_criterion_exceeded_for_two_consecutive_years",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company does not exceed more than one criterion in this financial year and in the immediately previous financial year."
+    },
+    {
+      "name": "is_small_company",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "output_category": "classification",
+      "description": "The company qualifies as a small company in the financial year."
+    },
+    {
+      "name": "loses_small_company_status_from",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "output_category": "legal_effect",
+      "description": "The company loses its small company status from this financial year."
+    },
+    {
+      "name": "gains_small_company_status_from",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "output_category": "legal_effect",
+      "description": "The company gains its small company status from this financial year."
+    },
+    {
+      "name": "previous_financial_year",
+      "args": [
+        "FinancialYear",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The second financial year is immediately before the first financial year."
+    },
+    {
+      "name": "next_financial_year",
+      "args": [
+        "FinancialYear",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The second financial year is immediately after the first financial year."
+    }
+  ],
+  "functions": [
+    {
+      "name": "annual_average_employees",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Int",
+      "kind": "observable",
+      "description": "The annual average number of employees of the company in the financial year."
+    },
+    {
+      "name": "annual_net_turnover_excluding_vat",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The annual net turnover excluding VAT of the company in the financial year."
+    },
+    {
+      "name": "balance_sheet_total",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The balance sheet total of the company in the financial year."
+    }
+  ],
+  "rules": [
+    {
+      "forall": [
+        {
+          "var": "c",
+          "type": "Company"
+        },
+        {
+          "var": "y",
+          "type": "FinancialYear"
+        }
+      ],
+      "if": [
+        {
+          "compare": {
+            "left": {
+              "func": "annual_average_employees",
+              "args": [
+                "c",
+                "y"
+              ]
+            },
+            "op": ">",
+            "right": 50
+          }
+        }
+      ],
+      "then": [
+        {
+          "pred": "employee_threshold_exceeded",
+          "args": [
+            "c",
+            "y"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "c",
+          "type": "Company"
+        },
+        {
+          "var": "y",
+          "type": "FinancialYear"
+        }
+      ],
+      "if": [
+        {
+          "compare": {
+            "left": {
+              "func": "annual_net_turnover_excluding_vat",
+              "args": [
+                "c",
+                "y"
+              ]
+            },
+            "op": ">",
+            "right": 11250000.0
+          }
+        }
+      ],
+      "then": [
+        {
+          "pred": "turnover_threshold_exceeded",
+          "args": [
+            "c",
+            "y"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "c",
+          "type": "Company"
+        },
+        {
+          "var": "y",
+          "type": "FinancialYear"
+        }
+      ],
+      "if": [
+        {
+          "compare": {
+            "left": {
+              "func": "balance_sheet_total",
+              "args": [
+                "c",
+                "y"
+              ]
+            },
+            "op": ">",
+            "right": 6000000.0
+          }
+        }
+      ],
+      "then": [
+        {
+          "pred": "balance_sheet_threshold_exceeded",
+          "args": [
+            "c",
+            "y"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "c",
+          "type": "Company"
+        },
+        {
+          "var": "y",
+          "type": "FinancialYear"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "employee_threshold_exceeded",
+              "args": [
+                "c",
+                "y"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "turnover_threshold_exceeded",
+              "args": [
+                "c",
+                "y"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "more_than_one_criterion_exceeded",
+          "args": [
+            "c",
+            "y"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "c",
+          "type": "Company"
+        },
+        {
+          "var": "y",
+          "type": "FinancialYear"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "employee_threshold_exceeded",
+              "args": [
+                "c",
+                "y"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "balance_sheet_threshold_exceeded",
+              "args": [
+                "c",
+                "y"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "more_than_one_criterion_exceeded",
+          "args": [
+            "c",
+            "y"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "c",
+          "type": "Company"
+        },
+        {
+          "var": "y",
+          "type": "FinancialYear"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "turnover_threshold_exceeded",
+              "args": [
+                "c",
+                "y"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "balance_sheet_threshold_exceeded",
+              "args": [
+                "c",
+                "y"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "more_than_one_criterion_exceeded",
+          "args": [
+            "c",
+            "y"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "c",
+          "type": "Company"
+        },
+        {
+          "var": "y",
+          "type": "FinancialYear"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "has_legal_personality",
+              "args": [
+                "c"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "more_than_one_criterion_exceeded",
+              "args": [
+                "c",
+                "y"
+              ],
+              "negated": true
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "is_small_company",
+          "args": [
+            "c",
+            "y"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "c",
+          "type": "Company"
+        },
+        {
+          "var": "y",
+          "type": "FinancialYear"
+        }
+      ],
+      "if": [
+        {
+          "pred": "more_than_one_criterion_exceeded",
+          "args": [
+            "c",
+            "y"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "is_small_company",
+          "args": [
+            "c",
+            "y"
+          ],
+          "negated": true
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "c",
+          "type": "Company"
+        },
+        {
+          "var": "y",
+          "type": "FinancialYear"
+        }
+      ],
+      "if": [
+        {
+          "pred": "has_legal_personality",
+          "args": [
+            "c"
+          ],
+          "negated": true
+        }
+      ],
+      "then": [
+        {
+          "pred": "is_small_company",
+          "args": [
+            "c",
+            "y"
+          ],
+          "negated": true
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "c",
+          "type": "Company"
+        },
+        {
+          "var": "y2",
+          "type": "FinancialYear"
+        },
+        {
+          "var": "y1",
+          "type": "FinancialYear"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "more_than_one_criterion_exceeded",
+              "args": [
+                "c",
+                "y1"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "more_than_one_criterion_exceeded",
+              "args": [
+                "c",
+                "y2"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "previous_financial_year",
+              "args": [
+                "y2",
+                "y1"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "more_than_one_criterion_exceeded_for_two_consecutive_years",
+          "args": [
+            "c",
+            "y2"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "c",
+          "type": "Company"
+        },
+        {
+          "var": "y2",
+          "type": "FinancialYear"
+        },
+        {
+          "var": "y1",
+          "type": "FinancialYear"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "more_than_one_criterion_exceeded",
+              "args": [
+                "c",
+                "y1"
+              ],
+              "negated": true
+            },
+            {
+              "pred": "more_than_one_criterion_exceeded",
+              "args": [
+                "c",
+                "y2"
+              ],
+              "negated": true
+            },
+            {
+              "pred": "previous_financial_year",
+              "args": [
+                "y2",
+                "y1"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "not_more_than_one_criterion_exceeded_for_two_consecutive_years",
+          "args": [
+            "c",
+            "y2"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "c",
+          "type": "Company"
+        },
+        {
+          "var": "y2",
+          "type": "FinancialYear"
+        },
+        {
+          "var": "effect_year",
+          "type": "FinancialYear"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "more_than_one_criterion_exceeded_for_two_consecutive_years",
+              "args": [
+                "c",
+                "y2"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "next_financial_year",
+              "args": [
+                "y2",
+                "effect_year"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "loses_small_company_status_from",
+          "args": [
+            "c",
+            "effect_year"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "c",
+          "type": "Company"
+        },
+        {
+          "var": "y2",
+          "type": "FinancialYear"
+        },
+        {
+          "var": "effect_year",
+          "type": "FinancialYear"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "not_more_than_one_criterion_exceeded_for_two_consecutive_years",
+              "args": [
+                "c",
+                "y2"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "next_financial_year",
+              "args": [
+                "y2",
+                "effect_year"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "gains_small_company_status_from",
+          "args": [
+            "c",
+            "effect_year"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "case_given_factual_inputs": [
+    {
+      "target_predicate": "more_than_one_criterion_exceeded",
+      "input_predicate": "case_given_more_than_one_criterion_exceeded",
+      "source": "case_given",
+      "evidence_text": "twee achtereenvolgende boekjaren telkens meer dan één van de drempels",
+      "assertion_kind": "factual_threshold_satisfaction",
+      "args": [
+        "bv_horizon",
+        "fy_2025"
+      ]
+    },
+    {
+      "target_predicate": "more_than_one_criterion_exceeded",
+      "input_predicate": "case_given_more_than_one_criterion_exceeded",
+      "source": "case_given",
+      "evidence_text": "twee achtereenvolgende boekjaren telkens meer dan één van de drempels",
+      "assertion_kind": "factual_threshold_satisfaction",
+      "args": [
+        "bv_horizon",
+        "fy_2024"
+      ]
+    }
+  ],
+  "accepted_threshold_satisfaction_facts": [
+    {
+      "input_predicate": "case_given_more_than_one_criterion_exceeded",
+      "target_predicate": "more_than_one_criterion_exceeded",
+      "args": [
+        "bv_horizon",
+        "fy_2025"
+      ],
+      "evidence_text": "twee achtereenvolgende boekjaren telkens meer dan één van de drempels",
+      "assertion_kind": "factual_threshold_satisfaction"
+    },
+    {
+      "input_predicate": "case_given_more_than_one_criterion_exceeded",
+      "target_predicate": "more_than_one_criterion_exceeded",
+      "args": [
+        "bv_horizon",
+        "fy_2024"
+      ],
+      "evidence_text": "twee achtereenvolgende boekjaren telkens meer dan één van de drempels",
+      "assertion_kind": "factual_threshold_satisfaction"
+    }
+  ],
+  "case_text_has_numeric_values": false,
+  "case_text_numeric_values_explicit": false,
+  "bridge_predicates_generated": true,
+  "rejected_query_predicate_assertions": [],
+  "rejected_legal_outputs": [],
+  "query_predicate": "loses_kleine_vennootschap_status_from"
+}

@@ -1,0 +1,64 @@
+{
+  "types": [
+    "Person",
+    "Property"
+  ],
+  "predicates": [
+    {
+      "name": "is_surviving_spouse_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the surviving spouse of the second person (the deceased)."
+    },
+    {
+      "name": "is_heir_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is an heir of the second person (the deceased)."
+    },
+    {
+      "name": "served_as_main_residence_at_opening_of_estate",
+      "args": [
+        "Property",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The property served as the main family residence at the time the estate of the deceased opened."
+    },
+    {
+      "name": "property_is_rented",
+      "args": [
+        "Property",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The property was held under a rental agreement by the deceased at the time of death."
+    },
+    {
+      "name": "acquires_right_to_lease",
+      "args": [
+        "Person",
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "description": "The surviving spouse acquires the exclusive right to the lease of the property, to the exclusion of all other heirs."
+    }
+  ],
+  "functions": []
+}

@@ -5,10 +5,10 @@ Example (OpenRouter):
 
   python scripts/run_model_sweep.py ^
     --provider openrouter ^
-    --models-file config/model_sweep_models.txt ^
+    --models-file config/model_sweep_top3.txt ^
     --input-dir inputs/json_final_clean ^
-    --strategies direct_json_ir_no_translate le_json_ir_no_translate ^
-    --config config/ablation_balanced.json ^
+    --strategies direct_json_ir_no_translate ^
+    --config config/heavy.json ^
     --ignore-local-config ^
     --clean ^
     --no-fail-on-missing-score ^
@@ -355,7 +355,7 @@ def main() -> int:
         "--input-dir",
         "--runs-dir",
         dest="runs_dir",
-        default="inputs/json",
+        default="inputs/json_final_clean",
         help="Benchmark input directory (alias: --runs-dir)",
     )
     ap.add_argument("--strategies", nargs="+", required=True, help="Strategies (space-separated)")

@@ -1,0 +1,14 @@
+{
+  "question": "Welke vennootschapsclassificatie volgt voor BV Beta volgens artikel 1:25?",
+  "detected_question_type": "explanation",
+  "selected_intent": "explain",
+  "selected_reason": "extracted_intent_query",
+  "scorable": false,
+  "fallback_intent": "relevance",
+  "warnings": [],
+  "legal_output_symbols": [
+    "micro_classification_applies_from"
+  ],
+  "query_hint_type": "explanation",
+  "expected_question_type": null
+}

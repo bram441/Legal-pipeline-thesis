@@ -1,0 +1,16 @@
+{
+  "case_entities_rendered_to_domains": {
+    "Person": [
+      "clara",
+      "david",
+      "zij"
+    ],
+    "Asset": [
+      "common_property",
+      "own_property"
+    ]
+  },
+  "query_arguments_with_inferred_types": [],
+  "unmapped_case_entities": [],
+  "pre_solver_domain_validation_errors": []
+}

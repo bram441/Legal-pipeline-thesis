@@ -1,0 +1,181 @@
+{
+  "types": [
+    "Person",
+    "Estate"
+  ],
+  "predicates": [
+    {
+      "name": "is_surviving_spouse_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the surviving spouse of the second person (the deceased)."
+    },
+    {
+      "name": "deceased_leaves_descendants",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deceased person leaves descendants."
+    },
+    {
+      "name": "deceased_leaves_adopted_children",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deceased person leaves adopted children."
+    },
+    {
+      "name": "deceased_leaves_descendants_of_adopted_children",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deceased person leaves descendants of adopted children."
+    },
+    {
+      "name": "is_estate_of",
+      "args": [
+        "Estate",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The estate belongs to the deceased person."
+    },
+    {
+      "name": "qualifying_issue_condition_met",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The deceased leaves descendants, adopted children, or descendants of adopted children."
+    },
+    {
+      "name": "receives_usufruct_of_entire_estate",
+      "args": [
+        "Person",
+        "Estate"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "output_category": "legal_effect",
+      "description": "The surviving spouse acquires the usufruct of the entire estate as a legal consequence."
+    }
+  ],
+  "functions": [],
+  "rules": [
+    {
+      "forall": [
+        {
+          "var": "deceased",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "or": [
+            {
+              "pred": "deceased_leaves_descendants",
+              "args": [
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "deceased_leaves_adopted_children",
+              "args": [
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "deceased_leaves_descendants_of_adopted_children",
+              "args": [
+                "deceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "qualifying_issue_condition_met",
+          "args": [
+            "deceased"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "spouse",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "estate",
+          "type": "Estate"
+        }
+      ],
+      "if": [
+        {
+          "pred": "is_surviving_spouse_of",
+          "args": [
+            "spouse",
+            "deceased"
+          ],
+          "negated": false
+        },
+        {
+          "pred": "qualifying_issue_condition_met",
+          "args": [
+            "deceased"
+          ],
+          "negated": false
+        },
+        {
+          "pred": "is_estate_of",
+          "args": [
+            "estate",
+            "deceased"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "receives_usufruct_of_entire_estate",
+          "args": [
+            "spouse",
+            "estate"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    }
+  ]
+}

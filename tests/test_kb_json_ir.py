@@ -4,6 +4,15 @@ import unittest
 from pipeline.kb.json_ir import JSONIRCompilationError, parse_json_ir, render_json_ir_to_fo
 
 
+def _implies_rule(*, var: str, var_type: str, if_pred: str, then_pred: str) -> dict:
+    return {
+        "forall": [{"var": var, "type": var_type}],
+        "if": [{"pred": if_pred, "args": [var]}],
+        "then": [{"pred": then_pred, "args": [var]}],
+        "operator": "implies",
+    }
+
+
 class TestKBJsonIR(unittest.TestCase):
     def test_render_minimal_ir(self):
         ir = {
@@ -13,14 +22,16 @@ class TestKBJsonIR(unittest.TestCase):
                 {"name": "LegallyAlive", "args": ["Person"], "returns": "Bool", "kind": "derived"},
             ],
             "functions": [],
-            "rules": ["!x in Person: Alive(x) => LegallyAlive(x)."],
+            "rules": [_implies_rule(var="x", var_type="Person", if_pred="Alive", then_pred="LegallyAlive")],
         }
         fo = render_json_ir_to_fo(ir)
         self.assertIn("vocabulary V {", fo)
         self.assertIn("type Person", fo)
         self.assertIn("Alive: Person -> Bool", fo)
         self.assertIn("theory T:V {", fo)
-        self.assertIn("Alive(x) => LegallyAlive(x)", fo)
+        self.assertIn("Alive(x)", fo)
+        self.assertIn("LegallyAlive(x)", fo)
+        self.assertIn("=>", fo)
 
     def test_parse_strips_code_fences(self):
         raw = """```json
@@ -71,7 +82,10 @@ trailing garbage } }"""
                 {"name": "DerivedKnown", "args": ["Person"], "returns": "Bool", "kind": "derived"},
             ],
             "functions": [],
-            "rules": ["!x in Person: Missing(x) => DerivedKnown(x)."],
+            "rules": [
+                _implies_rule(var="x", var_type="Person", if_pred="Known", then_pred="DerivedKnown"),
+                "!x in Person: Missing(x) => DerivedKnown(x).",
+            ],
         }
         old = os.environ.get("JSON_IR_SYNTHESIZE_UNDECLARED")
         os.environ["JSON_IR_SYNTHESIZE_UNDECLARED"] = "1"
@@ -92,7 +106,14 @@ trailing garbage } }"""
                 {"name": "HasDescendantsDerived", "args": ["Person"], "returns": "Bool", "kind": "derived"},
             ],
             "functions": [],
-            "rules": ["!x in Person: has_descendants(x) => HasDescendantsDerived(x)."],
+            "rules": [
+                {
+                    "forall": [{"var": "x", "type": "Person"}],
+                    "if": [{"pred": "HasDescendants", "args": ["x"]}],
+                    "then": [{"pred": "HasDescendantsDerived", "args": ["x"]}],
+                    "operator": "implies",
+                }
+            ],
         }
         fo = render_json_ir_to_fo(ir)
         self.assertIn("HasDescendantsDerived(x)", fo)
@@ -105,7 +126,10 @@ trailing garbage } }"""
                 {"name": "Q", "args": ["Person"], "returns": "Bool", "kind": "derived"},
             ],
             "functions": [],
-            "rules": ["!x,y in Person: (exists(d *in Person: P(d)) && !P(x)) => Q(x)."],
+            "rules": [
+                _implies_rule(var="x", var_type="Person", if_pred="P", then_pred="Q"),
+                "!x,y in Person: (exists(d *in Person: P(d)) && !P(x)) => Q(x).",
+            ],
         }
         fo = render_json_ir_to_fo(ir)
         self.assertIn("! x in Person, y in Person:", fo)
@@ -214,7 +238,7 @@ trailing garbage } }"""
         }
         with self.assertRaises(JSONIRCompilationError) as ctx:
             render_json_ir_to_fo(ir)
-        self.assertIn("not grounded", str(ctx.exception).lower())
+        self.assertIn("without a defining rule", str(ctx.exception).lower())
 
     def test_rejects_non_reflexive_self_relation(self):
         ir = {
@@ -264,7 +288,7 @@ trailing garbage } }"""
         with self.assertRaises(JSONIRCompilationError) as ctx:
             render_json_ir_to_fo(self._floating_helper_ir())
         self.assertIn("helper predicate 'helper_h'", str(ctx.exception).lower())
-        self.assertIn("never defined", str(ctx.exception).lower())
+        self.assertIn("no defining rule", str(ctx.exception).lower())
 
     def test_accepts_helper_defined_in_then(self):
         ir = self._floating_helper_ir(
@@ -289,8 +313,10 @@ trailing garbage } }"""
             "types": ["Actor"],
             "predicates": [
                 {"name": "is_surviving_party", "args": ["Actor"], "returns": "Bool", "kind": "observable",
+                 "directly_observable": True,
                  "description": "The person is the surviving party."},
                 {"name": "is_deceased", "args": ["Actor"], "returns": "Bool", "kind": "observable",
+                 "directly_observable": True,
                  "description": "The person is deceased."},
                 {"name": "legal_result", "args": ["Actor"], "returns": "Bool", "kind": "derived"},
             ],
@@ -314,8 +340,10 @@ trailing garbage } }"""
         ir = {
             "types": ["Actor"],
             "predicates": [
-                {"name": "status_of", "args": ["Actor", "Actor"], "returns": "Bool", "kind": "observable"},
+                {"name": "status_of", "args": ["Actor", "Actor"], "returns": "Bool", "kind": "observable",
+                 "directly_observable": True},
                 {"name": "condition_holds", "args": ["Actor"], "returns": "Bool", "kind": "observable",
+                 "directly_observable": True,
                  "description": "The deceased actor satisfies the condition."},
                 {"name": "legal_result", "args": ["Actor"], "returns": "Bool", "kind": "derived"},
             ],

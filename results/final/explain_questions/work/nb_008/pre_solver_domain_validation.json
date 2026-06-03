@@ -1,0 +1,13 @@
+{
+  "case_entities_rendered_to_domains": {
+    "FinancialYear": [
+      "boekjaar_2026"
+    ],
+    "Company": [
+      "bv_gamma"
+    ]
+  },
+  "query_arguments_with_inferred_types": [],
+  "unmapped_case_entities": [],
+  "pre_solver_domain_validation_errors": []
+}

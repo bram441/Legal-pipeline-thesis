@@ -1,0 +1,507 @@
+{
+  "query": {
+    "predicate": "has_risk_of_absconding",
+    "args": [
+      "dana"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "unknown",
+    "certain": false,
+    "possible": true,
+    "certainty_class": "inconclusive"
+  },
+  "extracted_case": {
+    "facts": [
+      "subject_to_removal_procedure(dana).",
+      "used_false_info_docs_or_fraud_in_procedure(dana)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "Person": [
+        "dana"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 4,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_foreigner",
+            "args": [
+              "x"
+            ]
+          },
+          {
+            "predicate": "subject_to_removal_procedure",
+            "args": [
+              "x"
+            ]
+          },
+          {
+            "predicate": "subject_to_international_protection_procedure",
+            "args": [
+              "x"
+            ]
+          },
+          {
+            "predicate": "subject_to_dublin_procedure",
+            "args": [
+              "x"
+            ]
+          },
+          {
+            "predicate": "risk_is_actual_and_real",
+            "args": [
+              "x"
+            ]
+          },
+          {
+            "predicate": "individual_examination_performed",
+            "args": [
+              "x"
+            ]
+          },
+          {
+            "predicate": "circumstances_specific_to_case_taken_into_account",
+            "args": [
+              "x"
+            ]
+          },
+          {
+            "predicate": "meets_at_least_one_absconding_criterion",
+            "args": [
+              "x"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "has_risk_of_absconding"
+      ]
+    },
+    {
+      "rule_index": 5,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "filed_residence_application_after_illegal_entry_or_during_illegal_stay",
+            "args": [
+              "x"
+            ]
+          },
+          {
+            "predicate": "filed_international_protection_request_within_legal_time_limit",
+            "args": [
+              "x"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "meets_absconding_criterion_1"
+      ]
+    },
+    {
+      "rule_index": 6,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "used_false_info_docs_or_fraud_in_procedure",
+            "args": [
+              "x"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "meets_absconding_criterion_2"
+      ]
+    },
+    {
+      "rule_index": 7,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "cooperates_with_authorities_on_entry_and_residence",
+            "args": [
+              "x"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "meets_absconding_criterion_3"
+      ]
+    },
+    {
+      "rule_index": 8,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "refuses_or_failed_to_comply_with_return_or_security_measure",
+            "args": [
+              "x"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "meets_absconding_criterion_4"
+      ]
+    },
+    {
+      "rule_index": 9,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "subject_to_active_entry_ban",
+            "args": [
+              "x"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "meets_absconding_criterion_5"
+      ]
+    },
+    {
+      "rule_index": 10,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "filed_new_application_immediately_after_negative_decision_or_measure",
+            "args": [
+              "x"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "meets_absconding_criterion_6"
+      ]
+    },
+    {
+      "rule_index": 11,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "hid_prior_fingerprints_in_other_dublin_state",
+            "args": [
+              "x"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "meets_absconding_criterion_7"
+      ]
+    },
+    {
+      "rule_index": 12,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "filed_multiple_applications_with_negative_outcome",
+            "args": [
+              "x"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "meets_absconding_criterion_8"
+      ]
+    },
+    {
+      "rule_index": 13,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "hid_prior_asylum_request_in_other_dublin_state",
+            "args": [
+              "x"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "meets_absconding_criterion_9"
+      ]
+    },
+    {
+      "rule_index": 14,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "came_to_realm_for_other_purposes_than_application",
+            "args": [
+              "x"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "meets_absconding_criterion_10"
+      ]
+    },
+    {
+      "rule_index": 15,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "subject_to_fine_for_manifestly_unlawful_appeal",
+            "args": [
+              "x"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "meets_absconding_criterion_11"
+      ]
+    },
+    {
+      "rule_index": 16,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "meets_absconding_criterion_1",
+            "args": [
+              "x"
+            ]
+          },
+          {
+            "predicate": "meets_absconding_criterion_2",
+            "args": [
+              "x"
+            ]
+          },
+          {
+            "predicate": "meets_absconding_criterion_3",
+            "args": [
+              "x"
+            ]
+          },
+          {
+            "predicate": "meets_absconding_criterion_4",
+            "args": [
+              "x"
+            ]
+          },
+          {
+            "predicate": "meets_absconding_criterion_5",
+            "args": [
+              "x"
+            ]
+          },
+          {
+            "predicate": "meets_absconding_criterion_6",
+            "args": [
+              "x"
+            ]
+          },
+          {
+            "predicate": "meets_absconding_criterion_7",
+            "args": [
+              "x"
+            ]
+          },
+          {
+            "predicate": "meets_absconding_criterion_8",
+            "args": [
+              "x"
+            ]
+          },
+          {
+            "predicate": "meets_absconding_criterion_9",
+            "args": [
+              "x"
+            ]
+          },
+          {
+            "predicate": "meets_absconding_criterion_10",
+            "args": [
+              "x"
+            ]
+          },
+          {
+            "predicate": "meets_absconding_criterion_11",
+            "args": [
+              "x"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "meets_at_least_one_absconding_criterion"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 4,
+      "target": "has_risk_of_absconding(dana)",
+      "conditions": [
+        {
+          "atom": "is_foreigner(dana)",
+          "status": "unknown"
+        },
+        {
+          "atom": "subject_to_removal_procedure(dana)",
+          "status": "present"
+        },
+        {
+          "atom": "subject_to_international_protection_procedure(dana)",
+          "status": "missing"
+        },
+        {
+          "atom": "subject_to_dublin_procedure(dana)",
+          "status": "missing"
+        },
+        {
+          "atom": "risk_is_actual_and_real(dana)",
+          "status": "missing"
+        },
+        {
+          "atom": "individual_examination_performed(dana)",
+          "status": "missing"
+        },
+        {
+          "atom": "circumstances_specific_to_case_taken_into_account(dana)",
+          "status": "missing"
+        },
+        {
+          "atom": "meets_at_least_one_absconding_criterion(dana)",
+          "status": "helper_defined"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "is_foreigner",
+      "symbol_type": "predicate",
+      "atom": "is_foreigner(dana)",
+      "kind": "derived",
+      "gap_status": "derivable_from_rules",
+      "assertable_in_case": false,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        0
+      ]
+    },
+    {
+      "symbol": "subject_to_removal_procedure",
+      "symbol_type": "predicate",
+      "atom": "subject_to_removal_procedure(dana)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "Dana is een vreemdeling en maakt het voorwerp uit van een verwijderingsprocedure."
+      ],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "subject_to_international_protection_procedure",
+      "symbol_type": "predicate",
+      "atom": "subject_to_international_protection_procedure(dana)",
+      "kind": "observable",
+      "gap_status": "missing_entirely",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "Dana is een vreemdeling en maakt het voorwerp uit van een verwijderingsprocedure."
+      ],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "subject_to_dublin_procedure",
+      "symbol_type": "predicate",
+      "atom": "subject_to_dublin_procedure(dana)",
+      "kind": "observable",
+      "gap_status": "missing_entirely",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "Dana is een vreemdeling en maakt het voorwerp uit van een verwijderingsprocedure."
+      ],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "risk_is_actual_and_real",
+      "symbol_type": "predicate",
+      "atom": "risk_is_actual_and_real(dana)",
+      "kind": "observable",
+      "gap_status": "missing_entirely",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "individual_examination_performed",
+      "symbol_type": "predicate",
+      "atom": "individual_examination_performed(dana)",
+      "kind": "observable",
+      "gap_status": "missing_entirely",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "circumstances_specific_to_case_taken_into_account",
+      "symbol_type": "predicate",
+      "atom": "circumstances_specific_to_case_taken_into_account(dana)",
+      "kind": "observable",
+      "gap_status": "missing_entirely",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "meets_at_least_one_absconding_criterion",
+      "symbol_type": "predicate",
+      "atom": "meets_at_least_one_absconding_criterion(dana)",
+      "kind": "helper",
+      "gap_status": "derivable_from_rules",
+      "assertable_in_case": false,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        16
+      ]
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "extraction_gap",
+    "secondary": [],
+    "rationale": "Assertable observables or temporal facts required by the derivation chain were not extracted from the case although the case text contains relevant qualitative evidence."
+  }
+}

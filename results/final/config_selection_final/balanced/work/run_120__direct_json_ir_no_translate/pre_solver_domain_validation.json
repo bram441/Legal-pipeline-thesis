@@ -1,0 +1,28 @@
+{
+  "case_entities_rendered_to_domains": {
+    "Company": [
+      "bv_horizon"
+    ],
+    "FinancialYear": [
+      "fy_2024",
+      "fy_2025",
+      "fy_2026"
+    ]
+  },
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "bv_horizon",
+      "arg_index": 0,
+      "expected_type": "Company",
+      "predicate": "loses_kleine_vennootschap_status_from"
+    },
+    {
+      "entity": "fy_2026",
+      "arg_index": 1,
+      "expected_type": "FinancialYear",
+      "predicate": "loses_kleine_vennootschap_status_from"
+    }
+  ],
+  "unmapped_case_entities": [],
+  "pre_solver_domain_validation_errors": []
+}

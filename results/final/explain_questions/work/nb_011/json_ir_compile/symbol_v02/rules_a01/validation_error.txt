@@ -1,0 +1,1 @@
+JSON_IR_RULE_DESIGN_ERROR: Rule rules[15].if[2] uses numeric threshold 13500000, but this number does not appear in the scoped law text. Do not invent or alter legal thresholds during repair. Use one of the law-text thresholds: 26, 38, 50, 1996, 2002, 6000000, 11250000. Repair layer: rules.

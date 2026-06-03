@@ -1,0 +1,7 @@
+{
+  "run_id": "nb_014",
+  "gold_type": "classification_with_reason",
+  "expected_answer": "Mila is een onderdaan van een derde land, omdat zij geen burger van de Unie is en niet onder het gemeenschapsrecht inzake vrij verkeer valt.",
+  "law_source": "vreemdelingenwet_clean.txt",
+  "notes": "Gold is separated from plain_inputs and must not be included in model prompts."
+}

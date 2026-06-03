@@ -1,0 +1,108 @@
+{
+  "rules": [
+    {
+      "forall": [
+        {"var": "spouse", "type": "Person"},
+        {"var": "deceased", "type": "Person"}
+      ],
+      "if": [
+        {
+          "or": [
+            {"pred": "deceased_leaves_ascendants", "args": ["deceased"], "negated": false},
+            {"pred": "deceased_leaves_close_collaterals", "args": ["deceased"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "deceased_leaves_ascendants_or_close_collaterals", "args": ["deceased"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "spouse", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "asset", "type": "Asset"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_surviving_spouse_of", "args": ["spouse", "deceased"], "negated": false},
+            {"pred": "deceased_leaves_ascendants_or_close_collaterals", "args": ["deceased"], "negated": false},
+            {"pred": "is_common_property_of_spouses", "args": ["asset", "deceased"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "acquires_full_ownership_of_common_share", "args": ["spouse", "asset"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "spouse", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "asset", "type": "Asset"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_surviving_spouse_of", "args": ["spouse", "deceased"], "negated": false},
+            {"pred": "deceased_leaves_ascendants_or_close_collaterals", "args": ["deceased"], "negated": false},
+            {"pred": "is_undivided_between_spouses", "args": ["asset", "deceased"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "acquires_full_ownership_of_common_share", "args": ["spouse", "asset"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "spouse", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "asset", "type": "Asset"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_surviving_spouse_of", "args": ["spouse", "deceased"], "negated": false},
+            {"pred": "deceased_leaves_ascendants_or_close_collaterals", "args": ["deceased"], "negated": false},
+            {"pred": "is_own_property_of_deceased", "args": ["asset", "deceased"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "acquires_usufruct_of_own_property", "args": ["spouse", "asset"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "spouse", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "asset", "type": "Asset"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_surviving_spouse_of", "args": ["spouse", "deceased"], "negated": false},
+            {"pred": "deceased_leaves_ascendants_or_close_collaterals", "args": ["deceased"], "negated": false},
+            {
+              "or": [
+                {"pred": "is_subject_to_legal_reversion_4_24", "args": ["asset", "deceased"], "negated": false},
+                {"pred": "is_subject_to_legal_reversion_4_25", "args": ["asset", "deceased"], "negated": false}
+              ]
+            },
+            {"pred": "deed_or_testament_excludes_usufruct_on_reversion_asset", "args": ["asset", "deceased"], "negated": true}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "acquires_usufruct_of_reversion_asset", "args": ["spouse", "asset"], "negated": false}
+      ],
+      "operator": "implies"
+    }
+  ]
+}

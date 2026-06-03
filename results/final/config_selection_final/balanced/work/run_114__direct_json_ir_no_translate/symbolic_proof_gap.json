@@ -1,0 +1,302 @@
+{
+  "query": {
+    "predicate": "is_kleine_vennootschap",
+    "args": [
+      "nv_atlas",
+      "boekjaar_recent"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "contradicted",
+    "certain": false,
+    "possible": false,
+    "certainty_class": "decisive"
+  },
+  "extracted_case": {
+    "facts": [
+      "has_legal_personality(nv_atlas).",
+      "annual_average_employees(nv_atlas,boekjaar_recent) = 55.",
+      "annual_net_turnover_excl_vat(nv_atlas,boekjaar_recent) = 12000000.0.",
+      "balance_sheet_total(nv_atlas,boekjaar_recent) = 5500000.0."
+    ],
+    "value_assertions": [
+      "annual_average_employees(nv_atlas,boekjaar_recent) = 55.",
+      "annual_net_turnover_excl_vat(nv_atlas,boekjaar_recent) = 12000000.0.",
+      "balance_sheet_total(nv_atlas,boekjaar_recent) = 5500000.0."
+    ],
+    "entities": {
+      "FinancialYear": [
+        "boekjaar_recent"
+      ],
+      "Company": [
+        "nv_atlas"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 0,
+      "requirements": {
+        "predicates": [],
+        "function_compares": [
+          {
+            "function": "annual_average_employees"
+          }
+        ]
+      },
+      "then_predicates": [
+        "employee_criterion_exceeded"
+      ]
+    },
+    {
+      "rule_index": 1,
+      "requirements": {
+        "predicates": [],
+        "function_compares": [
+          {
+            "function": "annual_net_turnover_excl_vat"
+          }
+        ]
+      },
+      "then_predicates": [
+        "turnover_criterion_exceeded"
+      ]
+    },
+    {
+      "rule_index": 2,
+      "requirements": {
+        "predicates": [],
+        "function_compares": [
+          {
+            "function": "balance_sheet_total"
+          }
+        ]
+      },
+      "then_predicates": [
+        "balance_sheet_criterion_exceeded"
+      ]
+    },
+    {
+      "rule_index": 3,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "employee_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          },
+          {
+            "predicate": "turnover_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "more_than_one_criterion_exceeded"
+      ]
+    },
+    {
+      "rule_index": 4,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "employee_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          },
+          {
+            "predicate": "balance_sheet_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "more_than_one_criterion_exceeded"
+      ]
+    },
+    {
+      "rule_index": 5,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "turnover_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          },
+          {
+            "predicate": "balance_sheet_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "more_than_one_criterion_exceeded"
+      ]
+    },
+    {
+      "rule_index": 6,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "has_legal_personality",
+            "args": [
+              "c"
+            ]
+          },
+          {
+            "predicate": "more_than_one_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "is_kleine_vennootschap"
+      ]
+    },
+    {
+      "rule_index": 7,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "more_than_one_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "is_kleine_vennootschap"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 6,
+      "target": "is_kleine_vennootschap(nv_atlas,boekjaar_recent)",
+      "conditions": [
+        {
+          "atom": "has_legal_personality(nv_atlas)",
+          "status": "present"
+        },
+        {
+          "atom": "more_than_one_criterion_exceeded(nv_atlas,boekjaar_recent)",
+          "status": "helper_defined"
+        }
+      ]
+    },
+    {
+      "rule_index": 7,
+      "target": "is_kleine_vennootschap(nv_atlas,boekjaar_recent)",
+      "conditions": [
+        {
+          "atom": "more_than_one_criterion_exceeded(nv_atlas,boekjaar_recent)",
+          "status": "helper_defined"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "has_legal_personality",
+      "symbol_type": "predicate",
+      "atom": "has_legal_personality(nv_atlas)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "NV Atlas heeft rechtspersoonlijkheid."
+      ],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "more_than_one_criterion_exceeded",
+      "symbol_type": "predicate",
+      "atom": "more_than_one_criterion_exceeded(nv_atlas,boekjaar_recent)",
+      "kind": "helper",
+      "gap_status": "derivable_from_rules",
+      "assertable_in_case": false,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "symbol": "annual_average_employees",
+      "symbol_type": "function",
+      "atom": "annual_average_employees(...)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        0
+      ]
+    },
+    {
+      "symbol": "annual_net_turnover_excl_vat",
+      "symbol_type": "function",
+      "atom": "annual_net_turnover_excl_vat(...)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        1
+      ]
+    },
+    {
+      "symbol": "balance_sheet_total",
+      "symbol_type": "function",
+      "atom": "balance_sheet_total(...)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        2
+      ]
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "genuinely_under_specified_case",
+    "secondary": [],
+    "rationale": "No single blocking category identified; case may lack explicit observables for a decisive proof."
+  }
+}

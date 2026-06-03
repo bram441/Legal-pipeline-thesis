@@ -1,0 +1,26 @@
+{
+  "entities": {
+    "omar": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "subject_to_removal_procedure",
+          "arg_index": 0,
+          "expected_type": "Person"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "case_given_at_least_one_absconding_criterion_met",
+          "arg_index": 0,
+          "expected_type": "Person"
+        }
+      ]
+    }
+  },
+  "unmapped_entities": [],
+  "conflicts": [],
+  "query_arguments_with_inferred_types": []
+}

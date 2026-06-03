@@ -1,0 +1,119 @@
+{
+  "intent": "deduction",
+  "symbolic_status": "ok",
+  "status": "ok",
+  "scorable": true,
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "extracted_query_hint",
+  "routing": {
+    "question": "Onder welke wettelijke categorie valt Samir volgens artikel 1, paragraaf 1, punt 1?",
+    "detected_question_type": "boolean",
+    "selected_intent": "deduction",
+    "selected_reason": "extracted_query_hint",
+    "scorable": true,
+    "fallback_intent": null,
+    "warnings": [],
+    "legal_output_symbols": [
+      "risk_of_absconding"
+    ],
+    "query_hint_type": "boolean",
+    "expected_question_type": null
+  },
+  "satisfiability_check": {
+    "stage": "pre_query",
+    "kb_case_satisfiable": true,
+    "status": "ok",
+    "details": "theory satisfiable",
+    "intent_backend": "idp_z3.tasks.satisfiable_check",
+    "duration_seconds": 0.1207
+  },
+  "warnings": [],
+  "deduction": {
+    "intent": "deduction",
+    "status": "ok",
+    "output_kind": "epistemic_boolean",
+    "predicate": "is_foreigner",
+    "args": [
+      "samir"
+    ],
+    "possible": true,
+    "certain": true,
+    "label": "entailed",
+    "atom": "is_foreigner(x0)",
+    "constraint": "? x0 in Person: __sel0(x0) & is_foreigner(x0)",
+    "certainty_class": "decisive",
+    "sat": true,
+    "internal_intent": "deduction",
+    "antecedent_coverage": [
+      {
+        "rule_index": 0,
+        "target": "is_foreigner(samir)",
+        "conditions": [
+          {
+            "atom": "is_belgian_national(samir)",
+            "status": "present"
+          }
+        ]
+      },
+      {
+        "rule_index": 1,
+        "target": "is_foreigner(samir)",
+        "conditions": [
+          {
+            "atom": "is_belgian_national(samir)",
+            "status": "present"
+          }
+        ]
+      }
+    ]
+  },
+  "model_expansion": null,
+  "get_range": null,
+  "satisfiable": null,
+  "explanation": null,
+  "execution_query": {
+    "type": "predicate",
+    "predicate": "is_foreigner",
+    "mode": "boolean",
+    "args": [
+      "samir"
+    ],
+    "explain": false,
+    "predicate_kind": "derived",
+    "query_type": "predicate_boolean",
+    "internal_intent": "deduction"
+  },
+  "output_kind": "epistemic_boolean",
+  "certainty_class": "decisive",
+  "predicate": "is_foreigner",
+  "args": [
+    "samir"
+  ],
+  "label": "entailed",
+  "possible": true,
+  "certain": true,
+  "sat": true,
+  "antecedent_coverage": [
+    {
+      "rule_index": 0,
+      "target": "is_foreigner(samir)",
+      "conditions": [
+        {
+          "atom": "is_belgian_national(samir)",
+          "status": "present"
+        }
+      ]
+    },
+    {
+      "rule_index": 1,
+      "target": "is_foreigner(samir)",
+      "conditions": [
+        {
+          "atom": "is_belgian_national(samir)",
+          "status": "present"
+        }
+      ]
+    }
+  ]
+}

@@ -26,6 +26,10 @@ class TestClassifyFailure(unittest.TestCase):
                 json.dumps({"questions": [{"pipeline": {"sat": True}}]}),
                 encoding="utf-8",
             )
+            (w / "score.json").write_text(
+                json.dumps({"total": 1, "correct": 1, "items": []}),
+                encoding="utf-8",
+            )
             self.assertEqual(es.classify_failure(w, 0, ok=True), "completed")
 
     def test_completed_with_errors(self):
@@ -40,6 +44,10 @@ class TestClassifyFailure(unittest.TestCase):
                         ]
                     }
                 ),
+                encoding="utf-8",
+            )
+            (w / "score.json").write_text(
+                json.dumps({"total": 1, "correct": 0, "items": []}),
                 encoding="utf-8",
             )
             self.assertEqual(es.classify_failure(w, 0, ok=True), "completed_with_errors")

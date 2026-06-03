@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 import pytest
 
+from pipeline.config import reload_config
 from pipeline.kb.cache import (
     KBCacheError,
     get_or_compile_kb,
@@ -70,6 +71,7 @@ def test_json_ir_outer_retries_only_when_explicitly_enabled(
 ) -> None:
     monkeypatch.setenv("JSON_IR_ALLOW_OUTER_CACHE_RETRIES", "1")
     monkeypatch.setenv("PIPELINE_KB_MAX_REPAIR_ATTEMPTS", "3")
+    reload_config()
     mock_compile.side_effect = _law_compilation_error()
     with pytest.raises(KBCacheError):
         get_or_compile_kb(str(tmp_path), "sample law text")
@@ -78,22 +80,21 @@ def test_json_ir_outer_retries_only_when_explicitly_enabled(
 
 def test_json_ir_allow_outer_cache_retries_env() -> None:
     os.environ["JSON_IR_ALLOW_OUTER_CACHE_RETRIES"] = "1"
+    reload_config()
     try:
         assert json_ir_outer_cache_retries_enabled() is True
         assert resolve_max_repair_attempts("json_ir", log_warnings=False) == 8
     finally:
         os.environ.pop("JSON_IR_ALLOW_OUTER_CACHE_RETRIES", None)
+        reload_config()
 
 
 def test_strategy_metadata_json_ir_structured_repair(monkeypatch) -> None:
     monkeypatch.setenv("JSON_IR_MAX_SYMBOL_VERSIONS", "3")
     monkeypatch.setenv("JSON_IR_MAX_RULES_ATTEMPTS_PER_SYMBOL_VERSION", "3")
     monkeypatch.setenv("JSON_IR_MAX_KB_LLM_CALLS", "7")
-    meta = strategy_metadata(
-        "direct_json_ir_translate",
-        pipeline_backend_mode="json_ir",
-        kb_backend="json_ir",
-    )
+    reload_config()
+    meta = strategy_metadata("direct_json_ir_translate")
     assert meta["repair_enabled"] is True
     assert meta["json_ir_structured_repair_enabled"] is True
     assert meta["json_ir_max_symbol_versions"] == 3

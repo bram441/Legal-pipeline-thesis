@@ -1,0 +1,162 @@
+{
+  "types": [
+    "Person",
+    "Estate"
+  ],
+  "predicates": [
+    {
+      "name": "is_surviving_spouse_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the surviving spouse of the second person (the deceased)."
+    },
+    {
+      "name": "leaves_descendants",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deceased person leaves descendants."
+    },
+    {
+      "name": "leaves_adopted_children",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deceased person leaves adopted children."
+    },
+    {
+      "name": "leaves_descendants_of_adopted_children",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deceased person leaves descendants of adopted children."
+    },
+    {
+      "name": "has_qualifying_issue",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The deceased person leaves descendants, adopted children, or descendants of adopted children."
+    },
+    {
+      "name": "receives_usufruct_of_entire_estate",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The first person (surviving spouse) receives usufruct over the entire estate of the second person (the deceased) as a legal consequence.",
+      "legal_output": true,
+      "output_category": "legal_effect"
+    }
+  ],
+  "functions": [],
+  "rules": [
+    {
+      "forall": [
+        {
+          "var": "deceased",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "or": [
+            {
+              "pred": "leaves_descendants",
+              "args": [
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "leaves_adopted_children",
+              "args": [
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "leaves_descendants_of_adopted_children",
+              "args": [
+                "deceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "has_qualifying_issue",
+          "args": [
+            "deceased"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "spouse",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_spouse_of",
+              "args": [
+                "spouse",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "has_qualifying_issue",
+              "args": [
+                "deceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "receives_usufruct_of_entire_estate",
+          "args": [
+            "spouse",
+            "deceased"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    }
+  ]
+}

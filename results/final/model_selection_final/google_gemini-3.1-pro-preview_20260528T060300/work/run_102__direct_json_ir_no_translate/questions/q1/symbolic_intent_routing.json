@@ -1,0 +1,15 @@
+{
+  "question": "Verkrijgt Dirk volgens artikel 4.17, paragraaf 2 het vruchtgebruik van de overige goederen van Carla's eigen vermogen?",
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "scorable": true,
+  "fallback_intent": null,
+  "warnings": [],
+  "legal_output_symbols": [
+    "acquires_full_ownership",
+    "acquires_usufruct"
+  ],
+  "query_hint_type": "explanation",
+  "expected_question_type": "boolean"
+}

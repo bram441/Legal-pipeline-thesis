@@ -1,0 +1,14 @@
+{
+  "question": "Welke algemene vereisten stelt artikel 1, paragraaf 2 voor het vaststellen van risico op onderduiken?",
+  "detected_question_type": "explanation",
+  "selected_intent": "explain",
+  "selected_reason": "extracted_intent_query",
+  "scorable": false,
+  "fallback_intent": "relevance",
+  "warnings": [],
+  "legal_output_symbols": [
+    "risk_of_absconding"
+  ],
+  "query_hint_type": "explanation",
+  "expected_question_type": null
+}

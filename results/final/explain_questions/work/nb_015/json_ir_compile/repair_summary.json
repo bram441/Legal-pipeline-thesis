@@ -1,0 +1,20 @@
+{
+  "symbol_version_count": 1,
+  "rules_attempt_count": 1,
+  "total_kb_llm_calls": 2,
+  "repair_layers_used": [],
+  "final_failure_category": null,
+  "final_normalized_error_code": null,
+  "final_normalized_error_signature": null,
+  "repeated_error_detected": false,
+  "repair_stalled": false,
+  "budget_exhausted": false,
+  "symbol_budget_exhausted": false,
+  "distinct_errors": [],
+  "validation_evidence_path": null,
+  "validation_evidence_fingerprint": null,
+  "evidence_consumed_by_repair": false,
+  "evidence_extension_used": false,
+  "evidence_extension_calls": 0,
+  "evidence_extension_reason": null
+}

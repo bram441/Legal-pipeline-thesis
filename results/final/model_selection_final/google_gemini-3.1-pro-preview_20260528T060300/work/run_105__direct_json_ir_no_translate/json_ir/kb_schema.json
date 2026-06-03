@@ -1,0 +1,88 @@
+{
+  "types": [
+    "Person"
+  ],
+  "predicates": [
+    {
+      "name": "is_surviving_legal_cohabitant_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person is the surviving legal cohabitant of the second person.",
+      "directly_observable": true
+    },
+    {
+      "name": "is_descendant_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person is a descendant of the second person.",
+      "directly_observable": true
+    },
+    {
+      "name": "preceding_provisions_do_not_apply",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The preceding provisions do not apply to the first person with respect to the second person.",
+      "output_category": "exception"
+    }
+  ],
+  "functions": [],
+  "rules": [
+    {
+      "forall": [
+        {
+          "var": "survivor",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_legal_cohabitant_of",
+              "args": [
+                "survivor",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_descendant_of",
+              "args": [
+                "survivor",
+                "deceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "preceding_provisions_do_not_apply",
+          "args": [
+            "survivor",
+            "deceased"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    }
+  ]
+}

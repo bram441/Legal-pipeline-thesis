@@ -1,0 +1,32 @@
+{
+  "entities": {
+    "mila": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_eu_citizen",
+          "arg_index": 0,
+          "expected_type": "Person"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "covered_by_eu_free_movement_law",
+          "arg_index": 0,
+          "expected_type": "Person"
+        }
+      ]
+    },
+    "unie": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "declared",
+      "evidence": []
+    }
+  },
+  "unmapped_entities": [],
+  "conflicts": [],
+  "query_arguments_with_inferred_types": []
+}

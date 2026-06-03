@@ -1,0 +1,27 @@
+{
+  "case_entities_rendered_to_domains": {
+    "Person": [
+      "mira",
+      "noor"
+    ],
+    "Asset": [
+      "woning"
+    ]
+  },
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "noor",
+      "arg_index": 0,
+      "expected_type": "Person",
+      "predicate": "acquires_usufruct_of_family_residence"
+    },
+    {
+      "entity": "mira",
+      "arg_index": 1,
+      "expected_type": "Person",
+      "predicate": "acquires_usufruct_of_family_residence"
+    }
+  ],
+  "unmapped_case_entities": [],
+  "pre_solver_domain_validation_errors": []
+}

@@ -1,0 +1,144 @@
+{
+  "query": {
+    "predicate": "",
+    "args": [],
+    "mode": null,
+    "type": "intent"
+  },
+  "symbolic_outcome": {
+    "status": "error",
+    "label": null,
+    "certain": null,
+    "possible": null,
+    "certainty_class": null
+  },
+  "extracted_case": {
+    "facts": [
+      "has_legal_personality(nv_alfa)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "Company": [
+        "nv_alfa"
+      ]
+    }
+  },
+  "deriving_rules": [],
+  "antecedent_coverage": [],
+  "antecedents": [
+    {
+      "symbol": "aggregated_employees",
+      "symbol_type": "function",
+      "atom": "aggregated_employees(...)",
+      "kind": "observable",
+      "gap_status": "blocked_by_missing_numeric",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        11
+      ]
+    },
+    {
+      "symbol": "alternative_turnover",
+      "symbol_type": "function",
+      "atom": "alternative_turnover(...)",
+      "kind": "observable",
+      "gap_status": "blocked_by_missing_numeric",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        3,
+        6
+      ]
+    },
+    {
+      "symbol": "annual_average_employees",
+      "symbol_type": "function",
+      "atom": "annual_average_employees(...)",
+      "kind": "observable",
+      "gap_status": "blocked_by_missing_numeric",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        12
+      ]
+    },
+    {
+      "symbol": "annual_net_turnover_excl_vat",
+      "symbol_type": "function",
+      "atom": "annual_net_turnover_excl_vat(...)",
+      "kind": "observable",
+      "gap_status": "blocked_by_missing_numeric",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        5,
+        8
+      ]
+    },
+    {
+      "symbol": "balance_sheet_total",
+      "symbol_type": "function",
+      "atom": "balance_sheet_total(...)",
+      "kind": "observable",
+      "gap_status": "blocked_by_missing_numeric",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        10
+      ]
+    },
+    {
+      "symbol": "consolidated_balance_sheet_total",
+      "symbol_type": "function",
+      "atom": "consolidated_balance_sheet_total(...)",
+      "kind": "observable",
+      "gap_status": "blocked_by_missing_numeric",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        9
+      ]
+    },
+    {
+      "symbol": "consolidated_net_turnover",
+      "symbol_type": "function",
+      "atom": "consolidated_net_turnover(...)",
+      "kind": "observable",
+      "gap_status": "blocked_by_missing_numeric",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        4,
+        7
+      ]
+    },
+    {
+      "symbol": "financial_year_duration_months",
+      "symbol_type": "function",
+      "atom": "financial_year_duration_months(...)",
+      "kind": "observable",
+      "gap_status": "blocked_by_missing_numeric",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        1
+      ]
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "renderer_solver_issue",
+    "secondary": [],
+    "rationale": "Symbolic engine returned an error before a conclusive proof could be evaluated."
+  }
+}

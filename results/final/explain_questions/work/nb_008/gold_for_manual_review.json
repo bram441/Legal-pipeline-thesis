@@ -1,0 +1,7 @@
+{
+  "run_id": "nb_008",
+  "gold_type": "period",
+  "expected_answer": "Er moet meteen rekening mee worden gehouden voor het eerste boekjaar, dus boekjaar 2026.",
+  "law_source": "microvennootschappen_clean.txt",
+  "notes": "Gold is separated from plain_inputs and must not be included in model prompts."
+}

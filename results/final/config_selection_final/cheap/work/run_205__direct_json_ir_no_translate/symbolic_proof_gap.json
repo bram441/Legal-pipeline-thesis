@@ -1,0 +1,459 @@
+{
+  "query": {
+    "predicate": "is_micro_company",
+    "args": [
+      "bv_pico"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "unknown",
+    "certain": false,
+    "possible": true,
+    "certainty_class": "inconclusive"
+  },
+  "extracted_case": {
+    "facts": [
+      "has_legal_personality(bv_pico).",
+      "is_last_closed_financial_year(bv_pico,fy_last).",
+      "not is_subsidiary(bv_pico).",
+      "not is_parent_company(bv_pico).",
+      "is_small_company(bv_pico).",
+      "annual_average_employees(bv_pico,fy_last) = 8.",
+      "annual_net_turnover_excl_vat(bv_pico,fy_last) = 700000.0.",
+      "balance_sheet_total(bv_pico,fy_last) = 300000.0."
+    ],
+    "value_assertions": [
+      "annual_average_employees(bv_pico,fy_last) = 8.",
+      "annual_net_turnover_excl_vat(bv_pico,fy_last) = 700000.0.",
+      "balance_sheet_total(bv_pico,fy_last) = 300000.0."
+    ],
+    "entities": {
+      "Company": [
+        "bv_pico"
+      ],
+      "FinancialYear": [
+        "fy_last"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 0,
+      "requirements": {
+        "predicates": [],
+        "function_compares": [
+          {
+            "function": "annual_average_employees"
+          }
+        ]
+      },
+      "then_predicates": [
+        "employee_criterion_exceeded"
+      ]
+    },
+    {
+      "rule_index": 1,
+      "requirements": {
+        "predicates": [],
+        "function_compares": [
+          {
+            "function": "annual_net_turnover_excl_vat"
+          }
+        ]
+      },
+      "then_predicates": [
+        "turnover_criterion_exceeded"
+      ]
+    },
+    {
+      "rule_index": 2,
+      "requirements": {
+        "predicates": [],
+        "function_compares": [
+          {
+            "function": "balance_sheet_total"
+          }
+        ]
+      },
+      "then_predicates": [
+        "balance_sheet_criterion_exceeded"
+      ]
+    },
+    {
+      "rule_index": 3,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "employee_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          },
+          {
+            "predicate": "turnover_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "more_than_one_criterion_exceeded"
+      ]
+    },
+    {
+      "rule_index": 4,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "employee_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          },
+          {
+            "predicate": "balance_sheet_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "more_than_one_criterion_exceeded"
+      ]
+    },
+    {
+      "rule_index": 5,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "turnover_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          },
+          {
+            "predicate": "balance_sheet_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "more_than_one_criterion_exceeded"
+      ]
+    },
+    {
+      "rule_index": 6,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "has_legal_personality",
+            "args": [
+              "c"
+            ]
+          },
+          {
+            "predicate": "is_small_company",
+            "args": [
+              "c"
+            ]
+          },
+          {
+            "predicate": "is_subsidiary",
+            "args": [
+              "c"
+            ]
+          },
+          {
+            "predicate": "is_parent_company",
+            "args": [
+              "c"
+            ]
+          },
+          {
+            "predicate": "is_last_closed_financial_year",
+            "args": [
+              "c",
+              "fy"
+            ]
+          },
+          {
+            "predicate": "more_than_one_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "is_micro_company"
+      ]
+    },
+    {
+      "rule_index": 7,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_last_closed_financial_year",
+            "args": [
+              "c",
+              "fy"
+            ]
+          },
+          {
+            "predicate": "more_than_one_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "is_micro_company"
+      ]
+    },
+    {
+      "rule_index": 8,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_subsidiary",
+            "args": [
+              "c"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "is_micro_company"
+      ]
+    },
+    {
+      "rule_index": 9,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_parent_company",
+            "args": [
+              "c"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "is_micro_company"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 6,
+      "target": "is_micro_company(bv_pico)",
+      "conditions": [
+        {
+          "atom": "has_legal_personality(bv_pico)",
+          "status": "present"
+        },
+        {
+          "atom": "is_small_company(bv_pico)",
+          "status": "present"
+        },
+        {
+          "atom": "is_subsidiary(bv_pico)",
+          "status": "present"
+        },
+        {
+          "atom": "is_parent_company(bv_pico)",
+          "status": "present"
+        },
+        {
+          "atom": "is_last_closed_financial_year(bv_pico,fy_last)",
+          "status": "present"
+        },
+        {
+          "atom": "more_than_one_criterion_exceeded(bv_pico,fy_last)",
+          "status": "helper_defined"
+        }
+      ]
+    },
+    {
+      "rule_index": 7,
+      "target": "is_micro_company(bv_pico)",
+      "conditions": [
+        {
+          "atom": "is_last_closed_financial_year(bv_pico,fy_last)",
+          "status": "present"
+        },
+        {
+          "atom": "more_than_one_criterion_exceeded(bv_pico,fy_last)",
+          "status": "helper_defined"
+        }
+      ]
+    },
+    {
+      "rule_index": 8,
+      "target": "is_micro_company(bv_pico)",
+      "conditions": [
+        {
+          "atom": "is_subsidiary(bv_pico)",
+          "status": "present"
+        }
+      ]
+    },
+    {
+      "rule_index": 9,
+      "target": "is_micro_company(bv_pico)",
+      "conditions": [
+        {
+          "atom": "is_parent_company(bv_pico)",
+          "status": "present"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "has_legal_personality",
+      "symbol_type": "predicate",
+      "atom": "has_legal_personality(bv_pico)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "BV Pico heeft rechtspersoonlijkheid."
+      ],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "is_small_company",
+      "symbol_type": "predicate",
+      "atom": "is_small_company(bv_pico)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "BV Pico is geen moeder- of dochtervennootschap."
+      ],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "is_subsidiary",
+      "symbol_type": "predicate",
+      "atom": "is_subsidiary(bv_pico)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "BV Pico is geen moeder- of dochtervennootschap."
+      ],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "is_parent_company",
+      "symbol_type": "predicate",
+      "atom": "is_parent_company(bv_pico)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "is_last_closed_financial_year",
+      "symbol_type": "predicate",
+      "atom": "is_last_closed_financial_year(bv_pico,fy_last)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "more_than_one_criterion_exceeded",
+      "symbol_type": "predicate",
+      "atom": "more_than_one_criterion_exceeded(bv_pico,fy_last)",
+      "kind": "helper",
+      "gap_status": "derivable_from_rules",
+      "assertable_in_case": false,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "symbol": "annual_average_employees",
+      "symbol_type": "function",
+      "atom": "annual_average_employees(...)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        0
+      ]
+    },
+    {
+      "symbol": "annual_net_turnover_excl_vat",
+      "symbol_type": "function",
+      "atom": "annual_net_turnover_excl_vat(...)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        1
+      ]
+    },
+    {
+      "symbol": "balance_sheet_total",
+      "symbol_type": "function",
+      "atom": "balance_sheet_total(...)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        2
+      ]
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "extraction_gap",
+    "secondary": [],
+    "rationale": "Symbolic result is inconclusive and antecedents are not fully grounded in case facts."
+  }
+}

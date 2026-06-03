@@ -1,0 +1,201 @@
+{
+  "types": {
+    "Person": {
+      "name": "Person",
+      "kind": "entity",
+      "aliases": [],
+      "source": "kb_symbol_table"
+    },
+    "Asset": {
+      "name": "Asset",
+      "kind": "entity",
+      "aliases": [],
+      "source": "kb_symbol_table"
+    }
+  },
+  "predicates": {
+    "is_legally_cohabiting_survivor_of": {
+      "name": "is_legally_cohabiting_survivor_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person is the surviving legal cohabitant of the second person (the deceased). This background status may be directly asserted by a case.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "is_heir_of": {
+      "name": "is_heir_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person is an heir of the second person (the deceased).",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "is_main_family_residence_at_opening_of_estate": {
+      "name": "is_main_family_residence_at_opening_of_estate",
+      "args": [
+        "Asset",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The asset served as the main family residence of the deceased's household at the time the estate opened.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "is_household_contents_of": {
+      "name": "is_household_contents_of",
+      "args": [
+        "Asset",
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first asset is household contents present in the second asset (the main family residence).",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "subject_to_legal_reversion_4_24": {
+      "name": "subject_to_legal_reversion_4_24",
+      "args": [
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The asset is subject to a right of legal reversion as referred to in article 4.24.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "subject_to_legal_reversion_4_25": {
+      "name": "subject_to_legal_reversion_4_25",
+      "args": [
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The asset is subject to a right of legal reversion as referred to in article 4.25.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "subject_to_legal_reversion": {
+      "name": "subject_to_legal_reversion",
+      "args": [
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The asset is subject to a right of legal reversion under article 4.24 or article 4.25.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "acquires_usufruct_of": {
+      "name": "acquires_usufruct_of",
+      "args": [
+        "Person",
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The surviving legal cohabitant acquires usufruct over the asset as a legal consequence of the succession.",
+      "legal_output": true,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": true,
+      "temporal_support": false
+    }
+  },
+  "functions": {},
+  "assertable_case_symbols": {
+    "predicates": [
+      "is_heir_of",
+      "is_household_contents_of",
+      "is_legally_cohabiting_survivor_of",
+      "is_main_family_residence_at_opening_of_estate",
+      "subject_to_legal_reversion_4_24",
+      "subject_to_legal_reversion_4_25"
+    ],
+    "functions": []
+  },
+  "factual_case_input_predicates": [],
+  "factual_criteria_input_predicates": [],
+  "legal_output_query_targets": [
+    "acquires_usufruct_of"
+  ],
+  "temporal_support_symbols": []
+}

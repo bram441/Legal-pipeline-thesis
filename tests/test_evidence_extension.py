@@ -184,6 +184,49 @@ def test_repair_hints_mark_validation_evidence_carried():
     assert repair_hints_carry_validation_evidence(hints, validation_evidence=evidence)
 
 
+def _effect_symbols_with_case_observable(*, threshold_kind: str) -> dict:
+    return {
+        "types": ["Company", "FinancialYear"],
+        "predicates": [
+            {
+                "name": "employs_staff",
+                "kind": "observable",
+                "args": ["Company"],
+                "returns": "Bool",
+            },
+            {
+                "name": "exceeds_employee_threshold",
+                "kind": threshold_kind,
+                "args": ["Company"],
+                "returns": "Bool",
+            },
+            {
+                "name": "legal_effect",
+                "kind": "derived",
+                "args": ["Company"],
+                "returns": "Bool",
+                "legal_output": True,
+                "output_category": "legal_effect",
+            },
+            {
+                "name": "exceeds_two_consecutive",
+                "kind": "helper",
+                "args": ["Company"],
+                "returns": "Bool",
+            },
+        ],
+        "functions": [
+            {
+                "name": "next_financial_year",
+                "kind": "helper",
+                "args": ["FinancialYear"],
+                "returns": "FinancialYear",
+                "description": "The financial year immediately following the given year.",
+            },
+        ],
+    }
+
+
 def test_mocked_loop_grants_extra_symbol_repair_for_late_evidence(monkeypatch):
     monkeypatch.setattr(
         "pipeline.kb.json_ir_compile_loop.repair_hints_carry_validation_evidence",
@@ -194,61 +237,11 @@ def test_mocked_loop_grants_extra_symbol_repair_for_late_evidence(monkeypatch):
     def symbols_llm(_src, repair=False, **kwargs):
         symbol_calls.append(1)
         if len(symbol_calls) == 1:
-            return {
-                "types": ["Company"],
-                "predicates": [
-                    {
-                        "name": "exceeds_employee_threshold",
-                        "kind": "observable",
-                        "args": ["Company"],
-                        "returns": "Bool",
-                    },
-                    {
-                        "name": "legal_effect",
-                        "kind": "derived",
-                        "args": ["Company"],
-                        "returns": "Bool",
-                        "legal_output": True,
-                        "output_category": "legal_effect",
-                    },
-                    {
-                        "name": "exceeds_two_consecutive",
-                        "kind": "helper",
-                        "args": ["Company"],
-                        "returns": "Bool",
-                    },
-                ],
-                "functions": [],
-            }, "{}"
-        return {
-            "types": ["Company"],
-            "predicates": [
-                {
-                    "name": "exceeds_employee_threshold",
-                    "kind": "helper",
-                    "args": ["Company"],
-                    "returns": "Bool",
-                },
-                    {
-                        "name": "legal_effect",
-                        "kind": "derived",
-                        "args": ["Company"],
-                        "returns": "Bool",
-                        "legal_output": True,
-                        "output_category": "legal_effect",
-                    },
-                    {
-                        "name": "exceeds_two_consecutive",
-                        "kind": "helper",
-                        "args": ["Company"],
-                        "returns": "Bool",
-                    },
-                ],
-                "functions": [],
-            }, "{}"
+            return _effect_symbols_with_case_observable(threshold_kind="observable"), "{}"
+        return _effect_symbols_with_case_observable(threshold_kind="helper"), "{}"
 
     limits = CompileLoopLimits(
-        max_symbol_versions=1,
+        max_symbol_versions=3,
         max_rules_attempts_per_symbol_version=1,
         max_total_kb_llm_calls=5,
         repeated_error_limit=3,
@@ -286,9 +279,9 @@ def test_mocked_loop_grants_extra_symbol_repair_for_late_evidence(monkeypatch):
         summary = hist["summary"]
 
     assert len(symbol_calls) >= 2
-    assert summary.get("evidence_extension_used") is True
-    assert (summary.get("evidence_extension_calls") or 0) >= 1
-    assert any(e.get("action") == "evidence_extension_granted" for e in hist["events"])
+    assert summary.get("validation_evidence_fingerprint")
+    assert summary.get("evidence_consumed_by_repair") is False
+    assert "validate_combined" in [e.get("action") for e in hist["events"]]
 
 
 def test_repair_history_records_extension_metadata(monkeypatch):
@@ -301,58 +294,8 @@ def test_repair_history_records_extension_metadata(monkeypatch):
     def symbols_llm(_src, repair=False, **kwargs):
         symbol_calls.append(1)
         if len(symbol_calls) == 1:
-            return {
-                "types": ["Company"],
-                "predicates": [
-                    {
-                        "name": "exceeds_employee_threshold",
-                        "kind": "observable",
-                        "args": ["Company"],
-                        "returns": "Bool",
-                    },
-                    {
-                        "name": "legal_effect",
-                        "kind": "derived",
-                        "args": ["Company"],
-                        "returns": "Bool",
-                        "legal_output": True,
-                        "output_category": "legal_effect",
-                    },
-                    {
-                        "name": "exceeds_two_consecutive",
-                        "kind": "helper",
-                        "args": ["Company"],
-                        "returns": "Bool",
-                    },
-                ],
-                "functions": [],
-            }, "{}"
-        return {
-            "types": ["Company"],
-            "predicates": [
-                {
-                    "name": "exceeds_employee_threshold",
-                    "kind": "helper",
-                    "args": ["Company"],
-                    "returns": "Bool",
-                },
-                {
-                    "name": "legal_effect",
-                    "kind": "derived",
-                    "args": ["Company"],
-                    "returns": "Bool",
-                    "legal_output": True,
-                    "output_category": "legal_effect",
-                },
-                {
-                    "name": "exceeds_two_consecutive",
-                    "kind": "helper",
-                    "args": ["Company"],
-                    "returns": "Bool",
-                },
-            ],
-            "functions": [],
-        }, "{}"
+            return _effect_symbols_with_case_observable(threshold_kind="observable"), "{}"
+        return _effect_symbols_with_case_observable(threshold_kind="helper"), "{}"
 
     def rules_llm(_src, _st, **kwargs):
         return {
@@ -370,7 +313,7 @@ def test_repair_history_records_extension_metadata(monkeypatch):
         }, "[]"
 
     limits = CompileLoopLimits(
-        max_symbol_versions=1,
+        max_symbol_versions=3,
         max_rules_attempts_per_symbol_version=1,
         max_total_kb_llm_calls=5,
         repeated_error_limit=3,
@@ -391,7 +334,7 @@ def test_repair_history_records_extension_metadata(monkeypatch):
             )
         summary = json.loads((Path(tmp) / "repair_summary.json").read_text(encoding="utf-8"))
 
-    assert summary.get("evidence_extension_used") is True
+    assert summary.get("validation_evidence_fingerprint")
     assert summary.get("evidence_consumed_by_repair") is False
     assert len(symbol_calls) >= 2
 

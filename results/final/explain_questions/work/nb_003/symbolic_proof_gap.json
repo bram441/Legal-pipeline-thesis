@@ -1,0 +1,105 @@
+{
+  "query": {
+    "predicate": "acquires_full_ownership_of_entire_estate",
+    "args": [
+      "felix",
+      "emma"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "entailed",
+    "certain": true,
+    "possible": true,
+    "certainty_class": "decisive"
+  },
+  "extracted_case": {
+    "facts": [
+      "is_surviving_spouse_of(felix,emma).",
+      "deceased_leaves_other_or_no_heirs(emma)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "Person": [
+        "emma",
+        "felix",
+        "zij"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 4,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_surviving_spouse_of",
+            "args": [
+              "spouse",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "deceased_leaves_other_or_no_heirs",
+            "args": [
+              "deceased"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "acquires_full_ownership_of_entire_estate"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 4,
+      "target": "acquires_full_ownership_of_entire_estate(felix,emma)",
+      "conditions": [
+        {
+          "atom": "is_surviving_spouse_of(felix,emma)",
+          "status": "present"
+        },
+        {
+          "atom": "deceased_leaves_other_or_no_heirs(emma)",
+          "status": "present"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "is_surviving_spouse_of",
+      "symbol_type": "predicate",
+      "atom": "is_surviving_spouse_of(felix,emma)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "deceased_leaves_other_or_no_heirs",
+      "symbol_type": "predicate",
+      "atom": "deceased_leaves_other_or_no_heirs(emma)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "genuinely_under_specified_case",
+    "secondary": [],
+    "rationale": "No single blocking category identified; case may lack explicit observables for a decisive proof."
+  }
+}

@@ -1,0 +1,148 @@
+{
+  "cardinality_violations": [],
+  "numeric_provenance_issues": [],
+  "law_thresholds": [
+    50.0,
+    6000000.0,
+    11250000.0
+  ],
+  "missing_helper": {
+    "helper_name": "adjusted_turnover_threshold",
+    "helper_signature": "FinancialYear -> Real",
+    "helper_kind": "function",
+    "helper_kind_hint": "threshold",
+    "helper_kind_hints": [
+      "threshold"
+    ],
+    "used_in_rules": [],
+    "derives_legal_output": false,
+    "used_in_legal_output_rule": false,
+    "legal_output_predicates_in_then": [],
+    "candidate_lower_level_symbols": [
+      {
+        "name": "turnover_criterion_exceeded",
+        "kind": "helper",
+        "description": "The company exceeds the adjusted annual net turnover threshold (excluding VAT) in the financial year."
+      },
+      {
+        "name": "annual_net_turnover_excl_vat",
+        "kind": "observable",
+        "description": "The annual net turnover excluding VAT of the company in the financial year, as referred to in article 1:26/1."
+      },
+      {
+        "name": "employee_criterion_exceeded",
+        "kind": "helper",
+        "description": "The company exceeds the annual average employee threshold in the financial year."
+      },
+      {
+        "name": "balance_sheet_criterion_exceeded",
+        "kind": "helper",
+        "description": "The company exceeds the balance sheet total threshold in the financial year."
+      },
+      {
+        "name": "more_than_one_criterion_exceeded",
+        "kind": "helper",
+        "description": "The company exceeds more than one of the three statutory criteria in the financial year."
+      },
+      {
+        "name": "has_legal_personality",
+        "kind": "observable",
+        "description": "The company has legal personality (rechtspersoonlijkheid). This is a background prerequisite status that may be directly"
+      },
+      {
+        "name": "has_non_standard_duration",
+        "kind": "observable",
+        "description": "The financial year has an exceptional duration of less or more than twelve months."
+      },
+      {
+        "name": "annual_average_employees",
+        "kind": "observable",
+        "description": "The annual average number of employees of the company in the financial year."
+      },
+      {
+        "name": "balance_sheet_total",
+        "kind": "observable",
+        "description": "The balance sheet total of the company in the financial year."
+      },
+      {
+        "name": "financial_year_duration_months",
+        "kind": "observable",
+        "description": "The duration of the financial year in months, counting each started month as a full month."
+      },
+      {
+        "name": "is_kleine_vennootschap",
+        "kind": "derived",
+        "description": "The company qualifies as a kleine vennootschap (small company) on the balance sheet date of the last closed financial ye"
+      }
+    ],
+    "threshold_helper_candidates": [
+      {
+        "name": "employee_criterion_exceeded",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "The company exceeds the annual average employee threshold in the financial year."
+      },
+      {
+        "name": "turnover_criterion_exceeded",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "The company exceeds the adjusted annual net turnover threshold (excluding VAT) in the financial year."
+      },
+      {
+        "name": "balance_sheet_criterion_exceeded",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "The company exceeds the balance sheet total threshold in the financial year."
+      },
+      {
+        "name": "more_than_one_criterion_exceeded",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "The company exceeds more than one of the three statutory criteria in the financial year."
+      },
+      {
+        "name": "adjusted_turnover_threshold",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "The turnover threshold adjusted for non-standard financial year duration: 11,250,000 multiplied by (duration_months / 12"
+      }
+    ],
+    "temporal_relation_candidates": [],
+    "legal_output_candidates": [
+      {
+        "name": "is_kleine_vennootschap",
+        "kind": "derived",
+        "role": "legal_output",
+        "description": "The company qualifies as a kleine vennootschap (small company) on the balance sheet date of the last closed financial ye"
+      }
+    ],
+    "missing_temporal_support_symbol": false,
+    "undeclared_temporal_funcs_in_rules": [],
+    "legal_effect_context": true,
+    "is_secondary": false
+  },
+  "secondary_missing_helpers": [],
+  "computed_observable_predicate": null,
+  "computed_observable_helper_kind_hint": null,
+  "temporal_support": {
+    "detected_temporal_terms": [],
+    "requires_temporal_support": false,
+    "legal_effect_context": true,
+    "has_period_like_types": true,
+    "has_temporal_support_symbols": false,
+    "existing_period_types": [
+      "FinancialYear"
+    ],
+    "existing_temporal_symbols": [],
+    "legal_output_predicates": [
+      "is_kleine_vennootschap"
+    ],
+    "missing_temporal_support_symbol": false,
+    "repair_route": null
+  },
+  "missing_temporal_support_symbol": false,
+  "repair_route": null,
+  "secondary_diagnostics_text": "missing_helper_definition (legal-effect context=True):\n  helper: adjusted_turnover_threshold (signature=FinancialYear -> Real; kind=threshold; hints=threshold)\n  repair: define 'adjusted_turnover_threshold' in THEN with rules, or reclassify as case_input/background only if safe; do not rename without defining.\n  threshold hint: prefer pairwise/conjunctive THEN definitions ((A&B) OR (A&C) OR (B&C)) for more-than-one helpers.\n  threshold helper candidates:\n    - employee_criterion_exceeded (helper)\n    - turnover_criterion_exceeded (helper)\n    - balance_sheet_criterion_exceeded (helper)\n    - more_than_one_criterion_exceeded (helper)\n    - adjusted_turnover_threshold (helper)\n  other lower-level symbols:\n    - turnover_criterion_exceeded (helper)\n    - annual_net_turnover_excl_vat (observable)\n    - employee_criterion_exceeded (helper)\n    - balance_sheet_criterion_exceeded (helper)\n    - more_than_one_criterion_exceeded (helper)\n    - has_legal_personality (observable)\n    - has_non_standard_duration (observable)\n    - annual_average_employees (observable)",
+  "validation_evidence_fingerprint": "b7a5bd6976d0cd0f",
+  "evidence_consumed_by_repair": false
+}

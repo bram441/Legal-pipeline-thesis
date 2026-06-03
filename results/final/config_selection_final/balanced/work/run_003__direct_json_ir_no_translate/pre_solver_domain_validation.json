@@ -1,0 +1,26 @@
+{
+  "case_entities_rendered_to_domains": {
+    "FinancialYear": [
+      "fy_current"
+    ],
+    "Company": [
+      "nv_delta"
+    ]
+  },
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "nv_delta",
+      "arg_index": 0,
+      "expected_type": "Company",
+      "predicate": "is_micro_company"
+    },
+    {
+      "entity": "fy_current",
+      "arg_index": 1,
+      "expected_type": "FinancialYear",
+      "predicate": "is_micro_company"
+    }
+  ],
+  "unmapped_case_entities": [],
+  "pre_solver_domain_validation_errors": []
+}

@@ -1,0 +1,39 @@
+{
+  "entities": {
+    "dana": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "subject_to_removal_procedure",
+          "arg_index": 0,
+          "expected_type": "Person"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "used_false_info_docs_or_fraud_in_procedure",
+          "arg_index": 0,
+          "expected_type": "Person"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "has_risk_of_absconding",
+          "arg_index": 0,
+          "expected_type": "Person"
+        }
+      ]
+    }
+  },
+  "unmapped_entities": [],
+  "conflicts": [],
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "dana",
+      "arg_index": 0,
+      "expected_type": "Person",
+      "predicate": "has_risk_of_absconding"
+    }
+  ]
+}

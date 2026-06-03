@@ -1,0 +1,89 @@
+{
+  "entities": {
+    "mira": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_surviving_legal_cohabitant_of",
+          "arg_index": 1,
+          "expected_type": "Person"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "is_heir_of",
+          "arg_index": 1,
+          "expected_type": "Person"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "is_main_family_residence_at_opening_of_estate",
+          "arg_index": 1,
+          "expected_type": "Person"
+        }
+      ]
+    },
+    "noor": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_surviving_legal_cohabitant_of",
+          "arg_index": 0,
+          "expected_type": "Person"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "is_heir_of",
+          "arg_index": 0,
+          "expected_type": "Person"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "acquires_usufruct_of",
+          "arg_index": 0,
+          "expected_type": "Person"
+        }
+      ]
+    },
+    "woning": {
+      "declared_type": "Asset",
+      "resolved_type": "Asset",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_main_family_residence_at_opening_of_estate",
+          "arg_index": 0,
+          "expected_type": "Asset"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "acquires_usufruct_of",
+          "arg_index": 1,
+          "expected_type": "Asset"
+        }
+      ]
+    }
+  },
+  "unmapped_entities": [],
+  "conflicts": [],
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "noor",
+      "arg_index": 0,
+      "expected_type": "Person",
+      "predicate": "acquires_usufruct_of"
+    },
+    {
+      "entity": "woning",
+      "arg_index": 1,
+      "expected_type": "Asset",
+      "predicate": "acquires_usufruct_of"
+    }
+  ]
+}

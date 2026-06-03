@@ -1,0 +1,89 @@
+{
+  "entities": {
+    "huurwoning": {
+      "declared_type": "Property",
+      "resolved_type": "Property",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "served_as_main_family_residence_at_opening_of_estate",
+          "arg_index": 0,
+          "expected_type": "Property"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "is_rented_property",
+          "arg_index": 0,
+          "expected_type": "Property"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "acquires_exclusive_right_to_lease",
+          "arg_index": 1,
+          "expected_type": "Property"
+        }
+      ]
+    },
+    "iris": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_surviving_spouse_of",
+          "arg_index": 1,
+          "expected_type": "Person"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "served_as_main_family_residence_at_opening_of_estate",
+          "arg_index": 1,
+          "expected_type": "Person"
+        }
+      ]
+    },
+    "jonas": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_surviving_spouse_of",
+          "arg_index": 0,
+          "expected_type": "Person"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "acquires_exclusive_right_to_lease",
+          "arg_index": 0,
+          "expected_type": "Person"
+        }
+      ]
+    },
+    "zij": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "declared",
+      "evidence": []
+    }
+  },
+  "unmapped_entities": [],
+  "conflicts": [],
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "jonas",
+      "arg_index": 0,
+      "expected_type": "Person",
+      "predicate": "acquires_exclusive_right_to_lease"
+    },
+    {
+      "entity": "huurwoning",
+      "arg_index": 1,
+      "expected_type": "Property",
+      "predicate": "acquires_exclusive_right_to_lease"
+    }
+  ]
+}

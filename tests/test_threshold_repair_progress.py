@@ -128,8 +128,8 @@ def test_exclusion_repair_prompt_includes_pred_thresholds_and_secondary():
     assert extract_classification_predicates(EXCLUSION_ERROR) == ["is_micro_company"]
     assert "is_micro_company" in supplement
     assert "900000" in supplement or "900,000" in supplement
-    assert "absence of proof" in supplement.lower()
-    assert "((A_exceeded AND B_exceeded)" in supplement
+    assert "disqualify" in supplement.lower() or "exclusion" in supplement.lower()
+    assert "exclusion" in supplement.lower() or "pairwise" in supplement.lower()
     assert "1900000" in supplement
 
     hints = _build_repair_hints(

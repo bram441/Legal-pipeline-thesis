@@ -1,0 +1,176 @@
+{
+  "types": [
+    "Person",
+    "Estate"
+  ],
+  "predicates": [
+    {
+      "name": "is_surviving_spouse_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the surviving spouse of the second person (the deceased)."
+    },
+    {
+      "name": "deceased_leaves_other_heirs",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deceased leaves heirs other than descendants (other heirs)."
+    },
+    {
+      "name": "deceased_leaves_no_heirs",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deceased leaves no heirs at all."
+    },
+    {
+      "name": "estate_belongs_to",
+      "args": [
+        "Estate",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The estate belongs to the deceased person."
+    },
+    {
+      "name": "acquires_full_ownership_of_entire_estate",
+      "args": [
+        "Person",
+        "Estate"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "description": "The surviving spouse acquires full ownership of the entire estate of the deceased as a legal consequence under par. 3."
+    }
+  ],
+  "functions": [],
+  "rules": [
+    {
+      "forall": [
+        {
+          "var": "spouse",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "estate",
+          "type": "Estate"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_spouse_of",
+              "args": [
+                "spouse",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "estate_belongs_to",
+              "args": [
+                "estate",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "deceased_leaves_other_heirs",
+              "args": [
+                "deceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "acquires_full_ownership_of_entire_estate",
+          "args": [
+            "spouse",
+            "estate"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "spouse",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "estate",
+          "type": "Estate"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_spouse_of",
+              "args": [
+                "spouse",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "estate_belongs_to",
+              "args": [
+                "estate",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "deceased_leaves_no_heirs",
+              "args": [
+                "deceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "acquires_full_ownership_of_entire_estate",
+          "args": [
+            "spouse",
+            "estate"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    }
+  ]
+}

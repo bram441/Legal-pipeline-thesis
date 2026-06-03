@@ -1,0 +1,90 @@
+{
+  "query": {
+    "predicate": "",
+    "args": [],
+    "mode": null,
+    "type": "intent"
+  },
+  "symbolic_outcome": {
+    "status": "error",
+    "label": null,
+    "certain": null,
+    "possible": null,
+    "certainty_class": null
+  },
+  "extracted_case": {
+    "facts": [
+      "has_legal_personality(bv_beta).",
+      "is_small_company(bv_beta,last_closed_fy).",
+      "not is_subsidiary(bv_beta).",
+      "not is_parent_company(bv_beta).",
+      "is_last_closed_financial_year(bv_beta,last_closed_fy).",
+      "annual_average_employees(bv_beta,last_closed_fy) = 8.",
+      "annual_net_turnover_excl_vat(bv_beta,last_closed_fy) = 800000.0.",
+      "balance_sheet_total(bv_beta,last_closed_fy) = 400000.0."
+    ],
+    "value_assertions": [
+      "annual_average_employees(bv_beta,last_closed_fy) = 8.",
+      "annual_net_turnover_excl_vat(bv_beta,last_closed_fy) = 800000.0.",
+      "balance_sheet_total(bv_beta,last_closed_fy) = 400000.0."
+    ],
+    "entities": {
+      "Company": [
+        "bv_beta"
+      ],
+      "FinancialYear": [
+        "last_closed_fy"
+      ]
+    }
+  },
+  "deriving_rules": [],
+  "antecedent_coverage": [],
+  "antecedents": [
+    {
+      "symbol": "annual_average_employees",
+      "symbol_type": "function",
+      "atom": "annual_average_employees(...)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        0
+      ]
+    },
+    {
+      "symbol": "annual_net_turnover_excl_vat",
+      "symbol_type": "function",
+      "atom": "annual_net_turnover_excl_vat(...)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        1
+      ]
+    },
+    {
+      "symbol": "balance_sheet_total",
+      "symbol_type": "function",
+      "atom": "balance_sheet_total(...)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        2
+      ]
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "renderer_solver_issue",
+    "secondary": [],
+    "rationale": "Symbolic engine returned an error before a conclusive proof could be evaluated."
+  }
+}

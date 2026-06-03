@@ -1,0 +1,121 @@
+{
+  "intent": "deduction",
+  "symbolic_status": "ok",
+  "status": "ok",
+  "scorable": true,
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "routing": {
+    "question": "Verkrijgt Willem volgens artikel 4.20 als enige het recht op de huur van de gezinswoning?",
+    "detected_question_type": "boolean",
+    "selected_intent": "deduction",
+    "selected_reason": "expected.mode=boolean",
+    "scorable": true,
+    "fallback_intent": null,
+    "warnings": [],
+    "legal_output_symbols": [
+      "acquires_right_to_lease",
+      "excluded_from_right_to_lease"
+    ],
+    "query_hint_type": "boolean",
+    "expected_question_type": "boolean"
+  },
+  "satisfiability_check": {
+    "stage": "pre_query",
+    "kb_case_satisfiable": true,
+    "status": "ok",
+    "details": "theory satisfiable",
+    "intent_backend": "idp_z3.tasks.satisfiable_check",
+    "duration_seconds": 0.0585
+  },
+  "warnings": [],
+  "deduction": {
+    "intent": "deduction",
+    "status": "ok",
+    "output_kind": "epistemic_boolean",
+    "predicate": "acquires_right_to_lease",
+    "args": [
+      "willem",
+      "appartement_gent"
+    ],
+    "possible": true,
+    "certain": false,
+    "label": "unknown",
+    "atom": "acquires_right_to_lease(x0,x1)",
+    "constraint": "? x0 in Person, x1 in Property: __sel0(x0) & __sel1(x1) & acquires_right_to_lease(x0,x1)",
+    "certainty_class": "inconclusive",
+    "sat": true,
+    "internal_intent": "deduction",
+    "antecedent_coverage": [
+      {
+        "rule_index": 0,
+        "target": "acquires_right_to_lease(willem,appartement_gent)",
+        "conditions": [
+          {
+            "atom": "is_surviving_spouse_of(willem,yara)",
+            "status": "present"
+          },
+          {
+            "atom": "served_as_main_residence_at_opening_of_estate(appartement_gent,yara)",
+            "status": "present"
+          },
+          {
+            "atom": "property_is_rented(appartement_gent)",
+            "status": "missing"
+          }
+        ]
+      }
+    ],
+    "extraction_repair_hint": "The selected legal conclusion could not be proven because an observable antecedent required by the KB rule was not asserted from the case. Re-check the case text for facts matching these observable schema symbols: property_is_rented: The property is subject to a rental agreement (i.e. the deceased held it under a lease).."
+  },
+  "model_expansion": null,
+  "get_range": null,
+  "satisfiable": null,
+  "explanation": null,
+  "execution_query": {
+    "type": "predicate",
+    "predicate": "acquires_right_to_lease",
+    "mode": "boolean",
+    "args": [
+      "willem",
+      "appartement_gent"
+    ],
+    "explain": false,
+    "predicate_kind": "derived",
+    "query_type": "predicate_boolean",
+    "internal_intent": "deduction"
+  },
+  "output_kind": "epistemic_boolean",
+  "certainty_class": "inconclusive",
+  "predicate": "acquires_right_to_lease",
+  "args": [
+    "willem",
+    "appartement_gent"
+  ],
+  "label": "unknown",
+  "possible": true,
+  "certain": false,
+  "sat": true,
+  "antecedent_coverage": [
+    {
+      "rule_index": 0,
+      "target": "acquires_right_to_lease(willem,appartement_gent)",
+      "conditions": [
+        {
+          "atom": "is_surviving_spouse_of(willem,yara)",
+          "status": "present"
+        },
+        {
+          "atom": "served_as_main_residence_at_opening_of_estate(appartement_gent,yara)",
+          "status": "present"
+        },
+        {
+          "atom": "property_is_rented(appartement_gent)",
+          "status": "missing"
+        }
+      ]
+    }
+  ],
+  "extraction_repair_hint": "The selected legal conclusion could not be proven because an observable antecedent required by the KB rule was not asserted from the case. Re-check the case text for facts matching these observable schema symbols: property_is_rented: The property is subject to a rental agreement (i.e. the deceased held it under a lease).."
+}

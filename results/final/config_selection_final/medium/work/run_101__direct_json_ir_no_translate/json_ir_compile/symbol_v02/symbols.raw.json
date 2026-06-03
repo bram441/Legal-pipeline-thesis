@@ -1,0 +1,62 @@
+{
+  "types": ["Person", "Estate"],
+  "predicates": [
+    {
+      "name": "is_surviving_spouse_of",
+      "args": ["Person", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the surviving spouse of the second person (the deceased)."
+    },
+    {
+      "name": "deceased_leaves_descendants",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deceased person leaves behind descendants."
+    },
+    {
+      "name": "deceased_leaves_adopted_children",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deceased person leaves behind adopted children."
+    },
+    {
+      "name": "deceased_leaves_descendants_of_adopted_children",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deceased person leaves behind descendants of adopted children."
+    },
+    {
+      "name": "estate_belongs_to",
+      "args": ["Estate", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The estate belongs to the deceased person."
+    },
+    {
+      "name": "has_qualifying_descendants_or_adopted",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The deceased leaves descendants, adopted children, or descendants of adopted children."
+    },
+    {
+      "name": "receives_usufruct_of_entire_estate",
+      "args": ["Person", "Estate"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The surviving spouse acquires usufruct over the entire estate of the deceased as a legal consequence.",
+      "legal_output": true,
+      "output_category": "right"
+    }
+  ],
+  "functions": []
+}

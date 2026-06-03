@@ -1,0 +1,131 @@
+{
+  "query": {
+    "predicate": "acquires_right_to_lease",
+    "args": [
+      "willem",
+      "appartement_gent"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "unknown",
+    "certain": false,
+    "possible": true,
+    "certainty_class": "inconclusive"
+  },
+  "extracted_case": {
+    "facts": [
+      "is_surviving_spouse_of(willem,yara).",
+      "served_as_main_residence_at_opening_of_estate(appartement_gent,yara)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "Property": [
+        "appartement_gent"
+      ],
+      "Person": [
+        "gent",
+        "willem",
+        "yara"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 0,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_surviving_spouse_of",
+            "args": [
+              "spouse",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "property_is_rented",
+            "args": [
+              "prop",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "served_as_main_residence_at_opening_of_estate",
+            "args": [
+              "prop",
+              "deceased"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "acquires_right_to_lease"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 0,
+      "target": "acquires_right_to_lease(willem,appartement_gent)",
+      "conditions": [
+        {
+          "atom": "is_surviving_spouse_of(willem,yara)",
+          "status": "present"
+        },
+        {
+          "atom": "property_is_rented(appartement_gent,yara)",
+          "status": "missing"
+        },
+        {
+          "atom": "served_as_main_residence_at_opening_of_estate(appartement_gent,yara)",
+          "status": "present"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "is_surviving_spouse_of",
+      "symbol_type": "predicate",
+      "atom": "is_surviving_spouse_of(willem,yara)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "property_is_rented",
+      "symbol_type": "predicate",
+      "atom": "property_is_rented(appartement_gent,yara)",
+      "kind": "observable",
+      "gap_status": "missing_entirely",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "served_as_main_residence_at_opening_of_estate",
+      "symbol_type": "predicate",
+      "atom": "served_as_main_residence_at_opening_of_estate(appartement_gent,yara)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "extraction_gap",
+    "secondary": [],
+    "rationale": "Assertable observables or temporal facts required by the derivation chain were not extracted from the case although the case text contains relevant qualitative evidence."
+  }
+}

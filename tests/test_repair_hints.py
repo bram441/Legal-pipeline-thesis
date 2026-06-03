@@ -1,22 +1,8 @@
 """Tests for KB repair hint classification."""
+
 import unittest
 
-from pipeline.kb.compiler import _kb_repair_prompt_path
 from pipeline.kb.repair_hints import build_machine_repair_hints
-
-
-class TestRepairPromptPath(unittest.TestCase):
-    def test_semantic_unsat(self):
-        self.assertIn(
-            "semantic",
-            _kb_repair_prompt_path("KB theory is unsatisfiable: no model"),
-        )
-
-    def test_semantic_ordinal(self):
-        self.assertIn("semantic", _kb_repair_prompt_path("IDP semantic check failed: ordinal must be >= 1"))
-
-    def test_symbolic_parse(self):
-        self.assertIn("syntax", _kb_repair_prompt_path("IDP failed to parse compiled KB: Expected"))
 
 
 class TestMachineHints(unittest.TestCase):

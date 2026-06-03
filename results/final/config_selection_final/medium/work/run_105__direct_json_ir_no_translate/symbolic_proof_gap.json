@@ -1,0 +1,160 @@
+{
+  "query": {
+    "predicate": "preceding_provisions_apply",
+    "args": [
+      "karin",
+      "joris"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "unknown",
+    "certain": false,
+    "possible": true,
+    "certainty_class": "inconclusive"
+  },
+  "extracted_case": {
+    "facts": [
+      "is_surviving_legal_cohabitant_of(karin,joris).",
+      "not is_descendant_of(karin,joris)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "Person": [
+        "joris",
+        "karin"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 0,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_surviving_legal_cohabitant_of",
+            "args": [
+              "survivor",
+              "predeceased"
+            ]
+          },
+          {
+            "predicate": "is_descendant_of",
+            "args": [
+              "survivor",
+              "predeceased"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "exception_descendant_cohabitant"
+      ]
+    },
+    {
+      "rule_index": 1,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_surviving_legal_cohabitant_of",
+            "args": [
+              "survivor",
+              "predeceased"
+            ]
+          },
+          {
+            "predicate": "exception_descendant_cohabitant",
+            "args": [
+              "survivor",
+              "predeceased"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "preceding_provisions_apply"
+      ]
+    },
+    {
+      "rule_index": 2,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "exception_descendant_cohabitant",
+            "args": [
+              "survivor",
+              "predeceased"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "preceding_provisions_apply"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 1,
+      "target": "preceding_provisions_apply(karin,joris)",
+      "conditions": [
+        {
+          "atom": "is_surviving_legal_cohabitant_of(karin,joris)",
+          "status": "present"
+        },
+        {
+          "atom": "exception_descendant_cohabitant(karin,joris)",
+          "status": "helper_defined"
+        }
+      ]
+    },
+    {
+      "rule_index": 2,
+      "target": "preceding_provisions_apply(karin,joris)",
+      "conditions": [
+        {
+          "atom": "exception_descendant_cohabitant(karin,joris)",
+          "status": "helper_defined"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "is_surviving_legal_cohabitant_of",
+      "symbol_type": "predicate",
+      "atom": "is_surviving_legal_cohabitant_of(karin,joris)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "exception_descendant_cohabitant",
+      "symbol_type": "predicate",
+      "atom": "exception_descendant_cohabitant(karin,joris)",
+      "kind": "helper",
+      "gap_status": "derivable_from_rules",
+      "assertable_in_case": false,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        0
+      ]
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "extraction_gap",
+    "secondary": [],
+    "rationale": "Symbolic result is inconclusive and antecedents are not fully grounded in case facts."
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "entities": {
+    "pavel": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "has_belgian_nationality_proof",
+          "arg_index": 0,
+          "expected_type": "Person"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "holds_valid_travel_document",
+          "arg_index": 0,
+          "expected_type": "Person"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "risk_of_absconding",
+          "arg_index": 0,
+          "expected_type": "Person"
+        }
+      ]
+    }
+  },
+  "unmapped_entities": [],
+  "conflicts": [],
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "pavel",
+      "arg_index": 0,
+      "expected_type": "Person",
+      "predicate": "risk_of_absconding"
+    }
+  ]
+}

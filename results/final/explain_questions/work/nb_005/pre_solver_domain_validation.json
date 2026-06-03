@@ -1,0 +1,28 @@
+{
+  "case_entities_rendered_to_domains": {
+    "Property": [
+      "huurwoning"
+    ],
+    "Person": [
+      "iris",
+      "jonas",
+      "zij"
+    ]
+  },
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "jonas",
+      "arg_index": 0,
+      "expected_type": "Person",
+      "predicate": "acquires_exclusive_right_to_lease"
+    },
+    {
+      "entity": "huurwoning",
+      "arg_index": 1,
+      "expected_type": "Property",
+      "predicate": "acquires_exclusive_right_to_lease"
+    }
+  ],
+  "unmapped_case_entities": [],
+  "pre_solver_domain_validation_errors": []
+}

@@ -1,0 +1,57 @@
+{
+  "id": "nb_008",
+  "law": {
+    "text": "Hoofdstuk 1. Kleine vennootschappen\n\nArt. 1:24. Kleine vennootschappen\n\npar. 1. Kleine vennootschappen zijn vennootschappen met rechtspersoonlijkheid die op balansdatum van het laatst afgesloten boekjaar niet meer dan één van de volgende criteria overschrijden:\n(1) jaargemiddelde van het aantal werknemers: 50;\n(2) jaarlijkse netto-omzet als bedoeld in artikel 1:26/1, exclusief de belasting over de toegevoegde waarde: 11.250.000 euro;\n(3) balanstotaal: 6.000.000 euro.\n\npar. 2. Wanneer meer dan één van de in paragraaf 1 bedoelde criteria worden overschreden of niet meer worden overschreden, heeft dit slechts gevolgen wanneer dit zich gedurende twee achtereenvolgende boekjaren voordoet. De gevolgen gaan in dat geval in vanaf het boekjaar dat volgt op het boekjaar gedurende hetwelk meer dan één van de criteria voor de tweede keer werden overschreden of niet meer werden overschreden.\n\npar. 3. Voor vennootschappen die met hun bedrijf starten, worden voor de toepassing van de in paragraaf 1 vermelde criteria deze cijfers bij het begin van het boekjaar te goeder trouw geschat. Indien uit deze schatting blijkt dat meer dan één van de criteria zullen worden overschreden gedurende het eerste boekjaar, moet daarmee voor dat eerste boekjaar meteen rekening worden gehouden.\n\npar. 4. Heeft het boekjaar uitzonderlijk een duur van minder of meer dan twaalf maanden, waarbij deze duur niet langer kan zijn dan vierentwintig maanden min één kalenderdag, dan wordt het bedrag van de netto-omzet exclusief de belasting over de toegevoegde waarde bedoeld in paragraaf 1 vermenigvuldigd met een breuk waarvan de noemer twaalf is en de teller het aantal maanden van het betrokken boekjaar, waarbij elke begonnen maand voor een volle maand wordt geteld.\n\npar. 5. Het gemiddeld aantal tewerkgestelde werknemers, bedoeld in paragraaf 1, is het gemiddelde van het aantal werknemers uitgedrukt in voltijdse equivalenten dat is geregistreerd in de DIMONA-databank overeenkomstig het koninklijk besluit van 5 november 2002 tot invoering van een onmiddellijke aangifte van tewerkstelling, met toepassing van artikel 38 van de wet van 26 juli 1996 tot modernisering van de sociale zekerheid en tot vrijwaring van de leefbaarheid van de wettelijke pensioenstelsels, per einde van elke maand van het boekjaar, of indien de tewerkstelling niet behoort tot het toepassingsgebied van dit koninklijk besluit, het gemiddelde aantal tewerkgestelde werknemers uitgedrukt in voltijdse equivalenten van de in het algemene personeelsregister of een gelijkwaardig document ingeschreven werknemers per einde van elke maand van het beschouwde boekjaar.\n\nHet aantal werknemers uitgedrukt in voltijdse equivalenten is gelijk aan het arbeidsvolume uitgedrukt in voltijds tewerkgestelde equivalenten, te berekenen voor de deeltijdse werknemers op basis van het contractueel aantal te presteren uren, gerelateerd ten opzichte van de normale arbeidsduur van een vergelijkbare voltijdse werknemer.\n\nWanneer de opbrengsten die voortspruiten uit het gewoon bedrijf van een vennootschap voor meer dan de helft bestaan uit opbrengsten die niet aan de omschrijving beantwoorden van de post netto-omzet, dan wordt voor de toepassing van paragraaf 1 onder netto-omzet verstaan: het totaal van de bedrijfs- en financiële opbrengsten met uitsluiting van de niet-recurrente opbrengsten.\n\nHet in paragraaf 1 bedoelde balanstotaal is de totale boekwaarde van de activa zoals ze blijkt uit het balansschema dat vastgesteld is bij koninklijk besluit genomen ter uitvoering van artikel 3:1, paragraaf 1.\n\npar. 6. Als de vennootschap met één of meer andere vennootschappen is verbonden als bedoeld in artikel 1:20, worden de criteria inzake netto-omzet en balanstotaal bedoeld in paragraaf 1 berekend op geconsolideerde basis. Wat het criterium aantal werknemers betreft, wordt het aantal werknemers, berekend volgens de bepalingen van paragraaf 5, dat elk van de betrokken verbonden vennootschappen jaarlijks gemiddeld tewerkstelt, opgeteld.\n\nIndien, bij de berekening van de in paragraaf 1 genoemde grensbedragen, de in het koninklijk besluit genomen ter uitvoering van artikel 3:30, paragraaf 1, bedoelde verrekeningen en elke daaruit voortvloeiende weglating niet worden verricht, dan worden deze grensbedragen betreffende het balanstotaal en de netto-omzet vermeerderd met twintig procent.\n\npar. 7. Paragraaf 6 is niet van toepassing op andere vennootschappen dan moedervennootschappen als bedoeld in artikel 1:15, (1), behalve indien dergelijke vennootschappen zijn opgericht met als enig doel de verslaggeving van bepaalde informatie te ontwijken.\n\nVoor de toepassing van deze paragraaf en paragraaf 6 worden vennootschappen die een consortium vormen als bedoeld in artikel 1:19, gelijkgesteld met een moedervennootschap.\n\nArt. 1:25. Microvennootschappen\n\npar. 1. Onder microvennootschappen wordt verstaan: kleine vennootschappen met rechtspersoonlijkheid die geen dochtervennootschap of moedervennootschap zijn en die op balansdatum van het laatst afgesloten boekjaar niet meer dan één van de volgende criteria overschrijden:\n(1) jaargemiddelde van het aantal werknemers: 10;\n(2) jaarlijkse netto-omzet bedoeld in artikel 1:26/1, exclusief de belasting over de toegevoegde waarde: 900.000 euro;\n(3) balanstotaal: 450.000 euro.\n\npar. 2. Artikel 1:24, paragrafen 2 tot 5 en paragraaf 8, is van toepassing.",
+    "source": "microvennootschappen_clean.txt"
+  },
+  "case": {
+    "text": "BV Gamma start met haar bedrijf in boekjaar 2026. Bij het begin van dat boekjaar schat zij te goeder trouw dat zij in het eerste boekjaar twee van de criteria uit artikel 1:24 zal overschrijden."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Vanaf welk boekjaar moet volgens artikel 1:24, paragraaf 3 met deze overschrijding rekening worden gehouden?",
+      "metadata": {
+        "original_question": "Vanaf welk boekjaar moet volgens artikel 1:24, paragraaf 3 met deze overschrijding rekening worden gehouden?",
+        "answer_type": "period",
+        "non_boolean_probe": true,
+        "automatic_scoring": false
+      }
+    }
+  ],
+  "metadata": {
+    "source_dataset": "non_boolean_same_laws_testset",
+    "answer_type": "period",
+    "law_source": "microvennootschappen_clean.txt"
+  },
+  "kb_compile_strategy": "direct_json_ir_no_translate",
+  "kb_compile_backend": "json_ir",
+  "extraction_backend": "json_ir",
+  "pipeline_backend_mode": "json_ir",
+  "kb_compile_flags": {
+    "use_le": false,
+    "uses_translation": false,
+    "json_ir_generation": "symbols_then_rules"
+  },
+  "strategy_metadata": {
+    "strategy_name": "direct_json_ir_no_translate",
+    "canonical_strategy_name": "direct_json_ir_no_translate",
+    "kb_backend": "json_ir",
+    "pipeline_backend_mode": "json_ir",
+    "uses_le_intermediate": false,
+    "json_ir_generation": "symbols_then_rules",
+    "belief_scoring": false,
+    "law_scope_mode": "cited",
+    "repair_enabled": true,
+    "json_ir_structured_repair_enabled": true,
+    "json_ir_max_symbol_versions": 3,
+    "json_ir_max_rules_attempts_per_symbol_version": 2,
+    "json_ir_max_kb_llm_calls": 8,
+    "json_ir_outer_cache_retries_enabled": false,
+    "json_ir_outer_cache_max_attempts": 1,
+    "configured_translation": false,
+    "effective_translation": false,
+    "translation_source": "strategy",
+    "uses_translation": false
+  }
+}

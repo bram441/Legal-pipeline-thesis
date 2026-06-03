@@ -1,0 +1,114 @@
+{
+  "rules": [
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "asset", "type": "Asset"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_surviving_legal_cohabitant_of", "args": ["survivor", "deceased"], "negated": false},
+            {"pred": "is_heir_of", "args": ["survivor", "deceased"], "negated": false},
+            {"pred": "served_as_main_family_residence_at_opening", "args": ["asset", "deceased"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "acquires_usufruct_of_main_residence", "args": ["survivor", "deceased"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "contents", "type": "Asset"},
+        {"var": "residence", "type": "Asset"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_surviving_legal_cohabitant_of", "args": ["survivor", "deceased"], "negated": false},
+            {"pred": "is_heir_of", "args": ["survivor", "deceased"], "negated": false},
+            {"pred": "served_as_main_family_residence_at_opening", "args": ["residence", "deceased"], "negated": false},
+            {"pred": "is_household_contents_of", "args": ["contents", "residence"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "acquires_usufruct_of_household_contents", "args": ["survivor", "deceased"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "asset", "type": "Asset"}
+      ],
+      "if": [
+        {"pred": "subject_to_legal_reversion_4_24", "args": ["asset"], "negated": false}
+      ],
+      "then": [
+        {"pred": "subject_to_legal_reversion", "args": ["asset"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "asset", "type": "Asset"}
+      ],
+      "if": [
+        {"pred": "subject_to_legal_reversion_4_25", "args": ["asset"], "negated": false}
+      ],
+      "then": [
+        {"pred": "subject_to_legal_reversion", "args": ["asset"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "asset", "type": "Asset"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_surviving_legal_cohabitant_of", "args": ["survivor", "deceased"], "negated": false},
+            {"pred": "is_heir_of", "args": ["survivor", "deceased"], "negated": false},
+            {"pred": "served_as_main_family_residence_at_opening", "args": ["asset", "deceased"], "negated": false},
+            {"pred": "subject_to_legal_reversion", "args": ["asset"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "acquires_usufruct_of_main_residence", "args": ["survivor", "deceased"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "contents", "type": "Asset"},
+        {"var": "residence", "type": "Asset"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_surviving_legal_cohabitant_of", "args": ["survivor", "deceased"], "negated": false},
+            {"pred": "is_heir_of", "args": ["survivor", "deceased"], "negated": false},
+            {"pred": "served_as_main_family_residence_at_opening", "args": ["residence", "deceased"], "negated": false},
+            {"pred": "is_household_contents_of", "args": ["contents", "residence"], "negated": false},
+            {"pred": "subject_to_legal_reversion", "args": ["contents"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "acquires_usufruct_of_household_contents", "args": ["survivor", "deceased"], "negated": false}
+      ],
+      "operator": "implies"
+    }
+  ]
+}

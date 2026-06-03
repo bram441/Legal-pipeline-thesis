@@ -1,0 +1,7 @@
+{
+  "run_id": "nb_020",
+  "gold_type": "definition_application",
+  "expected_answer": "Haar situatie is illegaal verblijf: aanwezigheid op het grondgebied van een vreemdeling die niet of niet langer voldoet aan de voorwaarden voor toegang tot of verblijf.",
+  "law_source": "vreemdelingenwet_clean.txt",
+  "notes": "Gold is separated from plain_inputs and must not be included in model prompts."
+}

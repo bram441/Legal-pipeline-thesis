@@ -1,0 +1,89 @@
+{
+  "types": {
+    "Person": {
+      "name": "Person",
+      "kind": "entity",
+      "aliases": [],
+      "source": "kb_symbol_table"
+    }
+  },
+  "predicates": {
+    "is_surviving_legal_cohabitant_of": {
+      "name": "is_surviving_legal_cohabitant_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person is the surviving legal cohabitant of the second person.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "is_descendant_of": {
+      "name": "is_descendant_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person is a descendant of the second person.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "preceding_provisions_do_not_apply": {
+      "name": "preceding_provisions_do_not_apply",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The preceding provisions do not apply to the first person with respect to the second person.",
+      "legal_output": null,
+      "output_category": "exception",
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": true,
+      "temporal_support": false
+    }
+  },
+  "functions": {},
+  "assertable_case_symbols": {
+    "predicates": [
+      "is_descendant_of",
+      "is_surviving_legal_cohabitant_of"
+    ],
+    "functions": []
+  },
+  "factual_case_input_predicates": [],
+  "factual_criteria_input_predicates": [],
+  "legal_output_query_targets": [
+    "preceding_provisions_do_not_apply"
+  ],
+  "temporal_support_symbols": []
+}

@@ -1,0 +1,20 @@
+{
+  "entities": {
+    "nv_alfa": {
+      "declared_type": "Company",
+      "resolved_type": "Company",
+      "source": "fact_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "has_legal_personality",
+          "arg_index": 0,
+          "expected_type": "Company"
+        }
+      ]
+    }
+  },
+  "unmapped_entities": [],
+  "conflicts": [],
+  "query_arguments_with_inferred_types": []
+}

@@ -1,0 +1,126 @@
+{
+  "intent": "explain",
+  "symbolic_status": "ok",
+  "status": "ok",
+  "scorable": false,
+  "detected_question_type": "explanation",
+  "selected_intent": "explain",
+  "selected_reason": "extracted_intent_query",
+  "routing": {
+    "question": "Onder welke wettelijke categorie valt Mila volgens artikel 1, paragraaf 1, punt 3, en waarom?",
+    "detected_question_type": "explanation",
+    "selected_intent": "explain",
+    "selected_reason": "extracted_intent_query",
+    "scorable": false,
+    "fallback_intent": "relevance",
+    "warnings": [],
+    "legal_output_symbols": [
+      "risk_of_absconding"
+    ],
+    "query_hint_type": "explanation",
+    "expected_question_type": null
+  },
+  "satisfiability_check": {
+    "stage": "pre_query",
+    "kb_case_satisfiable": true,
+    "status": "ok",
+    "details": "theory satisfiable",
+    "intent_backend": "idp_z3.tasks.satisfiable_check",
+    "duration_seconds": 0.1448
+  },
+  "warnings": [],
+  "deduction": null,
+  "model_expansion": null,
+  "get_range": null,
+  "satisfiable": null,
+  "explanation": {
+    "intent": "explain",
+    "answer": "Target atom is_third_country_national(mila) is entailed. Detailed proof explanation is limited in this environment.",
+    "support": null,
+    "parsed": true,
+    "warnings": [],
+    "raw": {
+      "intent": "explain",
+      "status": "ok",
+      "output_kind": "explanation",
+      "target": {
+        "type": "predicate",
+        "predicate": "is_third_country_national",
+        "args": [
+          "mila"
+        ]
+      },
+      "label": "entailed",
+      "explanation": "Target atom is_third_country_national(mila) is entailed. Detailed proof explanation is limited in this environment.",
+      "support": [],
+      "raw": {
+        "atom": "is_third_country_national(x0)",
+        "constraint": "? x0 in Person: __sel0(x0) & is_third_country_national(x0)",
+        "possible": true,
+        "certain": true
+      },
+      "predicate": "is_third_country_national",
+      "args": [
+        "mila"
+      ],
+      "possible": true,
+      "certain": true,
+      "certainty_class": "manual",
+      "sat": true,
+      "internal_intent": "explain",
+      "antecedent_coverage": [
+        {
+          "rule_index": 1,
+          "target": "is_third_country_national(mila)",
+          "conditions": [
+            {
+              "atom": "is_eu_citizen(mila)",
+              "status": "present"
+            },
+            {
+              "atom": "covered_by_eu_free_movement_law(mila)",
+              "status": "present"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "execution_query": {
+    "type": "intent",
+    "intent": "explain",
+    "target": {
+      "type": "predicate",
+      "predicate": "is_third_country_national",
+      "args": [
+        "mila"
+      ]
+    }
+  },
+  "output_kind": "explanation",
+  "certainty_class": "manual",
+  "predicate": "is_third_country_national",
+  "args": [
+    "mila"
+  ],
+  "label": "entailed",
+  "possible": true,
+  "certain": true,
+  "sat": true,
+  "antecedent_coverage": [
+    {
+      "rule_index": 1,
+      "target": "is_third_country_national(mila)",
+      "conditions": [
+        {
+          "atom": "is_eu_citizen(mila)",
+          "status": "present"
+        },
+        {
+          "atom": "covered_by_eu_free_movement_law(mila)",
+          "status": "present"
+        }
+      ]
+    }
+  ]
+}

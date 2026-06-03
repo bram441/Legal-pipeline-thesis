@@ -5,8 +5,10 @@ Run from repo root:
   python -m unittest discover -s tests -p "test_*.py" -v
 """
 import copy
+import os
 import unittest
 
+from pipeline.config import reload_config
 from pipeline.extraction.query_role_resolve import (
     apply_role_arg_consistency,
     question_role_intent,
@@ -57,6 +59,18 @@ class TestQuestionRoleIntent(unittest.TestCase):
 
 
 class TestApplyRoleArgConsistency(unittest.TestCase):
+    def setUp(self):
+        self._prev_domain_heuristics = os.environ.get("LEGAL_PIPELINE_ENABLE_DOMAIN_HEURISTICS")
+        os.environ["LEGAL_PIPELINE_ENABLE_DOMAIN_HEURISTICS"] = "1"
+        reload_config()
+
+    def tearDown(self):
+        if self._prev_domain_heuristics is None:
+            os.environ.pop("LEGAL_PIPELINE_ENABLE_DOMAIN_HEURISTICS", None)
+        else:
+            os.environ["LEGAL_PIPELINE_ENABLE_DOMAIN_HEURISTICS"] = self._prev_domain_heuristics
+        reload_config()
+
     _q_nl = (
         "Heeft de langstlevende echtgenoot recht op vruchtgebruik "
         "van de gehele nalatenschap volgens artikel 4.17?"

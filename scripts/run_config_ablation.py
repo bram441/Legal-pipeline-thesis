@@ -81,17 +81,17 @@ def profile_name(path: Path) -> str:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Run evaluation for several config profiles without editing config/local.json.")
-    ap.add_argument("--profiles", nargs="+", required=True, help="Config overlay JSON files, e.g. config/ablation_cheap.json")
+    ap.add_argument("--profiles", nargs="+", required=True, help="Config overlay JSON files, e.g. config/cheap.json")
     ap.add_argument("--runs", required=True, help="Comma-separated runs, e.g. run_001,run_004,run_009")
     ap.add_argument("--strategies", default="direct_json_ir_no_translate", help="Comma-separated strategies")
     ap.add_argument("--runs-dir", default="inputs/json_final", help="Run input directory")
-    ap.add_argument("--output-root", default=None, help="Root output directory; default results/reports/ablation_<timestamp>")
+    ap.add_argument("--output-root", default=None, help="Root output directory; default results/reports/config_<timestamp>")
     ap.add_argument("--model", default=None, help="Optional OPENAI_MODEL override for all profiles")
     ap.add_argument("--no-clean", action="store_true", help="Do not pass --clean to run_evaluation.py")
     ap.add_argument("--dry-run", action="store_true", help="Print commands/env but do not run")
     args = ap.parse_args()
 
-    root = Path(args.output_root or f"results/reports/ablation_{datetime.now().strftime('%Y%m%dT%H%M%S')}")
+    root = Path(args.output_root or f"results/reports/config_{datetime.now().strftime('%Y%m%dT%H%M%S')}")
     root.mkdir(parents=True, exist_ok=True)
 
     exit_code = 0

@@ -1,0 +1,18 @@
+{
+  "question": "Welk erfrechtelijk recht verkrijgt Anna volgens artikel 4.17?",
+  "detected_question_type": "explanation",
+  "selected_intent": "explain",
+  "selected_reason": "extracted_intent_query",
+  "scorable": false,
+  "fallback_intent": "relevance",
+  "warnings": [],
+  "legal_output_symbols": [
+    "acquires_full_ownership_of_common_share",
+    "acquires_full_ownership_of_entire_estate",
+    "acquires_usufruct_of_entire_estate",
+    "acquires_usufruct_of_legal_return_asset",
+    "acquires_usufruct_of_own_estate_assets"
+  ],
+  "query_hint_type": "explanation",
+  "expected_question_type": null
+}

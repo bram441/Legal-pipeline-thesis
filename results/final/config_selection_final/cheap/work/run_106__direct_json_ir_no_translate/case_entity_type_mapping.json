@@ -1,0 +1,83 @@
+{
+  "entities": {
+    "appartement": {
+      "declared_type": "Property",
+      "resolved_type": "Property",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "served_as_main_family_residence_at_opening_of_estate",
+          "arg_index": 0,
+          "expected_type": "Property"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "property_is_rented",
+          "arg_index": 0,
+          "expected_type": "Property"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "acquires_right_to_lease",
+          "arg_index": 1,
+          "expected_type": "Property"
+        }
+      ]
+    },
+    "lotte": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_surviving_spouse_of",
+          "arg_index": 0,
+          "expected_type": "Person"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "acquires_right_to_lease",
+          "arg_index": 0,
+          "expected_type": "Person"
+        }
+      ]
+    },
+    "milan": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_surviving_spouse_of",
+          "arg_index": 1,
+          "expected_type": "Person"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "served_as_main_family_residence_at_opening_of_estate",
+          "arg_index": 1,
+          "expected_type": "Person"
+        }
+      ]
+    }
+  },
+  "unmapped_entities": [],
+  "conflicts": [],
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "lotte",
+      "arg_index": 0,
+      "expected_type": "Person",
+      "predicate": "acquires_right_to_lease"
+    },
+    {
+      "entity": "appartement",
+      "arg_index": 1,
+      "expected_type": "Property",
+      "predicate": "acquires_right_to_lease"
+    }
+  ]
+}

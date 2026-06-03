@@ -1,0 +1,54 @@
+{
+  "case_given_factual_inputs": [
+    {
+      "target_predicate": "more_than_one_criterion_exceeded",
+      "input_predicate": "case_given_more_than_one_criterion_exceeded",
+      "source": "case_given",
+      "evidence_text": "overschrijdt meer dan één criterium in boekjaar 2024",
+      "assertion_kind": "factual_threshold_satisfaction",
+      "args": [
+        "nv_epsilon",
+        "fy_2024"
+      ]
+    },
+    {
+      "target_predicate": "more_than_one_criterion_exceeded",
+      "input_predicate": "case_given_more_than_one_criterion_exceeded",
+      "source": "case_given",
+      "evidence_text": "opnieuw in boekjaar 2025",
+      "assertion_kind": "factual_threshold_satisfaction",
+      "args": [
+        "nv_epsilon",
+        "fy_2025"
+      ]
+    }
+  ],
+  "accepted_threshold_satisfaction_facts": [
+    {
+      "input_predicate": "case_given_more_than_one_criterion_exceeded",
+      "target_predicate": "more_than_one_criterion_exceeded",
+      "args": [
+        "nv_epsilon",
+        "fy_2024"
+      ],
+      "evidence_text": "overschrijdt meer dan één criterium in boekjaar 2024",
+      "assertion_kind": "factual_threshold_satisfaction"
+    },
+    {
+      "input_predicate": "case_given_more_than_one_criterion_exceeded",
+      "target_predicate": "more_than_one_criterion_exceeded",
+      "args": [
+        "nv_epsilon",
+        "fy_2025"
+      ],
+      "evidence_text": "opnieuw in boekjaar 2025",
+      "assertion_kind": "factual_threshold_satisfaction"
+    }
+  ],
+  "case_text_has_numeric_values": false,
+  "case_text_numeric_values_explicit": false,
+  "bridge_predicates_generated": true,
+  "rejected_query_predicate_assertions": [],
+  "rejected_legal_outputs": [],
+  "query_predicate": "loses_kleine_vennootschap_status_from"
+}

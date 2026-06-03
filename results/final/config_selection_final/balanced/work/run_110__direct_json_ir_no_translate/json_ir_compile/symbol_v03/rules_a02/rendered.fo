@@ -1,0 +1,49 @@
+vocabulary V {
+  type Person
+  type Document
+  type Procedure
+  type Measure
+  type MemberState
+  is_foreigner: Person -> Bool
+  has_belgian_nationality: Person -> Bool
+  is_third_country_national: Person -> Bool
+  is_eu_citizen: Person -> Bool
+  covered_by_eu_free_movement_law: Person -> Bool
+  in_illegal_residence: Person -> Bool
+  meets_entry_or_residence_conditions: Person -> Bool
+  subject_to_removal_procedure: Person -> Bool
+  subject_to_international_protection_procedure: Person -> Bool
+  subject_to_responsibility_determination_procedure: Person -> Bool
+  risk_of_absconding: Person -> Bool
+  individual_examination_performed: Person -> Bool
+  has_valid_travel_document: Person -> Bool
+  recognized_by_national_authority_of_origin: Person -> Bool
+  falls_under_nationality_category_for_ministerial_laissez_passer: Person -> Bool
+  is_identified_foreigner: Person -> Bool
+  no_residence_application_filed_after_illegal_entry_or_during_illegal_stay: Person -> Bool
+  used_false_information_or_documents_in_procedure: Person -> Bool
+  does_not_cooperate_with_authorities: Person -> Bool
+  indicated_unwillingness_to_comply_with_measure: Person -> Bool
+  subject_to_active_entry_ban: Person -> Bool
+  filed_new_application_immediately_after_negative_decision: Person -> Bool
+  concealed_prior_fingerprints_in_other_state: Person -> Bool
+  multiple_applications_with_negative_outcomes_in_member_states: Person -> Bool
+  concealed_prior_international_protection_request_in_other_state: Person -> Bool
+  came_for_purposes_other_than_stated_in_application: Person -> Bool
+  fined_for_manifestly_unfounded_appeal: Person -> Bool
+  absconding_criterion_met: Person -> Bool
+}
+
+theory T:V {
+  ! p in Person: ((is_foreigner(p))) <=> ((~has_belgian_nationality(p))).
+  ! p in Person: ((is_third_country_national(p))) <=> ((~is_eu_citizen(p)) & (~covered_by_eu_free_movement_law(p))).
+  ! p in Person: ((is_foreigner(p)) & (~meets_entry_or_residence_conditions(p))) => ((in_illegal_residence(p))).
+  ! p in Person: ((has_valid_travel_document(p))) => ((meets_entry_or_residence_conditions(p))).
+  ! p in Person: ((recognized_by_national_authority_of_origin(p))) => ((meets_entry_or_residence_conditions(p))).
+  ! p in Person: ((falls_under_nationality_category_for_ministerial_laissez_passer(p))) => ((meets_entry_or_residence_conditions(p))).
+  ! p in Person: ((has_valid_travel_document(p))) => ((is_identified_foreigner(p))).
+  ! p in Person: ((recognized_by_national_authority_of_origin(p))) => ((is_identified_foreigner(p))).
+  ! p in Person: ((falls_under_nationality_category_for_ministerial_laissez_passer(p))) => ((is_identified_foreigner(p))).
+  ! p in Person: (((no_residence_application_filed_after_illegal_entry_or_during_illegal_stay(p)) | (used_false_information_or_documents_in_procedure(p)) | (does_not_cooperate_with_authorities(p)) | (indicated_unwillingness_to_comply_with_measure(p)) | (subject_to_active_entry_ban(p)) | (filed_new_application_immediately_after_negative_decision(p)) | (concealed_prior_fingerprints_in_other_state(p)) | (multiple_applications_with_negative_outcomes_in_member_states(p)) | (concealed_prior_international_protection_request_in_other_state(p)) | (came_for_purposes_other_than_stated_in_application(p)) | (fined_for_manifestly_unfounded_appeal(p)))) => ((absconding_criterion_met(p))).
+  ! p in Person: ((individual_examination_performed(p)) & (absconding_criterion_met(p)) & ((subject_to_removal_procedure(p)) | (subject_to_international_protection_procedure(p)) | (subject_to_responsibility_determination_procedure(p)))) => ((risk_of_absconding(p))).
+}

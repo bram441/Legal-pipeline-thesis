@@ -1,0 +1,18 @@
+vocabulary V {
+  type Person
+  type Asset
+  is_surviving_spouse_of: Person * Person -> Bool
+  leaves_ascendants_or_close_collaterals: Person -> Bool
+  is_share_in_common_or_exclusive_undivided_estate: Asset * Person * Person -> Bool
+  is_other_asset_of_own_estate: Asset * Person -> Bool
+  is_subject_to_legal_return: Asset -> Bool
+  otherwise_provided_in_donation_or_will: Asset -> Bool
+  acquires_full_ownership: Person * Asset -> Bool
+  acquires_usufruct: Person * Asset -> Bool
+}
+
+theory T:V {
+  ! spouse in Person, deceased in Person, asset in Asset: (((is_surviving_spouse_of(spouse,deceased)) & (leaves_ascendants_or_close_collaterals(deceased)) & (is_share_in_common_or_exclusive_undivided_estate(asset,deceased,spouse)))) => ((acquires_full_ownership(spouse,asset))).
+  ! spouse in Person, deceased in Person, asset in Asset: (((is_surviving_spouse_of(spouse,deceased)) & (leaves_ascendants_or_close_collaterals(deceased)) & (is_other_asset_of_own_estate(asset,deceased)))) => ((acquires_usufruct(spouse,asset))).
+  ! spouse in Person, deceased in Person, asset in Asset: (((is_surviving_spouse_of(spouse,deceased)) & (leaves_ascendants_or_close_collaterals(deceased)) & (is_subject_to_legal_return(asset)) & (~otherwise_provided_in_donation_or_will(asset)))) => ((acquires_usufruct(spouse,asset))).
+}

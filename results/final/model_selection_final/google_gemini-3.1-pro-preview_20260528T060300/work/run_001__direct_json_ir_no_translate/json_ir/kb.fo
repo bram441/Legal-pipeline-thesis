@@ -1,0 +1,34 @@
+vocabulary V {
+  type Person
+  type Property
+  is_surviving_spouse_of: Person * Person -> Bool
+  leaves_descendants: Person -> Bool
+  leaves_adopted_children: Person -> Bool
+  leaves_descendants_of_adopted_children: Person -> Bool
+  leaves_ascendants: Person -> Bool
+  leaves_close_collaterals: Person -> Bool
+  leaves_other_heirs: Person -> Bool
+  leaves_no_heirs: Person -> Bool
+  is_entire_estate_of: Property * Person -> Bool
+  is_share_in_common_property_of: Property * Person -> Bool
+  is_share_in_exclusively_undivided_property_of: Property * Person -> Bool
+  is_other_own_property_of: Property * Person -> Bool
+  is_subject_to_legal_return: Property -> Bool
+  deed_or_will_specifies_otherwise: Property -> Bool
+  leaves_descendants_or_adopted_children_or_their_descendants: Person -> Bool
+  leaves_ascendants_or_close_collaterals: Person -> Bool
+  leaves_other_or_no_heirs: Person -> Bool
+  receives_usufruct_of: Person * Property -> Bool
+  receives_full_ownership_of: Person * Property -> Bool
+}
+
+theory T:V {
+  ! deceased in Person: (((leaves_descendants(deceased)) | (leaves_adopted_children(deceased)) | (leaves_descendants_of_adopted_children(deceased)))) => ((leaves_descendants_or_adopted_children_or_their_descendants(deceased))).
+  ! deceased in Person: (((leaves_ascendants(deceased)) | (leaves_close_collaterals(deceased)))) => ((leaves_ascendants_or_close_collaterals(deceased))).
+  ! deceased in Person: (((leaves_other_heirs(deceased)) | (leaves_no_heirs(deceased)))) => ((leaves_other_or_no_heirs(deceased))).
+  ! spouse in Person, deceased in Person, property in Property: (((is_surviving_spouse_of(spouse,deceased)) & (leaves_descendants_or_adopted_children_or_their_descendants(deceased)) & (is_entire_estate_of(property,deceased)))) => ((receives_usufruct_of(spouse,property))).
+  ! spouse in Person, deceased in Person, property in Property: (((is_surviving_spouse_of(spouse,deceased)) & (leaves_ascendants_or_close_collaterals(deceased)) & ((is_share_in_common_property_of(property,deceased)) | (is_share_in_exclusively_undivided_property_of(property,deceased))))) => ((receives_full_ownership_of(spouse,property))).
+  ! spouse in Person, deceased in Person, property in Property: (((is_surviving_spouse_of(spouse,deceased)) & (leaves_ascendants_or_close_collaterals(deceased)) & (is_other_own_property_of(property,deceased)))) => ((receives_usufruct_of(spouse,property))).
+  ! spouse in Person, deceased in Person, property in Property: (((is_surviving_spouse_of(spouse,deceased)) & (leaves_ascendants_or_close_collaterals(deceased)) & (is_subject_to_legal_return(property)) & (~deed_or_will_specifies_otherwise(property)))) => ((receives_usufruct_of(spouse,property))).
+  ! spouse in Person, deceased in Person, property in Property: (((is_surviving_spouse_of(spouse,deceased)) & (leaves_other_or_no_heirs(deceased)) & (is_entire_estate_of(property,deceased)))) => ((receives_full_ownership_of(spouse,property))).
+}

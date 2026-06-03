@@ -1,0 +1,336 @@
+{
+  "query": {
+    "predicate": "receives_usufruct_of",
+    "args": [
+      "anna",
+      "property_main"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "unknown",
+    "certain": false,
+    "possible": true,
+    "certainty_class": "inconclusive"
+  },
+  "extracted_case": {
+    "facts": [
+      "is_surviving_spouse_of(anna,bert).",
+      "leaves_descendants(bert)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "Person": [
+        "anna",
+        "bert"
+      ],
+      "Property": [
+        "property_main"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 0,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "leaves_descendants",
+            "args": [
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "leaves_adopted_children",
+            "args": [
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "leaves_descendants_of_adopted_children",
+            "args": [
+              "deceased"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "leaves_descendants_or_adopted_children_or_their_descendants"
+      ]
+    },
+    {
+      "rule_index": 1,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "leaves_ascendants",
+            "args": [
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "leaves_close_collaterals",
+            "args": [
+              "deceased"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "leaves_ascendants_or_close_collaterals"
+      ]
+    },
+    {
+      "rule_index": 3,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_surviving_spouse_of",
+            "args": [
+              "spouse",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "leaves_descendants_or_adopted_children_or_their_descendants",
+            "args": [
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "is_entire_estate_of",
+            "args": [
+              "property",
+              "deceased"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "receives_usufruct_of"
+      ]
+    },
+    {
+      "rule_index": 5,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_surviving_spouse_of",
+            "args": [
+              "spouse",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "leaves_ascendants_or_close_collaterals",
+            "args": [
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "is_other_own_property_of",
+            "args": [
+              "property",
+              "deceased"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "receives_usufruct_of"
+      ]
+    },
+    {
+      "rule_index": 6,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_surviving_spouse_of",
+            "args": [
+              "spouse",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "leaves_ascendants_or_close_collaterals",
+            "args": [
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "is_subject_to_legal_return",
+            "args": [
+              "property"
+            ]
+          },
+          {
+            "predicate": "deed_or_will_specifies_otherwise",
+            "args": [
+              "property"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "receives_usufruct_of"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 3,
+      "target": "receives_usufruct_of(anna,property_main)",
+      "conditions": [
+        {
+          "atom": "is_surviving_spouse_of(anna,bert)",
+          "status": "present"
+        },
+        {
+          "atom": "leaves_descendants_or_adopted_children_or_their_descendants(bert)",
+          "status": "helper_defined"
+        },
+        {
+          "atom": "is_entire_estate_of(property_main,bert)",
+          "status": "missing"
+        }
+      ]
+    },
+    {
+      "rule_index": 5,
+      "target": "receives_usufruct_of(anna,property_main)",
+      "conditions": [
+        {
+          "atom": "is_surviving_spouse_of(anna,bert)",
+          "status": "present"
+        },
+        {
+          "atom": "leaves_ascendants_or_close_collaterals(bert)",
+          "status": "helper_defined"
+        },
+        {
+          "atom": "is_other_own_property_of(property_main,bert)",
+          "status": "missing"
+        }
+      ]
+    },
+    {
+      "rule_index": 6,
+      "target": "receives_usufruct_of(anna,property_main)",
+      "conditions": [
+        {
+          "atom": "is_surviving_spouse_of(anna,bert)",
+          "status": "present"
+        },
+        {
+          "atom": "leaves_ascendants_or_close_collaterals(bert)",
+          "status": "helper_defined"
+        },
+        {
+          "atom": "is_subject_to_legal_return(property_main)",
+          "status": "missing"
+        },
+        {
+          "atom": "deed_or_will_specifies_otherwise(property_main)",
+          "status": "missing"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "is_surviving_spouse_of",
+      "symbol_type": "predicate",
+      "atom": "is_surviving_spouse_of(anna,bert)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "leaves_descendants_or_adopted_children_or_their_descendants",
+      "symbol_type": "predicate",
+      "atom": "leaves_descendants_or_adopted_children_or_their_descendants(bert)",
+      "kind": "helper",
+      "gap_status": "derivable_from_rules",
+      "assertable_in_case": false,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        0
+      ]
+    },
+    {
+      "symbol": "is_entire_estate_of",
+      "symbol_type": "predicate",
+      "atom": "is_entire_estate_of(property_main,bert)",
+      "kind": "observable",
+      "gap_status": "missing_entirely",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "leaves_ascendants_or_close_collaterals",
+      "symbol_type": "predicate",
+      "atom": "leaves_ascendants_or_close_collaterals(bert)",
+      "kind": "helper",
+      "gap_status": "derivable_from_rules",
+      "assertable_in_case": false,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        1
+      ]
+    },
+    {
+      "symbol": "is_other_own_property_of",
+      "symbol_type": "predicate",
+      "atom": "is_other_own_property_of(property_main,bert)",
+      "kind": "observable",
+      "gap_status": "missing_entirely",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "is_subject_to_legal_return",
+      "symbol_type": "predicate",
+      "atom": "is_subject_to_legal_return(property_main)",
+      "kind": "observable",
+      "gap_status": "missing_entirely",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "deed_or_will_specifies_otherwise",
+      "symbol_type": "predicate",
+      "atom": "deed_or_will_specifies_otherwise(property_main)",
+      "kind": "observable",
+      "gap_status": "missing_entirely",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "extraction_gap",
+    "secondary": [],
+    "rationale": "Assertable observables or temporal facts required by the derivation chain were not extracted from the case although the case text contains relevant qualitative evidence."
+  }
+}

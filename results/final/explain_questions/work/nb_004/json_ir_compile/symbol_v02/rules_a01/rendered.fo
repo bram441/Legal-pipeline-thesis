@@ -1,0 +1,40 @@
+vocabulary V {
+  type Person
+  type Property
+  type Donation
+  is_legal_cohabitant_of: Person * Person -> Bool
+  is_surviving_cohabitant: Person * Person -> Bool
+  is_descendant_of: Person * Person -> Bool
+  is_main_family_residence: Property * Person -> Bool
+  is_household_contents_of: Property * Property -> Bool
+  subject_to_legal_return_right: Property -> Bool
+  is_rented_property: Property -> Bool
+  donation_reserved_usufruct: Donation * Person -> Bool
+  cohabitant_status_at_time_of_donation: Person * Donation -> Bool
+  donor_remained_usufruct_holder_until_death: Person * Donation -> Bool
+  donation_subject_property_is_main_residence: Donation * Person -> Bool
+  surviving_cohabitant_renounces_usufruct: Person * Donation -> Bool
+  renunciation_occurs_during_donors_lifetime: Person * Donation -> Bool
+  bare_ownership_acquired_by: Person * Property -> Bool
+  exclusion_applies_descendant: Person * Person -> Bool
+  acquires_usufruct_of_main_residence: Person * Property -> Bool
+  acquires_usufruct_of_household_contents: Person * Property -> Bool
+  acquires_usufruct_from_donation: Person * Donation -> Bool
+  acquires_rental_right_of_main_residence: Person * Property -> Bool
+  entitled_to_inventory_of_household_contents: Person * Property -> Bool
+  usufruct_rules_of_surviving_spouse_apply: Person -> Bool
+}
+
+theory T:V {
+  ! survivor in Person, deceased in Person, prop in Property: (((is_surviving_cohabitant(survivor,deceased)) & (is_main_family_residence(prop,deceased)) & (~exclusion_applies_descendant(survivor,deceased)))) => ((acquires_usufruct_of_main_residence(survivor,prop))).
+  ! survivor in Person, deceased in Person, contents in Property, residence in Property: (((is_surviving_cohabitant(survivor,deceased)) & (is_main_family_residence(residence,deceased)) & (is_household_contents_of(contents,residence)) & (~exclusion_applies_descendant(survivor,deceased)))) => ((acquires_usufruct_of_household_contents(survivor,contents))).
+  ! survivor in Person, deceased in Person, prop in Property: (((is_surviving_cohabitant(survivor,deceased)) & (is_main_family_residence(prop,deceased)) & (subject_to_legal_return_right(prop)) & (~exclusion_applies_descendant(survivor,deceased)))) => ((acquires_usufruct_of_main_residence(survivor,prop))).
+  ! survivor in Person, deceased in Person, contents in Property, residence in Property: (((is_surviving_cohabitant(survivor,deceased)) & (is_main_family_residence(residence,deceased)) & (is_household_contents_of(contents,residence)) & (subject_to_legal_return_right(contents)) & (~exclusion_applies_descendant(survivor,deceased)))) => ((acquires_usufruct_of_household_contents(survivor,contents))).
+  ! survivor in Person, deceased in Person, donation in Donation: (((is_surviving_cohabitant(survivor,deceased)) & (donation_reserved_usufruct(donation,deceased)) & (cohabitant_status_at_time_of_donation(survivor,donation)) & (donor_remained_usufruct_holder_until_death(deceased,donation)) & (donation_subject_property_is_main_residence(donation,deceased)) & (~exclusion_applies_descendant(survivor,deceased)))) => ((acquires_usufruct_from_donation(survivor,donation))).
+  ! survivor in Person, deceased in Person, donation in Donation: (((acquires_usufruct_from_donation(survivor,donation)) & (surviving_cohabitant_renounces_usufruct(survivor,donation)) & (renunciation_occurs_during_donors_lifetime(survivor,donation)))) => ((~acquires_usufruct_from_donation(survivor,donation))).
+  ! survivor in Person, deceased in Person, prop in Property: (((is_surviving_cohabitant(survivor,deceased)) & (is_main_family_residence(prop,deceased)) & (is_rented_property(prop)) & (~exclusion_applies_descendant(survivor,deceased)))) => ((acquires_rental_right_of_main_residence(survivor,prop))).
+  ! survivor in Person, deceased in Person, contents in Property, residence in Property: (((is_surviving_cohabitant(survivor,deceased)) & (is_main_family_residence(residence,deceased)) & (is_rented_property(residence)) & (is_household_contents_of(contents,residence)) & (~exclusion_applies_descendant(survivor,deceased)))) => ((acquires_usufruct_of_household_contents(survivor,contents))).
+  ! survivor in Person, deceased in Person: (((is_surviving_cohabitant(survivor,deceased)) & (is_descendant_of(survivor,deceased)))) => ((exclusion_applies_descendant(survivor,deceased))).
+  ! bare_owner in Person, prop in Property, contents in Property: (((bare_ownership_acquired_by(bare_owner,prop)) & (is_household_contents_of(contents,prop)))) => ((entitled_to_inventory_of_household_contents(bare_owner,contents))).
+  ! survivor in Person, deceased in Person: (((is_surviving_cohabitant(survivor,deceased)) & (~exclusion_applies_descendant(survivor,deceased)))) => ((usufruct_rules_of_surviving_spouse_apply(survivor))).
+}

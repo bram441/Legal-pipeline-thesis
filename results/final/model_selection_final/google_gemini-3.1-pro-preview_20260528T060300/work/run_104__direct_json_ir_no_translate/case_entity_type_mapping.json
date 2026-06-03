@@ -1,0 +1,114 @@
+{
+  "entities": {
+    "greet": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_surviving_legal_cohabitant_of",
+          "arg_index": 1,
+          "expected_type": "Person"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "served_as_principal_family_residence",
+          "arg_index": 1,
+          "expected_type": "Person"
+        }
+      ]
+    },
+    "hannah": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_surviving_legal_cohabitant_of",
+          "arg_index": 0,
+          "expected_type": "Person"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "obtains_usufruct",
+          "arg_index": 0,
+          "expected_type": "Person"
+        }
+      ]
+    },
+    "huisraad": {
+      "declared_type": "Asset",
+      "resolved_type": "Asset",
+      "source": "fact_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_household_goods",
+          "arg_index": 0,
+          "expected_type": "Asset"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "is_present_in",
+          "arg_index": 0,
+          "expected_type": "Asset"
+        }
+      ]
+    },
+    "leuven": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "declared",
+      "evidence": []
+    },
+    "woning_in_leuven": {
+      "declared_type": "Asset",
+      "resolved_type": "Asset",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_immovable_property",
+          "arg_index": 0,
+          "expected_type": "Asset"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "served_as_principal_family_residence",
+          "arg_index": 0,
+          "expected_type": "Asset"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "is_present_in",
+          "arg_index": 1,
+          "expected_type": "Asset"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "obtains_usufruct",
+          "arg_index": 1,
+          "expected_type": "Asset"
+        }
+      ]
+    }
+  },
+  "unmapped_entities": [],
+  "conflicts": [],
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "hannah",
+      "arg_index": 0,
+      "expected_type": "Person",
+      "predicate": "obtains_usufruct"
+    },
+    {
+      "entity": "woning_in_leuven",
+      "arg_index": 1,
+      "expected_type": "Asset",
+      "predicate": "obtains_usufruct"
+    }
+  ]
+}

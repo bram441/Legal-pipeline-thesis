@@ -1,6 +1,6 @@
-# Final thesis evaluation test set (`inputs/json_final`)
+# Final thesis evaluation test set (`inputs/json_final_clean`)
 
-This folder is the **clean, tiered** benchmark input for thesis evaluation. It contains only curated inputs:
+This folder is the **clean, tiered** benchmark input for thesis evaluation. Law texts use **`example_laws_clean/`** paths. It contains only curated inputs:
 
 - `manifest.json` — run metadata (group, difficulty, domain, phenomena, optional `family`)
 - `run_XXX/run.json` — law path, case text, questions with expected answers and `expected.reason`
@@ -30,7 +30,7 @@ Report results **per group** (and per difficulty / domain / phenomenon), not onl
 Static check (no LLM, no IDP):
 
 ```bash
-python scripts/validate_test_set.py --input-dir inputs/json_final
+python scripts/validate_test_set.py --input-dir inputs/json_final_clean
 ```
 
 Use `--strict` to fail on warnings, or `--json-output path/to/validation_summary.json` for a machine-readable summary.
@@ -38,7 +38,12 @@ Use `--strict` to fail on warnings, or `--json-output path/to/validation_summary
 ## Run evaluation
 
 ```bash
-python scripts/run_evaluation.py --runs-dir inputs/json_final --runs all --strategies direct_json_ir_no_translate
+python scripts/run_evaluation.py `
+  --config config/heavy.json `
+  --ignore-local-config `
+  --runs-dir inputs/json_final_clean `
+  --runs all `
+  --strategies direct_json_ir_no_translate
 ```
 
 Grouped metrics: `results/reports/evaluation_*/grouped_summary.json` when `manifest.json` is present.

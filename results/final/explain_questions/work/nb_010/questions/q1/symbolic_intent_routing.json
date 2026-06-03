@@ -1,0 +1,15 @@
+{
+  "question": "Vanaf welk boekjaar treden volgens artikel 1:24, paragraaf 2 de gevolgen in?",
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "extracted_query_hint",
+  "scorable": true,
+  "fallback_intent": null,
+  "warnings": [],
+  "legal_output_symbols": [
+    "gains_kleine_vennootschap_status_from",
+    "loses_kleine_vennootschap_status_from"
+  ],
+  "query_hint_type": "boolean",
+  "expected_question_type": null
+}

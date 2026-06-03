@@ -1,0 +1,139 @@
+{
+  "intent": "deduction",
+  "symbolic_status": "ok",
+  "status": "ok",
+  "scorable": true,
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "routing": {
+    "question": "Is NV Delta een microvennootschap in de zin van artikel 1:25?",
+    "detected_question_type": "boolean",
+    "selected_intent": "deduction",
+    "selected_reason": "expected.mode=boolean",
+    "scorable": true,
+    "fallback_intent": null,
+    "warnings": [],
+    "legal_output_symbols": [
+      "is_micro_company",
+      "micro_company_status_change_applies_from"
+    ],
+    "query_hint_type": "boolean",
+    "expected_question_type": "boolean"
+  },
+  "satisfiability_check": {
+    "stage": "pre_query",
+    "kb_case_satisfiable": true,
+    "status": "ok",
+    "details": "theory satisfiable",
+    "intent_backend": "idp_z3.tasks.satisfiable_check",
+    "duration_seconds": 0.1251
+  },
+  "warnings": [],
+  "deduction": {
+    "intent": "deduction",
+    "status": "ok",
+    "output_kind": "epistemic_boolean",
+    "predicate": "micro_company_status_change_applies_from",
+    "args": [
+      "nv_delta",
+      "fy_last"
+    ],
+    "possible": true,
+    "certain": false,
+    "label": "unknown",
+    "atom": "micro_company_status_change_applies_from(x0,x1)",
+    "constraint": "? x0 in Company, x1 in FinancialYear: __sel0(x0) & __sel1(x1) & micro_company_status_change_applies_from(x0,x1)",
+    "certainty_class": "inconclusive",
+    "sat": true,
+    "internal_intent": "deduction",
+    "antecedent_coverage": [
+      {
+        "rule_index": 10,
+        "target": "micro_company_status_change_applies_from(nv_delta,fy_last)",
+        "conditions": [
+          {
+            "atom": "more_than_one_criterion_exceeded_for_two_consecutive_years",
+            "status": "unknown"
+          },
+          {
+            "atom": "next_financial_year",
+            "status": "unknown"
+          }
+        ]
+      },
+      {
+        "rule_index": 11,
+        "target": "micro_company_status_change_applies_from(nv_delta,fy_last)",
+        "conditions": [
+          {
+            "atom": "ceases_to_exceed_more_than_one_criterion_for_two_consecutive_years",
+            "status": "unknown"
+          },
+          {
+            "atom": "next_financial_year",
+            "status": "unknown"
+          }
+        ]
+      }
+    ]
+  },
+  "model_expansion": null,
+  "get_range": null,
+  "satisfiable": null,
+  "explanation": null,
+  "execution_query": {
+    "type": "predicate",
+    "predicate": "micro_company_status_change_applies_from",
+    "mode": "boolean",
+    "args": [
+      "nv_delta",
+      "fy_last"
+    ],
+    "explain": false,
+    "predicate_kind": "derived",
+    "query_type": "predicate_boolean",
+    "internal_intent": "deduction"
+  },
+  "output_kind": "epistemic_boolean",
+  "certainty_class": "inconclusive",
+  "predicate": "micro_company_status_change_applies_from",
+  "args": [
+    "nv_delta",
+    "fy_last"
+  ],
+  "label": "unknown",
+  "possible": true,
+  "certain": false,
+  "sat": true,
+  "antecedent_coverage": [
+    {
+      "rule_index": 10,
+      "target": "micro_company_status_change_applies_from(nv_delta,fy_last)",
+      "conditions": [
+        {
+          "atom": "more_than_one_criterion_exceeded_for_two_consecutive_years",
+          "status": "unknown"
+        },
+        {
+          "atom": "next_financial_year",
+          "status": "unknown"
+        }
+      ]
+    },
+    {
+      "rule_index": 11,
+      "target": "micro_company_status_change_applies_from(nv_delta,fy_last)",
+      "conditions": [
+        {
+          "atom": "ceases_to_exceed_more_than_one_criterion_for_two_consecutive_years",
+          "status": "unknown"
+        },
+        {
+          "atom": "next_financial_year",
+          "status": "unknown"
+        }
+      ]
+    }
+  ]
+}

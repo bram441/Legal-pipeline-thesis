@@ -2,16 +2,13 @@
 
 from __future__ import annotations
 
-import inspect
-
 import pytest
 
 from pipeline.kb.json_ir import JSONIRCompilationError, compile_validate_json_ir
-from pipeline.kb.json_ir_compile_loop import _build_repair_hints, compile_json_ir_structured
+from pipeline.kb.json_ir_compile_loop import _build_repair_hints
 from pipeline.kb.prerequisite_classification_repair_hints import (
     build_prerequisite_classification_supplement,
 )
-from pipeline.utils.prompt_paths import REQUIRED_PROMPT_PATHS
 
 
 def _company_kb(*, predicates, rules):
@@ -21,15 +18,6 @@ def _company_kb(*, predicates, rules):
         "functions": [],
         "rules": rules,
     }
-
-
-def test_compile_json_ir_structured_has_no_rule_plan_parameter() -> None:
-    params = inspect.signature(compile_json_ir_structured).parameters
-    assert "rule_plan_llm" not in params
-
-
-def test_rule_plan_prompt_not_required() -> None:
-    assert "rule_plan" not in "\n".join(REQUIRED_PROMPT_PATHS)
 
 
 def test_micro_company_if_uses_undefined_small_company_fails_with_hint() -> None:

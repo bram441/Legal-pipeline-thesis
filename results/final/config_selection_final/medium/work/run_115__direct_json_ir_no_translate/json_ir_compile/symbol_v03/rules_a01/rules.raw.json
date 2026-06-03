@@ -1,0 +1,149 @@
+{
+  "rules": [
+    {
+      "forall": [
+        {"var": "c", "type": "Company"},
+        {"var": "fy", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"compare": {"left": {"func": "annual_average_employees", "args": ["c", "fy"]}, "op": ">", "right": 10}}
+      ],
+      "then": [
+        {"pred": "employee_threshold_exceeded", "args": ["c", "fy"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "c", "type": "Company"},
+        {"var": "fy", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"compare": {"left": {"func": "annual_net_turnover_excl_vat", "args": ["c", "fy"]}, "op": ">", "right": 900000.0}}
+      ],
+      "then": [
+        {"pred": "turnover_threshold_exceeded", "args": ["c", "fy"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "c", "type": "Company"},
+        {"var": "fy", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"compare": {"left": {"func": "balance_sheet_total", "args": ["c", "fy"]}, "op": ">", "right": 450000.0}}
+      ],
+      "then": [
+        {"pred": "balance_sheet_threshold_exceeded", "args": ["c", "fy"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "c", "type": "Company"},
+        {"var": "fy", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"and": [
+          {"pred": "employee_threshold_exceeded", "args": ["c", "fy"], "negated": false},
+          {"pred": "turnover_threshold_exceeded", "args": ["c", "fy"], "negated": false}
+        ]}
+      ],
+      "then": [
+        {"pred": "more_than_one_criterion_exceeded", "args": ["c", "fy"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "c", "type": "Company"},
+        {"var": "fy", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"and": [
+          {"pred": "employee_threshold_exceeded", "args": ["c", "fy"], "negated": false},
+          {"pred": "balance_sheet_threshold_exceeded", "args": ["c", "fy"], "negated": false}
+        ]}
+      ],
+      "then": [
+        {"pred": "more_than_one_criterion_exceeded", "args": ["c", "fy"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "c", "type": "Company"},
+        {"var": "fy", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"and": [
+          {"pred": "turnover_threshold_exceeded", "args": ["c", "fy"], "negated": false},
+          {"pred": "balance_sheet_threshold_exceeded", "args": ["c", "fy"], "negated": false}
+        ]}
+      ],
+      "then": [
+        {"pred": "more_than_one_criterion_exceeded", "args": ["c", "fy"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "c", "type": "Company"},
+        {"var": "fy", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"and": [
+          {"pred": "is_small_company", "args": ["c"], "negated": false},
+          {"pred": "has_legal_personality", "args": ["c"], "negated": false},
+          {"pred": "is_subsidiary", "args": ["c"], "negated": true},
+          {"pred": "is_parent_company", "args": ["c"], "negated": true},
+          {"pred": "more_than_one_criterion_exceeded", "args": ["c", "fy"], "negated": true}
+        ]}
+      ],
+      "then": [
+        {"pred": "is_micro_company", "args": ["c", "fy"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "c", "type": "Company"},
+        {"var": "fy", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"pred": "more_than_one_criterion_exceeded", "args": ["c", "fy"], "negated": false}
+      ],
+      "then": [
+        {"pred": "is_micro_company", "args": ["c", "fy"], "negated": true}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "c", "type": "Company"},
+        {"var": "fy", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"pred": "is_subsidiary", "args": ["c"], "negated": false}
+      ],
+      "then": [
+        {"pred": "is_micro_company", "args": ["c", "fy"], "negated": true}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "c", "type": "Company"},
+        {"var": "fy", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"pred": "is_parent_company", "args": ["c"], "negated": false}
+      ],
+      "then": [
+        {"pred": "is_micro_company", "args": ["c", "fy"], "negated": true}
+      ],
+      "operator": "implies"
+    }
+  ]
+}

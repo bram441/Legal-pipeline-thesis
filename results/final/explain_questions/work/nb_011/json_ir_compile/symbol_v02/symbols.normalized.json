@@ -1,0 +1,206 @@
+{
+  "types": [
+    "Company",
+    "FinancialYear"
+  ],
+  "predicates": [
+    {
+      "name": "has_legal_personality",
+      "args": [
+        "Company"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The company has legal personality (rechtspersoonlijkheid).",
+      "directly_observable": true
+    },
+    {
+      "name": "employee_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds the annual average employee threshold in the financial year."
+    },
+    {
+      "name": "turnover_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds the annual net turnover threshold (excluding VAT) in the financial year."
+    },
+    {
+      "name": "balance_sheet_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds the balance sheet total threshold in the financial year."
+    },
+    {
+      "name": "more_than_one_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds more than one of the three size criteria in the financial year."
+    },
+    {
+      "name": "is_small_company",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The company qualifies as a kleine vennootschap (small company) on the balance sheet date of the last closed financial year.",
+      "legal_output": true,
+      "output_category": "classification"
+    },
+    {
+      "name": "is_linked_company",
+      "args": [
+        "Company",
+        "Company"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The two companies are linked (verbonden) as defined in article 1:20.",
+      "directly_observable": true
+    },
+    {
+      "name": "revenues_mostly_non_turnover",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "More than half of the company's ordinary revenues do not qualify as net turnover, triggering the alternative turnover definition.",
+      "directly_observable": true
+    },
+    {
+      "name": "consolidation_eliminations_applied",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The required consolidation eliminations and omissions under the relevant royal decree are applied when computing consolidated balance sheet total and net turnover.",
+      "directly_observable": true
+    },
+    {
+      "name": "employees_registered_in_dimona",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The company's employment falls within the scope of the DIMONA registration system for the financial year.",
+      "directly_observable": true
+    }
+  ],
+  "functions": [
+    {
+      "name": "annual_average_employees_fte",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The annual average number of employees expressed in full-time equivalents for the company in the financial year."
+    },
+    {
+      "name": "annual_net_turnover_excl_vat",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The annual net turnover excluding VAT of the company in the financial year (in euros)."
+    },
+    {
+      "name": "balance_sheet_total",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The total book value of assets (balanstotaal) of the company in the financial year (in euros)."
+    },
+    {
+      "name": "total_operating_and_financial_revenues_excl_nonrecurrent",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The total of operating and financial revenues excluding non-recurrent revenues, used as alternative net turnover when ordinary revenues are mostly non-turnover (in euros)."
+    },
+    {
+      "name": "consolidated_annual_net_turnover_excl_vat",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The consolidated annual net turnover excluding VAT for the group of linked companies in the financial year (in euros)."
+    },
+    {
+      "name": "consolidated_balance_sheet_total",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The consolidated balance sheet total for the group of linked companies in the financial year (in euros)."
+    },
+    {
+      "name": "combined_average_employees_fte",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The sum of annual average employees in FTE across all linked companies in the financial year."
+    },
+    {
+      "name": "adjusted_turnover_threshold",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "helper",
+      "description": "The applicable net turnover threshold, increased by 20% when consolidation eliminations are not applied (in euros)."
+    },
+    {
+      "name": "adjusted_balance_sheet_threshold",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "helper",
+      "description": "The applicable balance sheet total threshold, increased by 20% when consolidation eliminations are not applied (in euros)."
+    }
+  ]
+}

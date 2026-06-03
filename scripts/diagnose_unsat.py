@@ -2,7 +2,7 @@
 """
 Diagnose why a run produces "theory is unsatisfiable" at reasoning time.
 
-Run from project root: python scripts/diagnose_unsat.py inputs/json/run_003
+Run from project root: python scripts/diagnose_unsat.py inputs/json_final_clean/run_003
 
 Composes KB + case structure, then uses the same UNSAT explanation helper as the
 pipeline: ``pipeline.kb.semantic_check.explain_unsat_fo`` (IDP Theory.propagate + explain).
@@ -21,7 +21,7 @@ sys.path.insert(0, str(_root))
 def main():
     if len(sys.argv) < 2:
         print("Usage: python scripts/diagnose_unsat.py <run_dir>")
-        print("Example: python scripts/diagnose_unsat.py inputs/json/run_003")
+        print("Example: python scripts/diagnose_unsat.py inputs/json_final_clean/run_003")
         sys.exit(1)
 
     run_dir = Path(sys.argv[1])

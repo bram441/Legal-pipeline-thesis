@@ -119,7 +119,22 @@ def test_b_legal_effect_predicate_with_rule_passes() -> None:
             ),
             _derived("is_small_company", ["Company", "FinancialYear"], output_category="classification"),
         ],
-        "functions": [],
+        "functions": [
+            {
+                "name": "next_financial_year",
+                "kind": "helper",
+                "args": ["FinancialYear"],
+                "returns": "FinancialYear",
+                "description": "The financial year immediately following the given year.",
+            },
+            {
+                "name": "consecutive_financial_years",
+                "kind": "helper",
+                "args": ["FinancialYear", "FinancialYear"],
+                "returns": "Bool",
+                "description": "The two financial years are consecutive.",
+            },
+        ],
         "rules": [
             _rule_company_year(then_pred="consequences_apply_from_following_financial_year"),
             _rule_company_year(then_pred="is_small_company"),

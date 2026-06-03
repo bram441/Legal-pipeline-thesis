@@ -1,0 +1,130 @@
+{
+  "types": ["Person", "Asset"],
+  "predicates": [
+    {
+      "name": "is_surviving_spouse_of",
+      "args": ["Person", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the surviving spouse of the second (deceased) person."
+    },
+    {
+      "name": "deceased_leaves_ascendants",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deceased person leaves relatives in the ascending line."
+    },
+    {
+      "name": "deceased_leaves_close_collaterals",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deceased person leaves close collateral relatives."
+    },
+    {
+      "name": "asset_in_common_estate",
+      "args": ["Asset", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset belongs to the common matrimonial estate of the deceased person."
+    },
+    {
+      "name": "asset_in_undivided_estate_between_spouses",
+      "args": ["Asset", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset belongs to the estate held exclusively in undivided co-ownership between the spouses."
+    },
+    {
+      "name": "asset_in_own_estate",
+      "args": ["Asset", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset belongs to the own (separate) estate of the deceased person."
+    },
+    {
+      "name": "asset_subject_to_legal_reversion_4_24",
+      "args": ["Asset", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset is subject to the right of legal reversion as referred to in article 4.24."
+    },
+    {
+      "name": "asset_subject_to_legal_reversion_4_25",
+      "args": ["Asset", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset is subject to the right of legal reversion as referred to in article 4.25."
+    },
+    {
+      "name": "deed_of_gift_excludes_usufruct",
+      "args": ["Asset", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deed of gift for the asset stipulates otherwise, excluding the surviving spouse's usufruct."
+    },
+    {
+      "name": "testament_excludes_usufruct",
+      "args": ["Asset", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The testament stipulates otherwise, excluding the surviving spouse's usufruct over the asset."
+    },
+    {
+      "name": "deceased_leaves_ascendants_or_close_collaterals",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The deceased leaves relatives in the ascending line or close collateral relatives."
+    },
+    {
+      "name": "asset_in_common_or_undivided_estate",
+      "args": ["Asset", "Person"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The asset belongs to the common estate or the estate held exclusively in undivided co-ownership between the spouses."
+    },
+    {
+      "name": "asset_subject_to_legal_reversion",
+      "args": ["Asset", "Person"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The asset is subject to the right of legal reversion under article 4.24 or 4.25."
+    },
+    {
+      "name": "usufruct_on_reversion_asset_excluded",
+      "args": ["Asset", "Person"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The usufruct of the surviving spouse on a reversion asset is excluded by the deed of gift or testament."
+    },
+    {
+      "name": "acquires_full_ownership",
+      "args": ["Person", "Asset"],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "description": "The surviving spouse acquires full ownership of the asset as a legal inheritance consequence."
+    },
+    {
+      "name": "acquires_usufruct",
+      "args": ["Person", "Asset"],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "description": "The surviving spouse acquires usufruct over the asset as a legal inheritance consequence."
+    }
+  ],
+  "functions": []
+}

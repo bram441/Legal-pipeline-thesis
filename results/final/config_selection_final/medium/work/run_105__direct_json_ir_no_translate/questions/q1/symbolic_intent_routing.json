@@ -1,0 +1,14 @@
+{
+  "question": "Is artikel 4.23, paragraaf 4 een reden om Karin het vruchtgebruik van de gezinswoning te weigeren?",
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "scorable": true,
+  "fallback_intent": null,
+  "warnings": [],
+  "legal_output_symbols": [
+    "preceding_provisions_apply"
+  ],
+  "query_hint_type": "boolean",
+  "expected_question_type": "boolean"
+}

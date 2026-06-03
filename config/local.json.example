@@ -1,4 +1,4 @@
-{
+﻿{
   "_comment": "Copy to config/local.json (gitignored). Merge only keys you need to override.",
   "json_ir": {
     "max_kb_llm_calls": 12,

@@ -1,0 +1,65 @@
+{
+  "cardinality_violations": [],
+  "numeric_provenance_issues": [
+    {
+      "path": "rules[15].if[2]",
+      "threshold": 13500000,
+      "law_values": [
+        26.0,
+        38.0,
+        50.0,
+        1996.0,
+        2002.0,
+        6000000.0,
+        11250000.0
+      ]
+    },
+    {
+      "path": "rules[16].if[2]",
+      "threshold": 7200000,
+      "law_values": [
+        26.0,
+        38.0,
+        50.0,
+        1996.0,
+        2002.0,
+        6000000.0,
+        11250000.0
+      ]
+    }
+  ],
+  "law_thresholds": [
+    26.0,
+    38.0,
+    50.0,
+    1996.0,
+    2002.0,
+    6000000.0,
+    11250000.0
+  ],
+  "missing_helper": null,
+  "secondary_missing_helpers": [],
+  "computed_observable_predicate": null,
+  "computed_observable_helper_kind_hint": null,
+  "temporal_support": {
+    "detected_temporal_terms": [],
+    "requires_temporal_support": false,
+    "legal_effect_context": true,
+    "has_period_like_types": true,
+    "has_temporal_support_symbols": false,
+    "existing_period_types": [
+      "FinancialYear"
+    ],
+    "existing_temporal_symbols": [],
+    "legal_output_predicates": [
+      "is_small_company"
+    ],
+    "missing_temporal_support_symbol": false,
+    "repair_route": null
+  },
+  "missing_temporal_support_symbol": false,
+  "repair_route": null,
+  "secondary_diagnostics_text": "numeric_threshold_not_in_law_text (secondary — fix even if cardinality is primary):\n  - Rule rules[15].if[2] uses numeric threshold 13500000, not in scoped law text.\n  - Rule rules[16].if[2] uses numeric threshold 7200000, not in scoped law text.\n  Allowed law-text thresholds: 26, 38, 50, 1996, 2002, 6000000, 11250000\nAlso fix these numeric threshold provenance issues.",
+  "validation_evidence_fingerprint": "7bd4742f89f0c02f",
+  "evidence_consumed_by_repair": false
+}

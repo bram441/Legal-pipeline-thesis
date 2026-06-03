@@ -1,0 +1,143 @@
+{
+  "types": ["Company", "FinancialYear"],
+  "predicates": [
+    {
+      "name": "has_legal_personality",
+      "args": ["Company"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The company has legal personality (rechtspersoonlijkheid). This is a background status that may be directly stated in a case."
+    },
+    {
+      "name": "is_small_company",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The company qualifies as a small company (kleine vennootschap) in the given financial year."
+    },
+    {
+      "name": "is_subsidiary",
+      "args": ["Company"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The company is a subsidiary (dochtervennootschap) of another company."
+    },
+    {
+      "name": "is_parent_company",
+      "args": ["Company"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The company is a parent company (moedervennootschap) of another company."
+    },
+    {
+      "name": "employee_criterion_exceeded",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds the annual average employee threshold of 10 in the financial year."
+    },
+    {
+      "name": "turnover_criterion_exceeded",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds the annual net turnover threshold of 900,000 EUR (excluding VAT) in the financial year."
+    },
+    {
+      "name": "balance_sheet_criterion_exceeded",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds the balance sheet total threshold of 450,000 EUR in the financial year."
+    },
+    {
+      "name": "more_than_one_criterion_exceeded",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds more than one of the three micro-company criteria in the financial year."
+    },
+    {
+      "name": "more_than_one_criterion_exceeded_for_two_consecutive_years",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds more than one criterion in this financial year and in the immediately preceding financial year."
+    },
+    {
+      "name": "ceases_to_exceed_more_than_one_criterion_for_two_consecutive_years",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company ceases to exceed more than one criterion in this financial year and in the immediately preceding financial year."
+    },
+    {
+      "name": "previous_financial_year",
+      "args": ["FinancialYear", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The second financial year is immediately before the first financial year."
+    },
+    {
+      "name": "next_financial_year",
+      "args": ["FinancialYear", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The second financial year is immediately after the first financial year."
+    },
+    {
+      "name": "is_micro_company",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "output_category": "classification",
+      "description": "The company qualifies as a micro-company (microvennootschap) as defined by Art. 1:25 in the given financial year."
+    },
+    {
+      "name": "loses_micro_company_status_from",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "derived",
+      "output_category": "legal_effect",
+      "description": "The company loses micro-company status starting from this financial year due to exceeding more than one criterion for two consecutive years."
+    },
+    {
+      "name": "gains_micro_company_status_from",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "derived",
+      "output_category": "legal_effect",
+      "description": "The company gains micro-company status starting from this financial year due to ceasing to exceed more than one criterion for two consecutive years."
+    }
+  ],
+  "functions": [
+    {
+      "name": "annual_average_employees",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Int",
+      "kind": "observable",
+      "description": "The annual average number of employees of the company in the financial year."
+    },
+    {
+      "name": "annual_net_turnover_excl_vat",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The annual net turnover of the company excluding VAT in the financial year, in EUR."
+    },
+    {
+      "name": "balance_sheet_total",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The balance sheet total of the company in the financial year, in EUR."
+    }
+  ]
+}

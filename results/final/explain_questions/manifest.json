@@ -1,0 +1,32 @@
+{
+  "input_dir": "C:\\Users\\bramd\\Documents\\VUB\\Master Thesis\\Legal-pipeline\\inputs\\non_boolean_same_laws_testset",
+  "output_dir": "C:\\Users\\bramd\\Documents\\VUB\\Master Thesis\\Legal-pipeline\\results\\final\\explain_questions",
+  "strategy": "direct_json_ir_no_translate",
+  "config": "config/ablation_medium.json",
+  "model": "anthropic/claude-sonnet-4.6",
+  "explain_appended_to_questions": false,
+  "llm_explanations_enabled": true,
+  "runs": [
+    "nb_001",
+    "nb_002",
+    "nb_003",
+    "nb_004",
+    "nb_005",
+    "nb_006",
+    "nb_007",
+    "nb_008",
+    "nb_009",
+    "nb_010",
+    "nb_011",
+    "nb_012",
+    "nb_013",
+    "nb_014",
+    "nb_015",
+    "nb_016",
+    "nb_017",
+    "nb_018",
+    "nb_019",
+    "nb_020"
+  ],
+  "note": "Gold answers are used only for manual review, not included in run.json prompts."
+}

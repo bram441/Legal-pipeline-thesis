@@ -1,0 +1,128 @@
+{
+  "cardinality_violations": [],
+  "numeric_provenance_issues": [],
+  "law_thresholds": [
+    10.0,
+    11.0,
+    14.0
+  ],
+  "missing_helper": {
+    "helper_name": "meets_entry_or_residence_conditions",
+    "helper_signature": "Person -> Bool",
+    "helper_kind": "predicate",
+    "helper_kind_hint": "unknown",
+    "helper_kind_hints": [
+      "unknown"
+    ],
+    "used_in_rules": [
+      {
+        "rule_index": 2,
+        "side": "if",
+        "negated": true,
+        "then_predicates": [
+          "in_illegal_residence"
+        ],
+        "then_legal_output_predicates": []
+      }
+    ],
+    "derives_legal_output": false,
+    "used_in_legal_output_rule": false,
+    "legal_output_predicates_in_then": [],
+    "candidate_lower_level_symbols": [
+      {
+        "name": "no_residence_application_filed_after_illegal_entry_or_during_illegal_stay",
+        "kind": "observable",
+        "description": "The person did not file a residence application after illegal entry or during illegal stay, or did not submit an interna"
+      },
+      {
+        "name": "subject_to_active_entry_ban",
+        "kind": "observable",
+        "description": "The person is subject to an entry ban in Belgium and/or another member state that has not been lifted or suspended."
+      },
+      {
+        "name": "in_illegal_residence",
+        "kind": "derived",
+        "description": "The person is present on the territory without meeting or no longer meeting the conditions for access or residence."
+      },
+      {
+        "name": "absconding_criterion_met",
+        "kind": "helper",
+        "description": "At least one of the statutory objective criteria for risk of absconding is met for the person."
+      },
+      {
+        "name": "has_belgian_nationality",
+        "kind": "observable",
+        "description": "The person has Belgian nationality, as directly stated or proven in the case."
+      },
+      {
+        "name": "is_eu_citizen",
+        "kind": "observable",
+        "description": "The person is a citizen of the European Union."
+      },
+      {
+        "name": "covered_by_eu_free_movement_law",
+        "kind": "observable",
+        "description": "The person falls under EU law on free movement as defined in Article 2(5) of the Schengen Borders Code."
+      },
+      {
+        "name": "subject_to_removal_procedure",
+        "kind": "observable",
+        "description": "The person is subject to a removal procedure."
+      },
+      {
+        "name": "subject_to_international_protection_procedure",
+        "kind": "observable",
+        "description": "The person is subject to a procedure for granting international protection."
+      },
+      {
+        "name": "subject_to_responsibility_determination_procedure",
+        "kind": "observable",
+        "description": "The person is subject to a procedure to determine or transfer to the responsible member state for an international prote"
+      },
+      {
+        "name": "individual_examination_performed",
+        "kind": "observable",
+        "description": "An individual examination of the person's situation has been performed."
+      },
+      {
+        "name": "has_valid_travel_document",
+        "kind": "observable",
+        "description": "The person holds a valid travel document, valid passport, or valid identity document."
+      }
+    ],
+    "threshold_helper_candidates": [
+      {
+        "name": "absconding_criterion_met",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "At least one of the statutory objective criteria for risk of absconding is met for the person."
+      }
+    ],
+    "temporal_relation_candidates": [],
+    "legal_output_candidates": [],
+    "missing_temporal_support_symbol": false,
+    "undeclared_temporal_funcs_in_rules": [],
+    "legal_effect_context": false,
+    "is_secondary": false
+  },
+  "secondary_missing_helpers": [],
+  "computed_observable_predicate": null,
+  "computed_observable_helper_kind_hint": null,
+  "temporal_support": {
+    "detected_temporal_terms": [],
+    "requires_temporal_support": false,
+    "legal_effect_context": false,
+    "has_period_like_types": false,
+    "has_temporal_support_symbols": false,
+    "existing_period_types": [],
+    "existing_temporal_symbols": [],
+    "legal_output_predicates": [],
+    "missing_temporal_support_symbol": false,
+    "repair_route": null
+  },
+  "missing_temporal_support_symbol": false,
+  "repair_route": null,
+  "secondary_diagnostics_text": "missing_helper_definition (legal-effect context=False):\n  helper: meets_entry_or_residence_conditions (signature=Person -> Bool; kind=unknown; hints=unknown)\n  repair: define 'meets_entry_or_residence_conditions' in THEN with rules, or reclassify as case_input/background only if safe; do not rename without defining.\n  - rules[2].if negated\n  threshold helper candidates:\n    - absconding_criterion_met (helper)\n  other lower-level symbols:\n    - no_residence_application_filed_after_illegal_entry_or_during_illegal_stay (observable)\n    - subject_to_active_entry_ban (observable)\n    - in_illegal_residence (derived)\n    - absconding_criterion_met (helper)\n    - has_belgian_nationality (observable)\n    - is_eu_citizen (observable)\n    - covered_by_eu_free_movement_law (observable)\n    - subject_to_removal_procedure (observable)",
+  "validation_evidence_fingerprint": "4f4aef5a8463da4b",
+  "evidence_consumed_by_repair": false
+}

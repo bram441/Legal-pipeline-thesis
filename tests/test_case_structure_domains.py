@@ -29,7 +29,7 @@ class TestCaseStructureDomains(unittest.TestCase):
             "not is_subsidiary(nv_delta).",
             "annual_average_number_of_employees(nv_delta) = 9.",
         ]
-        entities = {"Company": ["nv_delta", "nv"]}
+        entities = {"Company": ["nv_delta"]}
         s = build_structure_block_from_facts(
             facts,
             entities=entities,

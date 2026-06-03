@@ -1,0 +1,203 @@
+{
+  "types": {
+    "Person": {
+      "name": "Person",
+      "kind": "entity",
+      "aliases": [],
+      "source": "kb_symbol_table"
+    },
+    "Asset": {
+      "name": "Asset",
+      "kind": "entity",
+      "aliases": [],
+      "source": "kb_symbol_table"
+    }
+  },
+  "predicates": {
+    "is_surviving_spouse_of": {
+      "name": "is_surviving_spouse_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person is the surviving spouse of the second person (the deceased).",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "leaves_ascendants_or_close_collaterals": {
+      "name": "leaves_ascendants_or_close_collaterals",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The deceased person leaves ascendants or close collaterals.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "is_share_in_common_or_exclusive_undivided_estate": {
+      "name": "is_share_in_common_or_exclusive_undivided_estate",
+      "args": [
+        "Asset",
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The asset is the share of the deceased (second argument) in the common estate or in the estate exclusively in undivided co-ownership with the surviving spouse (third argument).",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "is_other_asset_of_own_estate": {
+      "name": "is_other_asset_of_own_estate",
+      "args": [
+        "Asset",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The asset is among the other assets of the deceased person's own estate.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "is_subject_to_legal_return": {
+      "name": "is_subject_to_legal_return",
+      "args": [
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The asset is subject to the right of legal return referred to in article 4.24 or 4.25.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "otherwise_provided_in_donation_or_will": {
+      "name": "otherwise_provided_in_donation_or_will",
+      "args": [
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "It is otherwise provided in the deed of donation or in the will regarding the asset.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "acquires_full_ownership": {
+      "name": "acquires_full_ownership",
+      "args": [
+        "Person",
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The person acquires full ownership of the asset.",
+      "legal_output": true,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": true,
+      "temporal_support": false
+    },
+    "acquires_usufruct": {
+      "name": "acquires_usufruct",
+      "args": [
+        "Person",
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The person acquires the usufruct of the asset.",
+      "legal_output": true,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": true,
+      "temporal_support": false
+    }
+  },
+  "functions": {},
+  "assertable_case_symbols": {
+    "predicates": [
+      "is_other_asset_of_own_estate",
+      "is_share_in_common_or_exclusive_undivided_estate",
+      "is_subject_to_legal_return",
+      "is_surviving_spouse_of",
+      "leaves_ascendants_or_close_collaterals",
+      "otherwise_provided_in_donation_or_will"
+    ],
+    "functions": []
+  },
+  "factual_case_input_predicates": [],
+  "factual_criteria_input_predicates": [],
+  "legal_output_query_targets": [
+    "acquires_full_ownership",
+    "acquires_usufruct"
+  ],
+  "temporal_support_symbols": []
+}

@@ -1,0 +1,29 @@
+{
+  "case_entities_rendered_to_domains": {
+    "Person": [
+      "greet",
+      "hannah",
+      "leuven"
+    ],
+    "Asset": [
+      "huisraad_woning_leuven",
+      "woning_leuven"
+    ]
+  },
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "hannah",
+      "arg_index": 0,
+      "expected_type": "Person",
+      "predicate": "acquires_usufruct_of_main_residence"
+    },
+    {
+      "entity": "greet",
+      "arg_index": 1,
+      "expected_type": "Person",
+      "predicate": "acquires_usufruct_of_main_residence"
+    }
+  ],
+  "unmapped_case_entities": [],
+  "pre_solver_domain_validation_errors": []
+}

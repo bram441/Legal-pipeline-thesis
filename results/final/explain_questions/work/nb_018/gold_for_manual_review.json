@@ -1,0 +1,7 @@
+{
+  "run_id": "nb_018",
+  "gold_type": "short_text",
+  "expected_answer": "Het criterium dat de betrokkene na illegale binnenkomst of tijdens illegaal verblijf geen verblijfsaanvraag heeft ingediend.",
+  "law_source": "vreemdelingenwet_clean.txt",
+  "notes": "Gold is separated from plain_inputs and must not be included in model prompts."
+}

@@ -141,6 +141,20 @@ def test_c_negated_pairwise_exceeded_passes() -> None:
             }
         }
     )
+    ir["rules"].append(
+        {
+            "forall": [{"var": "c", "type": "Company"}],
+            "if": {
+                "or": [
+                    {"and": [_cmp("metric_A", ">", 50), _cmp("metric_B", ">", 100)]},
+                    {"and": [_cmp("metric_A", ">", 50), _cmp("metric_C", ">", 200)]},
+                    {"and": [_cmp("metric_B", ">", 100), _cmp("metric_C", ">", 200)]},
+                ]
+            },
+            "then": [{"pred": "favorable_status", "args": ["c"], "negated": True}],
+            "operator": "implies",
+        }
+    )
     _validate_fixture(ir)
 
 

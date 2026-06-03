@@ -1,0 +1,161 @@
+{
+  "intent": "deduction",
+  "symbolic_status": "ok",
+  "status": "ok",
+  "scorable": true,
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "routing": {
+    "question": "Kan dit een objectief criterium zijn voor risico op onderduiken volgens artikel 1, paragraaf 2, punt 2?",
+    "detected_question_type": "boolean",
+    "selected_intent": "deduction",
+    "selected_reason": "expected.mode=boolean",
+    "scorable": true,
+    "fallback_intent": null,
+    "warnings": [],
+    "legal_output_symbols": [
+      "has_risk_of_absconding",
+      "is_foreigner",
+      "is_identified_foreigner",
+      "is_illegal_stay",
+      "is_third_country_national"
+    ],
+    "query_hint_type": "boolean",
+    "expected_question_type": "boolean"
+  },
+  "satisfiability_check": {
+    "stage": "pre_query",
+    "kb_case_satisfiable": true,
+    "status": "ok",
+    "details": "theory satisfiable",
+    "intent_backend": "idp_z3.tasks.satisfiable_check",
+    "duration_seconds": 0.1027
+  },
+  "warnings": [],
+  "deduction": {
+    "intent": "deduction",
+    "status": "ok",
+    "output_kind": "epistemic_boolean",
+    "predicate": "has_risk_of_absconding",
+    "args": [
+      "dana"
+    ],
+    "possible": true,
+    "certain": false,
+    "label": "unknown",
+    "atom": "has_risk_of_absconding(x0)",
+    "constraint": "? x0 in Person: __sel0(x0) & has_risk_of_absconding(x0)",
+    "certainty_class": "inconclusive",
+    "sat": true,
+    "internal_intent": "deduction",
+    "antecedent_coverage": [
+      {
+        "rule_index": 4,
+        "target": "has_risk_of_absconding(dana)",
+        "conditions": [
+          {
+            "atom": "is_foreigner(dana)",
+            "status": "unknown"
+          },
+          {
+            "atom": "subject_to_removal_procedure(dana)",
+            "status": "present"
+          },
+          {
+            "atom": "subject_to_international_protection_procedure(dana)",
+            "status": "missing"
+          },
+          {
+            "atom": "subject_to_dublin_procedure(dana)",
+            "status": "missing"
+          },
+          {
+            "atom": "risk_is_actual_and_real(dana)",
+            "status": "missing"
+          },
+          {
+            "atom": "individual_examination_performed(dana)",
+            "status": "missing"
+          },
+          {
+            "atom": "circumstances_specific_to_case_taken_into_account(dana)",
+            "status": "missing"
+          },
+          {
+            "atom": "meets_at_least_one_absconding_criterion(dana)",
+            "status": "helper_defined"
+          }
+        ]
+      }
+    ],
+    "extraction_repair_hint": "The selected legal conclusion could not be proven because an observable antecedent required by the KB rule was not asserted from the case. Re-check the case text for facts matching these observable schema symbols: subject_to_international_protection_procedure: The person is subject to a procedure for granting international protection.; subject_to_dublin_procedure: The person is subject to a procedure for determining or transferring to the responsible Member State.; risk_is_actual_and_real: The risk of absconding is actual and real.; individual_examination_performed: An individual examination of the person has been performed.; circumstances_specific_to_case_taken_into_account: All circumstances specific to the person's case have been taken into account.."
+  },
+  "model_expansion": null,
+  "get_range": null,
+  "satisfiable": null,
+  "explanation": null,
+  "execution_query": {
+    "type": "predicate",
+    "predicate": "has_risk_of_absconding",
+    "mode": "boolean",
+    "args": [
+      "dana"
+    ],
+    "explain": false,
+    "predicate_kind": "derived",
+    "query_type": "predicate_boolean",
+    "internal_intent": "deduction"
+  },
+  "output_kind": "epistemic_boolean",
+  "certainty_class": "inconclusive",
+  "predicate": "has_risk_of_absconding",
+  "args": [
+    "dana"
+  ],
+  "label": "unknown",
+  "possible": true,
+  "certain": false,
+  "sat": true,
+  "antecedent_coverage": [
+    {
+      "rule_index": 4,
+      "target": "has_risk_of_absconding(dana)",
+      "conditions": [
+        {
+          "atom": "is_foreigner(dana)",
+          "status": "unknown"
+        },
+        {
+          "atom": "subject_to_removal_procedure(dana)",
+          "status": "present"
+        },
+        {
+          "atom": "subject_to_international_protection_procedure(dana)",
+          "status": "missing"
+        },
+        {
+          "atom": "subject_to_dublin_procedure(dana)",
+          "status": "missing"
+        },
+        {
+          "atom": "risk_is_actual_and_real(dana)",
+          "status": "missing"
+        },
+        {
+          "atom": "individual_examination_performed(dana)",
+          "status": "missing"
+        },
+        {
+          "atom": "circumstances_specific_to_case_taken_into_account(dana)",
+          "status": "missing"
+        },
+        {
+          "atom": "meets_at_least_one_absconding_criterion(dana)",
+          "status": "helper_defined"
+        }
+      ]
+    }
+  ],
+  "extraction_repair_hint": "The selected legal conclusion could not be proven because an observable antecedent required by the KB rule was not asserted from the case. Re-check the case text for facts matching these observable schema symbols: subject_to_international_protection_procedure: The person is subject to a procedure for granting international protection.; subject_to_dublin_procedure: The person is subject to a procedure for determining or transferring to the responsible Member State.; risk_is_actual_and_real: The risk of absconding is actual and real.; individual_examination_performed: An individual examination of the person has been performed.; circumstances_specific_to_case_taken_into_account: All circumstances specific to the person's case have been taken into account.."
+}

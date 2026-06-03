@@ -423,7 +423,7 @@ def run_json_mode(
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode", choices=["text", "json"], required=True)
-    parser.add_argument("--run", required=True, help="Path to run folder (e.g., inputs/text/run_001)")
+    parser.add_argument("--run", required=True, help="Path to run folder (e.g., inputs/json_final_clean/run_001)")
     parser.add_argument("--provider", choices=["auto", "openai"], default="auto")
     parser.add_argument(
         "--no-translate",
@@ -443,7 +443,7 @@ def main():
         metavar="PATH",
         default=None,
         help="Optional config profile JSON merged on top of config/default.json and "
-        "config/local.json (e.g. config/final.json). Omitted: default + local only "
+        "config/local.json (e.g. config/heavy.json). Omitted: default + local only "
         "(unless PIPELINE_CONFIG_PROFILE is already set in the environment).",
     )
     parser.add_argument(

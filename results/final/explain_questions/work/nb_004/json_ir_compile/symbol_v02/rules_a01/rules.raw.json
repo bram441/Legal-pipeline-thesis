@@ -1,0 +1,210 @@
+{
+  "rules": [
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "prop", "type": "Property"}
+      ],
+      "if": [
+        {"and": [
+          {"pred": "is_surviving_cohabitant", "args": ["survivor", "deceased"], "negated": false},
+          {"pred": "is_main_family_residence", "args": ["prop", "deceased"], "negated": false},
+          {"pred": "exclusion_applies_descendant", "args": ["survivor", "deceased"], "negated": true}
+        ]}
+      ],
+      "then": [
+        {"pred": "acquires_usufruct_of_main_residence", "args": ["survivor", "prop"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "contents", "type": "Property"},
+        {"var": "residence", "type": "Property"}
+      ],
+      "if": [
+        {"and": [
+          {"pred": "is_surviving_cohabitant", "args": ["survivor", "deceased"], "negated": false},
+          {"pred": "is_main_family_residence", "args": ["residence", "deceased"], "negated": false},
+          {"pred": "is_household_contents_of", "args": ["contents", "residence"], "negated": false},
+          {"pred": "exclusion_applies_descendant", "args": ["survivor", "deceased"], "negated": true}
+        ]}
+      ],
+      "then": [
+        {"pred": "acquires_usufruct_of_household_contents", "args": ["survivor", "contents"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "prop", "type": "Property"}
+      ],
+      "if": [
+        {"and": [
+          {"pred": "is_surviving_cohabitant", "args": ["survivor", "deceased"], "negated": false},
+          {"pred": "is_main_family_residence", "args": ["prop", "deceased"], "negated": false},
+          {"pred": "subject_to_legal_return_right", "args": ["prop"], "negated": false},
+          {"pred": "exclusion_applies_descendant", "args": ["survivor", "deceased"], "negated": true}
+        ]}
+      ],
+      "then": [
+        {"pred": "acquires_usufruct_of_main_residence", "args": ["survivor", "prop"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "contents", "type": "Property"},
+        {"var": "residence", "type": "Property"}
+      ],
+      "if": [
+        {"and": [
+          {"pred": "is_surviving_cohabitant", "args": ["survivor", "deceased"], "negated": false},
+          {"pred": "is_main_family_residence", "args": ["residence", "deceased"], "negated": false},
+          {"pred": "is_household_contents_of", "args": ["contents", "residence"], "negated": false},
+          {"pred": "subject_to_legal_return_right", "args": ["contents"], "negated": false},
+          {"pred": "exclusion_applies_descendant", "args": ["survivor", "deceased"], "negated": true}
+        ]}
+      ],
+      "then": [
+        {"pred": "acquires_usufruct_of_household_contents", "args": ["survivor", "contents"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "donation", "type": "Donation"}
+      ],
+      "if": [
+        {"and": [
+          {"pred": "is_surviving_cohabitant", "args": ["survivor", "deceased"], "negated": false},
+          {"pred": "donation_reserved_usufruct", "args": ["donation", "deceased"], "negated": false},
+          {"pred": "cohabitant_status_at_time_of_donation", "args": ["survivor", "donation"], "negated": false},
+          {"pred": "donor_remained_usufruct_holder_until_death", "args": ["deceased", "donation"], "negated": false},
+          {"pred": "donation_subject_property_is_main_residence", "args": ["donation", "deceased"], "negated": false},
+          {"pred": "exclusion_applies_descendant", "args": ["survivor", "deceased"], "negated": true}
+        ]}
+      ],
+      "then": [
+        {"pred": "acquires_usufruct_from_donation", "args": ["survivor", "donation"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "donation", "type": "Donation"}
+      ],
+      "if": [
+        {"and": [
+          {"pred": "acquires_usufruct_from_donation", "args": ["survivor", "donation"], "negated": false},
+          {"pred": "surviving_cohabitant_renounces_usufruct", "args": ["survivor", "donation"], "negated": false},
+          {"pred": "renunciation_occurs_during_donors_lifetime", "args": ["survivor", "donation"], "negated": false}
+        ]}
+      ],
+      "then": [
+        {"pred": "acquires_usufruct_from_donation", "args": ["survivor", "donation"], "negated": true}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "prop", "type": "Property"}
+      ],
+      "if": [
+        {"and": [
+          {"pred": "is_surviving_cohabitant", "args": ["survivor", "deceased"], "negated": false},
+          {"pred": "is_main_family_residence", "args": ["prop", "deceased"], "negated": false},
+          {"pred": "is_rented_property", "args": ["prop"], "negated": false},
+          {"pred": "exclusion_applies_descendant", "args": ["survivor", "deceased"], "negated": true}
+        ]}
+      ],
+      "then": [
+        {"pred": "acquires_rental_right_of_main_residence", "args": ["survivor", "prop"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "contents", "type": "Property"},
+        {"var": "residence", "type": "Property"}
+      ],
+      "if": [
+        {"and": [
+          {"pred": "is_surviving_cohabitant", "args": ["survivor", "deceased"], "negated": false},
+          {"pred": "is_main_family_residence", "args": ["residence", "deceased"], "negated": false},
+          {"pred": "is_rented_property", "args": ["residence"], "negated": false},
+          {"pred": "is_household_contents_of", "args": ["contents", "residence"], "negated": false},
+          {"pred": "exclusion_applies_descendant", "args": ["survivor", "deceased"], "negated": true}
+        ]}
+      ],
+      "then": [
+        {"pred": "acquires_usufruct_of_household_contents", "args": ["survivor", "contents"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "deceased", "type": "Person"}
+      ],
+      "if": [
+        {"and": [
+          {"pred": "is_surviving_cohabitant", "args": ["survivor", "deceased"], "negated": false},
+          {"pred": "is_descendant_of", "args": ["survivor", "deceased"], "negated": false}
+        ]}
+      ],
+      "then": [
+        {"pred": "exclusion_applies_descendant", "args": ["survivor", "deceased"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "bare_owner", "type": "Person"},
+        {"var": "prop", "type": "Property"},
+        {"var": "contents", "type": "Property"}
+      ],
+      "if": [
+        {"and": [
+          {"pred": "bare_ownership_acquired_by", "args": ["bare_owner", "prop"], "negated": false},
+          {"pred": "is_household_contents_of", "args": ["contents", "prop"], "negated": false}
+        ]}
+      ],
+      "then": [
+        {"pred": "entitled_to_inventory_of_household_contents", "args": ["bare_owner", "contents"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "deceased", "type": "Person"}
+      ],
+      "if": [
+        {"and": [
+          {"pred": "is_surviving_cohabitant", "args": ["survivor", "deceased"], "negated": false},
+          {"pred": "exclusion_applies_descendant", "args": ["survivor", "deceased"], "negated": true}
+        ]}
+      ],
+      "then": [
+        {"pred": "usufruct_rules_of_surviving_spouse_apply", "args": ["survivor"], "negated": false}
+      ],
+      "operator": "implies"
+    }
+  ]
+}

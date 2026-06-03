@@ -1,0 +1,16 @@
+{
+  "question": "Welke drie drempels gebruikt artikel 1:24 om te bepalen of een vennootschap een kleine vennootschap is?",
+  "detected_question_type": "explanation",
+  "selected_intent": "explain",
+  "selected_reason": "extracted_intent_query",
+  "scorable": false,
+  "fallback_intent": "relevance",
+  "warnings": [],
+  "legal_output_symbols": [
+    "gains_kleine_vennootschap_status_from",
+    "is_kleine_vennootschap",
+    "loses_kleine_vennootschap_status_from"
+  ],
+  "query_hint_type": "explanation",
+  "expected_question_type": null
+}

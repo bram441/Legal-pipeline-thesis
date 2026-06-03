@@ -1,0 +1,89 @@
+{
+  "entities": {
+    "clara": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_surviving_spouse_of",
+          "arg_index": 1,
+          "expected_type": "Person"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "deceased_leaves_ascendants",
+          "arg_index": 0,
+          "expected_type": "Person"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "deceased_leaves_close_collaterals",
+          "arg_index": 0,
+          "expected_type": "Person"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "is_common_property_of_spouses",
+          "arg_index": 1,
+          "expected_type": "Person"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "is_own_property_of_deceased",
+          "arg_index": 1,
+          "expected_type": "Person"
+        }
+      ]
+    },
+    "common_property": {
+      "declared_type": "Asset",
+      "resolved_type": "Asset",
+      "source": "fact_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_common_property_of_spouses",
+          "arg_index": 0,
+          "expected_type": "Asset"
+        }
+      ]
+    },
+    "david": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_surviving_spouse_of",
+          "arg_index": 0,
+          "expected_type": "Person"
+        }
+      ]
+    },
+    "own_property": {
+      "declared_type": "Asset",
+      "resolved_type": "Asset",
+      "source": "fact_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_own_property_of_deceased",
+          "arg_index": 0,
+          "expected_type": "Asset"
+        }
+      ]
+    },
+    "zij": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "declared",
+      "evidence": []
+    }
+  },
+  "unmapped_entities": [],
+  "conflicts": [],
+  "query_arguments_with_inferred_types": []
+}

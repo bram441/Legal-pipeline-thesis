@@ -1,0 +1,15 @@
+{
+  "question": "Is NV Delta een microvennootschap in de zin van artikel 1:25?",
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "scorable": true,
+  "fallback_intent": null,
+  "warnings": [],
+  "legal_output_symbols": [
+    "is_micro_company",
+    "micro_company_status_change_applies_from"
+  ],
+  "query_hint_type": "boolean",
+  "expected_question_type": "boolean"
+}

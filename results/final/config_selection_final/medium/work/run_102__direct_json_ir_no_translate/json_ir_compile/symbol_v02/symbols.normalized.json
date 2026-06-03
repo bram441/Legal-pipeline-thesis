@@ -1,0 +1,151 @@
+{
+  "types": [
+    "Person",
+    "Asset"
+  ],
+  "predicates": [
+    {
+      "name": "is_surviving_spouse_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the surviving spouse of the second (deceased) person."
+    },
+    {
+      "name": "deceased_leaves_ascendants",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deceased person leaves relatives in the ascending line."
+    },
+    {
+      "name": "deceased_leaves_close_collaterals",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deceased person leaves close collateral relatives."
+    },
+    {
+      "name": "is_common_property_of_spouses",
+      "args": [
+        "Asset",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset belongs to the common matrimonial property of the deceased person and their spouse."
+    },
+    {
+      "name": "is_undivided_between_spouses",
+      "args": [
+        "Asset",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset is held in undivided co-ownership exclusively between the deceased and their spouse."
+    },
+    {
+      "name": "is_own_property_of_deceased",
+      "args": [
+        "Asset",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset belongs to the own (separate) estate of the deceased person."
+    },
+    {
+      "name": "is_subject_to_legal_reversion_4_24",
+      "args": [
+        "Asset",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset is subject to the right of legal reversion referred to in article 4.24 with respect to the deceased."
+    },
+    {
+      "name": "is_subject_to_legal_reversion_4_25",
+      "args": [
+        "Asset",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset is subject to the right of legal reversion referred to in article 4.25 with respect to the deceased."
+    },
+    {
+      "name": "deed_or_will_excludes_usufruct_on_reversion_asset",
+      "args": [
+        "Asset",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deed of gift or testament provides otherwise regarding usufruct on the reversion asset for the deceased's estate."
+    },
+    {
+      "name": "deceased_leaves_ascendants_or_close_collaterals",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The deceased leaves relatives in the ascending line or close collateral relatives."
+    },
+    {
+      "name": "acquires_full_ownership_of_share_in_common_property",
+      "args": [
+        "Person",
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "output_category": "legal_effect",
+      "description": "The surviving spouse acquires full ownership of the deceased's share in the common or exclusively undivided property."
+    },
+    {
+      "name": "acquires_usufruct_of_own_property",
+      "args": [
+        "Person",
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "output_category": "legal_effect",
+      "description": "The surviving spouse acquires usufruct over the asset belonging to the deceased's own separate estate."
+    },
+    {
+      "name": "acquires_usufruct_of_reversion_asset",
+      "args": [
+        "Person",
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "output_category": "legal_effect",
+      "description": "The surviving spouse acquires usufruct over the asset subject to the right of legal reversion, unless the deed or will provides otherwise."
+    }
+  ],
+  "functions": []
+}

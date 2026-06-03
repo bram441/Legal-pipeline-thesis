@@ -1,0 +1,7 @@
+{
+  "run_id": "nb_016",
+  "gold_type": "list",
+  "expected_answer": "Het risico moet actueel en reëel zijn, worden vastgesteld na een individueel onderzoek, gebaseerd zijn op één of meer objectieve criteria, en rekening houden met alle omstandigheden eigen aan het geval.",
+  "law_source": "vreemdelingenwet_clean.txt",
+  "notes": "Gold is separated from plain_inputs and must not be included in model prompts."
+}

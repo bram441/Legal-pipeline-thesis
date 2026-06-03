@@ -1,6 +1,7 @@
 import os
 import unittest
 
+from pipeline.config import reload_config
 from pipeline.eval.scoring import belief_scoring_enabled, score_question
 
 
@@ -8,6 +9,7 @@ class TestBooleanDecisiveScoring(unittest.TestCase):
     def tearDown(self):
         for k in ("SCORE_TREAT_OPEN_WITH_BELIEF", "SCORE_BOOLEAN_BELIEF_THRESHOLD", "PIPELINE_OPEN_WORLD_P_YES"):
             os.environ.pop(k, None)
+        reload_config()
 
     def test_entailed_matches_expected_true(self):
         r = score_question({"mode": "boolean", "value": True}, {"certain": True, "possible": True})
@@ -51,6 +53,7 @@ class TestBooleanDecisiveScoring(unittest.TestCase):
         os.environ["SCORE_TREAT_OPEN_WITH_BELIEF"] = "1"
         os.environ["SCORE_BOOLEAN_BELIEF_THRESHOLD"] = "0.5"
         os.environ["PIPELINE_OPEN_WORLD_P_YES"] = "0.5"
+        reload_config()
         self.assertTrue(belief_scoring_enabled())
         r = score_question({"mode": "boolean", "value": True}, {"certain": False, "possible": True})
         self.assertTrue(r["match"])
@@ -59,6 +62,7 @@ class TestBooleanDecisiveScoring(unittest.TestCase):
 
     def test_belief_threshold_065_fails_at_prior_05(self):
         os.environ["SCORE_TREAT_OPEN_WITH_BELIEF"] = "1"
+        reload_config()
         r = score_question(
             {"mode": "boolean", "value": True, "belief_match_threshold": 0.65},
             {"certain": False, "possible": True},
@@ -71,6 +75,7 @@ class TestRun001ScoringRegression(unittest.TestCase):
 
     def tearDown(self):
         os.environ.pop("SCORE_TREAT_OPEN_WITH_BELIEF", None)
+        reload_config()
 
     def test_unknown_possible_not_counted_correct(self):
         symbolic = {"possible": True, "certain": False, "label": "unknown"}

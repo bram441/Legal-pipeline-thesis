@@ -1,0 +1,118 @@
+{
+  "intent": "explain",
+  "symbolic_status": "ok",
+  "status": "ok",
+  "scorable": false,
+  "detected_question_type": "explanation",
+  "selected_intent": "explain",
+  "selected_reason": "extracted_intent_query",
+  "routing": {
+    "question": "Welke algemene vereisten stelt artikel 1, paragraaf 2 voor het vaststellen van risico op onderduiken?",
+    "detected_question_type": "explanation",
+    "selected_intent": "explain",
+    "selected_reason": "extracted_intent_query",
+    "scorable": false,
+    "fallback_intent": "relevance",
+    "warnings": [],
+    "legal_output_symbols": [
+      "risk_of_absconding"
+    ],
+    "query_hint_type": "explanation",
+    "expected_question_type": null
+  },
+  "satisfiability_check": {
+    "stage": "pre_query",
+    "kb_case_satisfiable": true,
+    "status": "ok",
+    "details": "theory satisfiable",
+    "intent_backend": "idp_z3.tasks.satisfiable_check",
+    "duration_seconds": 0.191
+  },
+  "warnings": [],
+  "deduction": null,
+  "model_expansion": null,
+  "get_range": null,
+  "satisfiable": null,
+  "explanation": {
+    "intent": "explain",
+    "answer": "Target atom risk_of_absconding(omar) is unknown. Detailed proof explanation is limited in this environment.",
+    "support": null,
+    "parsed": true,
+    "warnings": [],
+    "raw": {
+      "intent": "explain",
+      "status": "ok",
+      "output_kind": "explanation",
+      "target": {
+        "type": "predicate",
+        "predicate": "risk_of_absconding",
+        "args": [
+          "omar"
+        ]
+      },
+      "label": "unknown",
+      "explanation": "Target atom risk_of_absconding(omar) is unknown. Detailed proof explanation is limited in this environment.",
+      "support": [],
+      "raw": {
+        "atom": "risk_of_absconding(x0)",
+        "constraint": "? x0 in Person: __sel0(x0) & risk_of_absconding(x0)",
+        "possible": true,
+        "certain": false
+      },
+      "predicate": "risk_of_absconding",
+      "args": [
+        "omar"
+      ],
+      "possible": true,
+      "certain": false,
+      "certainty_class": "manual",
+      "sat": true,
+      "internal_intent": "explain",
+      "antecedent_coverage": [
+        {
+          "rule_index": 18,
+          "target": "risk_of_absconding(omar)",
+          "conditions": [
+            {
+              "atom": "risk_of_absconding_current_and_real(omar)",
+              "status": "helper_defined"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "execution_query": {
+    "type": "intent",
+    "intent": "explain",
+    "target": {
+      "type": "predicate",
+      "predicate": "risk_of_absconding",
+      "args": [
+        "omar"
+      ]
+    }
+  },
+  "output_kind": "explanation",
+  "certainty_class": "manual",
+  "predicate": "risk_of_absconding",
+  "args": [
+    "omar"
+  ],
+  "label": "unknown",
+  "possible": true,
+  "certain": false,
+  "sat": true,
+  "antecedent_coverage": [
+    {
+      "rule_index": 18,
+      "target": "risk_of_absconding(omar)",
+      "conditions": [
+        {
+          "atom": "risk_of_absconding_current_and_real(omar)",
+          "status": "helper_defined"
+        }
+      ]
+    }
+  ]
+}

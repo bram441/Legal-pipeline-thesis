@@ -1,0 +1,45 @@
+{
+  "rules": [
+    {
+      "forall": [
+        {"var": "spouse", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "prop", "type": "Property"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_surviving_spouse_of", "args": ["spouse", "deceased"], "negated": false},
+            {"pred": "served_as_main_residence_at_opening_of_estate", "args": ["prop", "deceased"], "negated": false},
+            {"pred": "property_is_rented", "args": ["prop"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "acquires_right_to_lease", "args": ["spouse", "prop"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "heir", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "spouse", "type": "Person"},
+        {"var": "prop", "type": "Property"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_heir_of", "args": ["heir", "deceased"], "negated": false},
+            {"pred": "acquires_right_to_lease", "args": ["spouse", "prop"], "negated": false},
+            {"pred": "is_surviving_spouse_of", "args": ["spouse", "deceased"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "excluded_from_right_to_lease", "args": ["heir", "prop"], "negated": false}
+      ],
+      "operator": "implies"
+    }
+  ]
+}

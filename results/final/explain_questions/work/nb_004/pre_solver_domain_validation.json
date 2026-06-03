@@ -1,0 +1,17 @@
+{
+  "case_entities_rendered_to_domains": {
+    "Person": [
+      "gilles",
+      "hana",
+      "hij",
+      "hun"
+    ],
+    "Property": [
+      "huisraad",
+      "woning"
+    ]
+  },
+  "query_arguments_with_inferred_types": [],
+  "unmapped_case_entities": [],
+  "pre_solver_domain_validation_errors": []
+}

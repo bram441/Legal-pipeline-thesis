@@ -1,0 +1,14 @@
+{
+  "question": "Vanaf welk boekjaar moet volgens artikel 1:24, paragraaf 3 met deze overschrijding rekening worden gehouden?",
+  "detected_question_type": "explanation",
+  "selected_intent": "explain",
+  "selected_reason": "extracted_intent_query",
+  "scorable": false,
+  "fallback_intent": "relevance",
+  "warnings": [],
+  "legal_output_symbols": [
+    "is_kleine_vennootschap"
+  ],
+  "query_hint_type": "explanation",
+  "expected_question_type": null
+}

@@ -1,0 +1,253 @@
+{
+  "rules": [
+    {
+      "forall": [
+        {"var": "c", "type": "Company"},
+        {"var": "fy", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"pred": "employees_registered_in_dimona", "args": ["c", "fy"], "negated": false},
+        {"compare": {"left": {"func": "annual_average_employees_fte", "args": ["c", "fy"]}, "op": ">", "right": 50.0}}
+      ],
+      "then": [
+        {"pred": "employee_criterion_exceeded", "args": ["c", "fy"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "c", "type": "Company"},
+        {"var": "fy", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"pred": "employees_registered_in_dimona", "args": ["c", "fy"], "negated": true},
+        {"compare": {"left": {"func": "annual_average_employees_fte", "args": ["c", "fy"]}, "op": ">", "right": 50.0}}
+      ],
+      "then": [
+        {"pred": "employee_criterion_exceeded", "args": ["c", "fy"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "c", "type": "Company"},
+        {"var": "fy", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"pred": "revenues_mostly_non_turnover", "args": ["c", "fy"], "negated": true},
+        {"compare": {"left": {"func": "annual_net_turnover_excl_vat", "args": ["c", "fy"]}, "op": ">", "right": 11250000.0}}
+      ],
+      "then": [
+        {"pred": "turnover_criterion_exceeded", "args": ["c", "fy"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "c", "type": "Company"},
+        {"var": "fy", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"pred": "revenues_mostly_non_turnover", "args": ["c", "fy"], "negated": false},
+        {"compare": {"left": {"func": "total_operating_and_financial_revenues_excl_nonrecurrent", "args": ["c", "fy"]}, "op": ">", "right": 11250000.0}}
+      ],
+      "then": [
+        {"pred": "turnover_criterion_exceeded", "args": ["c", "fy"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "c", "type": "Company"},
+        {"var": "fy", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"compare": {"left": {"func": "balance_sheet_total", "args": ["c", "fy"]}, "op": ">", "right": 6000000.0}}
+      ],
+      "then": [
+        {"pred": "balance_sheet_criterion_exceeded", "args": ["c", "fy"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "c", "type": "Company"},
+        {"var": "fy", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"and": [
+          {"pred": "employee_criterion_exceeded", "args": ["c", "fy"], "negated": false},
+          {"pred": "turnover_criterion_exceeded", "args": ["c", "fy"], "negated": false}
+        ]}
+      ],
+      "then": [
+        {"pred": "more_than_one_criterion_exceeded", "args": ["c", "fy"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "c", "type": "Company"},
+        {"var": "fy", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"and": [
+          {"pred": "employee_criterion_exceeded", "args": ["c", "fy"], "negated": false},
+          {"pred": "balance_sheet_criterion_exceeded", "args": ["c", "fy"], "negated": false}
+        ]}
+      ],
+      "then": [
+        {"pred": "more_than_one_criterion_exceeded", "args": ["c", "fy"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "c", "type": "Company"},
+        {"var": "fy", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"and": [
+          {"pred": "turnover_criterion_exceeded", "args": ["c", "fy"], "negated": false},
+          {"pred": "balance_sheet_criterion_exceeded", "args": ["c", "fy"], "negated": false}
+        ]}
+      ],
+      "then": [
+        {"pred": "more_than_one_criterion_exceeded", "args": ["c", "fy"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "c", "type": "Company"},
+        {"var": "fy", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"pred": "has_legal_personality", "args": ["c"], "negated": false},
+        {"pred": "more_than_one_criterion_exceeded", "args": ["c", "fy"], "negated": true}
+      ],
+      "then": [
+        {"pred": "is_small_company", "args": ["c", "fy"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "c", "type": "Company"},
+        {"var": "fy", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"pred": "more_than_one_criterion_exceeded", "args": ["c", "fy"], "negated": false}
+      ],
+      "then": [
+        {"pred": "is_small_company", "args": ["c", "fy"], "negated": true}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "c", "type": "Company"},
+        {"var": "c2", "type": "Company"},
+        {"var": "fy", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"pred": "is_linked_company", "args": ["c", "c2"], "negated": false},
+        {"pred": "consolidation_eliminations_applied", "args": ["c", "fy"], "negated": false},
+        {"compare": {"left": {"func": "consolidated_annual_net_turnover_excl_vat", "args": ["c", "fy"]}, "op": ">", "right": 11250000.0}}
+      ],
+      "then": [
+        {"pred": "turnover_criterion_exceeded", "args": ["c", "fy"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "c", "type": "Company"},
+        {"var": "c2", "type": "Company"},
+        {"var": "fy", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"pred": "is_linked_company", "args": ["c", "c2"], "negated": false},
+        {"pred": "consolidation_eliminations_applied", "args": ["c", "fy"], "negated": false},
+        {"compare": {"left": {"func": "consolidated_balance_sheet_total", "args": ["c", "fy"]}, "op": ">", "right": 6000000.0}}
+      ],
+      "then": [
+        {"pred": "balance_sheet_criterion_exceeded", "args": ["c", "fy"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "c", "type": "Company"},
+        {"var": "c2", "type": "Company"},
+        {"var": "fy", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"pred": "is_linked_company", "args": ["c", "c2"], "negated": false},
+        {"compare": {"left": {"func": "combined_average_employees_fte", "args": ["c", "fy"]}, "op": ">", "right": 50.0}}
+      ],
+      "then": [
+        {"pred": "employee_criterion_exceeded", "args": ["c", "fy"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "c", "type": "Company"},
+        {"var": "fy", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"pred": "consolidation_eliminations_applied", "args": ["c", "fy"], "negated": true}
+      ],
+      "then": [
+        {"compare": {"left": {"func": "adjusted_turnover_threshold", "args": ["c", "fy"]}, "op": "=", "right": 13500000.0}}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "c", "type": "Company"},
+        {"var": "fy", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"pred": "consolidation_eliminations_applied", "args": ["c", "fy"], "negated": true}
+      ],
+      "then": [
+        {"compare": {"left": {"func": "adjusted_balance_sheet_threshold", "args": ["c", "fy"]}, "op": "=", "right": 7200000.0}}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "c", "type": "Company"},
+        {"var": "c2", "type": "Company"},
+        {"var": "fy", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"pred": "is_linked_company", "args": ["c", "c2"], "negated": false},
+        {"pred": "consolidation_eliminations_applied", "args": ["c", "fy"], "negated": true},
+        {"compare": {"left": {"func": "consolidated_annual_net_turnover_excl_vat", "args": ["c", "fy"]}, "op": ">", "right": 13500000.0}}
+      ],
+      "then": [
+        {"pred": "turnover_criterion_exceeded", "args": ["c", "fy"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "c", "type": "Company"},
+        {"var": "c2", "type": "Company"},
+        {"var": "fy", "type": "FinancialYear"}
+      ],
+      "if": [
+        {"pred": "is_linked_company", "args": ["c", "c2"], "negated": false},
+        {"pred": "consolidation_eliminations_applied", "args": ["c", "fy"], "negated": true},
+        {"compare": {"left": {"func": "consolidated_balance_sheet_total", "args": ["c", "fy"]}, "op": ">", "right": 7200000.0}}
+      ],
+      "then": [
+        {"pred": "balance_sheet_criterion_exceeded", "args": ["c", "fy"], "negated": false}
+      ],
+      "operator": "implies"
+    }
+  ]
+}

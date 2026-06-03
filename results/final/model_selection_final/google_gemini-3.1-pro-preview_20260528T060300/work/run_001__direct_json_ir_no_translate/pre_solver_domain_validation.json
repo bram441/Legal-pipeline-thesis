@@ -1,0 +1,27 @@
+{
+  "case_entities_rendered_to_domains": {
+    "Person": [
+      "anna",
+      "bert"
+    ],
+    "Property": [
+      "property_main"
+    ]
+  },
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "anna",
+      "arg_index": 0,
+      "expected_type": "Person",
+      "predicate": "receives_usufruct_of"
+    },
+    {
+      "entity": "property_main",
+      "arg_index": 1,
+      "expected_type": "Property",
+      "predicate": "receives_usufruct_of"
+    }
+  ],
+  "unmapped_case_entities": [],
+  "pre_solver_domain_validation_errors": []
+}

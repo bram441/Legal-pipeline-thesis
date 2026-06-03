@@ -1,0 +1,16 @@
+{
+  "question": "Welke rechten verkrijgt David volgens artikel 4.17, paragraaf 2?",
+  "detected_question_type": "explanation",
+  "selected_intent": "explain",
+  "selected_reason": "extracted_intent_query",
+  "scorable": false,
+  "fallback_intent": "relevance",
+  "warnings": [],
+  "legal_output_symbols": [
+    "surviving_spouse_acquires_full_ownership_common_share",
+    "surviving_spouse_acquires_usufruct_own_property",
+    "surviving_spouse_acquires_usufruct_reversion_property"
+  ],
+  "query_hint_type": "explanation",
+  "expected_question_type": null
+}

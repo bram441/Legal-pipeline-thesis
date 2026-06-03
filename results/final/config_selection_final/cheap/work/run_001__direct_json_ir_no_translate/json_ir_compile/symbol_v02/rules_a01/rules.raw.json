@@ -1,0 +1,128 @@
+{
+  "rules": [
+    {
+      "forall": [
+        {"var": "spouse", "type": "Person"},
+        {"var": "deceased", "type": "Person"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_surviving_spouse_of", "args": ["spouse", "deceased"], "negated": false},
+            {"pred": "deceased_leaves_descendants_or_adopted_children", "args": ["deceased"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "surviving_spouse_acquires_usufruct_of_entire_estate", "args": ["spouse", "deceased"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "spouse", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "asset", "type": "Asset"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_surviving_spouse_of", "args": ["spouse", "deceased"], "negated": false},
+            {"pred": "deceased_leaves_ascendants_or_close_collaterals", "args": ["deceased"], "negated": false},
+            {
+              "or": [
+                {"pred": "asset_belongs_to_common_property", "args": ["asset", "deceased"], "negated": false},
+                {"pred": "asset_in_undivided_ownership_between_spouses", "args": ["asset", "deceased"], "negated": false}
+              ]
+            }
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "surviving_spouse_acquires_full_ownership_of_common_share", "args": ["spouse", "deceased"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "spouse", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "asset", "type": "Asset"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_surviving_spouse_of", "args": ["spouse", "deceased"], "negated": false},
+            {"pred": "deceased_leaves_ascendants_or_close_collaterals", "args": ["deceased"], "negated": false},
+            {"pred": "asset_belongs_to_own_property", "args": ["asset", "deceased"], "negated": false},
+            {"pred": "asset_subject_to_legal_return", "args": ["asset", "deceased"], "negated": true}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "surviving_spouse_acquires_usufruct_of_own_property", "args": ["spouse", "deceased"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "spouse", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "asset", "type": "Asset"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_surviving_spouse_of", "args": ["spouse", "deceased"], "negated": false},
+            {"pred": "deceased_leaves_ascendants_or_close_collaterals", "args": ["deceased"], "negated": false},
+            {"pred": "asset_subject_to_legal_return", "args": ["asset", "deceased"], "negated": false},
+            {"pred": "deed_or_testament_excludes_usufruct_on_return_asset", "args": ["asset", "deceased"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "surviving_spouse_acquires_usufruct_of_return_asset", "args": ["spouse", "asset", "deceased"], "negated": true}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "spouse", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "asset", "type": "Asset"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_surviving_spouse_of", "args": ["spouse", "deceased"], "negated": false},
+            {"pred": "deceased_leaves_ascendants_or_close_collaterals", "args": ["deceased"], "negated": false},
+            {"pred": "asset_subject_to_legal_return", "args": ["asset", "deceased"], "negated": false},
+            {"pred": "deed_or_testament_excludes_usufruct_on_return_asset", "args": ["asset", "deceased"], "negated": true}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "surviving_spouse_acquires_usufruct_of_return_asset", "args": ["spouse", "asset", "deceased"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "spouse", "type": "Person"},
+        {"var": "deceased", "type": "Person"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_surviving_spouse_of", "args": ["spouse", "deceased"], "negated": false},
+            {"pred": "deceased_leaves_other_or_no_heirs", "args": ["deceased"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "surviving_spouse_acquires_full_ownership_of_entire_estate", "args": ["spouse", "deceased"], "negated": false}
+      ],
+      "operator": "implies"
+    }
+  ]
+}

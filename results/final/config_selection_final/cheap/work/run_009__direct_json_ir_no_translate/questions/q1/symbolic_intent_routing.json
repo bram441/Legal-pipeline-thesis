@@ -1,0 +1,14 @@
+{
+  "question": "Is BV Vega een kleine vennootschap volgens artikel 1:24, paragraaf 1?",
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "scorable": true,
+  "fallback_intent": null,
+  "warnings": [],
+  "legal_output_symbols": [
+    "is_kleine_vennootschap"
+  ],
+  "query_hint_type": "boolean",
+  "expected_question_type": "boolean"
+}

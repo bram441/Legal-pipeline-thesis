@@ -1,0 +1,42 @@
+{
+  "rules": [
+    {
+      "forall": [
+        {"var": "deceased", "type": "Person"}
+      ],
+      "if": [
+        {
+          "or": [
+            {"pred": "deceased_leaves_descendants", "args": ["deceased"], "negated": false},
+            {"pred": "deceased_leaves_adopted_children", "args": ["deceased"], "negated": false},
+            {"pred": "deceased_leaves_descendants_of_adopted_children", "args": ["deceased"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "qualifying_heirs_present", "args": ["deceased"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "spouse", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "estate", "type": "Estate"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_surviving_spouse_of", "args": ["spouse", "deceased"], "negated": false},
+            {"pred": "qualifying_heirs_present", "args": ["deceased"], "negated": false},
+            {"pred": "estate_belongs_to", "args": ["estate", "deceased"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "receives_usufruct_of_entire_estate", "args": ["spouse", "estate"], "negated": false}
+      ],
+      "operator": "implies"
+    }
+  ]
+}

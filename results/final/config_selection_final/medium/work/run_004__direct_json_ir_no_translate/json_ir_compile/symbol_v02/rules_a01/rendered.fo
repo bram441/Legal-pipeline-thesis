@@ -1,0 +1,25 @@
+vocabulary V {
+  type Person
+  type Asset
+  is_surviving_spouse_of: Person * Person -> Bool
+  deceased_leaves_ascendants: Person -> Bool
+  deceased_leaves_close_collaterals: Person -> Bool
+  is_common_property_of_spouses: Asset * Person -> Bool
+  is_undivided_between_spouses: Asset * Person -> Bool
+  is_own_property_of_deceased: Asset * Person -> Bool
+  is_subject_to_legal_reversion_4_24: Asset * Person -> Bool
+  is_subject_to_legal_reversion_4_25: Asset * Person -> Bool
+  deed_or_testament_excludes_usufruct_on_reversion_asset: Asset * Person -> Bool
+  deceased_leaves_ascendants_or_close_collaterals: Person -> Bool
+  acquires_full_ownership_of_common_share: Person * Asset -> Bool
+  acquires_usufruct_of_own_property: Person * Asset -> Bool
+  acquires_usufruct_of_reversion_asset: Person * Asset -> Bool
+}
+
+theory T:V {
+  ! spouse in Person, deceased in Person: (((deceased_leaves_ascendants(deceased)) | (deceased_leaves_close_collaterals(deceased)))) => ((deceased_leaves_ascendants_or_close_collaterals(deceased))).
+  ! spouse in Person, deceased in Person, asset in Asset: (((is_surviving_spouse_of(spouse,deceased)) & (deceased_leaves_ascendants_or_close_collaterals(deceased)) & (is_common_property_of_spouses(asset,deceased)))) => ((acquires_full_ownership_of_common_share(spouse,asset))).
+  ! spouse in Person, deceased in Person, asset in Asset: (((is_surviving_spouse_of(spouse,deceased)) & (deceased_leaves_ascendants_or_close_collaterals(deceased)) & (is_undivided_between_spouses(asset,deceased)))) => ((acquires_full_ownership_of_common_share(spouse,asset))).
+  ! spouse in Person, deceased in Person, asset in Asset: (((is_surviving_spouse_of(spouse,deceased)) & (deceased_leaves_ascendants_or_close_collaterals(deceased)) & (is_own_property_of_deceased(asset,deceased)))) => ((acquires_usufruct_of_own_property(spouse,asset))).
+  ! spouse in Person, deceased in Person, asset in Asset: (((is_surviving_spouse_of(spouse,deceased)) & (deceased_leaves_ascendants_or_close_collaterals(deceased)) & ((is_subject_to_legal_reversion_4_24(asset,deceased)) | (is_subject_to_legal_reversion_4_25(asset,deceased))) & (~deed_or_testament_excludes_usufruct_on_reversion_asset(asset,deceased)))) => ((acquires_usufruct_of_reversion_asset(spouse,asset))).
+}

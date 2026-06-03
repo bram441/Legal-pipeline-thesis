@@ -1,0 +1,318 @@
+{
+  "query": {
+    "predicate": "loses_kleine_vennootschap_status_from",
+    "args": [
+      "nv_epsilon",
+      "fy_2026"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "entailed",
+    "certain": true,
+    "possible": true,
+    "certainty_class": "decisive"
+  },
+  "extracted_case": {
+    "facts": [
+      "case_given_more_than_one_criterion_exceeded(nv_epsilon,fy_2024).",
+      "case_given_more_than_one_criterion_exceeded(nv_epsilon,fy_2025).",
+      "previous_financial_year(fy_2025,fy_2024).",
+      "next_financial_year(fy_2025,fy_2026)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "FinancialYear": [
+        "fy_2024",
+        "fy_2025",
+        "fy_2026"
+      ],
+      "Company": [
+        "nv_epsilon"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 0,
+      "requirements": {
+        "predicates": [],
+        "function_compares": [
+          {
+            "function": "annual_average_employees"
+          }
+        ]
+      },
+      "then_predicates": [
+        "employee_criterion_exceeded"
+      ]
+    },
+    {
+      "rule_index": 1,
+      "requirements": {
+        "predicates": [],
+        "function_compares": [
+          {
+            "function": "annual_net_turnover_excl_vat"
+          }
+        ]
+      },
+      "then_predicates": [
+        "turnover_criterion_exceeded"
+      ]
+    },
+    {
+      "rule_index": 2,
+      "requirements": {
+        "predicates": [],
+        "function_compares": [
+          {
+            "function": "balance_sheet_total"
+          }
+        ]
+      },
+      "then_predicates": [
+        "balance_sheet_criterion_exceeded"
+      ]
+    },
+    {
+      "rule_index": 3,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "employee_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          },
+          {
+            "predicate": "turnover_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "more_than_one_criterion_exceeded"
+      ]
+    },
+    {
+      "rule_index": 4,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "employee_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          },
+          {
+            "predicate": "balance_sheet_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "more_than_one_criterion_exceeded"
+      ]
+    },
+    {
+      "rule_index": 5,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "turnover_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          },
+          {
+            "predicate": "balance_sheet_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "more_than_one_criterion_exceeded"
+      ]
+    },
+    {
+      "rule_index": 8,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "more_than_one_criterion_exceeded",
+            "args": [
+              "c",
+              "fy1"
+            ]
+          },
+          {
+            "predicate": "more_than_one_criterion_exceeded",
+            "args": [
+              "c",
+              "fy2"
+            ]
+          },
+          {
+            "predicate": "previous_financial_year",
+            "args": [
+              "fy2",
+              "fy1"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "more_than_one_criterion_exceeded_two_consecutive_years"
+      ]
+    },
+    {
+      "rule_index": 9,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "more_than_one_criterion_exceeded_two_consecutive_years",
+            "args": [
+              "c",
+              "fy2"
+            ]
+          },
+          {
+            "predicate": "next_financial_year",
+            "args": [
+              "fy2",
+              "fy_effect"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "loses_kleine_vennootschap_status_from"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 9,
+      "target": "loses_kleine_vennootschap_status_from(nv_epsilon,fy_2026)",
+      "conditions": [
+        {
+          "atom": "more_than_one_criterion_exceeded_two_consecutive_years(nv_epsilon,fy_2025)",
+          "status": "helper_defined"
+        },
+        {
+          "atom": "next_financial_year(fy_2025,fy_2026)",
+          "status": "present"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "more_than_one_criterion_exceeded_two_consecutive_years",
+      "symbol_type": "predicate",
+      "atom": "more_than_one_criterion_exceeded_two_consecutive_years(nv_epsilon,fy_2025)",
+      "kind": "helper",
+      "gap_status": "derivable_from_rules",
+      "assertable_in_case": false,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "NV Epsilon overschrijdt meer dan één criterium in boekjaar 2024 en opnieuw in boekjaar 2025.",
+        "Boekjaar 2026 volgt op boekjaar 2025."
+      ],
+      "deriving_rule_indices": [
+        8
+      ]
+    },
+    {
+      "symbol": "next_financial_year",
+      "symbol_type": "predicate",
+      "atom": "next_financial_year(fy_2025,fy_2026)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "NV Epsilon overschrijdt meer dan één criterium in boekjaar 2024 en opnieuw in boekjaar 2025.",
+        "Boekjaar 2026 volgt op boekjaar 2025."
+      ],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "annual_average_employees",
+      "symbol_type": "function",
+      "atom": "annual_average_employees(...)",
+      "kind": "observable",
+      "gap_status": "blocked_by_missing_numeric",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [
+        "NV Epsilon overschrijdt meer dan één criterium in boekjaar 2024 en opnieuw in boekjaar 2025.",
+        "Boekjaar 2026 volgt op boekjaar 2025."
+      ],
+      "deriving_rule_indices": [
+        0
+      ]
+    },
+    {
+      "symbol": "annual_net_turnover_excl_vat",
+      "symbol_type": "function",
+      "atom": "annual_net_turnover_excl_vat(...)",
+      "kind": "observable",
+      "gap_status": "blocked_by_missing_numeric",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [
+        "NV Epsilon overschrijdt meer dan één criterium in boekjaar 2024 en opnieuw in boekjaar 2025.",
+        "Boekjaar 2026 volgt op boekjaar 2025."
+      ],
+      "deriving_rule_indices": [
+        1
+      ]
+    },
+    {
+      "symbol": "balance_sheet_total",
+      "symbol_type": "function",
+      "atom": "balance_sheet_total(...)",
+      "kind": "observable",
+      "gap_status": "blocked_by_missing_numeric",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [
+        "NV Epsilon overschrijdt meer dan één criterium in boekjaar 2024 en opnieuw in boekjaar 2025.",
+        "Boekjaar 2026 volgt op boekjaar 2025."
+      ],
+      "deriving_rule_indices": [
+        2
+      ]
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "extraction_gap",
+    "secondary": [
+      "genuinely_under_specified_case"
+    ],
+    "rationale": "Case text states threshold exceedance and consecutive financial years qualitatively, but extraction did not produce the assertable numeric observables or full temporal grounding needed to derive the legal-effect antecedent chain."
+  }
+}

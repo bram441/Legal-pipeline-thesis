@@ -1,0 +1,27 @@
+vocabulary V {
+  type Person
+  type Asset
+  type Estate
+  is_surviving_spouse_of: Person * Person -> Bool
+  deceased_leaves_descendants_or_adopted_children: Person -> Bool
+  deceased_leaves_ascendants_or_close_collaterals: Person -> Bool
+  deceased_leaves_other_or_no_heirs: Person -> Bool
+  asset_is_part_of_common_property: Asset * Person -> Bool
+  asset_is_exclusively_undivided_between_spouses: Asset * Person -> Bool
+  asset_is_own_property_of_deceased: Asset * Person -> Bool
+  asset_subject_to_legal_return_right: Asset * Person -> Bool
+  deed_or_will_excludes_usufruct_on_return_asset: Asset * Person -> Bool
+  acquires_usufruct_of_entire_estate: Person * Person -> Bool
+  acquires_full_ownership_of_common_share: Person * Person -> Bool
+  acquires_usufruct_of_own_property: Person * Person -> Bool
+  acquires_usufruct_of_return_asset: Person * Asset * Person -> Bool
+  acquires_full_ownership_of_entire_estate: Person * Person -> Bool
+}
+
+theory T:V {
+  ! spouse in Person, deceased in Person: ((is_surviving_spouse_of(spouse,deceased)) & (deceased_leaves_descendants_or_adopted_children(deceased))) => ((acquires_usufruct_of_entire_estate(spouse,deceased))).
+  ! spouse in Person, deceased in Person: ((is_surviving_spouse_of(spouse,deceased)) & (deceased_leaves_ascendants_or_close_collaterals(deceased))) => ((acquires_full_ownership_of_common_share(spouse,deceased))).
+  ! spouse in Person, deceased in Person: ((is_surviving_spouse_of(spouse,deceased)) & (deceased_leaves_ascendants_or_close_collaterals(deceased))) => ((acquires_usufruct_of_own_property(spouse,deceased))).
+  ! spouse in Person, deceased in Person, asset in Asset: ((is_surviving_spouse_of(spouse,deceased)) & (deceased_leaves_ascendants_or_close_collaterals(deceased)) & (asset_subject_to_legal_return_right(asset,deceased)) & (~deed_or_will_excludes_usufruct_on_return_asset(asset,deceased))) => ((acquires_usufruct_of_return_asset(spouse,asset,deceased))).
+  ! spouse in Person, deceased in Person: ((is_surviving_spouse_of(spouse,deceased)) & (deceased_leaves_other_or_no_heirs(deceased))) => ((acquires_full_ownership_of_entire_estate(spouse,deceased))).
+}

@@ -44,7 +44,13 @@ def _symbols_no_temporal() -> dict:
     return {
         "types": ["Company", "FinancialYear"],
         "predicates": [
-            {"name": "has_legal_personality", "kind": "observable", "args": ["Company"], "returns": "Bool"},
+            {
+                "name": "has_legal_personality",
+                "kind": "observable",
+                "args": ["Company"],
+                "returns": "Bool",
+                "directly_observable": True,
+            },
             {
                 "name": "legal_consequences_apply_from_following_financial_year",
                 "kind": "derived",
@@ -110,7 +116,13 @@ def test_classification_only_no_temporal_requirement():
         "types": ["Company", "FinancialYear"],
         "predicates": [
             {"name": "is_qualified", "kind": "derived", "args": ["Company", "FinancialYear"], "returns": "Bool"},
-            {"name": "criterion_met", "kind": "observable", "args": ["Company"], "returns": "Bool"},
+            {
+                "name": "criterion_met",
+                "kind": "observable",
+                "args": ["Company"],
+                "returns": "Bool",
+                "directly_observable": True,
+            },
         ],
         "functions": [],
     }

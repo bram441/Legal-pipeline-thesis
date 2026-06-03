@@ -1,0 +1,20 @@
+{
+  "id": "run_110",
+  "law": {
+    "path": "example_laws_clean/vreemdelingenwet_clean.txt"
+  },
+  "case": {
+    "text": "Carlos is geen burger van de Unie en valt niet onder het gemeenschapsrecht inzake vrij verkeer."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Is Carlos een onderdaan van een derde land volgens artikel 1, paragraaf 1, punt 3?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "A third-country national is someone who is not a Union citizen and not covered by free movement law."
+      }
+    }
+  ]
+}

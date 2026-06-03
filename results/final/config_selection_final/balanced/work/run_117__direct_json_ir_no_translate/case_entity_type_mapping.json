@@ -1,0 +1,100 @@
+{
+  "entities": {
+    "bv_sigma": {
+      "declared_type": "Company",
+      "resolved_type": "Company",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "has_legal_personality",
+          "arg_index": 0,
+          "expected_type": "Company"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "is_subsidiary",
+          "arg_index": 0,
+          "expected_type": "Company"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "is_parent_company",
+          "arg_index": 0,
+          "expected_type": "Company"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "annual_average_employees",
+          "arg_index": 0,
+          "expected_type": "Company"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "annual_net_turnover_excl_vat",
+          "arg_index": 0,
+          "expected_type": "Company"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "balance_sheet_total",
+          "arg_index": 0,
+          "expected_type": "Company"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "is_micro_company",
+          "arg_index": 0,
+          "expected_type": "Company"
+        }
+      ]
+    },
+    "fy_current": {
+      "declared_type": "FinancialYear",
+      "resolved_type": "FinancialYear",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "annual_average_employees",
+          "arg_index": 1,
+          "expected_type": "FinancialYear"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "annual_net_turnover_excl_vat",
+          "arg_index": 1,
+          "expected_type": "FinancialYear"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "balance_sheet_total",
+          "arg_index": 1,
+          "expected_type": "FinancialYear"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "is_micro_company",
+          "arg_index": 1,
+          "expected_type": "FinancialYear"
+        }
+      ]
+    }
+  },
+  "unmapped_entities": [],
+  "conflicts": [],
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "bv_sigma",
+      "arg_index": 0,
+      "expected_type": "Company",
+      "predicate": "is_micro_company"
+    },
+    {
+      "entity": "fy_current",
+      "arg_index": 1,
+      "expected_type": "FinancialYear",
+      "predicate": "is_micro_company"
+    }
+  ]
+}

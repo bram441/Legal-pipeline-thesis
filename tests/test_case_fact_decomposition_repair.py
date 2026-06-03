@@ -202,7 +202,6 @@ def test_run_case_loop_retries_on_empty_decomposition(monkeypatch):
         provider="openai",
         model="test",
         max_retries=4,
-        use_json_ir=True,
     )
     assert calls["n"] >= 2
     assert case_object_has_non_entity_facts(case)

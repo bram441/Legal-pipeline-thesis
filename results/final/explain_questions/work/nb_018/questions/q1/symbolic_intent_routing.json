@@ -1,0 +1,15 @@
+{
+  "question": "Welk objectief criterium voor risico op onderduiken is volgens artikel 1, paragraaf 2 aanwezig?",
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "extracted_query_hint",
+  "scorable": true,
+  "fallback_intent": null,
+  "warnings": [],
+  "legal_output_symbols": [
+    "is_identified_foreigner",
+    "risk_of_absconding"
+  ],
+  "query_hint_type": "boolean",
+  "expected_question_type": null
+}

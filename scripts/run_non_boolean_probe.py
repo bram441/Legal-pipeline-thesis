@@ -17,7 +17,7 @@ Usage from the Legal-pipeline project root:
     --output-dir results/final/non_boolean_probe_json_ir_claude ^
     --model anthropic/claude-sonnet-4.6 ^
     --strategy direct_json_ir_no_translate ^
-    --config config/ablation_medium.json ^
+    --config config/heavy.json ^
     --explain
 """
 
@@ -225,7 +225,7 @@ def main() -> int:
     parser.add_argument("--input-dir", required=True, help="Folder containing plain_inputs/ and optional gold/.")
     parser.add_argument("--output-dir", required=True, help="Output folder for work dirs and manual review files.")
     parser.add_argument("--strategy", default="direct_json_ir_no_translate")
-    parser.add_argument("--config", default="config/ablation_medium.json")
+    parser.add_argument("--config", default="config/heavy.json")
     parser.add_argument("--provider", default="auto", choices=["auto", "openai"])
     parser.add_argument("--model", default=None, help="Optional model id, e.g. anthropic/claude-sonnet-4.6")
     parser.add_argument("--base-url", default="https://openrouter.ai/api/v1")

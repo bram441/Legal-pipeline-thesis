@@ -39,6 +39,7 @@ def _base_predicates(next_decl: SymbolDecl) -> list[SymbolDecl]:
             kind="observable",
             args=["Company"],
             returns="Bool",
+            directly_observable=True,
         ),
         SymbolDecl(
             name="legal_consequences_apply",
@@ -101,7 +102,11 @@ def test_temporal_support_derived_still_requires_definition():
         )
     msg = str(exc.value)
     assert "next_financial_year" in msg
-    assert "never appear in any rule THEN" in msg or "no defining rule" in msg
+    assert (
+        "never appear in any rule THEN" in msg
+        or "without a defining rule" in msg.lower()
+        or "no defining rule" in msg.lower()
+    )
 
 
 def test_non_temporal_helper_still_missing_helper():

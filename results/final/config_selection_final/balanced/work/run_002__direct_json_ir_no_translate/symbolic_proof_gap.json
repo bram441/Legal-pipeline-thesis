@@ -1,0 +1,82 @@
+{
+  "query": {
+    "predicate": "is_foreigner",
+    "args": [
+      "ahmed"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "entailed",
+    "certain": true,
+    "possible": true,
+    "certainty_class": "decisive"
+  },
+  "extracted_case": {
+    "facts": [
+      "not holds_belgian_nationality(ahmed).",
+      "meets_entry_or_residence_conditions(ahmed)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "Person": [
+        "ahmed",
+        "belgische",
+        "hij"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 0,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "holds_belgian_nationality",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "is_foreigner"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 0,
+      "target": "is_foreigner(ahmed)",
+      "conditions": [
+        {
+          "atom": "holds_belgian_nationality(ahmed)",
+          "status": "present"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "holds_belgian_nationality",
+      "symbol_type": "predicate",
+      "atom": "holds_belgian_nationality(ahmed)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "genuinely_under_specified_case",
+    "secondary": [],
+    "rationale": "No single blocking category identified; case may lack explicit observables for a decisive proof."
+  }
+}

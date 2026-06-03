@@ -1,0 +1,119 @@
+{
+  "types": [
+    "Person"
+  ],
+  "predicates": [
+    {
+      "name": "is_legally_cohabiting_partner_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the legally cohabiting partner of the second person."
+    },
+    {
+      "name": "is_surviving_cohabiting_partner",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The person is the surviving legally cohabiting partner after the death of the other partner."
+    },
+    {
+      "name": "is_predeceased_cohabiting_partner",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The person is the predeceased legally cohabiting partner."
+    },
+    {
+      "name": "is_descendant_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is a descendant of the second person."
+    },
+    {
+      "name": "exception_applies",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The exception in par. 4 applies: the preceding provisions do not apply because the surviving legally cohabiting partner is a descendant of the predeceased legally cohabiting partner.",
+      "legal_output": true,
+      "output_category": "exception"
+    }
+  ],
+  "functions": [],
+  "rules": [
+    {
+      "forall": [
+        {
+          "var": "survivor",
+          "type": "Person"
+        },
+        {
+          "var": "predeceased",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "is_surviving_cohabiting_partner",
+          "args": [
+            "survivor"
+          ],
+          "negated": false
+        },
+        {
+          "pred": "is_predeceased_cohabiting_partner",
+          "args": [
+            "predeceased"
+          ],
+          "negated": false
+        },
+        {
+          "pred": "is_legally_cohabiting_partner_of",
+          "args": [
+            "survivor",
+            "predeceased"
+          ],
+          "negated": false
+        },
+        {
+          "pred": "is_descendant_of",
+          "args": [
+            "survivor",
+            "predeceased"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "exception_applies",
+          "args": [
+            "survivor",
+            "predeceased"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    }
+  ]
+}

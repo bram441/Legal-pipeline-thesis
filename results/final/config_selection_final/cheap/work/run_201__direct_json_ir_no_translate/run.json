@@ -1,0 +1,50 @@
+{
+  "id": "run_201",
+  "law": {
+    "path": "example_laws_clean/erfrecht_clean.txt"
+  },
+  "case": {
+    "text": "Peter en Sara waren gehuwd. Sara overlijdt. Peter is de langstlevende echtgenoot. Sara laat één minderjarig kind na. Er is geen testament."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Heeft Peter volgens artikel 4.17, paragraaf 1 recht op het vruchtgebruik van de gehele nalatenschap?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "Art. 4.17 par. 1: when the deceased leaves descendants, the surviving spouse obtains usufruct of the whole estate."
+      }
+    }
+  ],
+  "kb_compile_strategy": "direct_json_ir_no_translate",
+  "kb_compile_backend": "json_ir",
+  "extraction_backend": "json_ir",
+  "pipeline_backend_mode": "json_ir",
+  "kb_compile_flags": {
+    "use_le": false,
+    "uses_translation": false,
+    "json_ir_generation": "symbols_then_rules"
+  },
+  "strategy_metadata": {
+    "strategy_name": "direct_json_ir_no_translate",
+    "canonical_strategy_name": "direct_json_ir_no_translate",
+    "kb_backend": "json_ir",
+    "pipeline_backend_mode": "json_ir",
+    "uses_le_intermediate": false,
+    "json_ir_generation": "symbols_then_rules",
+    "belief_scoring": false,
+    "law_scope_mode": "cited",
+    "repair_enabled": true,
+    "json_ir_structured_repair_enabled": true,
+    "json_ir_max_symbol_versions": 2,
+    "json_ir_max_rules_attempts_per_symbol_version": 1,
+    "json_ir_max_kb_llm_calls": 4,
+    "json_ir_outer_cache_retries_enabled": false,
+    "json_ir_outer_cache_max_attempts": 1,
+    "configured_translation": false,
+    "effective_translation": false,
+    "translation_source": "main_cli_no_translate",
+    "uses_translation": false
+  }
+}

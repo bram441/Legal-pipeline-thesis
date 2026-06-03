@@ -13,7 +13,9 @@ ui/run
 
 
 # Evaluation outputs (reproducible; not versioned)
-results/
+results/*
+!results/final/
+!results/final/**
 
 # Archived evaluation runs (contents gitignored; folder marker kept)
 archive/evaluation_runs/*

@@ -1,0 +1,7 @@
+{
+  "run_id": "nb_007",
+  "gold_type": "classification",
+  "expected_answer": "BV Beta kwalificeert als microvennootschap.",
+  "law_source": "microvennootschappen_clean.txt",
+  "notes": "Gold is separated from plain_inputs and must not be included in model prompts."
+}

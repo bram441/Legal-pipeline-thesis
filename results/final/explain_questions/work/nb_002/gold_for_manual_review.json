@@ -1,0 +1,7 @@
+{
+  "run_id": "nb_002",
+  "gold_type": "list",
+  "expected_answer": "David verkrijgt de volle eigendom van Clara’s deel in het gemeenschappelijk vermogen en het vruchtgebruik van de overige goederen van Clara’s eigen vermogen.",
+  "law_source": "erfrecht_clean.txt",
+  "notes": "Gold is separated from plain_inputs and must not be included in model prompts."
+}

@@ -1,0 +1,86 @@
+{
+  "query": {
+    "predicate": "",
+    "args": [],
+    "mode": null,
+    "type": "intent"
+  },
+  "symbolic_outcome": {
+    "status": "error",
+    "label": null,
+    "certain": null,
+    "possible": null,
+    "certainty_class": null
+  },
+  "extracted_case": {
+    "facts": [
+      "is_starting_company(bv_gamma).",
+      "good_faith_estimate_shows_more_than_one_criterion_exceeded(bv_gamma,boekjaar_2026)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "FinancialYear": [
+        "boekjaar_2026"
+      ],
+      "Company": [
+        "bv_gamma"
+      ]
+    }
+  },
+  "deriving_rules": [],
+  "antecedent_coverage": [],
+  "antecedents": [
+    {
+      "symbol": "annual_average_employees",
+      "symbol_type": "function",
+      "atom": "annual_average_employees(...)",
+      "kind": "observable",
+      "gap_status": "blocked_by_missing_numeric",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [
+        "BV Gamma start met haar bedrijf in boekjaar 2026."
+      ],
+      "deriving_rule_indices": [
+        0
+      ]
+    },
+    {
+      "symbol": "annual_net_turnover_excl_vat",
+      "symbol_type": "function",
+      "atom": "annual_net_turnover_excl_vat(...)",
+      "kind": "observable",
+      "gap_status": "blocked_by_missing_numeric",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [
+        "BV Gamma start met haar bedrijf in boekjaar 2026."
+      ],
+      "deriving_rule_indices": [
+        1
+      ]
+    },
+    {
+      "symbol": "balance_sheet_total",
+      "symbol_type": "function",
+      "atom": "balance_sheet_total(...)",
+      "kind": "observable",
+      "gap_status": "blocked_by_missing_numeric",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [
+        "BV Gamma start met haar bedrijf in boekjaar 2026."
+      ],
+      "deriving_rule_indices": [
+        2
+      ]
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "renderer_solver_issue",
+    "secondary": [],
+    "rationale": "Symbolic engine returned an error before a conclusive proof could be evaluated."
+  }
+}

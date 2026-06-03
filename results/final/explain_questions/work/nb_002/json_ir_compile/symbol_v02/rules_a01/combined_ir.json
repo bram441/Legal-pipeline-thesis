@@ -1,0 +1,456 @@
+{
+  "types": [
+    "Person",
+    "Asset"
+  ],
+  "predicates": [
+    {
+      "name": "is_surviving_spouse_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the surviving spouse of the second person (the deceased). Directly assertable as a background fact in a case."
+    },
+    {
+      "name": "deceased_leaves_ascendants",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deceased leaves relatives in the ascending line."
+    },
+    {
+      "name": "deceased_leaves_close_collaterals",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deceased leaves close collateral relatives."
+    },
+    {
+      "name": "is_common_property_of_spouses",
+      "args": [
+        "Asset",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset belongs to the common matrimonial property of the deceased."
+    },
+    {
+      "name": "is_undivided_between_spouses",
+      "args": [
+        "Asset",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset is held in undivided co-ownership exclusively between the spouses."
+    },
+    {
+      "name": "is_own_property_of_deceased",
+      "args": [
+        "Asset",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset belongs to the own (separate) estate of the deceased."
+    },
+    {
+      "name": "is_subject_to_legal_reversion_4_24",
+      "args": [
+        "Asset",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset is subject to the right of legal reversion referred to in article 4.24."
+    },
+    {
+      "name": "is_subject_to_legal_reversion_4_25",
+      "args": [
+        "Asset",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset is subject to the right of legal reversion referred to in article 4.25."
+    },
+    {
+      "name": "reversion_excluded_by_deed_or_will",
+      "args": [
+        "Asset",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deed of gift or the will provides otherwise regarding the usufruct on the asset subject to legal reversion."
+    },
+    {
+      "name": "deceased_leaves_ascendants_or_close_collaterals",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The deceased leaves relatives in the ascending line or close collateral relatives."
+    },
+    {
+      "name": "surviving_spouse_acquires_full_ownership_common_share",
+      "args": [
+        "Person",
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "description": "The surviving spouse acquires full ownership of the deceased's share in the common matrimonial property or property held in undivided co-ownership exclusively between the spouses."
+    },
+    {
+      "name": "surviving_spouse_acquires_usufruct_own_property",
+      "args": [
+        "Person",
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "description": "The surviving spouse acquires usufruct over the other goods belonging to the deceased's own estate."
+    },
+    {
+      "name": "surviving_spouse_acquires_usufruct_reversion_property",
+      "args": [
+        "Person",
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "description": "The surviving spouse acquires usufruct over goods subject to the right of legal reversion under article 4.24 or 4.25, unless the deed of gift or will provides otherwise."
+    }
+  ],
+  "functions": [],
+  "rules": [
+    {
+      "forall": [
+        {
+          "var": "deceased",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "or": [
+            {
+              "pred": "deceased_leaves_ascendants",
+              "args": [
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "deceased_leaves_close_collaterals",
+              "args": [
+                "deceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "deceased_leaves_ascendants_or_close_collaterals",
+          "args": [
+            "deceased"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "spouse",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "asset",
+          "type": "Asset"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_spouse_of",
+              "args": [
+                "spouse",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "deceased_leaves_ascendants_or_close_collaterals",
+              "args": [
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_common_property_of_spouses",
+              "args": [
+                "asset",
+                "deceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "surviving_spouse_acquires_full_ownership_common_share",
+          "args": [
+            "spouse",
+            "asset"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "spouse",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "asset",
+          "type": "Asset"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_spouse_of",
+              "args": [
+                "spouse",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "deceased_leaves_ascendants_or_close_collaterals",
+              "args": [
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_undivided_between_spouses",
+              "args": [
+                "asset",
+                "deceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "surviving_spouse_acquires_full_ownership_common_share",
+          "args": [
+            "spouse",
+            "asset"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "spouse",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "asset",
+          "type": "Asset"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_spouse_of",
+              "args": [
+                "spouse",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "deceased_leaves_ascendants_or_close_collaterals",
+              "args": [
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_own_property_of_deceased",
+              "args": [
+                "asset",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_subject_to_legal_reversion_4_24",
+              "args": [
+                "asset",
+                "deceased"
+              ],
+              "negated": true
+            },
+            {
+              "pred": "is_subject_to_legal_reversion_4_25",
+              "args": [
+                "asset",
+                "deceased"
+              ],
+              "negated": true
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "surviving_spouse_acquires_usufruct_own_property",
+          "args": [
+            "spouse",
+            "asset"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "spouse",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "asset",
+          "type": "Asset"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_spouse_of",
+              "args": [
+                "spouse",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "deceased_leaves_ascendants_or_close_collaterals",
+              "args": [
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_own_property_of_deceased",
+              "args": [
+                "asset",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "or": [
+                {
+                  "pred": "is_subject_to_legal_reversion_4_24",
+                  "args": [
+                    "asset",
+                    "deceased"
+                  ],
+                  "negated": false
+                },
+                {
+                  "pred": "is_subject_to_legal_reversion_4_25",
+                  "args": [
+                    "asset",
+                    "deceased"
+                  ],
+                  "negated": false
+                }
+              ]
+            },
+            {
+              "pred": "reversion_excluded_by_deed_or_will",
+              "args": [
+                "asset",
+                "deceased"
+              ],
+              "negated": true
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "surviving_spouse_acquires_usufruct_reversion_property",
+          "args": [
+            "spouse",
+            "asset"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    }
+  ]
+}

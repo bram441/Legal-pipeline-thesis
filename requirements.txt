@@ -1,0 +1,11 @@
+# Core runtime
+python-dotenv>=1.0
+openai>=1.0
+idp-engine>=0.12.0
+textX>=2.3.0
+
+# Optional: Excel export from run_evaluation.py (--excel)
+openpyxl>=3.1.0
+
+# Development / tests
+pytest>=8.0

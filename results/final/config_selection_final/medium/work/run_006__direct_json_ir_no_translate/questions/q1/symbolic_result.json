@@ -1,0 +1,111 @@
+{
+  "intent": "deduction",
+  "symbolic_status": "ok",
+  "status": "ok",
+  "scorable": true,
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "routing": {
+    "question": "Gaan de gevolgen volgens artikel 1:24, paragraaf 2 in vanaf het boekjaar dat volgt op boekjaar 2025?",
+    "detected_question_type": "boolean",
+    "selected_intent": "deduction",
+    "selected_reason": "expected.mode=boolean",
+    "scorable": true,
+    "fallback_intent": null,
+    "warnings": [],
+    "legal_output_symbols": [
+      "gains_kleine_vennootschap_status_from",
+      "loses_kleine_vennootschap_status_from"
+    ],
+    "query_hint_type": "boolean",
+    "expected_question_type": "boolean"
+  },
+  "satisfiability_check": {
+    "stage": "pre_query",
+    "kb_case_satisfiable": true,
+    "status": "ok",
+    "details": "theory satisfiable",
+    "intent_backend": "idp_z3.tasks.satisfiable_check",
+    "duration_seconds": 0.1395
+  },
+  "warnings": [],
+  "deduction": {
+    "intent": "deduction",
+    "status": "ok",
+    "output_kind": "epistemic_boolean",
+    "predicate": "loses_kleine_vennootschap_status_from",
+    "args": [
+      "bv_horizon",
+      "fy_2026"
+    ],
+    "possible": true,
+    "certain": true,
+    "label": "entailed",
+    "atom": "loses_kleine_vennootschap_status_from(x0,x1)",
+    "constraint": "? x0 in Company, x1 in FinancialYear: __sel0(x0) & __sel1(x1) & loses_kleine_vennootschap_status_from(x0,x1)",
+    "certainty_class": "decisive",
+    "sat": true,
+    "internal_intent": "deduction",
+    "antecedent_coverage": [
+      {
+        "rule_index": 10,
+        "target": "loses_kleine_vennootschap_status_from(bv_horizon,fy_2026)",
+        "conditions": [
+          {
+            "atom": "more_than_one_criterion_exceeded_two_consecutive_years(bv_horizon,fy_2025)",
+            "status": "helper_defined"
+          },
+          {
+            "atom": "next_financial_year(fy_2025,fy_2026)",
+            "status": "present"
+          }
+        ]
+      }
+    ]
+  },
+  "model_expansion": null,
+  "get_range": null,
+  "satisfiable": null,
+  "explanation": null,
+  "execution_query": {
+    "type": "predicate",
+    "predicate": "loses_kleine_vennootschap_status_from",
+    "mode": "boolean",
+    "args": [
+      "bv_horizon",
+      "fy_2026"
+    ],
+    "explain": false,
+    "predicate_kind": "derived",
+    "query_type": "predicate_boolean",
+    "internal_intent": "deduction"
+  },
+  "output_kind": "epistemic_boolean",
+  "certainty_class": "decisive",
+  "predicate": "loses_kleine_vennootschap_status_from",
+  "args": [
+    "bv_horizon",
+    "fy_2026"
+  ],
+  "label": "entailed",
+  "possible": true,
+  "certain": true,
+  "sat": true,
+  "antecedent_coverage": [
+    {
+      "rule_index": 10,
+      "target": "loses_kleine_vennootschap_status_from(bv_horizon,fy_2026)",
+      "conditions": [
+        {
+          "atom": "more_than_one_criterion_exceeded_two_consecutive_years(bv_horizon,fy_2025)",
+          "status": "helper_defined"
+        },
+        {
+          "atom": "next_financial_year(fy_2025,fy_2026)",
+          "status": "present"
+        }
+      ]
+    }
+  ]
+}

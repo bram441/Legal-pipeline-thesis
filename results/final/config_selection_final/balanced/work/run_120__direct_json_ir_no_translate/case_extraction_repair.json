@@ -1,0 +1,33 @@
+{
+  "case_given_factual_inputs": [
+    {
+      "target_predicate": "more_than_one_criterion_exceeded_two_consecutive_years",
+      "input_predicate": "case_given_more_than_one_criterion_exceeded_two_consecutive_years",
+      "source": "case_given",
+      "evidence_text": "overschreed gedurende twee achtereenvolgende boekjaren telkens meer dan één criterium",
+      "assertion_kind": "factual_threshold_satisfaction",
+      "args": [
+        "bv_horizon",
+        "fy_2025"
+      ]
+    }
+  ],
+  "accepted_threshold_satisfaction_facts": [
+    {
+      "input_predicate": "case_given_more_than_one_criterion_exceeded_two_consecutive_years",
+      "target_predicate": "more_than_one_criterion_exceeded_two_consecutive_years",
+      "args": [
+        "bv_horizon",
+        "fy_2025"
+      ],
+      "evidence_text": "overschreed gedurende twee achtereenvolgende boekjaren telkens meer dan één criterium",
+      "assertion_kind": "factual_threshold_satisfaction"
+    }
+  ],
+  "case_text_has_numeric_values": false,
+  "case_text_numeric_values_explicit": false,
+  "bridge_predicates_generated": true,
+  "rejected_query_predicate_assertions": [],
+  "rejected_legal_outputs": [],
+  "query_predicate": null
+}

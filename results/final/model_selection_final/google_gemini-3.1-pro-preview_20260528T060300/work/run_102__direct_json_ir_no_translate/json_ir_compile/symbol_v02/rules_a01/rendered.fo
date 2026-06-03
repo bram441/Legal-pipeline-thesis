@@ -1,0 +1,26 @@
+vocabulary V {
+  type Person
+  type Asset
+  is_surviving_spouse_of: Person * Person -> Bool
+  leaves_ascendants: Person -> Bool
+  leaves_close_collaterals: Person -> Bool
+  leaves_ascendants_or_close_collaterals: Person -> Bool
+  is_share_in_common_estate_of: Asset * Person -> Bool
+  is_share_in_exclusive_undivided_estate_of: Asset * Person -> Bool
+  is_other_asset_of_own_estate_of: Asset * Person -> Bool
+  is_asset_subject_to_legal_return: Asset -> Bool
+  provided_otherwise_in_deed_of_donation: Asset -> Bool
+  provided_otherwise_in_will: Asset -> Bool
+  provided_otherwise_for_legal_return: Asset -> Bool
+  acquires_full_ownership: Person * Asset -> Bool
+  acquires_usufruct: Person * Asset -> Bool
+}
+
+theory T:V {
+  ! deceased in Person: (((leaves_ascendants(deceased)) | (leaves_close_collaterals(deceased)))) => ((leaves_ascendants_or_close_collaterals(deceased))).
+  ! asset in Asset: (((provided_otherwise_in_deed_of_donation(asset)) | (provided_otherwise_in_will(asset)))) => ((provided_otherwise_for_legal_return(asset))).
+  ! spouse in Person, deceased in Person, asset in Asset: (((is_surviving_spouse_of(spouse,deceased)) & (leaves_ascendants_or_close_collaterals(deceased)) & (is_share_in_common_estate_of(asset,deceased)))) => ((acquires_full_ownership(spouse,asset))).
+  ! spouse in Person, deceased in Person, asset in Asset: (((is_surviving_spouse_of(spouse,deceased)) & (leaves_ascendants_or_close_collaterals(deceased)) & (is_share_in_exclusive_undivided_estate_of(asset,deceased)))) => ((acquires_full_ownership(spouse,asset))).
+  ! spouse in Person, deceased in Person, asset in Asset: (((is_surviving_spouse_of(spouse,deceased)) & (leaves_ascendants_or_close_collaterals(deceased)) & (is_other_asset_of_own_estate_of(asset,deceased)))) => ((acquires_usufruct(spouse,asset))).
+  ! spouse in Person, deceased in Person, asset in Asset: (((is_surviving_spouse_of(spouse,deceased)) & (leaves_ascendants_or_close_collaterals(deceased)) & (is_asset_subject_to_legal_return(asset)) & (~provided_otherwise_for_legal_return(asset)))) => ((acquires_usufruct(spouse,asset))).
+}

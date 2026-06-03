@@ -1,0 +1,15 @@
+{
+  "question": "Heeft de langstlevende echtgenoot recht op vruchtgebruik van de gehele nalatenschap volgens artikel 4.17?",
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "scorable": true,
+  "fallback_intent": null,
+  "warnings": [],
+  "legal_output_symbols": [
+    "receives_full_ownership_of",
+    "receives_usufruct_of"
+  ],
+  "query_hint_type": "boolean",
+  "expected_question_type": "boolean"
+}

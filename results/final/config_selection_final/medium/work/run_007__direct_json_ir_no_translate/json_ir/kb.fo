@@ -1,0 +1,17 @@
+vocabulary V {
+  type Person
+  type Asset
+  is_surviving_legal_cohabitant_of: Person * Person -> Bool
+  is_heir_of: Person * Person -> Bool
+  is_main_family_residence_at_opening_of_estate: Asset * Person -> Bool
+  is_household_contents_of: Asset * Asset -> Bool
+  subject_to_legal_reversion_right: Asset -> Bool
+  acquires_usufruct_of: Person * Asset -> Bool
+}
+
+theory T:V {
+  ! survivor in Person, deceased in Person, residence in Asset: (((is_surviving_legal_cohabitant_of(survivor,deceased)) & (is_heir_of(survivor,deceased)) & (is_main_family_residence_at_opening_of_estate(residence,deceased)))) => ((acquires_usufruct_of(survivor,residence))).
+  ! survivor in Person, deceased in Person, contents in Asset, residence in Asset: (((is_surviving_legal_cohabitant_of(survivor,deceased)) & (is_heir_of(survivor,deceased)) & (is_main_family_residence_at_opening_of_estate(residence,deceased)) & (is_household_contents_of(contents,residence)))) => ((acquires_usufruct_of(survivor,contents))).
+  ! survivor in Person, deceased in Person, residence in Asset: (((is_surviving_legal_cohabitant_of(survivor,deceased)) & (is_heir_of(survivor,deceased)) & (is_main_family_residence_at_opening_of_estate(residence,deceased)) & (subject_to_legal_reversion_right(residence)))) => ((acquires_usufruct_of(survivor,residence))).
+  ! survivor in Person, deceased in Person, contents in Asset, residence in Asset: (((is_surviving_legal_cohabitant_of(survivor,deceased)) & (is_heir_of(survivor,deceased)) & (is_main_family_residence_at_opening_of_estate(residence,deceased)) & (is_household_contents_of(contents,residence)) & (subject_to_legal_reversion_right(contents)))) => ((acquires_usufruct_of(survivor,contents))).
+}

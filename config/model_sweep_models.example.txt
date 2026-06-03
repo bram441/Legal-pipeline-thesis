@@ -1,4 +1,4 @@
-# Models to compare in scripts/run_model_sweep.py (one id per line).
+﻿# Models to compare in scripts/run_model_sweep.py (one id per line).
 # Copy to model_sweep_models.txt and edit; lines starting with # are ignored.
 
 openai/gpt-5.4-mini

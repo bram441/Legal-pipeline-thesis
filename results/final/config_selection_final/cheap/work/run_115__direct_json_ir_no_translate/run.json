@@ -1,0 +1,50 @@
+{
+  "id": "run_115",
+  "law": {
+    "path": "example_laws_clean/microvennootschappen_clean.txt"
+  },
+  "case": {
+    "text": "NV Delta heeft rechtspersoonlijkheid. Zij is geen dochtervennootschap en geen moedervennootschap. Op balansdatum van het laatst afgesloten boekjaar heeft zij 9 voltijdse equivalenten, een jaarlijkse netto-omzet van 800.000 euro exclusief btw en een balanstotaal van 400.000 euro."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Is NV Delta een microvennootschap volgens artikel 1:25, paragraaf 1?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "A micro-company must be small, have legal personality, not be parent/subsidiary, and exceed no more than one micro threshold. Delta exceeds none."
+      }
+    }
+  ],
+  "kb_compile_strategy": "direct_json_ir_no_translate",
+  "kb_compile_backend": "json_ir",
+  "extraction_backend": "json_ir",
+  "pipeline_backend_mode": "json_ir",
+  "kb_compile_flags": {
+    "use_le": false,
+    "uses_translation": false,
+    "json_ir_generation": "symbols_then_rules"
+  },
+  "strategy_metadata": {
+    "strategy_name": "direct_json_ir_no_translate",
+    "canonical_strategy_name": "direct_json_ir_no_translate",
+    "kb_backend": "json_ir",
+    "pipeline_backend_mode": "json_ir",
+    "uses_le_intermediate": false,
+    "json_ir_generation": "symbols_then_rules",
+    "belief_scoring": false,
+    "law_scope_mode": "cited",
+    "repair_enabled": true,
+    "json_ir_structured_repair_enabled": true,
+    "json_ir_max_symbol_versions": 2,
+    "json_ir_max_rules_attempts_per_symbol_version": 1,
+    "json_ir_max_kb_llm_calls": 4,
+    "json_ir_outer_cache_retries_enabled": false,
+    "json_ir_outer_cache_max_attempts": 1,
+    "configured_translation": false,
+    "effective_translation": false,
+    "translation_source": "main_cli_no_translate",
+    "uses_translation": false
+  }
+}

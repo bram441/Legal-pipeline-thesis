@@ -68,6 +68,7 @@ class TestComputedObservableValidation:
             args=["Person"],
             returns="Bool",
             kind="observable",
+            directly_observable=True,
         )
         _validate_observable_composite_symbol_declarations([decl])
 
@@ -79,6 +80,7 @@ class TestComputedObservableValidation:
                     "kind": "observable",
                     "args": ["Person"],
                     "returns": "Bool",
+                    "directly_observable": True,
                 },
                 {
                     "name": "some_effect",

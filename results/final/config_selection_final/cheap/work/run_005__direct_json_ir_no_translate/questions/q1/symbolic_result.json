@@ -1,0 +1,133 @@
+{
+  "intent": "deduction",
+  "symbolic_status": "ok",
+  "status": "ok",
+  "scorable": true,
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "routing": {
+    "question": "Is er voor Samir sprake van illegaal verblijf in de zin van artikel 1, paragraaf 1, punt 4?",
+    "detected_question_type": "boolean",
+    "selected_intent": "deduction",
+    "selected_reason": "expected.mode=boolean",
+    "scorable": true,
+    "fallback_intent": null,
+    "warnings": [],
+    "legal_output_symbols": [
+      "risk_of_absconding"
+    ],
+    "query_hint_type": "boolean",
+    "expected_question_type": "boolean"
+  },
+  "satisfiability_check": {
+    "stage": "pre_query",
+    "kb_case_satisfiable": true,
+    "status": "ok",
+    "details": "theory satisfiable",
+    "intent_backend": "idp_z3.tasks.satisfiable_check",
+    "duration_seconds": 0.1481
+  },
+  "warnings": [],
+  "deduction": {
+    "intent": "deduction",
+    "status": "ok",
+    "output_kind": "epistemic_boolean",
+    "predicate": "risk_of_absconding",
+    "args": [
+      "samir"
+    ],
+    "possible": true,
+    "certain": false,
+    "label": "unknown",
+    "atom": "risk_of_absconding(x0)",
+    "constraint": "? x0 in Person: __sel0(x0) & risk_of_absconding(x0)",
+    "certainty_class": "inconclusive",
+    "sat": true,
+    "internal_intent": "deduction",
+    "antecedent_coverage": [
+      {
+        "rule_index": 19,
+        "target": "risk_of_absconding(samir)",
+        "conditions": [
+          {
+            "atom": "individual_examination_performed(samir)",
+            "status": "missing"
+          },
+          {
+            "atom": "at_least_one_absconding_criterion_met(samir)",
+            "status": "helper_defined"
+          },
+          {
+            "atom": "subject_to_removal_procedure(samir)",
+            "status": "missing"
+          },
+          {
+            "atom": "subject_to_international_protection_procedure(samir)",
+            "status": "missing"
+          },
+          {
+            "atom": "subject_to_responsibility_determination_procedure(samir)",
+            "status": "missing"
+          }
+        ]
+      }
+    ],
+    "extraction_repair_hint": "The selected legal conclusion could not be proven because an observable antecedent required by the KB rule was not asserted from the case. Re-check the case text for facts matching these observable schema symbols: individual_examination_performed: An individual examination has been performed for the person.; subject_to_removal_procedure: The person is subject to a removal procedure.; subject_to_international_protection_procedure: The person is subject to a procedure for granting international protection.; subject_to_responsibility_determination_procedure: The person is subject to a procedure to determine or transfer to the responsible member state for an international protection request.."
+  },
+  "model_expansion": null,
+  "get_range": null,
+  "satisfiable": null,
+  "explanation": null,
+  "execution_query": {
+    "type": "predicate",
+    "predicate": "risk_of_absconding",
+    "mode": "boolean",
+    "args": [
+      "samir"
+    ],
+    "explain": false,
+    "predicate_kind": "derived",
+    "query_type": "predicate_boolean",
+    "internal_intent": "deduction"
+  },
+  "output_kind": "epistemic_boolean",
+  "certainty_class": "inconclusive",
+  "predicate": "risk_of_absconding",
+  "args": [
+    "samir"
+  ],
+  "label": "unknown",
+  "possible": true,
+  "certain": false,
+  "sat": true,
+  "antecedent_coverage": [
+    {
+      "rule_index": 19,
+      "target": "risk_of_absconding(samir)",
+      "conditions": [
+        {
+          "atom": "individual_examination_performed(samir)",
+          "status": "missing"
+        },
+        {
+          "atom": "at_least_one_absconding_criterion_met(samir)",
+          "status": "helper_defined"
+        },
+        {
+          "atom": "subject_to_removal_procedure(samir)",
+          "status": "missing"
+        },
+        {
+          "atom": "subject_to_international_protection_procedure(samir)",
+          "status": "missing"
+        },
+        {
+          "atom": "subject_to_responsibility_determination_procedure(samir)",
+          "status": "missing"
+        }
+      ]
+    }
+  ],
+  "extraction_repair_hint": "The selected legal conclusion could not be proven because an observable antecedent required by the KB rule was not asserted from the case. Re-check the case text for facts matching these observable schema symbols: individual_examination_performed: An individual examination has been performed for the person.; subject_to_removal_procedure: The person is subject to a removal procedure.; subject_to_international_protection_procedure: The person is subject to a procedure for granting international protection.; subject_to_responsibility_determination_procedure: The person is subject to a procedure to determine or transfer to the responsible member state for an international protection request.."
+}

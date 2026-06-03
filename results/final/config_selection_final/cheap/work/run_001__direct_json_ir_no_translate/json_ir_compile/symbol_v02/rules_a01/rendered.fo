@@ -1,0 +1,28 @@
+vocabulary V {
+  type Person
+  type Asset
+  type Estate
+  is_surviving_spouse_of: Person * Person -> Bool
+  deceased_leaves_descendants_or_adopted_children: Person -> Bool
+  deceased_leaves_ascendants_or_close_collaterals: Person -> Bool
+  deceased_leaves_other_or_no_heirs: Person -> Bool
+  asset_belongs_to_common_property: Asset * Person -> Bool
+  asset_in_undivided_ownership_between_spouses: Asset * Person -> Bool
+  asset_belongs_to_own_property: Asset * Person -> Bool
+  asset_subject_to_legal_return: Asset * Person -> Bool
+  deed_or_testament_excludes_usufruct_on_return_asset: Asset * Person -> Bool
+  surviving_spouse_acquires_usufruct_of_entire_estate: Person * Person -> Bool
+  surviving_spouse_acquires_full_ownership_of_common_share: Person * Person -> Bool
+  surviving_spouse_acquires_usufruct_of_own_property: Person * Person -> Bool
+  surviving_spouse_acquires_usufruct_of_return_asset: Person * Asset * Person -> Bool
+  surviving_spouse_acquires_full_ownership_of_entire_estate: Person * Person -> Bool
+}
+
+theory T:V {
+  ! spouse in Person, deceased in Person: (((is_surviving_spouse_of(spouse,deceased)) & (deceased_leaves_descendants_or_adopted_children(deceased)))) => ((surviving_spouse_acquires_usufruct_of_entire_estate(spouse,deceased))).
+  ! spouse in Person, deceased in Person, asset in Asset: (((is_surviving_spouse_of(spouse,deceased)) & (deceased_leaves_ascendants_or_close_collaterals(deceased)) & ((asset_belongs_to_common_property(asset,deceased)) | (asset_in_undivided_ownership_between_spouses(asset,deceased))))) => ((surviving_spouse_acquires_full_ownership_of_common_share(spouse,deceased))).
+  ! spouse in Person, deceased in Person, asset in Asset: (((is_surviving_spouse_of(spouse,deceased)) & (deceased_leaves_ascendants_or_close_collaterals(deceased)) & (asset_belongs_to_own_property(asset,deceased)) & (~asset_subject_to_legal_return(asset,deceased)))) => ((surviving_spouse_acquires_usufruct_of_own_property(spouse,deceased))).
+  ! spouse in Person, deceased in Person, asset in Asset: (((is_surviving_spouse_of(spouse,deceased)) & (deceased_leaves_ascendants_or_close_collaterals(deceased)) & (asset_subject_to_legal_return(asset,deceased)) & (deed_or_testament_excludes_usufruct_on_return_asset(asset,deceased)))) => ((~surviving_spouse_acquires_usufruct_of_return_asset(spouse,asset,deceased))).
+  ! spouse in Person, deceased in Person, asset in Asset: (((is_surviving_spouse_of(spouse,deceased)) & (deceased_leaves_ascendants_or_close_collaterals(deceased)) & (asset_subject_to_legal_return(asset,deceased)) & (~deed_or_testament_excludes_usufruct_on_return_asset(asset,deceased)))) => ((surviving_spouse_acquires_usufruct_of_return_asset(spouse,asset,deceased))).
+  ! spouse in Person, deceased in Person: (((is_surviving_spouse_of(spouse,deceased)) & (deceased_leaves_other_or_no_heirs(deceased)))) => ((surviving_spouse_acquires_full_ownership_of_entire_estate(spouse,deceased))).
+}

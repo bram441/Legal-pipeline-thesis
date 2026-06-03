@@ -1,0 +1,110 @@
+{
+  "rules": [
+    {
+      "forall": [
+        {
+          "var": "spouse",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "property",
+          "type": "Property"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_spouse_of",
+              "args": [
+                "spouse",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "served_as_principal_residence_of_family_at_opening_of_succession",
+              "args": [
+                "property",
+                "deceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "acquires_right_to_rent",
+          "args": [
+            "spouse",
+            "property"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "heir",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "property",
+          "type": "Property"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_heir_of",
+              "args": [
+                "heir",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_surviving_spouse_of",
+              "args": [
+                "heir",
+                "deceased"
+              ],
+              "negated": true
+            },
+            {
+              "pred": "served_as_principal_residence_of_family_at_opening_of_succession",
+              "args": [
+                "property",
+                "deceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "is_excluded_from_right_to_rent",
+          "args": [
+            "heir",
+            "property"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    }
+  ]
+}

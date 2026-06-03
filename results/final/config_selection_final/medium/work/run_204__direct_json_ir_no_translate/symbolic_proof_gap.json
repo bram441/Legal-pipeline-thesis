@@ -1,0 +1,364 @@
+{
+  "query": {
+    "predicate": "risk_of_absconding",
+    "args": [
+      "omar"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "unknown",
+    "certain": false,
+    "possible": true,
+    "certainty_class": "inconclusive"
+  },
+  "extracted_case": {
+    "facts": [
+      "not is_belgian_national(omar).",
+      "meets_entry_or_residence_conditions(omar)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "Person": [
+        "belgische",
+        "omar"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 6,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "no_residence_application_filed_after_illegal_entry_or_during_illegal_stay",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 7,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "used_false_information_or_documents",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 8,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "failed_to_cooperate_with_authorities",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 9,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "indicated_or_failed_to_comply_with_measure",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 10,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "subject_to_active_entry_ban",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 11,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "filed_new_application_immediately_after_negative_decision",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 12,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "concealed_prior_fingerprints_in_other_state",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 13,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "multiple_applications_with_negative_outcome",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 14,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "concealed_prior_protection_request_in_other_state",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 15,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "declared_or_file_shows_other_purpose_of_entry",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 16,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "subject_to_fine_for_manifestly_unfounded_appeal",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 17,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "individual_examination_performed",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "at_least_one_absconding_criterion_met",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "subject_to_removal_procedure",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "subject_to_international_protection_procedure",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "subject_to_responsibility_determination_procedure",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "risk_of_absconding"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 17,
+      "target": "risk_of_absconding(omar)",
+      "conditions": [
+        {
+          "atom": "individual_examination_performed(omar)",
+          "status": "missing"
+        },
+        {
+          "atom": "at_least_one_absconding_criterion_met(omar)",
+          "status": "helper_defined"
+        },
+        {
+          "atom": "subject_to_removal_procedure(omar)",
+          "status": "missing"
+        },
+        {
+          "atom": "subject_to_international_protection_procedure(omar)",
+          "status": "missing"
+        },
+        {
+          "atom": "subject_to_responsibility_determination_procedure(omar)",
+          "status": "missing"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "individual_examination_performed",
+      "symbol_type": "predicate",
+      "atom": "individual_examination_performed(omar)",
+      "kind": "observable",
+      "gap_status": "missing_entirely",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "at_least_one_absconding_criterion_met",
+      "symbol_type": "predicate",
+      "atom": "at_least_one_absconding_criterion_met(omar)",
+      "kind": "helper",
+      "gap_status": "derivable_from_rules",
+      "assertable_in_case": false,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    {
+      "symbol": "subject_to_removal_procedure",
+      "symbol_type": "predicate",
+      "atom": "subject_to_removal_procedure(omar)",
+      "kind": "observable",
+      "gap_status": "missing_entirely",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "subject_to_international_protection_procedure",
+      "symbol_type": "predicate",
+      "atom": "subject_to_international_protection_procedure(omar)",
+      "kind": "observable",
+      "gap_status": "missing_entirely",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "subject_to_responsibility_determination_procedure",
+      "symbol_type": "predicate",
+      "atom": "subject_to_responsibility_determination_procedure(omar)",
+      "kind": "observable",
+      "gap_status": "missing_entirely",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "extraction_gap",
+    "secondary": [],
+    "rationale": "Assertable observables or temporal facts required by the derivation chain were not extracted from the case although the case text contains relevant qualitative evidence."
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "case_entities_rendered_to_domains": {
+    "Person": [
+      "omar"
+    ]
+  },
+  "query_arguments_with_inferred_types": [],
+  "unmapped_case_entities": [],
+  "pre_solver_domain_validation_errors": []
+}

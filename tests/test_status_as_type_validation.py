@@ -142,7 +142,10 @@ def test_e_observable_has_legal_personality_on_company_passes() -> None:
     ir = {
         "types": ["Company"],
         "predicates": [
-            _observable("has_legal_personality", ["Company"]),
+            {
+                **_observable("has_legal_personality", ["Company"]),
+                "directly_observable": True,
+            },
             _derived("is_registered", ["Company"]),
         ],
         "functions": [],
@@ -163,7 +166,10 @@ def test_f_status_record_binary_predicate_passes() -> None:
     ir = {
         "types": ["StatusRecord", "Person"],
         "predicates": [
-            _observable("records_status", ["StatusRecord", "Person"]),
+            {
+                **_observable("records_status", ["StatusRecord", "Person"]),
+                "directly_observable": True,
+            },
             _derived("status_applies", ["Person"]),
         ],
         "functions": [],
@@ -187,7 +193,10 @@ def test_redundant_is_company_on_broad_company_type_passes() -> None:
     ir = {
         "types": ["Company"],
         "predicates": [
-            _observable("has_registration", ["Company"]),
+            {
+                **_observable("has_registration", ["Company"]),
+                "directly_observable": True,
+            },
             _derived("is_company", ["Company"]),
         ],
         "functions": [],

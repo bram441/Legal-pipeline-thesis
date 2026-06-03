@@ -1,0 +1,51 @@
+{
+  "entities": {
+    "belgische": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "declared",
+      "evidence": []
+    },
+    "nora": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_belgian_national",
+          "arg_index": 0,
+          "expected_type": "Person"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "meets_entry_or_residence_conditions",
+          "arg_index": 0,
+          "expected_type": "Person"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "risk_of_absconding",
+          "arg_index": 0,
+          "expected_type": "Person"
+        }
+      ]
+    },
+    "zij": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "declared",
+      "evidence": []
+    }
+  },
+  "unmapped_entities": [],
+  "conflicts": [],
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "nora",
+      "arg_index": 0,
+      "expected_type": "Person",
+      "predicate": "risk_of_absconding"
+    }
+  ]
+}

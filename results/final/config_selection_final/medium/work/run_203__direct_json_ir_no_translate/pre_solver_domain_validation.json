@@ -1,0 +1,18 @@
+{
+  "case_entities_rendered_to_domains": {
+    "Person": [
+      "belgische",
+      "nina"
+    ]
+  },
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "nina",
+      "arg_index": 0,
+      "expected_type": "Person",
+      "predicate": "is_foreigner"
+    }
+  ],
+  "unmapped_case_entities": [],
+  "pre_solver_domain_validation_errors": []
+}

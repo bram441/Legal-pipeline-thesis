@@ -1,0 +1,177 @@
+{
+  "query": {
+    "predicate": "obtains_usufruct",
+    "args": [
+      "hannah",
+      "woning_in_leuven"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "entailed",
+    "certain": true,
+    "possible": true,
+    "certainty_class": "decisive"
+  },
+  "extracted_case": {
+    "facts": [
+      "is_surviving_legal_cohabitant_of(hannah,greet).",
+      "is_immovable_property(woning_in_leuven).",
+      "served_as_principal_family_residence(woning_in_leuven,greet).",
+      "is_household_goods(huisraad).",
+      "is_present_in(huisraad,woning_in_leuven)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "Person": [
+        "greet",
+        "hannah",
+        "leuven"
+      ],
+      "Asset": [
+        "huisraad",
+        "woning_in_leuven"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 0,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_immovable_property",
+            "args": [
+              "asset"
+            ]
+          },
+          {
+            "predicate": "served_as_principal_family_residence",
+            "args": [
+              "asset",
+              "deceased"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "qualifies_for_cohabitant_usufruct"
+      ]
+    },
+    {
+      "rule_index": 1,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_household_goods",
+            "args": [
+              "asset"
+            ]
+          },
+          {
+            "predicate": "is_immovable_property",
+            "args": [
+              "home"
+            ]
+          },
+          {
+            "predicate": "served_as_principal_family_residence",
+            "args": [
+              "home",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "is_present_in",
+            "args": [
+              "asset",
+              "home"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "qualifies_for_cohabitant_usufruct"
+      ]
+    },
+    {
+      "rule_index": 2,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_surviving_legal_cohabitant_of",
+            "args": [
+              "survivor",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "qualifies_for_cohabitant_usufruct",
+            "args": [
+              "asset",
+              "deceased"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "obtains_usufruct"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 2,
+      "target": "obtains_usufruct(hannah,woning_in_leuven)",
+      "conditions": [
+        {
+          "atom": "is_surviving_legal_cohabitant_of(hannah,greet)",
+          "status": "present"
+        },
+        {
+          "atom": "qualifies_for_cohabitant_usufruct(woning_in_leuven,greet)",
+          "status": "helper_defined"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "is_surviving_legal_cohabitant_of",
+      "symbol_type": "predicate",
+      "atom": "is_surviving_legal_cohabitant_of(hannah,greet)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "qualifies_for_cohabitant_usufruct",
+      "symbol_type": "predicate",
+      "atom": "qualifies_for_cohabitant_usufruct(woning_in_leuven,greet)",
+      "kind": "helper",
+      "gap_status": "derivable_from_rules",
+      "assertable_in_case": false,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "genuinely_under_specified_case",
+    "secondary": [],
+    "rationale": "No single blocking category identified; case may lack explicit observables for a decisive proof."
+  }
+}

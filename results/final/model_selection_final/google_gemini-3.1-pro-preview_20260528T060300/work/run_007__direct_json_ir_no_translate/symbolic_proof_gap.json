@@ -1,0 +1,222 @@
+{
+  "query": {
+    "predicate": "acquires_usufruct",
+    "args": [
+      "noor",
+      "woning"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "entailed",
+    "certain": true,
+    "possible": true,
+    "certainty_class": "decisive"
+  },
+  "extracted_case": {
+    "facts": [
+      "is_surviving_legal_cohabitant_of(noor,mira).",
+      "is_immovable_property(woning).",
+      "served_as_principal_family_residence_at_estate_opening(woning,mira)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "Person": [
+        "mira",
+        "noor"
+      ],
+      "Asset": [
+        "woning"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 0,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_surviving_legal_cohabitant_of",
+            "args": [
+              "survivor",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "is_immovable_property",
+            "args": [
+              "home"
+            ]
+          },
+          {
+            "predicate": "served_as_principal_family_residence_at_estate_opening",
+            "args": [
+              "home",
+              "deceased"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "acquires_usufruct"
+      ]
+    },
+    {
+      "rule_index": 1,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_surviving_legal_cohabitant_of",
+            "args": [
+              "survivor",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "is_immovable_property",
+            "args": [
+              "home"
+            ]
+          },
+          {
+            "predicate": "served_as_principal_family_residence_at_estate_opening",
+            "args": [
+              "home",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "is_household_goods",
+            "args": [
+              "goods"
+            ]
+          },
+          {
+            "predicate": "is_present_in",
+            "args": [
+              "goods",
+              "home"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "acquires_usufruct"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 0,
+      "target": "acquires_usufruct(noor,woning)",
+      "conditions": [
+        {
+          "atom": "is_surviving_legal_cohabitant_of(noor,mira)",
+          "status": "present"
+        },
+        {
+          "atom": "is_immovable_property(woning)",
+          "status": "present"
+        },
+        {
+          "atom": "served_as_principal_family_residence_at_estate_opening(woning,mira)",
+          "status": "present"
+        }
+      ]
+    },
+    {
+      "rule_index": 1,
+      "target": "acquires_usufruct(noor,woning)",
+      "conditions": [
+        {
+          "atom": "is_surviving_legal_cohabitant_of(noor,mira)",
+          "status": "present"
+        },
+        {
+          "atom": "is_immovable_property(woning)",
+          "status": "present"
+        },
+        {
+          "atom": "served_as_principal_family_residence_at_estate_opening(woning,mira)",
+          "status": "present"
+        },
+        {
+          "atom": "is_household_goods(woning)",
+          "status": "missing_non_blocking"
+        },
+        {
+          "atom": "is_present_in(woning,woning)",
+          "status": "missing_non_blocking"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "is_surviving_legal_cohabitant_of",
+      "symbol_type": "predicate",
+      "atom": "is_surviving_legal_cohabitant_of(noor,mira)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "is_immovable_property",
+      "symbol_type": "predicate",
+      "atom": "is_immovable_property(woning)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "served_as_principal_family_residence_at_estate_opening",
+      "symbol_type": "predicate",
+      "atom": "served_as_principal_family_residence_at_estate_opening(woning,mira)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "is_household_goods",
+      "symbol_type": "predicate",
+      "atom": "is_household_goods(woning)",
+      "kind": "observable",
+      "gap_status": "missing_entirely",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "is_present_in",
+      "symbol_type": "predicate",
+      "atom": "is_present_in(woning,woning)",
+      "kind": "observable",
+      "gap_status": "missing_entirely",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "extraction_gap",
+    "secondary": [],
+    "rationale": "Assertable observables or temporal facts required by the derivation chain were not extracted from the case although the case text contains relevant qualitative evidence."
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "rules": [
+    {
+      "forall": [
+        {
+          "var": "survivor",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_legal_cohabitant_of",
+              "args": [
+                "survivor",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_descendant_of",
+              "args": [
+                "survivor",
+                "deceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "preceding_provisions_do_not_apply",
+          "args": [
+            "survivor",
+            "deceased"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    }
+  ]
+}

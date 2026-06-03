@@ -1,0 +1,493 @@
+{
+  "types": {
+    "Person": {
+      "name": "Person",
+      "kind": "entity",
+      "aliases": [],
+      "source": "kb_symbol_table"
+    },
+    "Property": {
+      "name": "Property",
+      "kind": "entity",
+      "aliases": [],
+      "source": "kb_symbol_table"
+    },
+    "Donation": {
+      "name": "Donation",
+      "kind": "entity",
+      "aliases": [],
+      "source": "kb_symbol_table"
+    }
+  },
+  "predicates": {
+    "is_legal_cohabitant_of": {
+      "name": "is_legal_cohabitant_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person is the legally cohabiting partner of the second person.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "is_surviving_cohabitant": {
+      "name": "is_surviving_cohabitant",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person is the surviving legal cohabitant of the deceased second person.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "is_descendant_of": {
+      "name": "is_descendant_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person is a descendant of the second person.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "is_main_family_residence": {
+      "name": "is_main_family_residence",
+      "args": [
+        "Property",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The property served as the main family residence of the deceased at the time the estate opened.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "is_household_contents_of": {
+      "name": "is_household_contents_of",
+      "args": [
+        "Property",
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first property represents the household contents present in the second property.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "subject_to_legal_return_right": {
+      "name": "subject_to_legal_return_right",
+      "args": [
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The property is subject to a right of legal return as referred to in the applicable articles.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "is_rented_property": {
+      "name": "is_rented_property",
+      "args": [
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The property is held under a rental agreement.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "donation_reserved_usufruct": {
+      "name": "donation_reserved_usufruct",
+      "args": [
+        "Donation",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The donor reserved the usufruct of the donated property at the time of the donation.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "cohabitant_status_at_time_of_donation": {
+      "name": "cohabitant_status_at_time_of_donation",
+      "args": [
+        "Person",
+        "Donation"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The surviving person already had the status of legal cohabitant at the time of the donation.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "donor_remained_usufruct_holder_until_death": {
+      "name": "donor_remained_usufruct_holder_until_death",
+      "args": [
+        "Person",
+        "Donation"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The donor remained the holder of the reserved usufruct until the day of death.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "donation_subject_property_is_main_residence": {
+      "name": "donation_subject_property_is_main_residence",
+      "args": [
+        "Donation",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The property subject to the donation served as the main family residence at the time the estate opened.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "surviving_cohabitant_renounces_usufruct": {
+      "name": "surviving_cohabitant_renounces_usufruct",
+      "args": [
+        "Person",
+        "Donation"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The surviving legal cohabitant renounces the usufruct arising from the donation provision.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "renunciation_occurs_during_donors_lifetime": {
+      "name": "renunciation_occurs_during_donors_lifetime",
+      "args": [
+        "Person",
+        "Donation"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The renunciation of usufruct takes place during the lifetime of the donor.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "bare_ownership_acquired_by": {
+      "name": "bare_ownership_acquired_by",
+      "args": [
+        "Person",
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person acquires bare ownership of the property.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "exclusion_applies_descendant": {
+      "name": "exclusion_applies_descendant",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The exclusion applies because the surviving legal cohabitant is a descendant of the deceased cohabitant, blocking inheritance rights under the article.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "acquires_usufruct_of_main_residence": {
+      "name": "acquires_usufruct_of_main_residence",
+      "args": [
+        "Person",
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The surviving legal cohabitant acquires usufruct over the main family residence property by operation of law.",
+      "legal_output": true,
+      "output_category": "legal_effect",
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": true,
+      "temporal_support": false
+    },
+    "acquires_usufruct_of_household_contents": {
+      "name": "acquires_usufruct_of_household_contents",
+      "args": [
+        "Person",
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The surviving legal cohabitant acquires usufruct over the household contents by operation of law.",
+      "legal_output": true,
+      "output_category": "legal_effect",
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": true,
+      "temporal_support": false
+    },
+    "acquires_usufruct_from_donation": {
+      "name": "acquires_usufruct_from_donation",
+      "args": [
+        "Person",
+        "Donation"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The surviving legal cohabitant acquires usufruct of the donated property upon the donor's death.",
+      "legal_output": true,
+      "output_category": "legal_effect",
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": true,
+      "temporal_support": false
+    },
+    "acquires_rental_right_of_main_residence": {
+      "name": "acquires_rental_right_of_main_residence",
+      "args": [
+        "Person",
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The surviving legal cohabitant acquires the exclusive right to the rental of the main family residence, to the exclusion of all other heirs.",
+      "legal_output": true,
+      "output_category": "right",
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": true,
+      "temporal_support": false
+    },
+    "entitled_to_inventory_of_household_contents": {
+      "name": "entitled_to_inventory_of_household_contents",
+      "args": [
+        "Person",
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The bare owner is entitled to demand an inventory of the household contents and a statement of condition of the main residence.",
+      "legal_output": null,
+      "output_category": "right",
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": true,
+      "temporal_support": false
+    },
+    "usufruct_rules_of_surviving_spouse_apply": {
+      "name": "usufruct_rules_of_surviving_spouse_apply",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The rules on usufruct of the surviving spouse apply by analogy to the surviving legal cohabitant.",
+      "legal_output": null,
+      "output_category": "legal_effect",
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": true,
+      "temporal_support": false
+    }
+  },
+  "functions": {},
+  "assertable_case_symbols": {
+    "predicates": [
+      "bare_ownership_acquired_by",
+      "cohabitant_status_at_time_of_donation",
+      "donation_reserved_usufruct",
+      "donation_subject_property_is_main_residence",
+      "donor_remained_usufruct_holder_until_death",
+      "is_descendant_of",
+      "is_household_contents_of",
+      "is_legal_cohabitant_of",
+      "is_main_family_residence",
+      "is_rented_property",
+      "is_surviving_cohabitant",
+      "renunciation_occurs_during_donors_lifetime",
+      "subject_to_legal_return_right",
+      "surviving_cohabitant_renounces_usufruct"
+    ],
+    "functions": []
+  },
+  "factual_case_input_predicates": [],
+  "factual_criteria_input_predicates": [],
+  "legal_output_query_targets": [
+    "acquires_rental_right_of_main_residence",
+    "acquires_usufruct_from_donation",
+    "acquires_usufruct_of_household_contents",
+    "acquires_usufruct_of_main_residence",
+    "entitled_to_inventory_of_household_contents",
+    "usufruct_rules_of_surviving_spouse_apply"
+  ],
+  "temporal_support_symbols": []
+}

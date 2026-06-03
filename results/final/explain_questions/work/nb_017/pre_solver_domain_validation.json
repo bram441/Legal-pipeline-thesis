@@ -1,0 +1,17 @@
+{
+  "case_entities_rendered_to_domains": {
+    "Person": [
+      "pavel"
+    ]
+  },
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "pavel",
+      "arg_index": 0,
+      "expected_type": "Person",
+      "predicate": "risk_of_absconding"
+    }
+  ],
+  "unmapped_case_entities": [],
+  "pre_solver_domain_validation_errors": []
+}

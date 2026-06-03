@@ -1,0 +1,46 @@
+{
+  "query": {
+    "predicate": "",
+    "args": [],
+    "mode": null,
+    "type": "intent"
+  },
+  "symbolic_outcome": {
+    "status": "error",
+    "label": null,
+    "certain": null,
+    "possible": null,
+    "certainty_class": null
+  },
+  "extracted_case": {
+    "facts": [
+      "is_surviving_cohabitant(hana,gilles).",
+      "is_main_family_residence(woning,gilles).",
+      "is_household_contents_of(huisraad,woning).",
+      "not is_descendant_of(hana,gilles)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "Person": [
+        "gilles",
+        "hana",
+        "hij",
+        "hun"
+      ],
+      "Property": [
+        "huisraad",
+        "woning"
+      ]
+    }
+  },
+  "deriving_rules": [],
+  "antecedent_coverage": [],
+  "antecedents": [],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "renderer_solver_issue",
+    "secondary": [],
+    "rationale": "Symbolic engine returned an error before a conclusive proof could be evaluated."
+  }
+}

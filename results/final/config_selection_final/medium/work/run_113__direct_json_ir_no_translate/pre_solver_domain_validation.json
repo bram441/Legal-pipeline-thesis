@@ -1,0 +1,26 @@
+{
+  "case_entities_rendered_to_domains": {
+    "FinancialYear": [
+      "boekjaar_laatst_afgesloten"
+    ],
+    "Company": [
+      "bv_orion"
+    ]
+  },
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "bv_orion",
+      "arg_index": 0,
+      "expected_type": "Company",
+      "predicate": "is_kleine_vennootschap"
+    },
+    {
+      "entity": "boekjaar_laatst_afgesloten",
+      "arg_index": 1,
+      "expected_type": "FinancialYear",
+      "predicate": "is_kleine_vennootschap"
+    }
+  ],
+  "unmapped_case_entities": [],
+  "pre_solver_domain_validation_errors": []
+}

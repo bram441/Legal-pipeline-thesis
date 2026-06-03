@@ -1,0 +1,56 @@
+{
+  "intent": "explain",
+  "symbolic_status": "error",
+  "status": "error",
+  "scorable": false,
+  "detected_question_type": "explanation",
+  "selected_intent": "explain",
+  "selected_reason": "extracted_intent_query",
+  "routing": {
+    "question": "Vanaf welk boekjaar moet volgens artikel 1:24, paragraaf 3 met deze overschrijding rekening worden gehouden?",
+    "detected_question_type": "explanation",
+    "selected_intent": "explain",
+    "selected_reason": "extracted_intent_query",
+    "scorable": false,
+    "fallback_intent": "relevance",
+    "warnings": [],
+    "legal_output_symbols": [
+      "is_kleine_vennootschap"
+    ],
+    "query_hint_type": "explanation",
+    "expected_question_type": null
+  },
+  "satisfiability_check": {
+    "stage": "pre_query",
+    "kb_case_satisfiable": true,
+    "status": "ok",
+    "details": "theory satisfiable",
+    "intent_backend": "idp_z3.tasks.satisfiable_check",
+    "duration_seconds": 0.0768
+  },
+  "warnings": [],
+  "deduction": null,
+  "model_expansion": null,
+  "get_range": null,
+  "satisfiable": null,
+  "explanation": {
+    "intent": "explain",
+    "answer": "explain target requires predicate and args",
+    "support": null,
+    "parsed": false,
+    "warnings": [],
+    "raw": {
+      "intent": "explain",
+      "status": "error",
+      "output_kind": "unknown",
+      "message": "explain target requires predicate and args"
+    }
+  },
+  "execution_query": {
+    "type": "intent",
+    "intent": "explain",
+    "target": null
+  },
+  "output_kind": "unknown",
+  "message": "explain target requires predicate and args"
+}

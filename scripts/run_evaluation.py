@@ -8,7 +8,7 @@ Usage (from project root):
   python scripts/run_evaluation.py --runs run_003
   python scripts/run_evaluation.py --runs all --strategies all
   python scripts/run_evaluation.py --runs run_003 --strategies direct_json_ir_translate,le_json_ir_no_translate
-  python scripts/run_evaluation.py --runs-dir inputs/json --runs run_001,run_003 --excel
+  python scripts/run_evaluation.py --runs-dir inputs/json_final_clean --runs run_001,run_003 --excel
   python scripts/run_evaluation.py --runs all --strategies all --max-failures 8
 
 Outputs under results/reports/evaluation_<timestamp>/:
@@ -472,8 +472,8 @@ def main() -> int:
         "--runs-dir",
         "--input-dir",
         dest="runs_dir",
-        default="inputs/json",
-        help="Directory containing run folders (each with run.json). Alias: --input-dir. Default: inputs/json",
+        default="inputs/json_final_clean",
+        help="Directory containing run folders (each with run.json). Alias: --input-dir. Default: inputs/json_final_clean",
     )
     p.add_argument(
         "--runs",
@@ -497,7 +497,7 @@ def main() -> int:
         metavar="PATH",
         default=None,
         help="Optional config profile JSON merged on top of config/default.json and "
-        "config/local.json (e.g. config/ablation_balanced.json). When omitted, uses "
+        "config/local.json (e.g. config/balanced.json). When omitted, uses "
         "default + local only (ignores any stale PIPELINE_CONFIG_PROFILE in the shell).",
     )
     p.add_argument(

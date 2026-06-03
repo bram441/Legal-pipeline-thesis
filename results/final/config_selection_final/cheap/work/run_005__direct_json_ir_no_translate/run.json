@@ -1,0 +1,51 @@
+{
+  "id": "run_005",
+  "law": {
+    "path": "example_laws_clean/vreemdelingenwet_clean.txt"
+  },
+  "case": {
+    "text": "Samir is een vreemdeling. Hij verblijft op het Belgische grondgebied zonder te voldoen aan de voorwaarden voor rechtmatig verblijf."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Is er voor Samir sprake van illegaal verblijf in de zin van artikel 1, paragraaf 1, punt 4?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "Illegal stay is the presence on the territory of a foreigner who does not or no longer satisfy the conditions for entry or stay.",
+        "target": "samir"
+      }
+    }
+  ],
+  "kb_compile_strategy": "direct_json_ir_no_translate",
+  "kb_compile_backend": "json_ir",
+  "extraction_backend": "json_ir",
+  "pipeline_backend_mode": "json_ir",
+  "kb_compile_flags": {
+    "use_le": false,
+    "uses_translation": false,
+    "json_ir_generation": "symbols_then_rules"
+  },
+  "strategy_metadata": {
+    "strategy_name": "direct_json_ir_no_translate",
+    "canonical_strategy_name": "direct_json_ir_no_translate",
+    "kb_backend": "json_ir",
+    "pipeline_backend_mode": "json_ir",
+    "uses_le_intermediate": false,
+    "json_ir_generation": "symbols_then_rules",
+    "belief_scoring": false,
+    "law_scope_mode": "cited",
+    "repair_enabled": true,
+    "json_ir_structured_repair_enabled": true,
+    "json_ir_max_symbol_versions": 2,
+    "json_ir_max_rules_attempts_per_symbol_version": 1,
+    "json_ir_max_kb_llm_calls": 4,
+    "json_ir_outer_cache_retries_enabled": false,
+    "json_ir_outer_cache_max_attempts": 1,
+    "configured_translation": false,
+    "effective_translation": false,
+    "translation_source": "main_cli_no_translate",
+    "uses_translation": false
+  }
+}

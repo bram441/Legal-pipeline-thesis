@@ -1,0 +1,130 @@
+{
+  "intent": "deduction",
+  "symbolic_status": "ok",
+  "status": "ok",
+  "scorable": true,
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "routing": {
+    "question": "Is artikel 4.23, paragraaf 4 een reden om Karin het vruchtgebruik van de gezinswoning te weigeren?",
+    "detected_question_type": "boolean",
+    "selected_intent": "deduction",
+    "selected_reason": "expected.mode=boolean",
+    "scorable": true,
+    "fallback_intent": null,
+    "warnings": [],
+    "legal_output_symbols": [
+      "preceding_provisions_apply"
+    ],
+    "query_hint_type": "boolean",
+    "expected_question_type": "boolean"
+  },
+  "satisfiability_check": {
+    "stage": "pre_query",
+    "kb_case_satisfiable": true,
+    "status": "ok",
+    "details": "theory satisfiable",
+    "intent_backend": "idp_z3.tasks.satisfiable_check",
+    "duration_seconds": 0.0398
+  },
+  "warnings": [],
+  "deduction": {
+    "intent": "deduction",
+    "status": "ok",
+    "output_kind": "epistemic_boolean",
+    "predicate": "preceding_provisions_apply",
+    "args": [
+      "karin",
+      "joris"
+    ],
+    "possible": true,
+    "certain": false,
+    "label": "unknown",
+    "atom": "preceding_provisions_apply(x0,x1)",
+    "constraint": "? x0 in Person, x1 in Person: __sel0(x0) & __sel1(x1) & preceding_provisions_apply(x0,x1)",
+    "certainty_class": "inconclusive",
+    "sat": true,
+    "internal_intent": "deduction",
+    "antecedent_coverage": [
+      {
+        "rule_index": 1,
+        "target": "preceding_provisions_apply(karin,joris)",
+        "conditions": [
+          {
+            "atom": "is_surviving_legal_cohabitant_of(karin,joris)",
+            "status": "present"
+          },
+          {
+            "atom": "exception_descendant_cohabitant(karin,joris)",
+            "status": "helper_defined"
+          }
+        ]
+      },
+      {
+        "rule_index": 2,
+        "target": "preceding_provisions_apply(karin,joris)",
+        "conditions": [
+          {
+            "atom": "exception_descendant_cohabitant(karin,joris)",
+            "status": "helper_defined"
+          }
+        ]
+      }
+    ]
+  },
+  "model_expansion": null,
+  "get_range": null,
+  "satisfiable": null,
+  "explanation": null,
+  "execution_query": {
+    "type": "predicate",
+    "predicate": "preceding_provisions_apply",
+    "mode": "boolean",
+    "args": [
+      "karin",
+      "joris"
+    ],
+    "explain": false,
+    "predicate_kind": "derived",
+    "query_type": "predicate_boolean",
+    "internal_intent": "deduction"
+  },
+  "output_kind": "epistemic_boolean",
+  "certainty_class": "inconclusive",
+  "predicate": "preceding_provisions_apply",
+  "args": [
+    "karin",
+    "joris"
+  ],
+  "label": "unknown",
+  "possible": true,
+  "certain": false,
+  "sat": true,
+  "antecedent_coverage": [
+    {
+      "rule_index": 1,
+      "target": "preceding_provisions_apply(karin,joris)",
+      "conditions": [
+        {
+          "atom": "is_surviving_legal_cohabitant_of(karin,joris)",
+          "status": "present"
+        },
+        {
+          "atom": "exception_descendant_cohabitant(karin,joris)",
+          "status": "helper_defined"
+        }
+      ]
+    },
+    {
+      "rule_index": 2,
+      "target": "preceding_provisions_apply(karin,joris)",
+      "conditions": [
+        {
+          "atom": "exception_descendant_cohabitant(karin,joris)",
+          "status": "helper_defined"
+        }
+      ]
+    }
+  ]
+}

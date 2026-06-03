@@ -1,6 +1,7 @@
 import os
 import unittest
 
+from pipeline.config import reload_config
 from pipeline.extraction.json_ir import ExtractionIRValidationError, normalize_case_ir, normalize_query_ir
 
 
@@ -96,6 +97,7 @@ class TestExtractionJSONIR(unittest.TestCase):
     def test_normalize_query_ir_splits_duplicate_person_args_using_is_deceased(self):
         old = os.environ.get("LEGAL_PIPELINE_ENABLE_DOMAIN_HEURISTICS")
         os.environ["LEGAL_PIPELINE_ENABLE_DOMAIN_HEURISTICS"] = "1"
+        reload_config()
         schema = {
             "types": ["Person"],
             "predicates": [
@@ -110,7 +112,7 @@ class TestExtractionJSONIR(unittest.TestCase):
         }
         case = {
             "facts": ["IsDeceased(bert)."],
-            "entities": {"Person": ["anna"]},
+            "entities": {"Person": ["anna", "bert"]},
         }
         qir = {
             "kind": "predicate",
@@ -134,11 +136,13 @@ class TestExtractionJSONIR(unittest.TestCase):
                 os.environ.pop("LEGAL_PIPELINE_ENABLE_DOMAIN_HEURISTICS", None)
             else:
                 os.environ["LEGAL_PIPELINE_ENABLE_DOMAIN_HEURISTICS"] = old
+            reload_config()
         self.assertEqual(out["args"], ["anna", "bert"])
 
     def test_normalize_query_ir_swaps_deceased_arg_for_surviving_spouse_role(self):
         old = os.environ.get("LEGAL_PIPELINE_ENABLE_DOMAIN_HEURISTICS")
         os.environ["LEGAL_PIPELINE_ENABLE_DOMAIN_HEURISTICS"] = "1"
+        reload_config()
         schema = {
             "types": ["Person", "Estate"],
             "predicates": [
@@ -172,6 +176,7 @@ class TestExtractionJSONIR(unittest.TestCase):
                 os.environ.pop("LEGAL_PIPELINE_ENABLE_DOMAIN_HEURISTICS", None)
             else:
                 os.environ["LEGAL_PIPELINE_ENABLE_DOMAIN_HEURISTICS"] = old
+            reload_config()
         self.assertEqual(out["args"][0], "anna")
 
 

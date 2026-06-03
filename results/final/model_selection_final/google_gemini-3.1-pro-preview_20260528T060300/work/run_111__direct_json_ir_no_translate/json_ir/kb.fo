@@ -1,0 +1,68 @@
+vocabulary V {
+  type Person
+  proves_belgian_nationality: Person -> Bool
+  is_foreigner: Person -> Bool
+  is_union_citizen: Person -> Bool
+  covered_by_community_law_on_free_movement: Person -> Bool
+  is_third_country_national: Person -> Bool
+  present_on_territory: Person -> Bool
+  meets_entry_or_residence_conditions: Person -> Bool
+  is_illegal_stay: Person -> Bool
+  subject_to_removal_procedure: Person -> Bool
+  subject_to_international_protection_procedure: Person -> Bool
+  subject_to_dublin_procedure: Person -> Bool
+  has_valid_travel_document: Person -> Bool
+  has_valid_passport: Person -> Bool
+  has_valid_identity_document: Person -> Bool
+  recognized_by_national_authority_willing_to_issue_laissez_passer: Person -> Bool
+  falls_under_nationality_for_ministerial_laissez_passer: Person -> Bool
+  is_identified_foreigner: Person -> Bool
+  individual_examination_performed: Person -> Bool
+  circumstances_specific_to_case_taken_into_account: Person -> Bool
+  risk_is_actual_and_real: Person -> Bool
+  filed_residence_application_after_illegal_entry_or_during_illegal_stay: Person -> Bool
+  filed_international_protection_request_within_legal_time_limit: Person -> Bool
+  used_false_info_docs_or_fraud_in_procedure: Person -> Bool
+  cooperates_with_authorities_on_entry_and_residence: Person -> Bool
+  refuses_or_failed_to_comply_with_return_or_security_measure: Person -> Bool
+  subject_to_active_entry_ban: Person -> Bool
+  filed_new_application_immediately_after_negative_decision_or_measure: Person -> Bool
+  hid_prior_fingerprints_in_other_dublin_state: Person -> Bool
+  filed_multiple_applications_with_negative_outcome: Person -> Bool
+  hid_prior_asylum_request_in_other_dublin_state: Person -> Bool
+  came_to_realm_for_other_purposes_than_application: Person -> Bool
+  subject_to_fine_for_manifestly_unlawful_appeal: Person -> Bool
+  meets_absconding_criterion_1: Person -> Bool
+  meets_absconding_criterion_2: Person -> Bool
+  meets_absconding_criterion_3: Person -> Bool
+  meets_absconding_criterion_4: Person -> Bool
+  meets_absconding_criterion_5: Person -> Bool
+  meets_absconding_criterion_6: Person -> Bool
+  meets_absconding_criterion_7: Person -> Bool
+  meets_absconding_criterion_8: Person -> Bool
+  meets_absconding_criterion_9: Person -> Bool
+  meets_absconding_criterion_10: Person -> Bool
+  meets_absconding_criterion_11: Person -> Bool
+  meets_at_least_one_absconding_criterion: Person -> Bool
+  has_risk_of_absconding: Person -> Bool
+}
+
+theory T:V {
+  ! x in Person: ((~proves_belgian_nationality(x))) => ((is_foreigner(x))).
+  ! x in Person: ((~is_union_citizen(x)) & (~covered_by_community_law_on_free_movement(x))) => ((is_third_country_national(x))).
+  ! x in Person: ((is_foreigner(x)) & (present_on_territory(x)) & (~meets_entry_or_residence_conditions(x))) => ((is_illegal_stay(x))).
+  ! x in Person: ((is_foreigner(x)) & ((has_valid_travel_document(x)) | (has_valid_passport(x)) | (has_valid_identity_document(x)) | (recognized_by_national_authority_willing_to_issue_laissez_passer(x)) | (falls_under_nationality_for_ministerial_laissez_passer(x)))) => ((is_identified_foreigner(x))).
+  ! x in Person: ((is_foreigner(x)) & ((subject_to_removal_procedure(x)) | (subject_to_international_protection_procedure(x)) | (subject_to_dublin_procedure(x))) & (risk_is_actual_and_real(x)) & (individual_examination_performed(x)) & (circumstances_specific_to_case_taken_into_account(x)) & (meets_at_least_one_absconding_criterion(x))) => ((has_risk_of_absconding(x))).
+  ! x in Person: (((~filed_residence_application_after_illegal_entry_or_during_illegal_stay(x)) | (~filed_international_protection_request_within_legal_time_limit(x)))) => ((meets_absconding_criterion_1(x))).
+  ! x in Person: ((used_false_info_docs_or_fraud_in_procedure(x))) => ((meets_absconding_criterion_2(x))).
+  ! x in Person: ((~cooperates_with_authorities_on_entry_and_residence(x))) => ((meets_absconding_criterion_3(x))).
+  ! x in Person: ((refuses_or_failed_to_comply_with_return_or_security_measure(x))) => ((meets_absconding_criterion_4(x))).
+  ! x in Person: ((subject_to_active_entry_ban(x))) => ((meets_absconding_criterion_5(x))).
+  ! x in Person: ((filed_new_application_immediately_after_negative_decision_or_measure(x))) => ((meets_absconding_criterion_6(x))).
+  ! x in Person: ((hid_prior_fingerprints_in_other_dublin_state(x))) => ((meets_absconding_criterion_7(x))).
+  ! x in Person: ((filed_multiple_applications_with_negative_outcome(x))) => ((meets_absconding_criterion_8(x))).
+  ! x in Person: ((hid_prior_asylum_request_in_other_dublin_state(x))) => ((meets_absconding_criterion_9(x))).
+  ! x in Person: ((came_to_realm_for_other_purposes_than_application(x))) => ((meets_absconding_criterion_10(x))).
+  ! x in Person: ((subject_to_fine_for_manifestly_unlawful_appeal(x))) => ((meets_absconding_criterion_11(x))).
+  ! x in Person: (((meets_absconding_criterion_1(x)) | (meets_absconding_criterion_2(x)) | (meets_absconding_criterion_3(x)) | (meets_absconding_criterion_4(x)) | (meets_absconding_criterion_5(x)) | (meets_absconding_criterion_6(x)) | (meets_absconding_criterion_7(x)) | (meets_absconding_criterion_8(x)) | (meets_absconding_criterion_9(x)) | (meets_absconding_criterion_10(x)) | (meets_absconding_criterion_11(x)))) => ((meets_at_least_one_absconding_criterion(x))).
+}
