@@ -1,0 +1,154 @@
+{
+  "intent": "deduction",
+  "symbolic_status": "ok",
+  "status": "ok",
+  "scorable": true,
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "routing": {
+    "question": "Is BV Quarto a micro company pursuant to Article 1:25, paragraph 1?",
+    "detected_question_type": "boolean",
+    "selected_intent": "deduction",
+    "selected_reason": "expected.mode=boolean",
+    "scorable": true,
+    "fallback_intent": null,
+    "warnings": [],
+    "legal_output_symbols": [
+      "is_micro_company"
+    ],
+    "query_hint_type": "boolean",
+    "expected_question_type": "boolean"
+  },
+  "satisfiability_check": {
+    "stage": "pre_query",
+    "kb_case_satisfiable": true,
+    "status": "ok",
+    "details": "theory satisfiable",
+    "intent_backend": "idp_z3.tasks.satisfiable_check",
+    "duration_seconds": 0.0606
+  },
+  "warnings": [],
+  "deduction": {
+    "intent": "deduction",
+    "status": "ok",
+    "output_kind": "epistemic_boolean",
+    "predicate": "is_micro_company",
+    "args": [
+      "bv_quarto",
+      "fy_last"
+    ],
+    "possible": false,
+    "certain": false,
+    "label": "contradicted",
+    "atom": "is_micro_company(x0,x1)",
+    "constraint": "? x0 in Company, x1 in FinancialYear: __sel0(x0) & __sel1(x1) & is_micro_company(x0,x1)",
+    "certainty_class": "decisive",
+    "sat": true,
+    "internal_intent": "deduction",
+    "antecedent_coverage": [
+      {
+        "rule_index": 6,
+        "target": "is_micro_company(bv_quarto,fy_last)",
+        "conditions": [
+          {
+            "atom": "is_small_company_with_legal_personality(bv_quarto)",
+            "status": "present"
+          },
+          {
+            "atom": "is_subsidiary_company(bv_quarto)",
+            "status": "present"
+          },
+          {
+            "atom": "is_parent_company(bv_quarto)",
+            "status": "present"
+          },
+          {
+            "atom": "is_last_closed_financial_year(fy_last,bv_quarto)",
+            "status": "present"
+          },
+          {
+            "atom": "more_than_one_micro_criterion_exceeded(bv_quarto,fy_last)",
+            "status": "helper_defined"
+          }
+        ]
+      },
+      {
+        "rule_index": 7,
+        "target": "is_micro_company(bv_quarto,fy_last)",
+        "conditions": [
+          {
+            "atom": "more_than_one_micro_criterion_exceeded(bv_quarto,fy_last)",
+            "status": "helper_defined"
+          }
+        ]
+      }
+    ]
+  },
+  "model_expansion": null,
+  "get_range": null,
+  "satisfiable": null,
+  "explanation": null,
+  "execution_query": {
+    "type": "predicate",
+    "predicate": "is_micro_company",
+    "mode": "boolean",
+    "args": [
+      "bv_quarto",
+      "fy_last"
+    ],
+    "explain": false,
+    "predicate_kind": "derived",
+    "query_type": "predicate_boolean",
+    "internal_intent": "deduction"
+  },
+  "output_kind": "epistemic_boolean",
+  "certainty_class": "decisive",
+  "predicate": "is_micro_company",
+  "args": [
+    "bv_quarto",
+    "fy_last"
+  ],
+  "label": "contradicted",
+  "possible": false,
+  "certain": false,
+  "sat": true,
+  "antecedent_coverage": [
+    {
+      "rule_index": 6,
+      "target": "is_micro_company(bv_quarto,fy_last)",
+      "conditions": [
+        {
+          "atom": "is_small_company_with_legal_personality(bv_quarto)",
+          "status": "present"
+        },
+        {
+          "atom": "is_subsidiary_company(bv_quarto)",
+          "status": "present"
+        },
+        {
+          "atom": "is_parent_company(bv_quarto)",
+          "status": "present"
+        },
+        {
+          "atom": "is_last_closed_financial_year(fy_last,bv_quarto)",
+          "status": "present"
+        },
+        {
+          "atom": "more_than_one_micro_criterion_exceeded(bv_quarto,fy_last)",
+          "status": "helper_defined"
+        }
+      ]
+    },
+    {
+      "rule_index": 7,
+      "target": "is_micro_company(bv_quarto,fy_last)",
+      "conditions": [
+        {
+          "atom": "more_than_one_micro_criterion_exceeded(bv_quarto,fy_last)",
+          "status": "helper_defined"
+        }
+      ]
+    }
+  ]
+}

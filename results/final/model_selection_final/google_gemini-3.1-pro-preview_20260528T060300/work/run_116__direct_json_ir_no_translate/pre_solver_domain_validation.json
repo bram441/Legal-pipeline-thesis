@@ -1,0 +1,26 @@
+{
+  "case_entities_rendered_to_domains": {
+    "Company": [
+      "bv_nova"
+    ],
+    "FinancialYear": [
+      "financial_year_1"
+    ]
+  },
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "bv_nova",
+      "arg_index": 0,
+      "expected_type": "Company",
+      "predicate": "is_micro_company"
+    },
+    {
+      "entity": "financial_year_1",
+      "arg_index": 1,
+      "expected_type": "FinancialYear",
+      "predicate": "is_micro_company"
+    }
+  ],
+  "unmapped_case_entities": [],
+  "pre_solver_domain_validation_errors": []
+}

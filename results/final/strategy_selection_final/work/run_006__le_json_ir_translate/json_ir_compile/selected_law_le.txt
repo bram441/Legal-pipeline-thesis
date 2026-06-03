@@ -1,0 +1,35 @@
+A company has legal personality if the company is incorporated as a legal person.
+
+The employee criterion is exceeded for a company in a financial year if the annual average number of employees of the company in that financial year is greater than 50.
+
+The turnover criterion is exceeded for a company in a financial year if the annual net turnover of the company in that financial year, exclusive of value added tax and as referred to in article 1:26/1, is greater than 11,250,000 euros.
+
+The balance sheet criterion is exceeded for a company in a financial year if the balance sheet total of the company in that financial year is greater than 6,000,000 euros.
+
+More than one small-company criterion is exceeded for a company in a financial year if the employee criterion and the turnover criterion are both exceeded for that company in that financial year.
+
+More than one small-company criterion is exceeded for a company in a financial year if the employee criterion and the balance sheet criterion are both exceeded for that company in that financial year.
+
+More than one small-company criterion is exceeded for a company in a financial year if the turnover criterion and the balance sheet criterion are both exceeded for that company in that financial year.
+
+Not more than one small-company criterion is exceeded for a company in a financial year if more than one small-company criterion is not exceeded for that company in that financial year.
+
+A company qualifies as a small company in a financial year if the company has legal personality and not more than one small-company criterion is exceeded for that company in the last closed financial year on the balance sheet date of that last closed financial year.
+
+A financial year Y2 is the consecutive financial year following financial year Y1 if Y2 immediately follows Y1.
+
+Two consecutive financial years form a consecutive pair for a company if financial year Y2 is the consecutive financial year following financial year Y1 and more than one small-company criterion is exceeded for that company in both Y1 and Y2.
+
+Two consecutive financial years form a no-longer-exceeded consecutive pair for a company if financial year Y2 is the consecutive financial year following financial year Y1 and not more than one small-company criterion is exceeded for that company in both Y1 and Y2.
+
+A threshold-crossing event occurs for a company at financial year Y2 if two consecutive financial years form a consecutive pair for that company and Y2 is the second of those two financial years.
+
+A no-longer-exceeded event occurs for a company at financial year Y2 if two consecutive financial years form a no-longer-exceeded consecutive pair for that company and Y2 is the second of those two financial years.
+
+A financial year Y3 is the effect financial year for a company following a threshold-crossing event at Y2 if Y3 is the consecutive financial year following Y2.
+
+A financial year Y3 is the effect financial year for a company following a no-longer-exceeded event at Y2 if Y3 is the consecutive financial year following Y2.
+
+A company loses small-company status from the effect financial year Y3 if a threshold-crossing event occurs for that company at Y2 and Y3 is the effect financial year for that company following that threshold-crossing event.
+
+A company gains small-company status from the effect financial year Y3 if a no-longer-exceeded event occurs for that company at Y2 and Y3 is the effect financial year for that company following that no-longer-exceeded event.

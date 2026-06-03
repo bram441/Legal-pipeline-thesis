@@ -1,0 +1,51 @@
+{
+  "entities": {
+    "tom": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "has_descendants",
+          "arg_index": 0,
+          "expected_type": "Person"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "acquires_usufruct_of_entire_estate",
+          "arg_index": 0,
+          "expected_type": "Person"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "acquires_usufruct_of_entire_estate",
+          "arg_index": 1,
+          "expected_type": "Person"
+        }
+      ]
+    },
+    "ulla": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "declared",
+      "evidence": []
+    }
+  },
+  "unmapped_entities": [],
+  "conflicts": [],
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "tom",
+      "arg_index": 0,
+      "expected_type": "Person",
+      "predicate": "acquires_usufruct_of_entire_estate"
+    },
+    {
+      "entity": "tom",
+      "arg_index": 1,
+      "expected_type": "Person",
+      "predicate": "acquires_usufruct_of_entire_estate"
+    }
+  ]
+}

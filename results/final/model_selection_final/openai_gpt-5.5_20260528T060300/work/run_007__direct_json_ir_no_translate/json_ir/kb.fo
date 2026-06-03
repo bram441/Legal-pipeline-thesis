@@ -1,0 +1,16 @@
+vocabulary V {
+  type Person
+  type Asset
+  is_surviving_legal_cohabitant_of: Person * Person -> Bool
+  is_immovable_property: Asset -> Bool
+  is_household_good: Asset -> Bool
+  served_as_principal_family_dwelling_at_succession_opening: Asset * Person -> Bool
+  present_in_asset_at_succession_opening: Asset * Asset * Person -> Bool
+  subject_to_legal_reversion: Asset -> Bool
+  has_usufruct_right_over: Person * Asset -> Bool
+}
+
+theory T:V {
+  ! cohabitant in Person, deceased in Person, dwelling in Asset: (((is_surviving_legal_cohabitant_of(cohabitant,deceased)) & (is_immovable_property(dwelling)) & (served_as_principal_family_dwelling_at_succession_opening(dwelling,deceased)))) => ((has_usufruct_right_over(cohabitant,dwelling))).
+  ! cohabitant in Person, deceased in Person, dwelling in Asset, good in Asset: (((is_surviving_legal_cohabitant_of(cohabitant,deceased)) & (is_immovable_property(dwelling)) & (served_as_principal_family_dwelling_at_succession_opening(dwelling,deceased)) & (is_household_good(good)) & (present_in_asset_at_succession_opening(good,dwelling,deceased)))) => ((has_usufruct_right_over(cohabitant,good))).
+}

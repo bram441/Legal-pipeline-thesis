@@ -1,0 +1,104 @@
+{
+  "types": ["Company", "FinancialYear"],
+  "predicates": [
+    {
+      "name": "has_legal_personality",
+      "args": ["Company"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The company has legal personality, as directly stated in the case."
+    },
+    {
+      "name": "is_subsidiary",
+      "args": ["Company"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The company is a subsidiary of another company."
+    },
+    {
+      "name": "is_parent_company",
+      "args": ["Company"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The company is a parent company of another company."
+    },
+    {
+      "name": "is_small_company",
+      "args": ["Company"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The company qualifies as a small company under applicable law, as directly stated in the case."
+    },
+    {
+      "name": "is_last_closed_financial_year",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The given financial year is the last closed financial year for the company."
+    },
+    {
+      "name": "employee_criterion_exceeded",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds the annual average employee threshold of 10 in the financial year."
+    },
+    {
+      "name": "turnover_criterion_exceeded",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds the annual net turnover threshold of 900,000 euros (excluding VAT) in the financial year."
+    },
+    {
+      "name": "balance_sheet_criterion_exceeded",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds the balance sheet total threshold of 450,000 euros in the financial year."
+    },
+    {
+      "name": "more_than_one_micro_criterion_exceeded",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds more than one of the three micro-company criteria in the financial year."
+    },
+    {
+      "name": "is_micro_company",
+      "args": ["Company"],
+      "returns": "Bool",
+      "kind": "derived",
+      "output_category": "classification",
+      "description": "The company qualifies as a micro-company under the statutory definition, assessed on the balance sheet date of the last closed financial year."
+    }
+  ],
+  "functions": [
+    {
+      "name": "annual_average_employees",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Int",
+      "kind": "observable",
+      "description": "The annual average number of employees of the company in the financial year."
+    },
+    {
+      "name": "annual_net_turnover_excl_vat",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The annual net turnover of the company excluding value added tax in the financial year, in euros."
+    },
+    {
+      "name": "balance_sheet_total",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The balance sheet total of the company in the financial year, in euros."
+    }
+  ]
+}

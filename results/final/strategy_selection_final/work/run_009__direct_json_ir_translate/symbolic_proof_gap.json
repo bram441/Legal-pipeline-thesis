@@ -1,0 +1,310 @@
+{
+  "query": {
+    "predicate": "is_small_company",
+    "args": [
+      "bv_vega",
+      "last_closed_fy"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "contradicted",
+    "certain": false,
+    "possible": false,
+    "certainty_class": "decisive"
+  },
+  "extracted_case": {
+    "facts": [
+      "has_legal_personality(bv_vega).",
+      "annual_average_employees(bv_vega,last_closed_fy) = 55.",
+      "annual_net_turnover_excl_vat(bv_vega,last_closed_fy) = 12000000.0.",
+      "balance_sheet_total(bv_vega,last_closed_fy) = 5500000.0."
+    ],
+    "value_assertions": [
+      "annual_average_employees(bv_vega,last_closed_fy) = 55.",
+      "annual_net_turnover_excl_vat(bv_vega,last_closed_fy) = 12000000.0.",
+      "balance_sheet_total(bv_vega,last_closed_fy) = 5500000.0."
+    ],
+    "entities": {
+      "Company": [
+        "bv_vega"
+      ],
+      "FinancialYear": [
+        "last_closed_fy"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 0,
+      "requirements": {
+        "predicates": [],
+        "function_compares": [
+          {
+            "function": "annual_average_employees"
+          }
+        ]
+      },
+      "then_predicates": [
+        "employee_criterion_exceeded"
+      ]
+    },
+    {
+      "rule_index": 1,
+      "requirements": {
+        "predicates": [],
+        "function_compares": [
+          {
+            "function": "annual_net_turnover_excl_vat"
+          }
+        ]
+      },
+      "then_predicates": [
+        "turnover_criterion_exceeded"
+      ]
+    },
+    {
+      "rule_index": 2,
+      "requirements": {
+        "predicates": [],
+        "function_compares": [
+          {
+            "function": "balance_sheet_total"
+          }
+        ]
+      },
+      "then_predicates": [
+        "balance_sheet_criterion_exceeded"
+      ]
+    },
+    {
+      "rule_index": 3,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "employee_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          },
+          {
+            "predicate": "turnover_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "more_than_one_criterion_exceeded"
+      ]
+    },
+    {
+      "rule_index": 4,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "employee_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          },
+          {
+            "predicate": "balance_sheet_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "more_than_one_criterion_exceeded"
+      ]
+    },
+    {
+      "rule_index": 5,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "turnover_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          },
+          {
+            "predicate": "balance_sheet_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "more_than_one_criterion_exceeded"
+      ]
+    },
+    {
+      "rule_index": 6,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "has_legal_personality",
+            "args": [
+              "c"
+            ]
+          },
+          {
+            "predicate": "more_than_one_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "is_small_company"
+      ]
+    },
+    {
+      "rule_index": 7,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "more_than_one_criterion_exceeded",
+            "args": [
+              "c",
+              "fy"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "is_small_company"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 6,
+      "target": "is_small_company(bv_vega,last_closed_fy)",
+      "conditions": [
+        {
+          "atom": "has_legal_personality(bv_vega)",
+          "status": "present"
+        },
+        {
+          "atom": "more_than_one_criterion_exceeded(bv_vega,last_closed_fy)",
+          "status": "helper_defined"
+        }
+      ]
+    },
+    {
+      "rule_index": 7,
+      "target": "is_small_company(bv_vega,last_closed_fy)",
+      "conditions": [
+        {
+          "atom": "more_than_one_criterion_exceeded(bv_vega,last_closed_fy)",
+          "status": "helper_defined"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "has_legal_personality",
+      "symbol_type": "predicate",
+      "atom": "has_legal_personality(bv_vega)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "BV Vega has legal personality."
+      ],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "more_than_one_criterion_exceeded",
+      "symbol_type": "predicate",
+      "atom": "more_than_one_criterion_exceeded(bv_vega,last_closed_fy)",
+      "kind": "helper",
+      "gap_status": "derivable_from_rules",
+      "assertable_in_case": false,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "On the balance sheet date of the last closed financial year, it has 55 full-time equivalents, an annual net turnover of 12,000,000 euros excluding VAT, and a balance sheet total of 5,500,000 euros."
+      ],
+      "deriving_rule_indices": [
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "symbol": "annual_average_employees",
+      "symbol_type": "function",
+      "atom": "annual_average_employees(...)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "On the balance sheet date of the last closed financial year, it has 55 full-time equivalents, an annual net turnover of 12,000,000 euros excluding VAT, and a balance sheet total of 5,500,000 euros."
+      ],
+      "deriving_rule_indices": [
+        0
+      ]
+    },
+    {
+      "symbol": "annual_net_turnover_excl_vat",
+      "symbol_type": "function",
+      "atom": "annual_net_turnover_excl_vat(...)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "On the balance sheet date of the last closed financial year, it has 55 full-time equivalents, an annual net turnover of 12,000,000 euros excluding VAT, and a balance sheet total of 5,500,000 euros."
+      ],
+      "deriving_rule_indices": [
+        1
+      ]
+    },
+    {
+      "symbol": "balance_sheet_total",
+      "symbol_type": "function",
+      "atom": "balance_sheet_total(...)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "On the balance sheet date of the last closed financial year, it has 55 full-time equivalents, an annual net turnover of 12,000,000 euros excluding VAT, and a balance sheet total of 5,500,000 euros."
+      ],
+      "deriving_rule_indices": [
+        2
+      ]
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "genuinely_under_specified_case",
+    "secondary": [],
+    "rationale": "No single blocking category identified; case may lack explicit observables for a decisive proof."
+  }
+}

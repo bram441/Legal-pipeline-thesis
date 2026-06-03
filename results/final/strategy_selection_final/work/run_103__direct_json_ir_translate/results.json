@@ -1,0 +1,551 @@
+{
+  "id": "run_103",
+  "law": {
+    "text": "Chapter 4. Succession entitlement of the spouse and the legally cohabiting partner\n\nSection 1. The surviving spouse\n\nArt. 4.17. Inheritance rights of the surviving spouse\n\npar. 1. When the deceased leaves descendants, adopted children or descendants of these, the surviving spouse acquires the usufruct of the entire estate.\n\npar. 2. When the deceased leaves relatives in the ascending line or close collateral relatives, the surviving spouse acquires:\n(1) the full ownership of the share of the first to die in the common property and in the property held exclusively in undivided co-ownership between the spouses, and\n(2) the usufruct of the remaining goods of their own property.\n(3) the usufruct of the goods subject to the right of legal reversion referred to in article 4.24 or in article 4.25, unless otherwise provided in the deed of gift or in the will.\n\npar. 3. When the deceased leaves other heirs or no heirs, the surviving spouse acquires the full ownership of the entire estate.\n\nArt. 4.18. Usufruct over donated goods\n\nUpon the death of the donor, the surviving spouse who is called to the estate receives the usufruct of the goods that the donor donated and over which the donor reserved the usufruct, on the condition that the spouse already held that capacity at the time of the donation and that the donor remained the holder of this usufruct until the day of their death.\n\nUpon the death of the donor, the surviving spouse who is called to the estate receives the usufruct of the immovable property that served as the family's principal residence at the time the estate opened and of the household effects present therein, on the condition that the donor had reserved the usufruct of those goods upon the donation of those goods, that the spouse was legally cohabiting with the donor at the time of the donation, and that the donor remained the holder of this usufruct until the day of their death.\n\nThe spouse may renounce that usufruct. Articles 4.244 to 4.253 apply to that renunciation when it takes place during the lifetime of the donor.\n\nArt. 4.20. Right to lease\n\nThe surviving spouse acquires exclusively, to the exclusion of all other heirs, the right to the lease of the immovable property that served as the family's principal residence at the time the estate of the deceased opened.\n\nArt. 4.22. Exclusion or forfeiture\n\npar. 1. The surviving spouse may be wholly or partially excluded from their inheritance rights or declared to have forfeited them if they have been wholly or partially deprived of parental authority over the children born of their marriage with the deceased.\n\npar. 2. The legal action is brought by the descendants within one year calculated either from the opening of the estate or from the deprivation of parental authority.\n\nThe judgment takes effect from the date on which the action was brought.\n\npar. 3. If the usufruct has already been converted into the full ownership of a good or into a sum of money, or if the bare ownership of the goods referred to in article 4.61, paragraph 7, has already been transferred, the exclusion or the declaration of forfeiture gives rise to a right to compensation.\n\nThat compensation is determined by the court and corresponds to the value of the usufruct, taking into account the presumed life expectancy of the usufructuary at the time the legal action was brought.\n\nIf the usufruct has been converted into a life annuity, the judgment has retroactive effect to the same point in time.\n\nSection 2. The surviving legally cohabiting partner\n\nArt. 4.23. Inheritance rights and right to lease of the surviving legally cohabiting partner\n\npar. 1. The surviving legally cohabiting partner acquires, regardless of which heirs they are called to the estate with, the usufruct of the immovable property that served as the family's principal residence at the time the estate of the deceased opened, and of the household effects present therein.\n\nThe surviving legally cohabiting partner also exercises this right if the goods referred to in the first paragraph are the subject of a right of legal reversion referred to in article 4.24 or in article 4.25.\n\npar. 2. The surviving legally cohabiting partner who is called to the estate receives upon the death of the donor the usufruct of the immovable property that served as the family's principal residence at the time the estate opened and of the household effects present therein, if the donor had reserved the usufruct of these goods upon the donation of these goods, and on the condition that the legally cohabiting partner already held that capacity at the time of the donation and that the donor remained the holder of this usufruct until the day of their death.\n\nThe legally cohabiting partner may renounce the usufruct referred to in the first paragraph. Articles 4.244 to 4.253 apply to that renunciation when it takes place during the lifetime of the donor.\n\npar. 3. The surviving legally cohabiting partner acquires exclusively, to the exclusion of all other heirs, the right to the lease of the immovable property that served as the family's principal residence at the time the estate of the predeceased legally cohabiting partner opened, and acquires the usufruct of the household effects present therein.\n\npar. 4. The foregoing provisions do not apply when the surviving legally cohabiting partner is a descendant of the predeceased legally cohabiting partner.\n\npar. 5. Notwithstanding any provision to the contrary, anyone who acquires the bare ownership may demand that an inventory of the household effects and a statement of condition of the immovable property that served as the family's principal residence be drawn up.\n\npar. 6. The rules concerning the usufruct of the surviving spouse that are included in articles 4.22 and 4.60 to 4.64 apply mutatis mutandis to the usufruct of the surviving legally cohabiting partner."
+  },
+  "kb_used": {
+    "fo": "vocabulary V {\n  type Person\n  type Estate\n  is_surviving_spouse_of: Person * Person -> Bool\n  is_deceased: Person -> Bool\n  deceased_leaves_other_heirs: Person -> Bool\n  deceased_leaves_no_heirs: Person -> Bool\n  estate_belongs_to: Estate * Person -> Bool\n  other_heirs_or_no_heirs_condition: Person -> Bool\n  acquires_full_ownership_of_entire_estate: Person * Estate -> Bool\n}\n\ntheory T:V {\n  ! deceased in Person: (((deceased_leaves_other_heirs(deceased)) | (deceased_leaves_no_heirs(deceased)))) => ((other_heirs_or_no_heirs_condition(deceased))).\n  ! spouse in Person, deceased in Person, estate in Estate: (((is_surviving_spouse_of(spouse,deceased)) & (is_deceased(deceased)) & (estate_belongs_to(estate,deceased)) & (other_heirs_or_no_heirs_condition(deceased)))) => ((acquires_full_ownership_of_entire_estate(spouse,estate))).\n}"
+  },
+  "case": {
+    "text": "Els and Filip were married. Els dies without descendants, without relatives in the ascending line, without close collateral relatives and without other heirs. Filip is still alive."
+  },
+  "kb_compile_strategy": "direct_json_ir_translate",
+  "kb_compile_backend": "json_ir",
+  "extraction_backend": "json_ir",
+  "pipeline_backend_mode": "json_ir",
+  "kb_compile_flags": {
+    "use_le": false,
+    "uses_translation": true,
+    "json_ir_generation": "symbols_then_rules"
+  },
+  "strategy_metadata": {
+    "strategy_name": "direct_json_ir_translate",
+    "canonical_strategy_name": "direct_json_ir_translate",
+    "kb_backend": "json_ir",
+    "pipeline_backend_mode": "json_ir",
+    "uses_le_intermediate": false,
+    "json_ir_generation": "symbols_then_rules",
+    "belief_scoring": false,
+    "law_scope_mode": "cited",
+    "repair_enabled": true,
+    "json_ir_structured_repair_enabled": true,
+    "json_ir_max_symbol_versions": 3,
+    "json_ir_max_rules_attempts_per_symbol_version": 2,
+    "json_ir_max_kb_llm_calls": 8,
+    "json_ir_outer_cache_retries_enabled": false,
+    "json_ir_outer_cache_max_attempts": 1,
+    "configured_translation": true,
+    "effective_translation": true,
+    "translation_source": "strategy",
+    "uses_translation": true
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Does Filip acquire, pursuant to Article 4.17, paragraph 3, the full ownership of the entire estate?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "Art. 4.17 par. 3: if the deceased leaves other heirs or no heirs, the surviving spouse obtains full ownership of the whole estate."
+      },
+      "pipeline": {
+        "sat": true,
+        "case": {
+          "facts": [
+            "is_deceased(els).",
+            "is_surviving_spouse_of(filip,els).",
+            "deceased_leaves_no_heirs(els).",
+            "estate_belongs_to(els_estate,els)."
+          ],
+          "case_given_factual_inputs": [],
+          "entities": {
+            "Person": [
+              "els",
+              "filip"
+            ],
+            "Estate": [
+              "els_estate"
+            ]
+          },
+          "schema_environment": {
+            "types": {
+              "Person": {
+                "name": "Person",
+                "kind": "entity",
+                "aliases": [],
+                "source": "kb_symbol_table"
+              },
+              "Estate": {
+                "name": "Estate",
+                "kind": "entity",
+                "aliases": [],
+                "source": "kb_symbol_table"
+              }
+            },
+            "predicates": {
+              "is_surviving_spouse_of": {
+                "name": "is_surviving_spouse_of",
+                "args": [
+                  "Person",
+                  "Person"
+                ],
+                "returns": "Bool",
+                "kind": "observable",
+                "description": "The first person is the surviving spouse of the second (deceased) person.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": true,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "is_deceased": {
+                "name": "is_deceased",
+                "args": [
+                  "Person"
+                ],
+                "returns": "Bool",
+                "kind": "observable",
+                "description": "The person is deceased.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": true,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "deceased_leaves_other_heirs": {
+                "name": "deceased_leaves_other_heirs",
+                "args": [
+                  "Person"
+                ],
+                "returns": "Bool",
+                "kind": "observable",
+                "description": "The deceased person leaves heirs other than the surviving spouse.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": true,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "deceased_leaves_no_heirs": {
+                "name": "deceased_leaves_no_heirs",
+                "args": [
+                  "Person"
+                ],
+                "returns": "Bool",
+                "kind": "observable",
+                "description": "The deceased person leaves no heirs at all.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": true,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "estate_belongs_to": {
+                "name": "estate_belongs_to",
+                "args": [
+                  "Estate",
+                  "Person"
+                ],
+                "returns": "Bool",
+                "kind": "observable",
+                "description": "The estate belongs to the deceased person.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": true,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "other_heirs_or_no_heirs_condition": {
+                "name": "other_heirs_or_no_heirs_condition",
+                "args": [
+                  "Person"
+                ],
+                "returns": "Bool",
+                "kind": "helper",
+                "description": "The deceased leaves other heirs or leaves no heirs at all.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": false,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": false,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "acquires_full_ownership_of_entire_estate": {
+                "name": "acquires_full_ownership_of_entire_estate",
+                "args": [
+                  "Person",
+                  "Estate"
+                ],
+                "returns": "Bool",
+                "kind": "derived",
+                "description": "The surviving spouse acquires full ownership of the entire estate as a legal consequence under par. 3.",
+                "legal_output": true,
+                "output_category": "legal_effect",
+                "directly_observable": false,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": false,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": true,
+                "temporal_support": false
+              }
+            },
+            "functions": {},
+            "assertable_case_symbols": {
+              "predicates": [
+                "deceased_leaves_no_heirs",
+                "deceased_leaves_other_heirs",
+                "estate_belongs_to",
+                "is_deceased",
+                "is_surviving_spouse_of"
+              ],
+              "functions": []
+            },
+            "factual_case_input_predicates": [],
+            "factual_criteria_input_predicates": [],
+            "legal_output_query_targets": [
+              "acquires_full_ownership_of_entire_estate"
+            ],
+            "temporal_support_symbols": []
+          },
+          "entity_type_mapping": {
+            "entities": {
+              "els": {
+                "declared_type": "Person",
+                "resolved_type": "Person",
+                "source": "fact_argument",
+                "evidence": [
+                  {
+                    "source": "fact_argument",
+                    "symbol": "is_deceased",
+                    "arg_index": 0,
+                    "expected_type": "Person"
+                  },
+                  {
+                    "source": "fact_argument",
+                    "symbol": "is_surviving_spouse_of",
+                    "arg_index": 1,
+                    "expected_type": "Person"
+                  },
+                  {
+                    "source": "fact_argument",
+                    "symbol": "deceased_leaves_no_heirs",
+                    "arg_index": 0,
+                    "expected_type": "Person"
+                  },
+                  {
+                    "source": "fact_argument",
+                    "symbol": "estate_belongs_to",
+                    "arg_index": 1,
+                    "expected_type": "Person"
+                  }
+                ]
+              },
+              "els_estate": {
+                "declared_type": "Estate",
+                "resolved_type": "Estate",
+                "source": "fact_argument+query_argument",
+                "evidence": [
+                  {
+                    "source": "fact_argument",
+                    "symbol": "estate_belongs_to",
+                    "arg_index": 0,
+                    "expected_type": "Estate"
+                  },
+                  {
+                    "source": "query_argument",
+                    "symbol": "acquires_full_ownership_of_entire_estate",
+                    "arg_index": 1,
+                    "expected_type": "Estate"
+                  }
+                ]
+              },
+              "filip": {
+                "declared_type": "Person",
+                "resolved_type": "Person",
+                "source": "fact_argument+query_argument",
+                "evidence": [
+                  {
+                    "source": "fact_argument",
+                    "symbol": "is_surviving_spouse_of",
+                    "arg_index": 0,
+                    "expected_type": "Person"
+                  },
+                  {
+                    "source": "query_argument",
+                    "symbol": "acquires_full_ownership_of_entire_estate",
+                    "arg_index": 0,
+                    "expected_type": "Person"
+                  }
+                ]
+              }
+            },
+            "unmapped_entities": [],
+            "conflicts": [],
+            "query_arguments_with_inferred_types": [
+              {
+                "entity": "filip",
+                "arg_index": 0,
+                "expected_type": "Person",
+                "predicate": "acquires_full_ownership_of_entire_estate"
+              },
+              {
+                "entity": "els_estate",
+                "arg_index": 1,
+                "expected_type": "Estate",
+                "predicate": "acquires_full_ownership_of_entire_estate"
+              }
+            ]
+          },
+          "resolved_entity_domains": {
+            "Person": [
+              "els",
+              "filip"
+            ],
+            "Estate": [
+              "els_estate"
+            ]
+          }
+        },
+        "query": {
+          "type": "predicate",
+          "predicate": "acquires_full_ownership_of_entire_estate",
+          "mode": "boolean",
+          "args": [
+            "filip",
+            "els_estate"
+          ],
+          "explain": false,
+          "predicate_kind": "derived",
+          "query_type": "predicate_boolean",
+          "internal_intent": "deduction"
+        },
+        "symbolic_result": {
+          "intent": "deduction",
+          "symbolic_status": "ok",
+          "status": "ok",
+          "scorable": true,
+          "detected_question_type": "boolean",
+          "selected_intent": "deduction",
+          "selected_reason": "expected.mode=boolean",
+          "routing": {
+            "question": "Does Filip acquire, pursuant to Article 4.17, paragraph 3, the full ownership of the entire estate?",
+            "detected_question_type": "boolean",
+            "selected_intent": "deduction",
+            "selected_reason": "expected.mode=boolean",
+            "scorable": true,
+            "fallback_intent": null,
+            "warnings": [],
+            "legal_output_symbols": [
+              "acquires_full_ownership_of_entire_estate"
+            ],
+            "query_hint_type": "boolean",
+            "expected_question_type": "boolean"
+          },
+          "satisfiability_check": {
+            "stage": "pre_query",
+            "kb_case_satisfiable": true,
+            "status": "ok",
+            "details": "theory satisfiable",
+            "intent_backend": "idp_z3.tasks.satisfiable_check",
+            "duration_seconds": 0.0361
+          },
+          "warnings": [],
+          "deduction": {
+            "intent": "deduction",
+            "status": "ok",
+            "output_kind": "epistemic_boolean",
+            "predicate": "acquires_full_ownership_of_entire_estate",
+            "args": [
+              "filip",
+              "els_estate"
+            ],
+            "possible": true,
+            "certain": true,
+            "label": "entailed",
+            "atom": "acquires_full_ownership_of_entire_estate(x0,x1)",
+            "constraint": "? x0 in Person, x1 in Estate: __sel0(x0) & __sel1(x1) & acquires_full_ownership_of_entire_estate(x0,x1)",
+            "certainty_class": "decisive",
+            "sat": true,
+            "internal_intent": "deduction",
+            "antecedent_coverage": [
+              {
+                "rule_index": 1,
+                "target": "acquires_full_ownership_of_entire_estate(filip,els_estate)",
+                "conditions": [
+                  {
+                    "atom": "is_surviving_spouse_of(filip,els)",
+                    "status": "present"
+                  },
+                  {
+                    "atom": "is_deceased(els)",
+                    "status": "present"
+                  },
+                  {
+                    "atom": "estate_belongs_to(els_estate,els)",
+                    "status": "present"
+                  },
+                  {
+                    "atom": "other_heirs_or_no_heirs_condition(els)",
+                    "status": "helper_defined"
+                  }
+                ]
+              }
+            ]
+          },
+          "model_expansion": null,
+          "get_range": null,
+          "satisfiable": null,
+          "explanation": null,
+          "execution_query": {
+            "type": "predicate",
+            "predicate": "acquires_full_ownership_of_entire_estate",
+            "mode": "boolean",
+            "args": [
+              "filip",
+              "els_estate"
+            ],
+            "explain": false,
+            "predicate_kind": "derived",
+            "query_type": "predicate_boolean",
+            "internal_intent": "deduction"
+          },
+          "output_kind": "epistemic_boolean",
+          "certainty_class": "decisive",
+          "predicate": "acquires_full_ownership_of_entire_estate",
+          "args": [
+            "filip",
+            "els_estate"
+          ],
+          "label": "entailed",
+          "possible": true,
+          "certain": true,
+          "sat": true,
+          "antecedent_coverage": [
+            {
+              "rule_index": 1,
+              "target": "acquires_full_ownership_of_entire_estate(filip,els_estate)",
+              "conditions": [
+                {
+                  "atom": "is_surviving_spouse_of(filip,els)",
+                  "status": "present"
+                },
+                {
+                  "atom": "is_deceased(els)",
+                  "status": "present"
+                },
+                {
+                  "atom": "estate_belongs_to(els_estate,els)",
+                  "status": "present"
+                },
+                {
+                  "atom": "other_heirs_or_no_heirs_condition(els)",
+                  "status": "helper_defined"
+                }
+              ]
+            }
+          ]
+        },
+        "symbolic_intent_routing": {
+          "question": "Does Filip acquire, pursuant to Article 4.17, paragraph 3, the full ownership of the entire estate?",
+          "detected_question_type": "boolean",
+          "selected_intent": "deduction",
+          "selected_reason": "expected.mode=boolean",
+          "scorable": true,
+          "fallback_intent": null,
+          "warnings": [],
+          "legal_output_symbols": [
+            "acquires_full_ownership_of_entire_estate"
+          ],
+          "query_hint_type": "boolean",
+          "expected_question_type": "boolean"
+        },
+        "prediction": {
+          "query_type": "predicate_boolean",
+          "internal_intent": "deduction",
+          "output_kind": "epistemic_boolean",
+          "status": "ok",
+          "certainty_class": "decisive",
+          "mode": "boolean",
+          "label": "entailed",
+          "belief_yes": 1.0,
+          "credence_yes_pct": 100,
+          "verdict_strength_pct": 100
+        },
+        "natural_language": "Yes. Filip, Els_estate: The surviving spouse acquires full ownership of the entire estate as a legal consequence under par. 3.",
+        "explanation": null,
+        "extraction_prompt": "You are debugging a legal extraction failure.\n\nGiven KB_SCHEMA, CASE, and QUESTION, identify the likely generic cause of failure.\nFocus on schema mismatch, missing observable facts, wrong argument order, wrong entity type, selected observable instead of derived predicate, or unsupported query shape.\n\nDo not invent new law-specific fixes.\nReturn concise bullet points and one generic repair suggestion.\n\nKB_SCHEMA:\n{\n  \"types\": [\n    \"Person\",\n    \"Estate\"\n  ],\n  \"predicates\": [\n    {\n      \"name\": \"is_surviving_spouse_of\",\n      \"args\": [\n        \"Person\",\n        \"Person\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"observable\",\n      \"description\": \"The first person is the surviving spouse of the second (deceased) person.\",\n      \"directly_observable\": true\n    },\n    {\n      \"name\": \"is_deceased\",\n      \"args\": [\n        \"Person\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"observable\",\n      \"description\": \"The person is deceased.\",\n      \"directly_observable\": true\n    },\n    {\n      \"name\": \"deceased_leaves_other_heirs\",\n      \"args\": [\n        \"Person\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"observable\",\n      \"description\": \"The deceased person leaves heirs other than the surviving spouse.\",\n      \"directly_observable\": true\n    },\n    {\n      \"name\": \"deceased_leaves_no_heirs\",\n      \"args\": [\n        \"Person\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"observable\",\n      \"description\": \"The deceased person leaves no heirs at all.\",\n      \"directly_observable\": true\n    },\n    {\n      \"name\": \"estate_belongs_to\",\n      \"args\": [\n        \"Estate\",\n        \"Person\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"observable\",\n      \"description\": \"The estate belongs to the deceased person.\",\n      \"directly_observable\": true\n    },\n    {\n      \"name\": \"other_heirs_or_no_heirs_condition\",\n      \"args\": [\n        \"Person\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"helper\",\n      \"description\": \"The deceased leaves other heirs or leaves no heirs at all.\"\n    },\n    {\n      \"name\": \"acquires_full_ownership_of_entire_estate\",\n      \"args\": [\n        \"Person\",\n        \"Estate\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"derived\",\n      \"description\": \"The surviving spouse acquires full ownership of the entire estate as a legal consequence under par. 3.\",\n      \"legal_output\": true,\n      \"output_category\": \"legal_effect\"\n    }\n  ],\n  \"functions\": [],\n  \"rules\": [\n    {\n      \"forall\": [\n        {\n          \"var\": \"deceased\",\n          \"type\": \"Person\"\n        }\n      ],\n      \"if\": [\n        {\n          \"or\": [\n            {\n              \"pred\": \"deceased_leaves_other_heirs\",\n              \"args\": [\n                \"deceased\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"deceased_leaves_no_heirs\",\n              \"args\": [\n                \"deceased\"\n              ],\n              \"negated\": false\n            }\n          ]\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"other_heirs_or_no_heirs_condition\",\n          \"args\": [\n            \"deceased\"\n          ],\n          \"negated\": false\n        }\n      ],\n      \"operator\": \"implies\"\n    },\n    {\n      \"forall\": [\n        {\n          \"var\": \"spouse\",\n          \"type\": \"Person\"\n        },\n        {\n          \"var\": \"deceased\",\n          \"type\": \"Person\"\n        },\n        {\n          \"var\": \"estate\",\n          \"type\": \"Estate\"\n        }\n      ],\n      \"if\": [\n        {\n          \"and\": [\n            {\n              \"pred\": \"is_surviving_spouse_of\",\n              \"args\": [\n                \"spouse\",\n                \"deceased\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"is_deceased\",\n              \"args\": [\n                \"deceased\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"estate_belongs_to\",\n              \"args\": [\n                \"estate\",\n                \"deceased\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"other_heirs_or_no_heirs_condition\",\n              \"args\": [\n                \"deceased\"\n              ],\n              \"negated\": false\n            }\n          ]\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"acquires_full_ownership_of_entire_estate\",\n          \"args\": [\n            \"spouse\",\n            \"estate\"\n          ],\n          \"negated\": false\n        }\n      ],\n      \"operator\": \"implies\"\n    }\n  ]\n}\n\nCASE:\nEls and Filip were married. Els dies without descendants, without relatives in the ascending line, without close collateral relatives and without other heirs. Filip is still alive.\n\nQUESTION:\nDoes Filip acquire, pursuant to Article 4.17, paragraph 3, the full ownership of the entire estate?",
+        "raw_extracted": {
+          "case": {
+            "facts": [
+              "is_deceased(els).",
+              "is_surviving_spouse_of(filip,els).",
+              "deceased_leaves_no_heirs(els).",
+              "estate_belongs_to(els_estate,els)."
+            ],
+            "case_given_factual_inputs": [],
+            "entities": {
+              "Person": [
+                "els",
+                "filip"
+              ],
+              "Estate": [
+                "els_estate"
+              ]
+            }
+          },
+          "query": {
+            "type": "predicate",
+            "predicate": "acquires_full_ownership_of_entire_estate",
+            "mode": "boolean",
+            "args": [
+              "filip",
+              "els_estate"
+            ],
+            "explain": false,
+            "predicate_kind": "derived",
+            "query_type": "predicate_boolean",
+            "internal_intent": "deduction"
+          }
+        }
+      }
+    }
+  ]
+}

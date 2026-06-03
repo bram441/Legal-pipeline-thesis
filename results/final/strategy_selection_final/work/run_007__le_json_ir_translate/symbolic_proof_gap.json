@@ -1,0 +1,139 @@
+{
+  "query": {
+    "predicate": "acquires_usufruct_of_principal_residence",
+    "args": [
+      "noor",
+      "mira"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "entailed",
+    "certain": true,
+    "possible": true,
+    "certainty_class": "decisive"
+  },
+  "extracted_case": {
+    "facts": [
+      "is_surviving_legally_cohabiting_partner_of(noor,mira).",
+      "is_family_principal_residence(dwelling,mira).",
+      "called_to_estate_with_heirs(noor,mira)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "Property": [
+        "dwelling"
+      ],
+      "Person": [
+        "mira",
+        "noor"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 0,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_surviving_legally_cohabiting_partner_of",
+            "args": [
+              "survivor",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "is_family_principal_residence",
+            "args": [
+              "prop",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "called_to_estate_with_heirs",
+            "args": [
+              "survivor",
+              "deceased"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "acquires_usufruct_of_principal_residence"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 0,
+      "target": "acquires_usufruct_of_principal_residence(noor,mira)",
+      "conditions": [
+        {
+          "atom": "is_surviving_legally_cohabiting_partner_of(noor,mira)",
+          "status": "present"
+        },
+        {
+          "atom": "is_family_principal_residence(dwelling,mira)",
+          "status": "present"
+        },
+        {
+          "atom": "called_to_estate_with_heirs(noor,mira)",
+          "status": "present"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "is_surviving_legally_cohabiting_partner_of",
+      "symbol_type": "predicate",
+      "atom": "is_surviving_legally_cohabiting_partner_of(noor,mira)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "Mira and Noor were legally cohabiting.",
+        "Noor is the surviving legal cohabitant, comes to the estate, and is not a descendant of Mira."
+      ],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "is_family_principal_residence",
+      "symbol_type": "predicate",
+      "atom": "is_family_principal_residence(dwelling,mira)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "Noor is the surviving legal cohabitant, comes to the estate, and is not a descendant of Mira.",
+        "The dwelling was their principal family residence."
+      ],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "called_to_estate_with_heirs",
+      "symbol_type": "predicate",
+      "atom": "called_to_estate_with_heirs(noor,mira)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "Noor is the surviving legal cohabitant, comes to the estate, and is not a descendant of Mira."
+      ],
+      "deriving_rule_indices": []
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "genuinely_under_specified_case",
+    "secondary": [],
+    "rationale": "No single blocking category identified; case may lack explicit observables for a decisive proof."
+  }
+}

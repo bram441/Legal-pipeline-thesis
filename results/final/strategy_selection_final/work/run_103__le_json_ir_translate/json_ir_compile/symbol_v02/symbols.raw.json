@@ -1,0 +1,47 @@
+{
+  "types": ["Person", "Estate"],
+  "predicates": [
+    {
+      "name": "is_surviving_spouse_of",
+      "args": ["Person", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the surviving spouse of the second (deceased) person."
+    },
+    {
+      "name": "deceased_leaves_heirs_other_than_surviving_spouse",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deceased person leaves heirs other than the surviving spouse."
+    },
+    {
+      "name": "deceased_leaves_no_heirs",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deceased person leaves no heirs at all."
+    },
+    {
+      "name": "is_estate_of",
+      "args": ["Estate", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The estate belongs to the deceased person."
+    },
+    {
+      "name": "acquires_full_ownership_of_entire_estate",
+      "args": ["Person", "Estate"],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "output_category": "legal_effect",
+      "description": "The surviving spouse acquires full ownership of the entire estate as a legal consequence of succession."
+    }
+  ],
+  "functions": []
+}

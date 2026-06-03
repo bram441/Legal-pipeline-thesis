@@ -1,0 +1,43 @@
+vocabulary V {
+  type Company
+  type FinancialYear
+  has_legal_personality: Company -> Bool
+  is_starting_company: Company -> Bool
+  is_first_financial_year: Company * FinancialYear -> Bool
+  employee_criterion_exceeded: Company * FinancialYear -> Bool
+  turnover_criterion_exceeded: Company * FinancialYear -> Bool
+  balance_sheet_criterion_exceeded: Company * FinancialYear -> Bool
+  more_than_one_criterion_exceeded: Company * FinancialYear -> Bool
+  not_more_than_one_criterion_exceeded: Company * FinancialYear -> Bool
+  estimated_employee_criterion_exceeded: Company * FinancialYear -> Bool
+  estimated_turnover_criterion_exceeded: Company * FinancialYear -> Bool
+  estimated_balance_sheet_criterion_exceeded: Company * FinancialYear -> Bool
+  more_than_one_estimated_criterion_exceeded: Company * FinancialYear -> Bool
+  is_small_company: Company * FinancialYear -> Bool
+  annual_average_employees: Company * FinancialYear -> Int
+  annual_net_turnover_excl_vat: Company * FinancialYear -> Real
+  balance_sheet_total: Company * FinancialYear -> Real
+  estimated_annual_average_employees: Company * FinancialYear -> Int
+  estimated_annual_net_turnover_excl_vat: Company * FinancialYear -> Real
+  estimated_balance_sheet_total: Company * FinancialYear -> Real
+  last_closed_financial_year: Company * FinancialYear -> FinancialYear
+}
+
+theory T:V {
+  ! c in Company, fy in FinancialYear: ((has_legal_personality(c)) & (not_more_than_one_criterion_exceeded(c,fy))) => ((is_small_company(c,fy))).
+  ! c in Company, fy in FinancialYear: ((annual_average_employees(c,fy) > 50)) => ((employee_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((annual_net_turnover_excl_vat(c,fy) > 11250000.0)) => ((turnover_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((balance_sheet_total(c,fy) > 6000000.0)) => ((balance_sheet_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((employee_criterion_exceeded(c,fy)) & (turnover_criterion_exceeded(c,fy))) => ((more_than_one_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((employee_criterion_exceeded(c,fy)) & (balance_sheet_criterion_exceeded(c,fy))) => ((more_than_one_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((turnover_criterion_exceeded(c,fy)) & (balance_sheet_criterion_exceeded(c,fy))) => ((more_than_one_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((~more_than_one_criterion_exceeded(c,fy))) => ((not_more_than_one_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((more_than_one_criterion_exceeded(c,fy))) => ((~is_small_company(c,fy))).
+  ! c in Company, fy in FinancialYear: ((is_starting_company(c)) & (is_first_financial_year(c,fy)) & (estimated_annual_average_employees(c,fy) > 50)) => ((estimated_employee_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((is_starting_company(c)) & (is_first_financial_year(c,fy)) & (estimated_annual_net_turnover_excl_vat(c,fy) > 11250000.0)) => ((estimated_turnover_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((is_starting_company(c)) & (is_first_financial_year(c,fy)) & (estimated_balance_sheet_total(c,fy) > 6000000.0)) => ((estimated_balance_sheet_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((is_starting_company(c)) & (is_first_financial_year(c,fy)) & (estimated_employee_criterion_exceeded(c,fy)) & (estimated_turnover_criterion_exceeded(c,fy))) => ((more_than_one_estimated_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((is_starting_company(c)) & (is_first_financial_year(c,fy)) & (estimated_employee_criterion_exceeded(c,fy)) & (estimated_balance_sheet_criterion_exceeded(c,fy))) => ((more_than_one_estimated_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((is_starting_company(c)) & (is_first_financial_year(c,fy)) & (estimated_turnover_criterion_exceeded(c,fy)) & (estimated_balance_sheet_criterion_exceeded(c,fy))) => ((more_than_one_estimated_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((is_starting_company(c)) & (is_first_financial_year(c,fy)) & (more_than_one_estimated_criterion_exceeded(c,fy))) => ((~is_small_company(c,fy))).
+}

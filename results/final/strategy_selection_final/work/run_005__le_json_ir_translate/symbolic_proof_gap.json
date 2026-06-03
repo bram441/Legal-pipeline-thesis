@@ -1,0 +1,107 @@
+{
+  "query": {
+    "predicate": "has_illegal_stay",
+    "args": [
+      "samir"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "entailed",
+    "certain": true,
+    "possible": true,
+    "certainty_class": "decisive"
+  },
+  "extracted_case": {
+    "facts": [
+      "is_present_on_territory(samir).",
+      "not meets_conditions_for_entry_or_stay(samir).",
+      "not provides_proof_of_belgian_nationality(samir)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "Person": [
+        "belgian",
+        "samir"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 2,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_present_on_territory",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "meets_conditions_for_entry_or_stay",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "has_illegal_stay"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 2,
+      "target": "has_illegal_stay(samir)",
+      "conditions": [
+        {
+          "atom": "is_present_on_territory(samir)",
+          "status": "present"
+        },
+        {
+          "atom": "meets_conditions_for_entry_or_stay(samir)",
+          "status": "present"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "is_present_on_territory",
+      "symbol_type": "predicate",
+      "atom": "is_present_on_territory(samir)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "He resides on Belgian territory without meeting the conditions for lawful residence."
+      ],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "meets_conditions_for_entry_or_stay",
+      "symbol_type": "predicate",
+      "atom": "meets_conditions_for_entry_or_stay(samir)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "He resides on Belgian territory without meeting the conditions for lawful residence."
+      ],
+      "deriving_rule_indices": []
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "genuinely_under_specified_case",
+    "secondary": [],
+    "rationale": "No single blocking category identified; case may lack explicit observables for a decisive proof."
+  }
+}

@@ -1,0 +1,160 @@
+{
+  "types": {
+    "Person": {
+      "name": "Person",
+      "kind": "entity",
+      "aliases": [],
+      "source": "kb_symbol_table"
+    },
+    "ImmovableProperty": {
+      "name": "ImmovableProperty",
+      "kind": "entity",
+      "aliases": [],
+      "source": "kb_symbol_table"
+    }
+  },
+  "predicates": {
+    "is_surviving_spouse_of": {
+      "name": "is_surviving_spouse_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person is the surviving spouse of the second person.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "is_heir_of": {
+      "name": "is_heir_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person is an heir of the second person.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "property_is_leased": {
+      "name": "property_is_leased",
+      "args": [
+        "ImmovableProperty"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The immovable property is subject to a lease.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "served_as_family_principal_residence_at_estate_opening": {
+      "name": "served_as_family_principal_residence_at_estate_opening",
+      "args": [
+        "ImmovableProperty",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The immovable property served the family as principal residence when the estate of the person opened.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "has_right_to_lease": {
+      "name": "has_right_to_lease",
+      "args": [
+        "Person",
+        "ImmovableProperty"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The person has the legal right to the lease of the immovable property.",
+      "legal_output": true,
+      "output_category": "right",
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": true,
+      "temporal_support": false
+    },
+    "excluded_from_lease_right": {
+      "name": "excluded_from_lease_right",
+      "args": [
+        "Person",
+        "ImmovableProperty"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The person is excluded from the legal right to the lease of the immovable property.",
+      "legal_output": true,
+      "output_category": "legal_effect",
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": true,
+      "temporal_support": false
+    }
+  },
+  "functions": {},
+  "assertable_case_symbols": {
+    "predicates": [
+      "is_heir_of",
+      "is_surviving_spouse_of",
+      "property_is_leased",
+      "served_as_family_principal_residence_at_estate_opening"
+    ],
+    "functions": []
+  },
+  "factual_case_input_predicates": [],
+  "factual_criteria_input_predicates": [],
+  "legal_output_query_targets": [
+    "excluded_from_lease_right",
+    "has_right_to_lease"
+  ],
+  "temporal_support_symbols": []
+}

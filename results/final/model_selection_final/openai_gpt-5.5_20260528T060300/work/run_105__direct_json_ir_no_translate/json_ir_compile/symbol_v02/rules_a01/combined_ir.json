@@ -1,0 +1,89 @@
+{
+  "types": [
+    "Person"
+  ],
+  "predicates": [
+    {
+      "name": "is_surviving_legal_cohabitant_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the surviving legal cohabitant of the second person, who is the predeceased legal cohabitant."
+    },
+    {
+      "name": "is_descendant_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is a descendant of the second person."
+    },
+    {
+      "name": "preceding_provisions_not_applicable",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "output_category": "exception",
+      "description": "The preceding provisions do not apply in relation to the surviving legal cohabitant and the predeceased legal cohabitant."
+    }
+  ],
+  "functions": [],
+  "rules": [
+    {
+      "forall": [
+        {
+          "var": "survivor",
+          "type": "Person"
+        },
+        {
+          "var": "predeceased",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_legal_cohabitant_of",
+              "args": [
+                "survivor",
+                "predeceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_descendant_of",
+              "args": [
+                "survivor",
+                "predeceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "preceding_provisions_not_applicable",
+          "args": [
+            "survivor",
+            "predeceased"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    }
+  ]
+}

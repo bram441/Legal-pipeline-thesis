@@ -1,0 +1,201 @@
+{
+  "intent": "deduction",
+  "symbolic_status": "ok",
+  "status": "ok",
+  "scorable": true,
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "routing": {
+    "question": "Is NV Delta a micro-company within the meaning of Article 1:25, paragraph 1?",
+    "detected_question_type": "boolean",
+    "selected_intent": "deduction",
+    "selected_reason": "expected.mode=boolean",
+    "scorable": true,
+    "fallback_intent": null,
+    "warnings": [],
+    "legal_output_symbols": [
+      "is_micro_company"
+    ],
+    "query_hint_type": "boolean",
+    "expected_question_type": "boolean"
+  },
+  "satisfiability_check": {
+    "stage": "pre_query",
+    "kb_case_satisfiable": true,
+    "status": "ok",
+    "details": "theory satisfiable",
+    "intent_backend": "idp_z3.tasks.satisfiable_check",
+    "duration_seconds": 0.1176
+  },
+  "warnings": [],
+  "deduction": {
+    "intent": "deduction",
+    "status": "ok",
+    "output_kind": "epistemic_boolean",
+    "predicate": "is_micro_company",
+    "args": [
+      "nv_delta"
+    ],
+    "possible": true,
+    "certain": false,
+    "label": "unknown",
+    "atom": "is_micro_company(x0)",
+    "constraint": "? x0 in Company: __sel0(x0) & is_micro_company(x0)",
+    "certainty_class": "inconclusive",
+    "sat": true,
+    "internal_intent": "deduction",
+    "antecedent_coverage": [
+      {
+        "rule_index": 5,
+        "target": "is_micro_company(nv_delta)",
+        "conditions": [
+          {
+            "atom": "has_legal_personality(nv_delta)",
+            "status": "present"
+          },
+          {
+            "atom": "is_small_company(nv_delta)",
+            "status": "missing"
+          },
+          {
+            "atom": "is_subsidiary(nv_delta)",
+            "status": "present"
+          },
+          {
+            "atom": "is_parent_company(nv_delta)",
+            "status": "present"
+          },
+          {
+            "atom": "micro_criteria_satisfied(nv_delta)",
+            "status": "helper_defined"
+          }
+        ]
+      },
+      {
+        "rule_index": 6,
+        "target": "is_micro_company(nv_delta)",
+        "conditions": [
+          {
+            "atom": "is_subsidiary(nv_delta)",
+            "status": "present"
+          }
+        ]
+      },
+      {
+        "rule_index": 7,
+        "target": "is_micro_company(nv_delta)",
+        "conditions": [
+          {
+            "atom": "is_parent_company(nv_delta)",
+            "status": "present"
+          }
+        ]
+      },
+      {
+        "rule_index": 8,
+        "target": "is_micro_company(nv_delta)",
+        "conditions": [
+          {
+            "atom": "is_last_closed_financial_year(nv_delta,fy_last)",
+            "status": "present"
+          },
+          {
+            "atom": "more_than_one_micro_criterion_exceeded(nv_delta,fy_last)",
+            "status": "helper_defined"
+          }
+        ]
+      }
+    ],
+    "extraction_repair_hint": "The selected legal conclusion could not be proven because an observable antecedent required by the KB rule was not asserted from the case. Re-check the case text for facts matching these observable schema symbols: is_small_company: The company qualifies as a small company under applicable law.."
+  },
+  "model_expansion": null,
+  "get_range": null,
+  "satisfiable": null,
+  "explanation": null,
+  "execution_query": {
+    "type": "predicate",
+    "predicate": "is_micro_company",
+    "mode": "boolean",
+    "args": [
+      "nv_delta"
+    ],
+    "explain": false,
+    "predicate_kind": "derived",
+    "query_type": "predicate_boolean",
+    "internal_intent": "deduction"
+  },
+  "output_kind": "epistemic_boolean",
+  "certainty_class": "inconclusive",
+  "predicate": "is_micro_company",
+  "args": [
+    "nv_delta"
+  ],
+  "label": "unknown",
+  "possible": true,
+  "certain": false,
+  "sat": true,
+  "antecedent_coverage": [
+    {
+      "rule_index": 5,
+      "target": "is_micro_company(nv_delta)",
+      "conditions": [
+        {
+          "atom": "has_legal_personality(nv_delta)",
+          "status": "present"
+        },
+        {
+          "atom": "is_small_company(nv_delta)",
+          "status": "missing"
+        },
+        {
+          "atom": "is_subsidiary(nv_delta)",
+          "status": "present"
+        },
+        {
+          "atom": "is_parent_company(nv_delta)",
+          "status": "present"
+        },
+        {
+          "atom": "micro_criteria_satisfied(nv_delta)",
+          "status": "helper_defined"
+        }
+      ]
+    },
+    {
+      "rule_index": 6,
+      "target": "is_micro_company(nv_delta)",
+      "conditions": [
+        {
+          "atom": "is_subsidiary(nv_delta)",
+          "status": "present"
+        }
+      ]
+    },
+    {
+      "rule_index": 7,
+      "target": "is_micro_company(nv_delta)",
+      "conditions": [
+        {
+          "atom": "is_parent_company(nv_delta)",
+          "status": "present"
+        }
+      ]
+    },
+    {
+      "rule_index": 8,
+      "target": "is_micro_company(nv_delta)",
+      "conditions": [
+        {
+          "atom": "is_last_closed_financial_year(nv_delta,fy_last)",
+          "status": "present"
+        },
+        {
+          "atom": "more_than_one_micro_criterion_exceeded(nv_delta,fy_last)",
+          "status": "helper_defined"
+        }
+      ]
+    }
+  ],
+  "extraction_repair_hint": "The selected legal conclusion could not be proven because an observable antecedent required by the KB rule was not asserted from the case. Re-check the case text for facts matching these observable schema symbols: is_small_company: The company qualifies as a small company under applicable law.."
+}

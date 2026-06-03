@@ -1,0 +1,141 @@
+{
+  "types": [
+    "Company",
+    "FinancialYear"
+  ],
+  "predicates": [
+    {
+      "name": "is_small_company",
+      "args": [
+        "Company"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The company has the status of a small company for purposes of the provision."
+    },
+    {
+      "name": "has_legal_personality",
+      "args": [
+        "Company"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The company has legal personality."
+    },
+    {
+      "name": "is_subsidiary_company",
+      "args": [
+        "Company"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The company has the status of a subsidiary company."
+    },
+    {
+      "name": "is_parent_company",
+      "args": [
+        "Company"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The company has the status of a parent company."
+    },
+    {
+      "name": "last_closed_financial_year",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The financial year is the company's last closed financial year."
+    },
+    {
+      "name": "employee_micro_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds the employee criterion for micro-company status in the financial year."
+    },
+    {
+      "name": "net_turnover_micro_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds the annual net turnover criterion for micro-company status in the financial year."
+    },
+    {
+      "name": "balance_sheet_micro_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds the balance sheet total criterion for micro-company status in the financial year."
+    },
+    {
+      "name": "more_than_one_micro_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds more than one of the criteria for micro-company status in the financial year."
+    },
+    {
+      "name": "is_micro_company",
+      "args": [
+        "Company"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "output_category": "classification",
+      "description": "The company qualifies as a micro-company under the provision."
+    }
+  ],
+  "functions": [
+    {
+      "name": "annual_average_employees",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Int",
+      "kind": "observable",
+      "description": "The company's annual average number of employees in the financial year."
+    },
+    {
+      "name": "annual_net_turnover_excluding_vat",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The company's annual net turnover excluding value added tax in the financial year."
+    },
+    {
+      "name": "balance_sheet_total",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The company's balance sheet total in the financial year."
+    }
+  ]
+}

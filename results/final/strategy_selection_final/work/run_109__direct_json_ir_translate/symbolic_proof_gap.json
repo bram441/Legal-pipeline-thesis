@@ -1,0 +1,108 @@
+{
+  "query": {
+    "predicate": "is_in_illegal_stay",
+    "args": [
+      "bilal"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "unknown",
+    "certain": false,
+    "possible": true,
+    "certainty_class": "inconclusive"
+  },
+  "extracted_case": {
+    "facts": [
+      "not provides_proof_of_belgian_nationality(bilal).",
+      "meets_entry_or_stay_conditions(bilal)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "Person": [
+        "belgian",
+        "bilal"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 2,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_alien",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "meets_entry_or_stay_conditions",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "is_in_illegal_stay"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 2,
+      "target": "is_in_illegal_stay(bilal)",
+      "conditions": [
+        {
+          "atom": "is_alien(bilal)",
+          "status": "unknown"
+        },
+        {
+          "atom": "meets_entry_or_stay_conditions(bilal)",
+          "status": "present"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "is_alien",
+      "symbol_type": "predicate",
+      "atom": "is_alien(bilal)",
+      "kind": "derived",
+      "gap_status": "derivable_from_rules",
+      "assertable_in_case": false,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "He is present on Belgian territory and no longer meets the conditions for residence on the territory."
+      ],
+      "deriving_rule_indices": [
+        0
+      ]
+    },
+    {
+      "symbol": "meets_entry_or_stay_conditions",
+      "symbol_type": "predicate",
+      "atom": "meets_entry_or_stay_conditions(bilal)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "He is present on Belgian territory and no longer meets the conditions for residence on the territory."
+      ],
+      "deriving_rule_indices": []
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "extraction_gap",
+    "secondary": [],
+    "rationale": "Symbolic result is inconclusive and antecedents are not fully grounded in case facts."
+  }
+}

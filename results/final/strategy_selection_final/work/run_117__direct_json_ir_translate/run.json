@@ -1,0 +1,50 @@
+{
+  "id": "run_117",
+  "law": {
+    "path": "example_laws_clean/microvennootschappen_clean.txt"
+  },
+  "case": {
+    "text": "BV Sigma heeft rechtspersoonlijkheid. Zij is geen dochtervennootschap en geen moedervennootschap. Op balansdatum heeft zij 11 voltijdse equivalenten, een jaarlijkse netto-omzet van 1.000.000 euro exclusief btw en een balanstotaal van 420.000 euro."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Is BV Sigma een microvennootschap volgens artikel 1:25, paragraaf 1?",
+      "expected": {
+        "mode": "boolean",
+        "value": false,
+        "reason": "Sigma exceeds two micro thresholds: employees > 10 and turnover > 900,000. A micro-company may exceed no more than one."
+      }
+    }
+  ],
+  "kb_compile_strategy": "direct_json_ir_translate",
+  "kb_compile_backend": "json_ir",
+  "extraction_backend": "json_ir",
+  "pipeline_backend_mode": "json_ir",
+  "kb_compile_flags": {
+    "use_le": false,
+    "uses_translation": true,
+    "json_ir_generation": "symbols_then_rules"
+  },
+  "strategy_metadata": {
+    "strategy_name": "direct_json_ir_translate",
+    "canonical_strategy_name": "direct_json_ir_translate",
+    "kb_backend": "json_ir",
+    "pipeline_backend_mode": "json_ir",
+    "uses_le_intermediate": false,
+    "json_ir_generation": "symbols_then_rules",
+    "belief_scoring": false,
+    "law_scope_mode": "cited",
+    "repair_enabled": true,
+    "json_ir_structured_repair_enabled": true,
+    "json_ir_max_symbol_versions": 3,
+    "json_ir_max_rules_attempts_per_symbol_version": 2,
+    "json_ir_max_kb_llm_calls": 8,
+    "json_ir_outer_cache_retries_enabled": false,
+    "json_ir_outer_cache_max_attempts": 1,
+    "configured_translation": true,
+    "effective_translation": true,
+    "translation_source": "strategy",
+    "uses_translation": true
+  }
+}

@@ -1,0 +1,250 @@
+{
+  "query": {
+    "predicate": "acquires_usufruct_of_entire_estate",
+    "args": [
+      "peter",
+      "sara_estate"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "entailed",
+    "certain": true,
+    "possible": true,
+    "certainty_class": "decisive"
+  },
+  "extracted_case": {
+    "facts": [
+      "is_surviving_spouse_of(peter,sara).",
+      "is_estate_of(sara_estate,sara).",
+      "leaves_descendants(sara)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "Person": [
+        "peter",
+        "sara"
+      ],
+      "Estate": [
+        "sara_estate"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 0,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_surviving_spouse_of",
+            "args": [
+              "spouse",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "leaves_descendants",
+            "args": [
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "is_estate_of",
+            "args": [
+              "estate",
+              "deceased"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "acquires_usufruct_of_entire_estate"
+      ]
+    },
+    {
+      "rule_index": 1,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_surviving_spouse_of",
+            "args": [
+              "spouse",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "leaves_adopted_children",
+            "args": [
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "is_estate_of",
+            "args": [
+              "estate",
+              "deceased"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "acquires_usufruct_of_entire_estate"
+      ]
+    },
+    {
+      "rule_index": 2,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_surviving_spouse_of",
+            "args": [
+              "spouse",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "leaves_descendants_of_adopted_children",
+            "args": [
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "is_estate_of",
+            "args": [
+              "estate",
+              "deceased"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "acquires_usufruct_of_entire_estate"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 0,
+      "target": "acquires_usufruct_of_entire_estate(peter,sara_estate)",
+      "conditions": [
+        {
+          "atom": "is_surviving_spouse_of(peter,sara)",
+          "status": "present"
+        },
+        {
+          "atom": "leaves_descendants(sara)",
+          "status": "present"
+        },
+        {
+          "atom": "is_estate_of(sara_estate,sara)",
+          "status": "present"
+        }
+      ]
+    },
+    {
+      "rule_index": 1,
+      "target": "acquires_usufruct_of_entire_estate(peter,sara_estate)",
+      "conditions": [
+        {
+          "atom": "is_surviving_spouse_of(peter,sara)",
+          "status": "present"
+        },
+        {
+          "atom": "leaves_adopted_children(sara)",
+          "status": "missing_non_blocking"
+        },
+        {
+          "atom": "is_estate_of(sara_estate,sara)",
+          "status": "present"
+        }
+      ]
+    },
+    {
+      "rule_index": 2,
+      "target": "acquires_usufruct_of_entire_estate(peter,sara_estate)",
+      "conditions": [
+        {
+          "atom": "is_surviving_spouse_of(peter,sara)",
+          "status": "present"
+        },
+        {
+          "atom": "leaves_descendants_of_adopted_children(sara)",
+          "status": "missing_non_blocking"
+        },
+        {
+          "atom": "is_estate_of(sara_estate,sara)",
+          "status": "present"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "is_surviving_spouse_of",
+      "symbol_type": "predicate",
+      "atom": "is_surviving_spouse_of(peter,sara)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "leaves_descendants",
+      "symbol_type": "predicate",
+      "atom": "leaves_descendants(sara)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "is_estate_of",
+      "symbol_type": "predicate",
+      "atom": "is_estate_of(sara_estate,sara)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "leaves_adopted_children",
+      "symbol_type": "predicate",
+      "atom": "leaves_adopted_children(sara)",
+      "kind": "observable",
+      "gap_status": "missing_entirely",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "leaves_descendants_of_adopted_children",
+      "symbol_type": "predicate",
+      "atom": "leaves_descendants_of_adopted_children(sara)",
+      "kind": "observable",
+      "gap_status": "missing_entirely",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "extraction_gap",
+    "secondary": [],
+    "rationale": "Assertable observables or temporal facts required by the derivation chain were not extracted from the case although the case text contains relevant qualitative evidence."
+  }
+}

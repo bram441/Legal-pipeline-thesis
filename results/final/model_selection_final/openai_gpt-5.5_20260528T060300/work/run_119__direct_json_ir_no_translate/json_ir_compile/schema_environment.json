@@ -1,0 +1,512 @@
+{
+  "types": {
+    "Company": {
+      "name": "Company",
+      "kind": "entity",
+      "aliases": [],
+      "source": "kb_symbol_table"
+    },
+    "FinancialYear": {
+      "name": "FinancialYear",
+      "kind": "period",
+      "aliases": [],
+      "source": "kb_symbol_table"
+    }
+  },
+  "predicates": {
+    "has_legal_personality": {
+      "name": "has_legal_personality",
+      "args": [
+        "Company"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The company has legal personality.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "last_closed_financial_year": {
+      "name": "last_closed_financial_year",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The financial year is the company's last closed financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "first_financial_year": {
+      "name": "first_financial_year",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The financial year is the company's first financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "good_faith_estimate_at_beginning_of_year": {
+      "name": "good_faith_estimate_at_beginning_of_year",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The company made the relevant figures estimate in good faith at the beginning of the financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "employee_threshold_exceeded": {
+      "name": "employee_threshold_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds the statutory employee criterion in the financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": true,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": "case_given_employee_threshold_exceeded",
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "turnover_threshold_exceeded": {
+      "name": "turnover_threshold_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds the statutory net turnover criterion in the financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": true,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": "case_given_turnover_threshold_exceeded",
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "balance_sheet_threshold_exceeded": {
+      "name": "balance_sheet_threshold_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds the statutory balance sheet total criterion in the financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": true,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": "case_given_balance_sheet_threshold_exceeded",
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "more_than_one_criterion_exceeded": {
+      "name": "more_than_one_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds more than one of the statutory criteria in the financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": true,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": "case_given_more_than_one_criterion_exceeded",
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "no_more_than_one_criterion_exceeded": {
+      "name": "no_more_than_one_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company does not exceed more than one of the statutory criteria in the financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "estimated_employee_threshold_exceeded": {
+      "name": "estimated_employee_threshold_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company's good faith estimate exceeds the statutory employee criterion for the financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": true,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": "case_given_estimated_employee_threshold_exceeded",
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "estimated_turnover_threshold_exceeded": {
+      "name": "estimated_turnover_threshold_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company's good faith estimate exceeds the statutory net turnover criterion for the financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": true,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": "case_given_estimated_turnover_threshold_exceeded",
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "estimated_balance_sheet_threshold_exceeded": {
+      "name": "estimated_balance_sheet_threshold_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company's good faith estimate exceeds the statutory balance sheet total criterion for the financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": true,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": "case_given_estimated_balance_sheet_threshold_exceeded",
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "more_than_one_estimated_criterion_exceeded": {
+      "name": "more_than_one_estimated_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company's good faith estimate shows that more than one statutory criterion will be exceeded in the financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": true,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": "case_given_more_than_one_estimated_criterion_exceeded",
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "no_more_than_one_estimated_criterion_exceeded": {
+      "name": "no_more_than_one_estimated_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company's good faith estimate does not show that more than one statutory criterion will be exceeded in the financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "is_small_company": {
+      "name": "is_small_company",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The company is legally classified as a small company for the financial year.",
+      "legal_output": null,
+      "output_category": "classification",
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "estimate_must_be_taken_into_account_immediately": {
+      "name": "estimate_must_be_taken_into_account_immediately",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The company must immediately take the good faith estimate into account for the first financial year.",
+      "legal_output": true,
+      "output_category": "obligation",
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": true,
+      "temporal_support": false
+    }
+  },
+  "functions": {
+    "annual_average_employees": {
+      "name": "annual_average_employees",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Int",
+      "kind": "observable",
+      "description": "The company's annual average number of employees in the financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "annual_net_turnover_excluding_vat": {
+      "name": "annual_net_turnover_excluding_vat",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The company's annual net turnover excluding value added tax in the financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "balance_sheet_total": {
+      "name": "balance_sheet_total",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The company's balance sheet total in the financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "estimated_annual_average_employees": {
+      "name": "estimated_annual_average_employees",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Int",
+      "kind": "observable",
+      "description": "The good faith estimated annual average number of employees for the financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "estimated_annual_net_turnover_excluding_vat": {
+      "name": "estimated_annual_net_turnover_excluding_vat",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The good faith estimated annual net turnover excluding value added tax for the financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "estimated_balance_sheet_total": {
+      "name": "estimated_balance_sheet_total",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The good faith estimated balance sheet total for the financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    }
+  },
+  "assertable_case_symbols": {
+    "predicates": [
+      "first_financial_year",
+      "good_faith_estimate_at_beginning_of_year",
+      "has_legal_personality",
+      "last_closed_financial_year"
+    ],
+    "functions": [
+      "annual_average_employees",
+      "annual_net_turnover_excluding_vat",
+      "balance_sheet_total",
+      "estimated_annual_average_employees",
+      "estimated_annual_net_turnover_excluding_vat",
+      "estimated_balance_sheet_total"
+    ]
+  },
+  "factual_case_input_predicates": [
+    "balance_sheet_threshold_exceeded",
+    "employee_threshold_exceeded",
+    "estimated_balance_sheet_threshold_exceeded",
+    "estimated_employee_threshold_exceeded",
+    "estimated_turnover_threshold_exceeded",
+    "more_than_one_criterion_exceeded",
+    "more_than_one_estimated_criterion_exceeded",
+    "turnover_threshold_exceeded"
+  ],
+  "factual_criteria_input_predicates": [],
+  "legal_output_query_targets": [
+    "estimate_must_be_taken_into_account_immediately"
+  ],
+  "temporal_support_symbols": []
+}

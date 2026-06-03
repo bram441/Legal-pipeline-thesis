@@ -1,0 +1,69 @@
+{
+  "types": ["Person", "Asset"],
+  "predicates": [
+    {
+      "name": "is_surviving_legal_cohabitant_of",
+      "args": ["Person", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the surviving legal cohabitant of the second person (the deceased). This background status may be directly asserted in a case."
+    },
+    {
+      "name": "is_heir_of",
+      "args": ["Person", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is an heir of the second person (the deceased)."
+    },
+    {
+      "name": "is_main_family_residence_at_opening_of_estate",
+      "args": ["Asset", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset served as the main family residence of the deceased's household at the time the estate opened."
+    },
+    {
+      "name": "is_household_contents_of",
+      "args": ["Asset", "Asset"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first asset is household contents present in the second asset (the main family residence)."
+    },
+    {
+      "name": "subject_to_legal_reversion_4_24",
+      "args": ["Asset"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset is subject to the right of legal reversion referred to in article 4.24."
+    },
+    {
+      "name": "subject_to_legal_reversion_4_25",
+      "args": ["Asset"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset is subject to the right of legal reversion referred to in article 4.25."
+    },
+    {
+      "name": "subject_to_legal_reversion",
+      "args": ["Asset"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The asset is subject to a right of legal reversion under article 4.24 or article 4.25."
+    },
+    {
+      "name": "acquires_usufruct_of",
+      "args": ["Person", "Asset"],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "description": "The surviving legal cohabitant acquires the usufruct of the asset as a legal consequence of the estate opening."
+    }
+  ],
+  "functions": []
+}

@@ -1,0 +1,481 @@
+{
+  "id": "run_202",
+  "law": {
+    "text": "Chapter 4. Succession entitlement of the spouse and the legally cohabiting partner\n\nSection 1. The surviving spouse\n\nArt. 4.17. Inheritance rights of the surviving spouse\n\npar. 1. When the deceased leaves descendants, adopted children or descendants of these, the surviving spouse acquires the usufruct of the entire estate.\n\npar. 2. When the deceased leaves relatives in the ascending line or close collateral relatives, the surviving spouse acquires:\n(1) the full ownership of the share of the first-dying in the common property and in the property that is exclusively held in undivided co-ownership between the spouses, and\n(2) the usufruct of the remaining goods of their own property.\n(3) the usufruct of the goods subject to the right of legal reversion referred to in article 4.24 or in article 4.25, unless otherwise provided in the deed of donation or in the will.\n\npar. 3. When the deceased leaves other heirs or no heirs, the surviving spouse acquires the full ownership of the entire estate.\n\nArt. 4.18. Usufruct over donated goods\n\nUpon the death of the donor, the surviving spouse who is called to the estate receives the usufruct of the goods that the donor donated and of which the donor reserved the usufruct, on the condition that the spouse already held that capacity at the time of the donation and that the donor remained the holder of this usufruct until the day of their death.\n\nUpon the death of the donor, the surviving spouse who is called to the estate receives the usufruct of the immovable property that served as the family's principal residence at the time the estate opened and of the household effects present therein, on the condition that the donor had reserved the usufruct of those goods upon the donation of those goods, that the spouse was legally cohabiting with the donor at the time of the donation, and that the donor remained the holder of this usufruct until the day of their death.\n\nThe spouse may renounce that usufruct. Articles 4.244 to 4.253 apply to that renunciation when it takes place during the lifetime of the donor.\n\nArt. 4.20. Right to lease\n\nThe surviving spouse acquires exclusively, to the exclusion of all other heirs, the right to the lease of the immovable property that served as the family's principal residence at the time the estate of the deceased opened.\n\nArt. 4.22. Exclusion or forfeiture\n\npar. 1. The surviving spouse may be wholly or partially excluded from their inheritance rights or declared to have forfeited them if they have been wholly or partially deprived of parental authority over the children born of their marriage with the deceased.\n\npar. 2. The legal action is brought by the descendants within one year calculated either from the opening of the estate or from the deprivation of parental authority.\n\nThe judgment takes effect from the date on which the action was brought.\n\npar. 3. If the usufruct has already been converted into the full ownership of a good or into a sum of money, or if the bare ownership of the goods referred to in article 4.61, paragraph 7, has already been transferred, the exclusion or the declaration of forfeiture gives rise to a right to compensation.\n\nThat compensation is determined by the court and corresponds to the value of the usufruct, taking into account the presumed life expectancy of the usufructuary at the time the legal action was brought.\n\nIf the usufruct has been converted into a life annuity, the judgment has retroactive effect to the same point in time.\n\nSection 2. The surviving legally cohabiting partner\n\nArt. 4.23. Inheritance rights and right to lease of the surviving legally cohabiting partner\n\npar. 1. The surviving legally cohabiting partner acquires, regardless of which heirs they are called to the estate with, the usufruct of the immovable property that served as the family's principal residence at the time the estate of the deceased opened, and of the household effects present therein.\n\nThe surviving legally cohabiting partner also exercises this right if the goods referred to in the first paragraph are the subject of a right of legal reversion referred to in article 4.24 or in article 4.25.\n\npar. 2. The surviving legally cohabiting partner who is called to the estate receives upon the death of the donor the usufruct of the immovable property that served as the family's principal residence at the time the estate opened and of the household effects present therein, if the donor had reserved the usufruct of these goods upon the donation of these goods, and on the condition that the legally cohabiting partner already held that capacity at the time of the donation and that the donor remained the holder of this usufruct until the day of their death.\n\nThe legally cohabiting partner may renounce the usufruct referred to in the first paragraph. Articles 4.244 to 4.253 apply to that renunciation when it takes place during the lifetime of the donor.\n\npar. 3. The surviving legally cohabiting partner acquires exclusively, to the exclusion of all other heirs, the right to the lease of the immovable property that served as the family's principal residence at the time the estate of the predeceased legally cohabiting partner opened, and acquires the usufruct of the household effects present therein.\n\npar. 4. The foregoing provisions do not apply when the surviving legally cohabiting partner is a descendant of the predeceased legally cohabiting partner.\n\npar. 5. Notwithstanding any provision to the contrary, any person who acquires the bare ownership may require that an inventory of the household effects and a statement of condition of the immovable property that served as the family's principal residence be drawn up.\n\npar. 6. The rules concerning the usufruct of the surviving spouse that are included in articles 4.22 and 4.60 to 4.64 apply mutatis mutandis to the usufruct of the surviving legally cohabiting partner."
+  },
+  "kb_used": {
+    "fo": "vocabulary V {\n  type Person\n  type Asset\n  is_surviving_spouse_of: Person * Person -> Bool\n  is_deceased: Person -> Bool\n  leaves_descendants: Person -> Bool\n  is_part_of_estate_of: Asset * Person -> Bool\n  acquires_usufruct_of_entire_estate: Person * Person -> Bool\n}\n\ntheory T:V {\n  ! spouse in Person, deceased in Person: (((is_surviving_spouse_of(spouse,deceased)) & (is_deceased(deceased)) & (leaves_descendants(deceased)))) => ((acquires_usufruct_of_entire_estate(spouse,deceased))).\n}"
+  },
+  "case": {
+    "text": "Tom and Ulla lived together without marriage and without legal cohabitation. Tom dies and leaves behind one child."
+  },
+  "kb_compile_strategy": "direct_json_ir_translate",
+  "kb_compile_backend": "json_ir",
+  "extraction_backend": "json_ir",
+  "pipeline_backend_mode": "json_ir",
+  "kb_compile_flags": {
+    "use_le": false,
+    "uses_translation": true,
+    "json_ir_generation": "symbols_then_rules"
+  },
+  "strategy_metadata": {
+    "strategy_name": "direct_json_ir_translate",
+    "canonical_strategy_name": "direct_json_ir_translate",
+    "kb_backend": "json_ir",
+    "pipeline_backend_mode": "json_ir",
+    "uses_le_intermediate": false,
+    "json_ir_generation": "symbols_then_rules",
+    "belief_scoring": false,
+    "law_scope_mode": "cited",
+    "repair_enabled": true,
+    "json_ir_structured_repair_enabled": true,
+    "json_ir_max_symbol_versions": 3,
+    "json_ir_max_rules_attempts_per_symbol_version": 2,
+    "json_ir_max_kb_llm_calls": 8,
+    "json_ir_outer_cache_retries_enabled": false,
+    "json_ir_outer_cache_max_attempts": 1,
+    "configured_translation": true,
+    "effective_translation": true,
+    "translation_source": "strategy",
+    "uses_translation": true
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Does Ulla have the right, pursuant to Article 4.17, paragraph 1, to the usufruct of the entire estate?",
+      "expected": {
+        "mode": "boolean",
+        "value": false,
+        "reason": "Art. 4.17 par. 1 applies to the surviving spouse; Ulla was not married to Tom, so the spouse usufruct rule does not apply."
+      },
+      "pipeline": {
+        "sat": true,
+        "case": {
+          "facts": [
+            "is_deceased(tom).",
+            "leaves_descendants(tom).",
+            "not is_surviving_spouse_of(ulla,tom)."
+          ],
+          "case_given_factual_inputs": [],
+          "entities": {
+            "Person": [
+              "child_of_tom",
+              "tom",
+              "ulla"
+            ]
+          },
+          "schema_environment": {
+            "types": {
+              "Person": {
+                "name": "Person",
+                "kind": "entity",
+                "aliases": [],
+                "source": "kb_symbol_table"
+              },
+              "Asset": {
+                "name": "Asset",
+                "kind": "entity",
+                "aliases": [],
+                "source": "kb_symbol_table"
+              }
+            },
+            "predicates": {
+              "is_surviving_spouse_of": {
+                "name": "is_surviving_spouse_of",
+                "args": [
+                  "Person",
+                  "Person"
+                ],
+                "returns": "Bool",
+                "kind": "observable",
+                "description": "The first person is the surviving spouse of the second (deceased) person.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": true,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "is_deceased": {
+                "name": "is_deceased",
+                "args": [
+                  "Person"
+                ],
+                "returns": "Bool",
+                "kind": "observable",
+                "description": "The person is deceased.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": true,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "leaves_descendants": {
+                "name": "leaves_descendants",
+                "args": [
+                  "Person"
+                ],
+                "returns": "Bool",
+                "kind": "observable",
+                "description": "The deceased person leaves descendants (including adopted children or descendants of adopted children).",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": true,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "is_part_of_estate_of": {
+                "name": "is_part_of_estate_of",
+                "args": [
+                  "Asset",
+                  "Person"
+                ],
+                "returns": "Bool",
+                "kind": "observable",
+                "description": "The asset forms part of the estate of the deceased person.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": true,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "acquires_usufruct_of_entire_estate": {
+                "name": "acquires_usufruct_of_entire_estate",
+                "args": [
+                  "Person",
+                  "Person"
+                ],
+                "returns": "Bool",
+                "kind": "derived",
+                "description": "The first person (surviving spouse) acquires the usufruct of the entire estate of the second person (deceased) as a legal consequence.",
+                "legal_output": true,
+                "output_category": "right",
+                "directly_observable": false,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": false,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": true,
+                "temporal_support": false
+              }
+            },
+            "functions": {},
+            "assertable_case_symbols": {
+              "predicates": [
+                "is_deceased",
+                "is_part_of_estate_of",
+                "is_surviving_spouse_of",
+                "leaves_descendants"
+              ],
+              "functions": []
+            },
+            "factual_case_input_predicates": [],
+            "factual_criteria_input_predicates": [],
+            "legal_output_query_targets": [
+              "acquires_usufruct_of_entire_estate"
+            ],
+            "temporal_support_symbols": []
+          },
+          "entity_type_mapping": {
+            "entities": {
+              "child_of_tom": {
+                "declared_type": "Person",
+                "resolved_type": "Person",
+                "source": "declared",
+                "evidence": []
+              },
+              "tom": {
+                "declared_type": "Person",
+                "resolved_type": "Person",
+                "source": "fact_argument+query_argument",
+                "evidence": [
+                  {
+                    "source": "fact_argument",
+                    "symbol": "is_deceased",
+                    "arg_index": 0,
+                    "expected_type": "Person"
+                  },
+                  {
+                    "source": "fact_argument",
+                    "symbol": "leaves_descendants",
+                    "arg_index": 0,
+                    "expected_type": "Person"
+                  },
+                  {
+                    "source": "fact_argument",
+                    "symbol": "is_surviving_spouse_of",
+                    "arg_index": 1,
+                    "expected_type": "Person"
+                  },
+                  {
+                    "source": "query_argument",
+                    "symbol": "acquires_usufruct_of_entire_estate",
+                    "arg_index": 1,
+                    "expected_type": "Person"
+                  }
+                ]
+              },
+              "ulla": {
+                "declared_type": "Person",
+                "resolved_type": "Person",
+                "source": "fact_argument+query_argument",
+                "evidence": [
+                  {
+                    "source": "fact_argument",
+                    "symbol": "is_surviving_spouse_of",
+                    "arg_index": 0,
+                    "expected_type": "Person"
+                  },
+                  {
+                    "source": "query_argument",
+                    "symbol": "acquires_usufruct_of_entire_estate",
+                    "arg_index": 0,
+                    "expected_type": "Person"
+                  }
+                ]
+              }
+            },
+            "unmapped_entities": [],
+            "conflicts": [],
+            "query_arguments_with_inferred_types": [
+              {
+                "entity": "ulla",
+                "arg_index": 0,
+                "expected_type": "Person",
+                "predicate": "acquires_usufruct_of_entire_estate"
+              },
+              {
+                "entity": "tom",
+                "arg_index": 1,
+                "expected_type": "Person",
+                "predicate": "acquires_usufruct_of_entire_estate"
+              }
+            ]
+          },
+          "resolved_entity_domains": {
+            "Person": [
+              "child_of_tom",
+              "tom",
+              "ulla"
+            ]
+          }
+        },
+        "query": {
+          "type": "predicate",
+          "predicate": "acquires_usufruct_of_entire_estate",
+          "mode": "boolean",
+          "args": [
+            "ulla",
+            "tom"
+          ],
+          "explain": false,
+          "predicate_kind": "derived",
+          "query_type": "predicate_boolean",
+          "internal_intent": "deduction"
+        },
+        "symbolic_result": {
+          "intent": "deduction",
+          "symbolic_status": "ok",
+          "status": "ok",
+          "scorable": true,
+          "detected_question_type": "boolean",
+          "selected_intent": "deduction",
+          "selected_reason": "expected.mode=boolean",
+          "routing": {
+            "question": "Does Ulla have the right, pursuant to Article 4.17, paragraph 1, to the usufruct of the entire estate?",
+            "detected_question_type": "boolean",
+            "selected_intent": "deduction",
+            "selected_reason": "expected.mode=boolean",
+            "scorable": true,
+            "fallback_intent": null,
+            "warnings": [],
+            "legal_output_symbols": [
+              "acquires_usufruct_of_entire_estate"
+            ],
+            "query_hint_type": "boolean",
+            "expected_question_type": "boolean"
+          },
+          "satisfiability_check": {
+            "stage": "pre_query",
+            "kb_case_satisfiable": true,
+            "status": "ok",
+            "details": "theory satisfiable",
+            "intent_backend": "idp_z3.tasks.satisfiable_check",
+            "duration_seconds": 0.0274
+          },
+          "warnings": [],
+          "deduction": {
+            "intent": "deduction",
+            "status": "ok",
+            "output_kind": "epistemic_boolean",
+            "predicate": "acquires_usufruct_of_entire_estate",
+            "args": [
+              "ulla",
+              "tom"
+            ],
+            "possible": true,
+            "certain": false,
+            "label": "unknown",
+            "atom": "acquires_usufruct_of_entire_estate(x0,x1)",
+            "constraint": "? x0 in Person, x1 in Person: __sel0(x0) & __sel1(x1) & acquires_usufruct_of_entire_estate(x0,x1)",
+            "certainty_class": "inconclusive",
+            "sat": true,
+            "internal_intent": "deduction",
+            "antecedent_coverage": [
+              {
+                "rule_index": 0,
+                "target": "acquires_usufruct_of_entire_estate(ulla,tom)",
+                "conditions": [
+                  {
+                    "atom": "is_surviving_spouse_of(ulla,tom)",
+                    "status": "present"
+                  },
+                  {
+                    "atom": "is_deceased(tom)",
+                    "status": "present"
+                  },
+                  {
+                    "atom": "leaves_descendants(tom)",
+                    "status": "present"
+                  }
+                ]
+              }
+            ]
+          },
+          "model_expansion": null,
+          "get_range": null,
+          "satisfiable": null,
+          "explanation": null,
+          "execution_query": {
+            "type": "predicate",
+            "predicate": "acquires_usufruct_of_entire_estate",
+            "mode": "boolean",
+            "args": [
+              "ulla",
+              "tom"
+            ],
+            "explain": false,
+            "predicate_kind": "derived",
+            "query_type": "predicate_boolean",
+            "internal_intent": "deduction"
+          },
+          "output_kind": "epistemic_boolean",
+          "certainty_class": "inconclusive",
+          "predicate": "acquires_usufruct_of_entire_estate",
+          "args": [
+            "ulla",
+            "tom"
+          ],
+          "label": "unknown",
+          "possible": true,
+          "certain": false,
+          "sat": true,
+          "antecedent_coverage": [
+            {
+              "rule_index": 0,
+              "target": "acquires_usufruct_of_entire_estate(ulla,tom)",
+              "conditions": [
+                {
+                  "atom": "is_surviving_spouse_of(ulla,tom)",
+                  "status": "present"
+                },
+                {
+                  "atom": "is_deceased(tom)",
+                  "status": "present"
+                },
+                {
+                  "atom": "leaves_descendants(tom)",
+                  "status": "present"
+                }
+              ]
+            }
+          ]
+        },
+        "symbolic_intent_routing": {
+          "question": "Does Ulla have the right, pursuant to Article 4.17, paragraph 1, to the usufruct of the entire estate?",
+          "detected_question_type": "boolean",
+          "selected_intent": "deduction",
+          "selected_reason": "expected.mode=boolean",
+          "scorable": true,
+          "fallback_intent": null,
+          "warnings": [],
+          "legal_output_symbols": [
+            "acquires_usufruct_of_entire_estate"
+          ],
+          "query_hint_type": "boolean",
+          "expected_question_type": "boolean"
+        },
+        "prediction": {
+          "query_type": "predicate_boolean",
+          "internal_intent": "deduction",
+          "output_kind": "epistemic_boolean",
+          "status": "ok",
+          "certainty_class": "inconclusive",
+          "mode": "boolean",
+          "label": "unknown",
+          "belief_yes": 0.5,
+          "credence_yes_pct": 50,
+          "verdict_strength_pct": 0
+        },
+        "natural_language": "Cannot determine with certainty. acquires_usufruct_of_entire_estate(ulla, tom) is not logically forced either way (label: unknown).",
+        "explanation": null,
+        "extraction_prompt": "You are debugging a legal extraction failure.\n\nGiven KB_SCHEMA, CASE, and QUESTION, identify the likely generic cause of failure.\nFocus on schema mismatch, missing observable facts, wrong argument order, wrong entity type, selected observable instead of derived predicate, or unsupported query shape.\n\nDo not invent new law-specific fixes.\nReturn concise bullet points and one generic repair suggestion.\n\nKB_SCHEMA:\n{\n  \"types\": [\n    \"Person\",\n    \"Asset\"\n  ],\n  \"predicates\": [\n    {\n      \"name\": \"is_surviving_spouse_of\",\n      \"args\": [\n        \"Person\",\n        \"Person\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"observable\",\n      \"description\": \"The first person is the surviving spouse of the second (deceased) person.\",\n      \"directly_observable\": true\n    },\n    {\n      \"name\": \"is_deceased\",\n      \"args\": [\n        \"Person\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"observable\",\n      \"description\": \"The person is deceased.\",\n      \"directly_observable\": true\n    },\n    {\n      \"name\": \"leaves_descendants\",\n      \"args\": [\n        \"Person\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"observable\",\n      \"description\": \"The deceased person leaves descendants (including adopted children or descendants of adopted children).\",\n      \"directly_observable\": true\n    },\n    {\n      \"name\": \"is_part_of_estate_of\",\n      \"args\": [\n        \"Asset\",\n        \"Person\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"observable\",\n      \"description\": \"The asset forms part of the estate of the deceased person.\",\n      \"directly_observable\": true\n    },\n    {\n      \"name\": \"acquires_usufruct_of_entire_estate\",\n      \"args\": [\n        \"Person\",\n        \"Person\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"derived\",\n      \"description\": \"The first person (surviving spouse) acquires the usufruct of the entire estate of the second person (deceased) as a legal consequence.\",\n      \"legal_output\": true,\n      \"output_category\": \"right\"\n    }\n  ],\n  \"functions\": [],\n  \"rules\": [\n    {\n      \"forall\": [\n        {\n          \"var\": \"spouse\",\n          \"type\": \"Person\"\n        },\n        {\n          \"var\": \"deceased\",\n          \"type\": \"Person\"\n        }\n      ],\n      \"if\": [\n        {\n          \"and\": [\n            {\n              \"pred\": \"is_surviving_spouse_of\",\n              \"args\": [\n                \"spouse\",\n                \"deceased\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"is_deceased\",\n              \"args\": [\n                \"deceased\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"leaves_descendants\",\n              \"args\": [\n                \"deceased\"\n              ],\n              \"negated\": false\n            }\n          ]\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"acquires_usufruct_of_entire_estate\",\n          \"args\": [\n            \"spouse\",\n            \"deceased\"\n          ],\n          \"negated\": false\n        }\n      ],\n      \"operator\": \"implies\"\n    }\n  ]\n}\n\nCASE:\nTom and Ulla lived together without marriage and without legal cohabitation. Tom dies and leaves behind one child.\n\nQUESTION:\nDoes Ulla have the right, pursuant to Article 4.17, paragraph 1, to the usufruct of the entire estate?",
+        "raw_extracted": {
+          "case": {
+            "facts": [
+              "is_deceased(tom).",
+              "leaves_descendants(tom).",
+              "not is_surviving_spouse_of(ulla,tom)."
+            ],
+            "case_given_factual_inputs": [],
+            "entities": {
+              "Person": [
+                "child_of_tom",
+                "tom",
+                "ulla"
+              ]
+            }
+          },
+          "query": {
+            "type": "predicate",
+            "predicate": "acquires_usufruct_of_entire_estate",
+            "mode": "boolean",
+            "args": [
+              "ulla",
+              "tom"
+            ],
+            "explain": false,
+            "predicate_kind": "derived",
+            "query_type": "predicate_boolean",
+            "internal_intent": "deduction"
+          }
+        }
+      }
+    }
+  ]
+}

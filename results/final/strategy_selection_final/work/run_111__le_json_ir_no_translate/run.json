@@ -1,0 +1,50 @@
+{
+  "id": "run_111",
+  "law": {
+    "path": "example_laws_clean/vreemdelingenwet_clean.txt"
+  },
+  "case": {
+    "text": "Dana is een vreemdeling en maakt het voorwerp uit van een verwijderingsprocedure. In haar verblijfsaanvraag gebruikte zij valse documenten."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Kan dit een objectief criterium zijn voor risico op onderduiken volgens artikel 1, paragraaf 2, punt 2?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "Risk of absconding can be established using one or more objective criteria; use of false documents in a residence/removal procedure is listed as criterion 2."
+      }
+    }
+  ],
+  "kb_compile_strategy": "le_json_ir_no_translate",
+  "kb_compile_backend": "json_ir",
+  "extraction_backend": "json_ir",
+  "pipeline_backend_mode": "json_ir",
+  "kb_compile_flags": {
+    "use_le": true,
+    "uses_translation": false,
+    "json_ir_generation": "symbols_then_rules"
+  },
+  "strategy_metadata": {
+    "strategy_name": "le_json_ir_no_translate",
+    "canonical_strategy_name": "le_json_ir_no_translate",
+    "kb_backend": "json_ir",
+    "pipeline_backend_mode": "json_ir",
+    "uses_le_intermediate": true,
+    "json_ir_generation": "symbols_then_rules",
+    "belief_scoring": false,
+    "law_scope_mode": "cited",
+    "repair_enabled": true,
+    "json_ir_structured_repair_enabled": true,
+    "json_ir_max_symbol_versions": 3,
+    "json_ir_max_rules_attempts_per_symbol_version": 2,
+    "json_ir_max_kb_llm_calls": 8,
+    "json_ir_outer_cache_retries_enabled": false,
+    "json_ir_outer_cache_max_attempts": 1,
+    "configured_translation": false,
+    "effective_translation": false,
+    "translation_source": "main_cli_no_translate",
+    "uses_translation": false
+  }
+}

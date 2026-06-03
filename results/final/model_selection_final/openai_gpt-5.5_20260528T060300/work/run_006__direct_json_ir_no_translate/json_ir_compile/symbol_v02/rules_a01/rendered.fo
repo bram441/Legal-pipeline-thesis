@@ -1,0 +1,34 @@
+vocabulary V {
+  type Company
+  type FinancialYear
+  has_legal_personality: Company -> Bool
+  previous_financial_year: FinancialYear * FinancialYear -> Bool
+  next_financial_year: FinancialYear * FinancialYear -> Bool
+  employee_threshold_exceeded: Company * FinancialYear -> Bool
+  turnover_threshold_exceeded: Company * FinancialYear -> Bool
+  balance_sheet_threshold_exceeded: Company * FinancialYear -> Bool
+  more_than_one_criterion_exceeded: Company * FinancialYear -> Bool
+  not_more_than_one_criterion_exceeded: Company * FinancialYear -> Bool
+  more_than_one_criterion_exceeded_for_two_consecutive_years: Company * FinancialYear -> Bool
+  not_more_than_one_criterion_exceeded_for_two_consecutive_years: Company * FinancialYear -> Bool
+  is_small_company: Company * FinancialYear -> Bool
+  loses_small_company_status_from: Company * FinancialYear -> Bool
+  gains_small_company_status_from: Company * FinancialYear -> Bool
+  annual_average_employees: Company * FinancialYear -> Int
+  annual_net_turnover_excluding_vat: Company * FinancialYear -> Real
+  balance_sheet_total: Company * FinancialYear -> Real
+}
+
+theory T:V {
+  ! c in Company, y in FinancialYear: ((employee_threshold_exceeded(c,y))) <=> ((annual_average_employees(c,y) > 50)).
+  ! c in Company, y in FinancialYear: ((turnover_threshold_exceeded(c,y))) <=> ((annual_net_turnover_excluding_vat(c,y) > 11250000.0)).
+  ! c in Company, y in FinancialYear: ((balance_sheet_threshold_exceeded(c,y))) <=> ((balance_sheet_total(c,y) > 6000000.0)).
+  ! c in Company, y in FinancialYear: ((more_than_one_criterion_exceeded(c,y))) <=> ((((employee_threshold_exceeded(c,y)) & (turnover_threshold_exceeded(c,y))) | ((employee_threshold_exceeded(c,y)) & (balance_sheet_threshold_exceeded(c,y))) | ((turnover_threshold_exceeded(c,y)) & (balance_sheet_threshold_exceeded(c,y))))).
+  ! c in Company, y in FinancialYear: ((not_more_than_one_criterion_exceeded(c,y))) <=> ((~more_than_one_criterion_exceeded(c,y))).
+  ! c in Company, y in FinancialYear, prev in FinancialYear: ((more_than_one_criterion_exceeded_for_two_consecutive_years(c,y))) <=> (((more_than_one_criterion_exceeded(c,y)) & (more_than_one_criterion_exceeded(c,prev)) & (previous_financial_year(y,prev)))).
+  ! c in Company, y in FinancialYear, prev in FinancialYear: ((not_more_than_one_criterion_exceeded_for_two_consecutive_years(c,y))) <=> (((not_more_than_one_criterion_exceeded(c,y)) & (not_more_than_one_criterion_exceeded(c,prev)) & (previous_financial_year(y,prev)))).
+  ! c in Company, y in FinancialYear: (((has_legal_personality(c)) & (not_more_than_one_criterion_exceeded(c,y)))) => ((is_small_company(c,y))).
+  ! c in Company, y in FinancialYear: ((more_than_one_criterion_exceeded(c,y))) => ((~is_small_company(c,y))).
+  ! c in Company, second_year in FinancialYear, effect_year in FinancialYear: (((has_legal_personality(c)) & (more_than_one_criterion_exceeded_for_two_consecutive_years(c,second_year)) & (next_financial_year(second_year,effect_year)))) => ((loses_small_company_status_from(c,effect_year))).
+  ! c in Company, second_year in FinancialYear, effect_year in FinancialYear: (((has_legal_personality(c)) & (not_more_than_one_criterion_exceeded_for_two_consecutive_years(c,second_year)) & (next_financial_year(second_year,effect_year)))) => ((gains_small_company_status_from(c,effect_year))).
+}

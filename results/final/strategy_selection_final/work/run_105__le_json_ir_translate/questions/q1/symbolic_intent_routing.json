@@ -1,0 +1,15 @@
+{
+  "question": "Is Article 4.23, paragraph 4 a reason to deny Karin the usufruct of the family home?",
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "scorable": true,
+  "fallback_intent": null,
+  "warnings": [],
+  "legal_output_symbols": [
+    "exclusion_from_foregoing_provisions_applies",
+    "foregoing_provisions_apply"
+  ],
+  "query_hint_type": "boolean",
+  "expected_question_type": "boolean"
+}

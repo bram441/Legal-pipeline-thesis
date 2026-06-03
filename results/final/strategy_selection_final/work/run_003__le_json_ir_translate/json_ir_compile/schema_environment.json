@@ -1,0 +1,314 @@
+{
+  "types": {
+    "Company": {
+      "name": "Company",
+      "kind": "entity",
+      "aliases": [],
+      "source": "kb_symbol_table"
+    },
+    "FinancialYear": {
+      "name": "FinancialYear",
+      "kind": "period",
+      "aliases": [],
+      "source": "kb_symbol_table"
+    }
+  },
+  "predicates": {
+    "is_small_company_with_legal_personality": {
+      "name": "is_small_company_with_legal_personality",
+      "args": [
+        "Company"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The company is a small company with legal personality.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "is_subsidiary_company": {
+      "name": "is_subsidiary_company",
+      "args": [
+        "Company"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The company is a subsidiary company.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "is_parent_company": {
+      "name": "is_parent_company",
+      "args": [
+        "Company"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The company is a parent company.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "micro_employee_criterion_exceeded": {
+      "name": "micro_employee_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The micro-company employee criterion is exceeded for the company in the given financial year (annual average employees > 10).",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": true,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": "case_given_micro_employee_criterion_exceeded",
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "micro_turnover_criterion_exceeded": {
+      "name": "micro_turnover_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The micro-company turnover criterion is exceeded for the company in the given financial year (annual net turnover excl. VAT > 900,000 EUR).",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": true,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": "case_given_micro_turnover_criterion_exceeded",
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "micro_balance_sheet_criterion_exceeded": {
+      "name": "micro_balance_sheet_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The micro-company balance sheet criterion is exceeded for the company in the given financial year (balance sheet total > 450,000 EUR).",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": true,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": "case_given_micro_balance_sheet_criterion_exceeded",
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "more_than_one_micro_criterion_exceeded": {
+      "name": "more_than_one_micro_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "More than one micro-company criterion is exceeded for the company in the given financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": true,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": "case_given_more_than_one_micro_criterion_exceeded",
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "not_more_than_one_micro_criterion_exceeded": {
+      "name": "not_more_than_one_micro_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "Not more than one micro-company criterion is exceeded for the company in the given financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": true,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": "case_given_not_more_than_one_micro_criterion_exceeded",
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "is_last_closed_financial_year": {
+      "name": "is_last_closed_financial_year",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The given financial year is the last closed financial year for the company.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "is_micro_company": {
+      "name": "is_micro_company",
+      "args": [
+        "Company"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The company qualifies as a micro-company under the statutory definition.",
+      "legal_output": true,
+      "output_category": "classification",
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": true,
+      "temporal_support": false
+    }
+  },
+  "functions": {
+    "annual_average_employees": {
+      "name": "annual_average_employees",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Int",
+      "kind": "observable",
+      "description": "The annual average number of employees of the company in the given financial year.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "annual_net_turnover_excl_vat": {
+      "name": "annual_net_turnover_excl_vat",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The annual net turnover of the company exclusive of value added tax in the given financial year, in euros.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "balance_sheet_total": {
+      "name": "balance_sheet_total",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The balance sheet total of the company in the given financial year, in euros.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    }
+  },
+  "assertable_case_symbols": {
+    "predicates": [
+      "is_last_closed_financial_year",
+      "is_parent_company",
+      "is_small_company_with_legal_personality",
+      "is_subsidiary_company"
+    ],
+    "functions": [
+      "annual_average_employees",
+      "annual_net_turnover_excl_vat",
+      "balance_sheet_total"
+    ]
+  },
+  "factual_case_input_predicates": [
+    "micro_balance_sheet_criterion_exceeded",
+    "micro_employee_criterion_exceeded",
+    "micro_turnover_criterion_exceeded",
+    "more_than_one_micro_criterion_exceeded",
+    "not_more_than_one_micro_criterion_exceeded"
+  ],
+  "factual_criteria_input_predicates": [],
+  "legal_output_query_targets": [
+    "is_micro_company"
+  ],
+  "temporal_support_symbols": []
+}

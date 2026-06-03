@@ -1,0 +1,6 @@
+The deceased leaves descendants if the deceased has descendants.
+The deceased leaves adopted children if the deceased has adopted children.
+The deceased leaves descendants of adopted children if the deceased has descendants of adopted children.
+The surviving spouse acquires the usufruct of the entire estate if the deceased leaves descendants.
+The surviving spouse acquires the usufruct of the entire estate if the deceased leaves adopted children.
+The surviving spouse acquires the usufruct of the entire estate if the deceased leaves descendants of adopted children.

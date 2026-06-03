@@ -1,0 +1,92 @@
+{
+  "id": "run_102",
+  "law": {
+    "text": "Chapter 4. Succession entitlement of the spouse and the legally cohabiting partner\n\nSection 1. The surviving spouse\n\nArt. 4.17. Inheritance rights of the surviving spouse\n\npar. 1. When the deceased leaves descendants, adopted children or descendants of these, the surviving spouse acquires the usufruct of the entire estate.\n\npar. 2. When the deceased leaves relatives in the ascending line or close collateral relatives, the surviving spouse acquires:\n(1) the full ownership of the share of the first deceased in the common property and in the property held exclusively in undivided co-ownership between the spouses, and\n(2) the usufruct of the remaining goods of their own property.\n(3) the usufruct of the goods subject to the right of legal reversion referred to in article 4.24 or in article 4.25, unless otherwise provided in the deed of donation or in the will.\n\npar. 3. When the deceased leaves other heirs or no heirs, the surviving spouse acquires the full ownership of the entire estate.\n\nArt. 4.18. Usufruct over donated goods\n\nUpon the death of the donor, the surviving spouse who is called to the estate receives the usufruct of the goods that the donor donated and of which the donor reserved the usufruct, on the condition that the spouse already held that capacity at the time of the donation and that the donor remained the holder of this usufruct until the day of their death.\n\nUpon the death of the donor, the surviving spouse who is called to the estate receives the usufruct of the immovable property that served as the family's principal residence at the time the estate opened and of the household effects present therein, on the condition that the donor had reserved the usufruct of those goods upon the donation thereof, that the spouse was legally cohabiting with the donor at the time of the donation, and that the donor remained the holder of this usufruct until the day of their death.\n\nThe spouse may renounce that usufruct. Articles 4.244 to 4.253 apply to that renunciation when it takes place during the lifetime of the donor.\n\nArt. 4.20. Right to lease\n\nThe surviving spouse acquires alone, to the exclusion of all other heirs, the right to the lease of the immovable property that served as the family's principal residence at the time the estate of the deceased opened.\n\nArt. 4.22. Exclusion or forfeiture\n\npar. 1. The surviving spouse may be wholly or partially excluded from their inheritance rights or declared to have forfeited them if they have been wholly or partially deprived of parental authority over the children born of their marriage with the deceased.\n\npar. 2. The legal action is brought by the descendants within one year calculated either from the opening of the estate or from the deprivation of parental authority.\n\nThe judgment takes effect from the date on which the action was brought.\n\npar. 3. If the usufruct has already been converted into the full ownership of a good or into a sum of money, or if the bare ownership of the goods referred to in article 4.61, paragraph 7, has already been transferred, the exclusion or the declaration of forfeiture gives rise to a right to compensation.\n\nThat compensation is determined by the court and corresponds to the value of the usufruct, taking into account the probable life expectancy of the usufructuary at the time the legal action was brought.\n\nIf the usufruct has been converted into a life annuity, the judgment has retroactive effect to the same point in time.\n\nSection 2. The surviving legally cohabiting partner\n\nArt. 4.23. Inheritance rights and right to lease of the surviving legally cohabiting partner\n\npar. 1. The surviving legally cohabiting partner acquires, regardless of which heirs they are called to the estate with, the usufruct of the immovable property that served as the family's principal residence at the time the estate of the deceased opened, and of the household effects present therein.\n\nThe surviving legally cohabiting partner also exercises this right if the goods referred to in the first paragraph are the subject of a right of legal reversion referred to in article 4.24 or in article 4.25.\n\npar. 2. The surviving legally cohabiting partner who is called to the estate receives upon the death of the donor the usufruct of the immovable property that served as the family's principal residence at the time the estate opened and of the household effects present therein, if the donor had reserved the usufruct of these goods upon the donation thereof, and on the condition that the legally cohabiting partner already held that capacity at the time of the donation and that the donor remained the holder of this usufruct until the day of their death.\n\nThe legally cohabiting partner may renounce the usufruct referred to in the first paragraph. Articles 4.244 to 4.253 apply to that renunciation when it takes place during the lifetime of the donor.\n\npar. 3. The surviving legally cohabiting partner acquires alone, to the exclusion of all other heirs, the right to the lease of the immovable property that served as the family's principal residence at the time the estate of the predeceased legally cohabiting partner opened, and acquires the usufruct of the household effects present therein.\n\npar. 4. The foregoing provisions do not apply when the surviving legally cohabiting partner is a descendant of the predeceased legally cohabiting partner.\n\npar. 5. Notwithstanding any provision to the contrary, any person who acquires the bare ownership may demand that an inventory of the household effects and a statement of condition of the immovable property that served as the family's principal residence be drawn up.\n\npar. 6. The rules concerning the usufruct of the surviving spouse that are included in articles 4.22 and 4.60 to 4.64 apply mutatis mutandis to the usufruct of the surviving legally cohabiting partner."
+  },
+  "kb_used": {
+    "fo": "vocabulary V {\n  type Person\n  type Asset\n  is_surviving_spouse_of: Person * Person -> Bool\n  deceased_leaves_ascending_or_close_collateral_relatives: Person -> Bool\n  is_common_property_share_of: Asset * Person -> Bool\n  is_undivided_co_ownership_property_of: Asset * Person -> Bool\n  is_own_property_of: Asset * Person -> Bool\n  is_subject_to_legal_reversion_4_24: Asset -> Bool\n  is_subject_to_legal_reversion_4_25: Asset -> Bool\n  deed_of_donation_excludes_usufruct_4_24: Asset -> Bool\n  will_excludes_usufruct_4_24: Asset -> Bool\n  deed_of_donation_excludes_usufruct_4_25: Asset -> Bool\n  will_excludes_usufruct_4_25: Asset -> Bool\n  acquires_full_ownership_of: Person * Asset -> Bool\n  acquires_usufruct_of: Person * Asset -> Bool\n  usufruct_4_24_excluded: Asset -> Bool\n  usufruct_4_25_excluded: Asset -> Bool\n}\n\ntheory T:V {\n  ! spouse in Person, deceased in Person, asset in Asset: (((is_surviving_spouse_of(spouse,deceased)) & (deceased_leaves_ascending_or_close_collateral_relatives(deceased)) & (is_common_property_share_of(asset,deceased)))) => ((acquires_full_ownership_of(spouse,asset))).\n  ! spouse in Person, deceased in Person, asset in Asset: (((is_surviving_spouse_of(spouse,deceased)) & (deceased_leaves_ascending_or_close_collateral_relatives(deceased)) & (is_undivided_co_ownership_property_of(asset,deceased)))) => ((acquires_full_ownership_of(spouse,asset))).\n  ! spouse in Person, deceased in Person, asset in Asset: (((is_surviving_spouse_of(spouse,deceased)) & (deceased_leaves_ascending_or_close_collateral_relatives(deceased)) & (is_own_property_of(asset,deceased)) & (~is_subject_to_legal_reversion_4_24(asset)) & (~is_subject_to_legal_reversion_4_25(asset)))) => ((acquires_usufruct_of(spouse,asset))).\n  ! spouse in Person, deceased in Person, asset in Asset: (((is_surviving_spouse_of(spouse,deceased)) & (deceased_leaves_ascending_or_close_collateral_relatives(deceased)) & (is_subject_to_legal_reversion_4_24(asset)) & (~usufruct_4_24_excluded(asset)))) => ((acquires_usufruct_of(spouse,asset))).\n  ! spouse in Person, deceased in Person, asset in Asset: (((is_surviving_spouse_of(spouse,deceased)) & (deceased_leaves_ascending_or_close_collateral_relatives(deceased)) & (is_subject_to_legal_reversion_4_25(asset)) & (~usufruct_4_25_excluded(asset)))) => ((acquires_usufruct_of(spouse,asset))).\n  ! spouse in Person, deceased in Person, asset in Asset: (((is_surviving_spouse_of(spouse,deceased)) & (deceased_leaves_ascending_or_close_collateral_relatives(deceased)) & (is_subject_to_legal_reversion_4_24(asset)) & (usufruct_4_24_excluded(asset)))) => ((~acquires_usufruct_of(spouse,asset))).\n  ! spouse in Person, deceased in Person, asset in Asset: (((is_surviving_spouse_of(spouse,deceased)) & (deceased_leaves_ascending_or_close_collateral_relatives(deceased)) & (is_subject_to_legal_reversion_4_25(asset)) & (usufruct_4_25_excluded(asset)))) => ((~acquires_usufruct_of(spouse,asset))).\n  ! asset in Asset: (((deed_of_donation_excludes_usufruct_4_24(asset)) | (will_excludes_usufruct_4_24(asset)))) => ((usufruct_4_24_excluded(asset))).\n  ! asset in Asset: (((deed_of_donation_excludes_usufruct_4_25(asset)) | (will_excludes_usufruct_4_25(asset)))) => ((usufruct_4_25_excluded(asset))).\n}"
+  },
+  "case": {
+    "text": "Carla and Dirk were married. Carla dies without descendants, but she leaves behind her father and her brother. Dirk is still alive."
+  },
+  "kb_compile_strategy": "le_json_ir_translate",
+  "kb_compile_backend": "json_ir",
+  "extraction_backend": "json_ir",
+  "pipeline_backend_mode": "json_ir",
+  "kb_compile_flags": {
+    "use_le": true,
+    "uses_translation": true,
+    "json_ir_generation": "symbols_then_rules"
+  },
+  "strategy_metadata": {
+    "strategy_name": "le_json_ir_translate",
+    "canonical_strategy_name": "le_json_ir_translate",
+    "kb_backend": "json_ir",
+    "pipeline_backend_mode": "json_ir",
+    "uses_le_intermediate": true,
+    "json_ir_generation": "symbols_then_rules",
+    "belief_scoring": false,
+    "law_scope_mode": "cited",
+    "repair_enabled": true,
+    "json_ir_structured_repair_enabled": true,
+    "json_ir_max_symbol_versions": 3,
+    "json_ir_max_rules_attempts_per_symbol_version": 2,
+    "json_ir_max_kb_llm_calls": 8,
+    "json_ir_outer_cache_retries_enabled": false,
+    "json_ir_outer_cache_max_attempts": 1,
+    "configured_translation": true,
+    "effective_translation": true,
+    "translation_source": "strategy",
+    "uses_translation": true
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Does Dirk acquire, pursuant to article 4.17, paragraph 2, the usufruct of the remaining assets of Carla's separate estate?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "Art. 4.17 par. 2: with ascendants or close collateral relatives, the surviving spouse gets usufruct of the remaining goods of the deceased's own property."
+      },
+      "pipeline": {
+        "sat": null,
+        "case": {
+          "facts": [
+            "is_surviving_spouse_of(dirk,carla).",
+            "deceased_leaves_ascending_or_close_collateral_relatives(carla)."
+          ],
+          "case_given_factual_inputs": [],
+          "entities": {
+            "Person": [
+              "carla",
+              "dirk"
+            ]
+          }
+        },
+        "query": null,
+        "symbolic_result": null,
+        "natural_language": null,
+        "explanation": null,
+        "extraction_prompt": null,
+        "raw_extracted": {
+          "case": {
+            "facts": [
+              "is_surviving_spouse_of(dirk,carla).",
+              "deceased_leaves_ascending_or_close_collateral_relatives(carla)."
+            ],
+            "case_given_factual_inputs": [],
+            "entities": {
+              "Person": [
+                "carla",
+                "dirk"
+              ]
+            }
+          },
+          "query": null
+        },
+        "error_stage": "extraction",
+        "error": "Query extraction failed after 6 repair attempts: Query arg for type Asset is unresolved placeholder: "
+      }
+    }
+  ]
+}

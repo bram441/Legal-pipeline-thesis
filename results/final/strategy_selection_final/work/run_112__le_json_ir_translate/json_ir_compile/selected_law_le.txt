@@ -1,0 +1,77 @@
+A person is an alien if the person does not provide proof that they possess Belgian nationality.
+
+A person is a third-country national if the person is not a Union citizen and the person is not a person enjoying the Community right of free movement as defined in Article 2, point 5, of the Schengen Borders Code.
+
+A presence on the territory constitutes illegal residence if the person present is an alien and the alien does not or no longer meets the conditions for entry to or residence on the territory.
+
+A risk of absconding exists for an alien if there are reasons to believe that the alien will abscond and the alien is the subject of a removal procedure or a procedure for the granting of international protection or a procedure for determining or transferring to the Member State responsible for examining the application for international protection and the risk is assessed having regard to the criteria listed in paragraph 2.
+
+An alien is an identified alien if the alien is in possession of a valid travel document or a valid passport or a valid identity document.
+
+An alien is an identified alien if the national authority of the alien's country has recognised the alien as a national and that authority has declared itself willing to issue a laissez-passer.
+
+An alien is an identified alien if the alien falls within the category of nationalities for which the minister may personally issue a laissez-passer.
+
+A risk of absconding must be current and real as referred to in paragraph 1, point 11.
+
+A risk of absconding is established following an individual examination of the person concerned.
+
+A risk of absconding is established on the basis of one or more objective criteria listed in paragraph 2, taking into account all circumstances specific to each case.
+
+The objective criterion in paragraph 2, point 1, is present if the person concerned has not submitted a residence application following their illegal entry or during their illegal residence.
+
+The objective criterion in paragraph 2, point 1, is present if the person concerned has not made their application for international protection within the time limit provided for by this Act.
+
+The objective criterion in paragraph 2, point 2, is present if the person concerned has used false or misleading information in the context of a procedure for international protection, residence, removal, or refusal of entry.
+
+The objective criterion in paragraph 2, point 2, is present if the person concerned has used false or falsified documents in the context of a procedure for international protection, residence, removal, or refusal of entry.
+
+The objective criterion in paragraph 2, point 2, is present if the person concerned has committed fraud in the context of a procedure for international protection, residence, removal, or refusal of entry.
+
+The objective criterion in paragraph 2, point 2, is present if the person concerned has used other unlawful means in the context of a procedure for international protection, residence, removal, or refusal of entry.
+
+The objective criterion in paragraph 2, point 3, is present if the person concerned does not cooperate or has not cooperated in the context of their relations with the authorities responsible for the implementation of or supervision of compliance with the regulations concerning access to the territory, residence, establishment, and removal of aliens.
+
+The objective criterion in paragraph 2, point 4, is present if the person concerned has made clear that they do not wish to comply with a transfer measure, a refusal of entry measure, or a removal measure.
+
+The objective criterion in paragraph 2, point 4, is present if the person concerned has already failed to comply with a transfer measure, a refusal of entry measure, or a removal measure.
+
+The objective criterion in paragraph 2, point 4, is present if the person concerned has made clear that they do not wish to comply with an entry ban that has neither been lifted nor suspended.
+
+The objective criterion in paragraph 2, point 4, is present if the person concerned has already failed to comply with an entry ban that has neither been lifted nor suspended.
+
+The objective criterion in paragraph 2, point 4, is present if the person concerned has made clear that they do not wish to comply with a less coercive measure than a deprivation of liberty measure aimed at guaranteeing their transfer, refusal of entry, or removal, regardless of whether it is a liberty-restricting measure or another measure.
+
+The objective criterion in paragraph 2, point 4, is present if the person concerned has already failed to comply with a less coercive measure than a deprivation of liberty measure aimed at guaranteeing their transfer, refusal of entry, or removal, regardless of whether it is a liberty-restricting measure or another measure.
+
+The objective criterion in paragraph 2, point 4, is present if the person concerned has made clear that they do not wish to comply with a liberty-restricting measure aimed at guaranteeing public order or national security.
+
+The objective criterion in paragraph 2, point 4, is present if the person concerned has already failed to comply with a liberty-restricting measure aimed at guaranteeing public order or national security.
+
+The objective criterion in paragraph 2, point 4, is present if the person concerned has made clear that they do not wish to comply with a measure taken by another Member State equivalent to a transfer measure, a refusal of entry measure, a removal measure, an entry ban that has neither been lifted nor suspended, a less coercive measure aimed at guaranteeing transfer, refusal of entry, or removal, or a liberty-restricting measure aimed at guaranteeing public order or national security.
+
+The objective criterion in paragraph 2, point 4, is present if the person concerned has already failed to comply with a measure taken by another Member State equivalent to a transfer measure, a refusal of entry measure, a removal measure, an entry ban that has neither been lifted nor suspended, a less coercive measure aimed at guaranteeing transfer, refusal of entry, or removal, or a liberty-restricting measure aimed at guaranteeing public order or national security.
+
+The objective criterion in paragraph 2, point 5, is present if the person concerned is the subject of an entry ban in the Kingdom that has neither been lifted nor suspended.
+
+The objective criterion in paragraph 2, point 5, is present if the person concerned is the subject of an entry ban in another Member State that has neither been lifted nor suspended.
+
+The objective criterion in paragraph 2, point 6, is present if the person concerned has submitted a new residence application immediately after having been the subject of a decision refusing entry or residence or a decision terminating their residence.
+
+The objective criterion in paragraph 2, point 6, is present if the person concerned has submitted a new application for international protection immediately after having been the subject of a decision refusing entry or residence or a decision terminating their residence.
+
+The objective criterion in paragraph 2, point 6, is present if the person concerned has submitted a new residence application immediately after having been the subject of a refusal of entry or removal measure.
+
+The objective criterion in paragraph 2, point 6, is present if the person concerned has submitted a new application for international protection immediately after having been the subject of a refusal of entry or removal measure.
+
+The objective criterion in paragraph 2, point 7, is present if the person concerned, while being questioned on that point, concealed the fact that they had already provided their fingerprints in another State bound by the European regulations concerning the determination of the State responsible for examining an application for international protection after having submitted an application for international protection.
+
+The objective criterion in paragraph 2, point 8, is present if the person concerned has submitted multiple applications for international protection or multiple residence applications in the Kingdom or in one or more other Member States and those applications have given rise to a negative decision or have not resulted in the issuance of a residence permit.
+
+The objective criterion in paragraph 2, point 9, is present if the person concerned, while being questioned on that point, concealed the fact that they had previously submitted an application for international protection in another State bound by the European regulations concerning the determination of the State responsible for examining an application for international protection.
+
+The objective criterion in paragraph 2, point 10, is present if the person concerned has declared that they came to the Kingdom for purposes other than those for which they submitted an application for international protection or a residence application.
+
+The objective criterion in paragraph 2, point 10, is present if it appears from the file of the person concerned that they came to the Kingdom for purposes other than those for which they submitted an application for international protection or a residence application.
+
+The objective criterion in paragraph 2, point 11, is present if the person concerned is the subject of a fine because they submitted a manifestly unlawful appeal to the Council for Alien Law Litigation.

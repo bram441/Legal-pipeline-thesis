@@ -1,0 +1,27 @@
+vocabulary V {
+  type Company
+  is_small_company_with_legal_personality: Company -> Bool
+  is_subsidiary_company: Company -> Bool
+  is_parent_company: Company -> Bool
+  employee_criterion_exceeded: Company -> Bool
+  turnover_criterion_exceeded: Company -> Bool
+  balance_sheet_criterion_exceeded: Company -> Bool
+  more_than_one_micro_criterion_exceeded: Company -> Bool
+  not_more_than_one_micro_criterion_exceeded: Company -> Bool
+  is_micro_company: Company -> Bool
+  annual_average_employees: Company -> Int
+  annual_net_turnover_excl_vat: Company -> Real
+  balance_sheet_total: Company -> Real
+}
+
+theory T:V {
+  ! c in Company: ((annual_average_employees(c) > 10)) => ((employee_criterion_exceeded(c))).
+  ! c in Company: ((annual_net_turnover_excl_vat(c) > 900000.0)) => ((turnover_criterion_exceeded(c))).
+  ! c in Company: ((balance_sheet_total(c) > 450000.0)) => ((balance_sheet_criterion_exceeded(c))).
+  ! c in Company: (((employee_criterion_exceeded(c)) & (turnover_criterion_exceeded(c)))) => ((more_than_one_micro_criterion_exceeded(c))).
+  ! c in Company: (((employee_criterion_exceeded(c)) & (balance_sheet_criterion_exceeded(c)))) => ((more_than_one_micro_criterion_exceeded(c))).
+  ! c in Company: (((turnover_criterion_exceeded(c)) & (balance_sheet_criterion_exceeded(c)))) => ((more_than_one_micro_criterion_exceeded(c))).
+  ! c in Company: ((~more_than_one_micro_criterion_exceeded(c))) => ((not_more_than_one_micro_criterion_exceeded(c))).
+  ! c in Company: (((is_small_company_with_legal_personality(c)) & (~is_subsidiary_company(c)) & (~is_parent_company(c)) & (not_more_than_one_micro_criterion_exceeded(c)))) => ((is_micro_company(c))).
+  ! c in Company: ((more_than_one_micro_criterion_exceeded(c))) => ((~is_micro_company(c))).
+}

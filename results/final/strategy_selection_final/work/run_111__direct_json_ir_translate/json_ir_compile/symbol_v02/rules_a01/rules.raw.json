@@ -1,0 +1,246 @@
+{
+  "rules": [
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "lacks_proof_of_belgian_nationality", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "is_alien", "args": ["p"], "negated": false}
+      ],
+      "operator": "iff"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "possesses_valid_travel_document", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "is_identified_alien", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "recognised_as_national_by_home_authority", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "is_identified_alien", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "falls_within_ministerial_laissez_passer_nationality_category", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "is_identified_alien", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "no_residence_application_after_illegal_entry", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "at_least_one_absconding_criterion_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "no_international_protection_application_in_time", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "at_least_one_absconding_criterion_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "used_false_information_or_documents", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "at_least_one_absconding_criterion_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "committed_fraud_or_unlawful_means", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "at_least_one_absconding_criterion_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "does_not_cooperate_with_authorities", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "at_least_one_absconding_criterion_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "declared_unwillingness_to_comply_with_transfer_measure", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "at_least_one_absconding_criterion_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "declared_unwillingness_to_comply_with_entry_ban", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "at_least_one_absconding_criterion_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "declared_unwillingness_to_comply_with_less_coercive_measure", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "at_least_one_absconding_criterion_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "declared_unwillingness_to_comply_with_liberty_restricting_measure", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "at_least_one_absconding_criterion_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "declared_unwillingness_to_comply_with_equivalent_member_state_measure", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "at_least_one_absconding_criterion_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "subject_to_unlifted_entry_ban_in_kingdom", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "at_least_one_absconding_criterion_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "subject_to_unlifted_entry_ban_in_member_state", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "at_least_one_absconding_criterion_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "submitted_new_application_immediately_after_negative_decision", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "at_least_one_absconding_criterion_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "concealed_prior_fingerprints_in_dublin_state", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "at_least_one_absconding_criterion_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "submitted_multiple_applications_with_negative_outcome", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "at_least_one_absconding_criterion_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "concealed_prior_international_protection_application", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "at_least_one_absconding_criterion_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "came_for_purposes_other_than_stated_application", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "at_least_one_absconding_criterion_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "subject_to_fine_for_manifestly_unlawful_appeal", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "at_least_one_absconding_criterion_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {
+          "and": [
+            {"pred": "individual_examination_performed", "args": ["p"], "negated": false},
+            {"pred": "at_least_one_absconding_criterion_met", "args": ["p"], "negated": false},
+            {
+              "or": [
+                {"pred": "subject_to_removal_procedure", "args": ["p"], "negated": false},
+                {"pred": "subject_to_international_protection_procedure", "args": ["p"], "negated": false},
+                {"pred": "subject_to_dublin_transfer_procedure", "args": ["p"], "negated": false}
+              ]
+            }
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "risk_of_absconding", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    }
+  ]
+}

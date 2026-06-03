@@ -1,0 +1,38 @@
+run_id,question_id,status,expected,answer,correct,failure_stage,error,inference,provider,model,syntax_refinements,unsat_refinements,llm_calls,prompt_tokens,completion_tokens,total_tokens
+run_001,Q1,correct_decisive,True,True,True,,,entailment,openrouter,anthropic/claude-sonnet-4.6,1,0,4,17365,3925,21290
+run_002,Q1,inconclusive,True,Unknown,,,,entailment,openrouter,anthropic/claude-sonnet-4.6,0,0,7,30049,5914,35963
+run_003,Q1,correct_decisive,True,True,True,,,entailment,openrouter,anthropic/claude-sonnet-4.6,0,0,10,42331,7013,49344
+run_004,Q1,correct_decisive,True,True,True,,,entailment,openrouter,anthropic/claude-sonnet-4.6,2,0,15,62763,11299,74062
+run_005,Q1,correct_decisive,True,True,True,,,entailment,openrouter,anthropic/claude-sonnet-4.6,1,0,19,79607,13963,93570
+run_006,Q1,correct_decisive,True,True,True,,,entailment,openrouter,anthropic/claude-sonnet-4.6,0,0,22,92411,15831,108242
+run_007,Q1,symbolic_execution_failure,True,,,question_answering,UnboundLocalError: cannot access local variable 'response' where it is not associated with a value,,openrouter,anthropic/claude-sonnet-4.6,0,0,0,0,0,0
+run_008,Q1,correct_decisive,True,True,True,,,entailment,openrouter,anthropic/claude-sonnet-4.6,1,0,29,122676,20568,143244
+run_009,Q1,inconclusive,False,Unknown,,,,entailment,openrouter,anthropic/claude-sonnet-4.6,0,0,32,135186,22021,157207
+run_101,Q1,correct_decisive,True,True,True,,,entailment,openrouter,anthropic/claude-sonnet-4.6,0,0,35,147987,23178,171165
+run_102,Q1,correct_decisive,True,True,True,,,entailment,openrouter,anthropic/claude-sonnet-4.6,0,0,38,160967,24863,185830
+run_103,Q1,symbolic_execution_failure,True,,,question_answering,UnboundLocalError: cannot access local variable 'response' where it is not associated with a value,,openrouter,anthropic/claude-sonnet-4.6,0,0,0,0,0,0
+run_104,Q1,correct_decisive,True,True,True,,,entailment,openrouter,anthropic/claude-sonnet-4.6,0,0,48,205772,35266,241038
+run_105,Q1,inconclusive,False,Unknown,,,,entailment,openrouter,anthropic/claude-sonnet-4.6,2,0,53,226071,38993,265064
+run_106,Q1,inconclusive,True,Unknown,,,,entailment,openrouter,anthropic/claude-sonnet-4.6,1,0,57,241647,40058,281705
+run_107,Q1,symbolic_execution_failure,True,,,question_answering,UnboundLocalError: cannot access local variable 'response' where it is not associated with a value,,openrouter,anthropic/claude-sonnet-4.6,0,0,0,0,0,0
+run_108,Q1,wrong_decisive,False,True,False,,,entailment,openrouter,anthropic/claude-sonnet-4.6,0,0,63,267145,43705,310850
+run_109,Q1,correct_decisive,True,True,True,,,entailment,openrouter,anthropic/claude-sonnet-4.6,0,0,66,280003,45768,325771
+run_110,Q1,correct_decisive,True,True,True,,,entailment,openrouter,anthropic/claude-sonnet-4.6,0,0,69,293016,47697,340713
+run_111,Q1,inconclusive,True,Unknown,,,,entailment,openrouter,anthropic/claude-sonnet-4.6,1,0,73,309221,49975,359196
+run_112,Q1,wrong_decisive,False,True,False,,,entailment,openrouter,anthropic/claude-sonnet-4.6,1,0,77,325210,51791,377001
+run_113,Q1,correct_decisive,True,True,True,,,entailment,openrouter,anthropic/claude-sonnet-4.6,0,0,80,337740,53695,391435
+run_114,Q1,correct_decisive,False,False,True,,,entailment,openrouter,anthropic/claude-sonnet-4.6,0,0,83,350197,55221,405418
+run_115,Q1,symbolic_execution_failure,True,,,question_answering,UnboundLocalError: cannot access local variable 'response' where it is not associated with a value,,openrouter,anthropic/claude-sonnet-4.6,0,0,0,0,0,0
+run_116,Q1,correct_decisive,True,True,True,,,entailment,openrouter,anthropic/claude-sonnet-4.6,1,1,91,385394,62411,447805
+run_117,Q1,correct_decisive,False,False,True,,,entailment,openrouter,anthropic/claude-sonnet-4.6,1,1,96,406708,66444,473152
+run_118,Q1,correct_decisive,False,False,True,,,entailment,openrouter,anthropic/claude-sonnet-4.6,0,0,99,418969,67624,486593
+run_119,Q1,symbolic_execution_failure,True,,,question_answering,UnboundLocalError: cannot access local variable 'response' where it is not associated with a value,,openrouter,anthropic/claude-sonnet-4.6,0,0,0,0,0,0
+run_120,Q1,correct_decisive,True,True,True,,,entailment,openrouter,anthropic/claude-sonnet-4.6,0,0,107,455288,76035,531323
+run_201,Q1,wrong_decisive,True,False,False,,,entailment,openrouter,anthropic/claude-sonnet-4.6,5,0,117,502234,89421,591655
+run_202,Q1,wrong_decisive,False,True,False,,,entailment,openrouter,anthropic/claude-sonnet-4.6,2,1,123,528437,95309,623746
+run_203,Q1,wrong_decisive,False,True,False,,,entailment,openrouter,anthropic/claude-sonnet-4.6,3,1,130,557170,101538,658708
+run_204,Q1,inconclusive,False,Unknown,,,,entailment,openrouter,anthropic/claude-sonnet-4.6,1,0,134,573382,104243,677625
+run_205,Q1,correct_decisive,True,True,True,,,entailment,openrouter,anthropic/claude-sonnet-4.6,1,0,138,589739,106930,696669
+run_206,Q1,correct_decisive,False,False,True,,,entailment,openrouter,anthropic/claude-sonnet-4.6,1,0,142,607413,111150,718563
+run_207,Q1,symbolic_execution_failure,True,,,question_answering,UnboundLocalError: cannot access local variable 'response' where it is not associated with a value,,openrouter,anthropic/claude-sonnet-4.6,0,0,0,0,0,0
+run_208,Q1,correct_decisive,False,False,True,,,entailment,openrouter,anthropic/claude-sonnet-4.6,0,0,151,645597,119817,765414

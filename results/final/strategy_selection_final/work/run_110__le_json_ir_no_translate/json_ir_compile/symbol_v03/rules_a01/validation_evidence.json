@@ -1,0 +1,202 @@
+{
+  "cardinality_violations": [],
+  "numeric_provenance_issues": [],
+  "law_thresholds": [
+    10.0,
+    11.0
+  ],
+  "missing_helper": {
+    "helper_name": "satisfies_conditions_for_access_or_residence",
+    "helper_signature": "Person -> Bool",
+    "helper_kind": "predicate",
+    "helper_kind_hint": "unknown",
+    "helper_kind_hints": [
+      "unknown"
+    ],
+    "used_in_rules": [
+      {
+        "rule_index": 2,
+        "side": "if",
+        "negated": true,
+        "then_predicates": [
+          "is_in_illegal_residence"
+        ],
+        "then_legal_output_predicates": []
+      }
+    ],
+    "derives_legal_output": false,
+    "used_in_legal_output_rule": false,
+    "legal_output_predicates_in_then": [],
+    "candidate_lower_level_symbols": [
+      {
+        "name": "no_residence_application_after_illegal_entry_or_stay",
+        "kind": "observable",
+        "description": "The foreigner did not submit a residence application after illegal entry or during illegal residence."
+      },
+      {
+        "name": "is_in_illegal_residence",
+        "kind": "derived",
+        "description": "The person is in illegal residence: present on the territory without satisfying access or residence conditions."
+      },
+      {
+        "name": "subject_to_relevant_procedure",
+        "kind": "helper",
+        "description": "The foreigner is subject to a removal procedure, international protection procedure, or Dublin determination procedure."
+      },
+      {
+        "name": "objective_criterion_established",
+        "kind": "helper",
+        "description": "At least one objective criterion listed in paragraph 2 is met for the foreigner."
+      },
+      {
+        "name": "absconding_criterion_1_met",
+        "kind": "helper",
+        "description": "Criterion 1: the foreigner did not submit a residence application after illegal entry or during illegal residence, or di"
+      },
+      {
+        "name": "absconding_criterion_2_met",
+        "kind": "helper",
+        "description": "Criterion 2: the foreigner used false or misleading information, false or falsified documents, committed fraud, or used "
+      },
+      {
+        "name": "absconding_criterion_3_met",
+        "kind": "helper",
+        "description": "Criterion 3: the foreigner does not cooperate or has not cooperated with authorities responsible for access, residence, "
+      },
+      {
+        "name": "absconding_criterion_4_met",
+        "kind": "helper",
+        "description": "Criterion 4: the foreigner has indicated non-compliance or has already failed to comply with a transfer, removal, entry "
+      },
+      {
+        "name": "absconding_criterion_5_met",
+        "kind": "helper",
+        "description": "Criterion 5: the foreigner is subject to an entry ban in the Kingdom or another member state that has not been lifted or"
+      },
+      {
+        "name": "absconding_criterion_6_met",
+        "kind": "helper",
+        "description": "Criterion 6: the foreigner submitted a new residence application or international protection request immediately after a"
+      },
+      {
+        "name": "absconding_criterion_7_met",
+        "kind": "helper",
+        "description": "Criterion 7: the foreigner concealed, when questioned, that they had already provided fingerprints in another Dublin-bou"
+      },
+      {
+        "name": "absconding_criterion_8_met",
+        "kind": "helper",
+        "description": "Criterion 8: the foreigner submitted multiple international protection requests or residence applications in the Kingdom"
+      }
+    ],
+    "threshold_helper_candidates": [
+      {
+        "name": "objective_criterion_established",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "At least one objective criterion listed in paragraph 2 is met for the foreigner."
+      },
+      {
+        "name": "absconding_criterion_1_met",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "Criterion 1: the foreigner did not submit a residence application after illegal entry or during illegal residence, or di"
+      },
+      {
+        "name": "absconding_criterion_2_met",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "Criterion 2: the foreigner used false or misleading information, false or falsified documents, committed fraud, or used "
+      },
+      {
+        "name": "absconding_criterion_3_met",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "Criterion 3: the foreigner does not cooperate or has not cooperated with authorities responsible for access, residence, "
+      },
+      {
+        "name": "absconding_criterion_4_met",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "Criterion 4: the foreigner has indicated non-compliance or has already failed to comply with a transfer, removal, entry "
+      },
+      {
+        "name": "absconding_criterion_5_met",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "Criterion 5: the foreigner is subject to an entry ban in the Kingdom or another member state that has not been lifted or"
+      },
+      {
+        "name": "absconding_criterion_6_met",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "Criterion 6: the foreigner submitted a new residence application or international protection request immediately after a"
+      },
+      {
+        "name": "absconding_criterion_7_met",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "Criterion 7: the foreigner concealed, when questioned, that they had already provided fingerprints in another Dublin-bou"
+      },
+      {
+        "name": "absconding_criterion_8_met",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "Criterion 8: the foreigner submitted multiple international protection requests or residence applications in the Kingdom"
+      },
+      {
+        "name": "absconding_criterion_9_met",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "Criterion 9: the foreigner concealed, when questioned, that they had previously submitted an international protection re"
+      },
+      {
+        "name": "absconding_criterion_10_met",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "Criterion 10: the foreigner declared or it appears from the file that the foreigner came to the Kingdom for purposes oth"
+      },
+      {
+        "name": "absconding_criterion_11_met",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "Criterion 11: the foreigner is subject to a fine because the foreigner submitted a manifestly unlawful appeal to the Cou"
+      }
+    ],
+    "temporal_relation_candidates": [],
+    "legal_output_candidates": [
+      {
+        "name": "risk_of_absconding",
+        "kind": "derived",
+        "role": "legal_output",
+        "description": "A risk of absconding exists for the foreigner."
+      }
+    ],
+    "missing_temporal_support_symbol": false,
+    "undeclared_temporal_funcs_in_rules": [],
+    "legal_effect_context": true,
+    "is_secondary": false
+  },
+  "secondary_missing_helpers": [],
+  "computed_observable_predicate": null,
+  "computed_observable_helper_kind_hint": null,
+  "temporal_support": {
+    "detected_temporal_terms": [],
+    "requires_temporal_support": false,
+    "legal_effect_context": true,
+    "has_period_like_types": false,
+    "has_temporal_support_symbols": false,
+    "existing_period_types": [],
+    "existing_temporal_symbols": [],
+    "legal_output_predicates": [
+      "risk_of_absconding"
+    ],
+    "missing_temporal_support_symbol": false,
+    "repair_route": null
+  },
+  "missing_temporal_support_symbol": false,
+  "repair_route": null,
+  "secondary_diagnostics_text": "missing_helper_definition (legal-effect context=True):\n  helper: satisfies_conditions_for_access_or_residence (signature=Person -> Bool; kind=unknown; hints=unknown)\n  repair: define 'satisfies_conditions_for_access_or_residence' in THEN with rules, or reclassify as case_input/background only if safe; do not rename without defining.\n  - rules[2].if negated\n  threshold helper candidates:\n    - objective_criterion_established (helper)\n    - absconding_criterion_1_met (helper)\n    - absconding_criterion_2_met (helper)\n    - absconding_criterion_3_met (helper)\n    - absconding_criterion_4_met (helper)\n    - absconding_criterion_5_met (helper)\n  other lower-level symbols:\n    - no_residence_application_after_illegal_entry_or_stay (observable)\n    - is_in_illegal_residence (derived)\n    - subject_to_relevant_procedure (helper)\n    - objective_criterion_established (helper)\n    - absconding_criterion_1_met (helper)\n    - absconding_criterion_2_met (helper)\n    - absconding_criterion_3_met (helper)\n    - absconding_criterion_4_met (helper)",
+  "validation_evidence_fingerprint": "4c802c24f669d011",
+  "evidence_consumed_by_repair": false
+}

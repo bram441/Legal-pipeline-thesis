@@ -1,0 +1,63 @@
+{
+  "types": [
+    "Person",
+    "ImmovableProperty"
+  ],
+  "predicates": [
+    {
+      "name": "is_surviving_spouse_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the surviving spouse of the second (deceased) person."
+    },
+    {
+      "name": "served_as_main_family_residence_at_estate_opening",
+      "args": [
+        "ImmovableProperty",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The immovable property served as the main residence of the family at the time the estate of the deceased person opened."
+    },
+    {
+      "name": "is_heir_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is an heir of the second (deceased) person."
+    },
+    {
+      "name": "acquires_right_to_lease",
+      "args": [
+        "Person",
+        "ImmovableProperty"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "description": "The surviving spouse acquires the right to the lease of the immovable property under article 4.20, to the exclusion of all other heirs."
+    },
+    {
+      "name": "excluded_from_right_to_lease",
+      "args": [
+        "Person",
+        "ImmovableProperty"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The person (heir) is excluded from the right to the lease of the immovable property because the surviving spouse acquires that right."
+    }
+  ],
+  "functions": []
+}

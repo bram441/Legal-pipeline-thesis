@@ -1,0 +1,27 @@
+{
+  "case_entities_rendered_to_domains": {
+    "Person": [
+      "els",
+      "filip"
+    ],
+    "Estate": [
+      "els_estate"
+    ]
+  },
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "filip",
+      "arg_index": 0,
+      "expected_type": "Person",
+      "predicate": "obtains_full_ownership_of_entire_estate"
+    },
+    {
+      "entity": "els_estate",
+      "arg_index": 1,
+      "expected_type": "Estate",
+      "predicate": "obtains_full_ownership_of_entire_estate"
+    }
+  ],
+  "unmapped_case_entities": [],
+  "pre_solver_domain_validation_errors": []
+}

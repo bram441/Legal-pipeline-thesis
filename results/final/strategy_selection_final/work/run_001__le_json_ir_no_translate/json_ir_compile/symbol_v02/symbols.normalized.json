@@ -1,0 +1,213 @@
+{
+  "types": [
+    "Person",
+    "Asset",
+    "LegalDocument"
+  ],
+  "predicates": [
+    {
+      "name": "is_surviving_spouse_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the surviving spouse of the second (deceased) person."
+    },
+    {
+      "name": "leaves_descendants_or_adopted",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deceased leaves descendants, adopted children, or descendants of adopted children."
+    },
+    {
+      "name": "leaves_ascending_or_close_collateral",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deceased leaves relatives in the ascending line or close collateral relatives."
+    },
+    {
+      "name": "leaves_other_heirs_only",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deceased leaves only heirs other than those referred to in Art. 4.17 par. 1 and par. 2."
+    },
+    {
+      "name": "leaves_no_heirs",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deceased leaves no heirs at all."
+    },
+    {
+      "name": "is_common_property_share",
+      "args": [
+        "Asset",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset is the share of the deceased spouse in the common property of the spouses."
+    },
+    {
+      "name": "is_undivided_ownership_share",
+      "args": [
+        "Asset",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset is the share of the deceased spouse in property held exclusively in undivided ownership between the spouses."
+    },
+    {
+      "name": "is_own_property_remaining",
+      "args": [
+        "Asset",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset is part of the remaining own property of the deceased (not common or undivided)."
+    },
+    {
+      "name": "subject_to_legal_return_4_24",
+      "args": [
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset is subject to the right of legal return referred to in article 4.24."
+    },
+    {
+      "name": "subject_to_legal_return_4_25",
+      "args": [
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset is subject to the right of legal return referred to in article 4.25."
+    },
+    {
+      "name": "deed_of_gift_excludes_usufruct",
+      "args": [
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deed of gift for the asset provides that the surviving spouse does not acquire usufruct of it."
+    },
+    {
+      "name": "testament_excludes_usufruct",
+      "args": [
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The testament provides that the surviving spouse does not acquire usufruct of the asset."
+    },
+    {
+      "name": "legal_return_usufruct_excluded",
+      "args": [
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The surviving spouse's usufruct over a legal-return asset is excluded by deed of gift or testament."
+    },
+    {
+      "name": "acquires_usufruct_of_entire_estate",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "description": "The surviving spouse (first) acquires usufruct of the entire estate of the deceased (second) under Art. 4.17 par. 1."
+    },
+    {
+      "name": "acquires_full_ownership_of_common_property_share",
+      "args": [
+        "Person",
+        "Person",
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "description": "The surviving spouse (first) acquires full ownership of the deceased's (second) share in the common property (asset) under Art. 4.17 par. 2."
+    },
+    {
+      "name": "acquires_full_ownership_of_undivided_share",
+      "args": [
+        "Person",
+        "Person",
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "description": "The surviving spouse (first) acquires full ownership of the deceased's (second) share in undivided property (asset) under Art. 4.17 par. 2."
+    },
+    {
+      "name": "acquires_usufruct_of_own_property_remaining",
+      "args": [
+        "Person",
+        "Person",
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "description": "The surviving spouse (first) acquires usufruct of the remaining own property (asset) of the deceased (second) under Art. 4.17 par. 2."
+    },
+    {
+      "name": "acquires_usufruct_of_legal_return_asset",
+      "args": [
+        "Person",
+        "Person",
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "description": "The surviving spouse (first) acquires usufruct of the legal-return asset of the deceased (second) under Art. 4.17 par. 2(3), unless excluded."
+    },
+    {
+      "name": "acquires_full_ownership_of_entire_estate",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "description": "The surviving spouse (first) acquires full ownership of the entire estate of the deceased (second) under Art. 4.17 par. 3."
+    }
+  ],
+  "functions": []
+}

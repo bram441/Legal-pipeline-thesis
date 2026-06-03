@@ -1,0 +1,653 @@
+{
+  "types": [
+    "Person"
+  ],
+  "predicates": [
+    {
+      "name": "provides_proof_of_belgian_nationality",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person provides proof of possessing Belgian nationality.",
+      "directly_observable": true
+    },
+    {
+      "name": "is_foreigner",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The person is legally considered a foreigner.",
+      "output_category": "classification"
+    },
+    {
+      "name": "is_union_citizen",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person is a Union citizen.",
+      "directly_observable": true
+    },
+    {
+      "name": "covered_by_community_law_on_free_movement",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person is covered by Community law on free movement.",
+      "directly_observable": true
+    },
+    {
+      "name": "is_third_country_national",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The person is legally considered a third-country national.",
+      "output_category": "classification"
+    },
+    {
+      "name": "present_on_territory",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person is present on the territory.",
+      "directly_observable": true
+    },
+    {
+      "name": "meets_conditions_for_access_or_stay",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person meets the conditions for access to or stay on the territory.",
+      "directly_observable": true
+    },
+    {
+      "name": "is_illegal_stay",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The person is legally considered to be in an illegal stay.",
+      "output_category": "classification"
+    },
+    {
+      "name": "subject_to_removal_procedure",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person is subject to a removal procedure.",
+      "directly_observable": true
+    },
+    {
+      "name": "subject_to_international_protection_procedure",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person is subject to a procedure for granting international protection.",
+      "directly_observable": true
+    },
+    {
+      "name": "subject_to_dublin_procedure",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person is subject to a procedure for determining or transferring to the member state responsible for an international protection request.",
+      "directly_observable": true
+    },
+    {
+      "name": "has_valid_travel_document_passport_or_id",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person possesses a valid travel document, passport, or identity document.",
+      "directly_observable": true
+    },
+    {
+      "name": "recognized_by_national_authorities_for_laissez_passer",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person is recognized as a national by their country's authorities who agreed to issue a laissez-passer.",
+      "directly_observable": true
+    },
+    {
+      "name": "falls_under_ministerial_laissez_passer_nationality",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person falls under a category of nationalities for which the minister can issue a laissez-passer.",
+      "directly_observable": true
+    },
+    {
+      "name": "is_identified_foreigner",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The person is legally considered an identified foreigner.",
+      "output_category": "classification"
+    },
+    {
+      "name": "individual_examination_performed",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "An individual examination of the person's circumstances has been performed.",
+      "directly_observable": true
+    },
+    {
+      "name": "filed_residence_application_after_illegal_entry_or_during_stay",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person filed a residence application after illegal entry or during illegal stay.",
+      "directly_observable": true
+    },
+    {
+      "name": "filed_international_protection_request_in_time",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person filed their request for international protection within the legally foreseen time limit.",
+      "directly_observable": true
+    },
+    {
+      "name": "used_false_info_or_fraud_in_procedures",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person used false or misleading information, false documents, fraud, or other unlawful means in relevant procedures.",
+      "directly_observable": true
+    },
+    {
+      "name": "cooperates_with_authorities_on_access_stay_removal",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person cooperates with authorities regarding access, stay, establishment, and removal.",
+      "directly_observable": true
+    },
+    {
+      "name": "refuses_or_fails_to_comply_with_listed_measure",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person has made clear they will not comply or has already failed to comply with a listed transfer, return, removal, or restrictive measure.",
+      "directly_observable": true
+    },
+    {
+      "name": "subject_to_active_entry_ban_in_kingdom_or_member_state",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person is subject to an entry ban in the Kingdom or another member state that is neither lifted nor suspended.",
+      "directly_observable": true
+    },
+    {
+      "name": "filed_new_application_immediately_after_refusal_or_removal",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person filed a new application immediately after a refusal of entry/stay or a removal measure.",
+      "directly_observable": true
+    },
+    {
+      "name": "hid_fingerprints_given_in_other_dublin_state",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person hid having given fingerprints in another Dublin state after filing an international protection request.",
+      "directly_observable": true
+    },
+    {
+      "name": "filed_multiple_unsuccessful_applications_in_kingdom_or_member_states",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person filed multiple unsuccessful international protection or residence applications in the Kingdom or other member states.",
+      "directly_observable": true
+    },
+    {
+      "name": "hid_previous_international_protection_request_in_other_dublin_state",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person hid having previously filed an international protection request in another Dublin state.",
+      "directly_observable": true
+    },
+    {
+      "name": "came_to_kingdom_for_other_purposes_than_applied_for",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person stated or their file shows they came to the Kingdom for purposes other than those for which they applied.",
+      "directly_observable": true
+    },
+    {
+      "name": "subject_to_fine_for_manifestly_unlawful_appeal",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person is subject to a fine for filing a manifestly unlawful appeal with the Council for Alien Law Litigation.",
+      "directly_observable": true
+    },
+    {
+      "name": "meets_at_least_one_absconding_criterion",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The person meets at least one of the objective criteria for the risk of absconding."
+    },
+    {
+      "name": "has_risk_of_absconding",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The person is legally considered to have a risk of absconding.",
+      "output_category": "classification"
+    }
+  ],
+  "functions": [],
+  "rules": [
+    {
+      "forall": [
+        {
+          "var": "x",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "provides_proof_of_belgian_nationality",
+          "args": [
+            "x"
+          ],
+          "negated": true
+        }
+      ],
+      "then": [
+        {
+          "pred": "is_foreigner",
+          "args": [
+            "x"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "x",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_union_citizen",
+              "args": [
+                "x"
+              ],
+              "negated": true
+            },
+            {
+              "pred": "covered_by_community_law_on_free_movement",
+              "args": [
+                "x"
+              ],
+              "negated": true
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "is_third_country_national",
+          "args": [
+            "x"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "x",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_foreigner",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "present_on_territory",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "meets_conditions_for_access_or_stay",
+              "args": [
+                "x"
+              ],
+              "negated": true
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "is_illegal_stay",
+          "args": [
+            "x"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "x",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_foreigner",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            },
+            {
+              "or": [
+                {
+                  "pred": "has_valid_travel_document_passport_or_id",
+                  "args": [
+                    "x"
+                  ],
+                  "negated": false
+                },
+                {
+                  "pred": "recognized_by_national_authorities_for_laissez_passer",
+                  "args": [
+                    "x"
+                  ],
+                  "negated": false
+                },
+                {
+                  "pred": "falls_under_ministerial_laissez_passer_nationality",
+                  "args": [
+                    "x"
+                  ],
+                  "negated": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "is_identified_foreigner",
+          "args": [
+            "x"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "x",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "or": [
+            {
+              "pred": "filed_residence_application_after_illegal_entry_or_during_stay",
+              "args": [
+                "x"
+              ],
+              "negated": true
+            },
+            {
+              "pred": "filed_international_protection_request_in_time",
+              "args": [
+                "x"
+              ],
+              "negated": true
+            },
+            {
+              "pred": "used_false_info_or_fraud_in_procedures",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "cooperates_with_authorities_on_access_stay_removal",
+              "args": [
+                "x"
+              ],
+              "negated": true
+            },
+            {
+              "pred": "refuses_or_fails_to_comply_with_listed_measure",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "subject_to_active_entry_ban_in_kingdom_or_member_state",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "filed_new_application_immediately_after_refusal_or_removal",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "hid_fingerprints_given_in_other_dublin_state",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "filed_multiple_unsuccessful_applications_in_kingdom_or_member_states",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "hid_previous_international_protection_request_in_other_dublin_state",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "came_to_kingdom_for_other_purposes_than_applied_for",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "subject_to_fine_for_manifestly_unlawful_appeal",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "meets_at_least_one_absconding_criterion",
+          "args": [
+            "x"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "x",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_foreigner",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            },
+            {
+              "or": [
+                {
+                  "pred": "subject_to_removal_procedure",
+                  "args": [
+                    "x"
+                  ],
+                  "negated": false
+                },
+                {
+                  "pred": "subject_to_international_protection_procedure",
+                  "args": [
+                    "x"
+                  ],
+                  "negated": false
+                },
+                {
+                  "pred": "subject_to_dublin_procedure",
+                  "args": [
+                    "x"
+                  ],
+                  "negated": false
+                }
+              ]
+            },
+            {
+              "pred": "individual_examination_performed",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "meets_at_least_one_absconding_criterion",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "has_risk_of_absconding",
+          "args": [
+            "x"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    }
+  ]
+}

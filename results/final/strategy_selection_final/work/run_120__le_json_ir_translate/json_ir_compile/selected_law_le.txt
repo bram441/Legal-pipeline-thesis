@@ -1,0 +1,31 @@
+A company has legal personality if the law treats it as a company with legal personality.
+
+The employee criterion is exceeded for a company in a financial year if the annual average number of employees is greater than 50.
+
+The turnover criterion is exceeded for a company in a financial year if the annual net turnover exclusive of value added tax as referred to in article 1:26/1 is greater than 11,250,000 euros.
+
+The balance sheet criterion is exceeded for a company in a financial year if the balance sheet total is greater than 6,000,000 euros.
+
+More than one small-company criterion is exceeded for a company in a financial year if the employee criterion and the turnover criterion are exceeded for that company in that financial year.
+
+More than one small-company criterion is exceeded for a company in a financial year if the employee criterion and the balance sheet criterion are exceeded for that company in that financial year.
+
+More than one small-company criterion is exceeded for a company in a financial year if the turnover criterion and the balance sheet criterion are exceeded for that company in that financial year.
+
+Not more than one small-company criterion is exceeded for a company in a financial year if more than one small-company criterion is not exceeded for that company in that financial year.
+
+A company is a small company if the company has legal personality and not more than one small-company criterion is exceeded for the company in the last closed financial year on the balance sheet date.
+
+A financial year Y2 is the following financial year after financial year Y1 if Y2 immediately follows Y1.
+
+More than one small-company criterion is exceeded in two consecutive financial years for a company if more than one small-company criterion is exceeded for that company in financial year Y1 and more than one small-company criterion is exceeded for that company in financial year Y2 and Y2 is the following financial year after Y1.
+
+More than one small-company criterion is no longer exceeded in two consecutive financial years for a company if not more than one small-company criterion is exceeded for that company in financial year Y1 and not more than one small-company criterion is exceeded for that company in financial year Y2 and Y2 is the following financial year after Y1.
+
+A change in small-company status takes effect from the financial year following the second consecutive financial year if more than one small-company criterion is exceeded in two consecutive financial years for the company and the second consecutive financial year is Y2 and the following financial year after Y2 is Y3.
+
+A change in small-company status takes effect from the financial year following the second consecutive financial year if more than one small-company criterion is no longer exceeded in two consecutive financial years for the company and the second consecutive financial year is Y2 and the following financial year after Y2 is Y3.
+
+A company loses small-company status from financial year Y3 if more than one small-company criterion is exceeded in two consecutive financial years for that company and Y3 is the following financial year after the second of those two consecutive financial years.
+
+A company gains small-company status from financial year Y3 if more than one small-company criterion is no longer exceeded in two consecutive financial years for that company and Y3 is the following financial year after the second of those two consecutive financial years.

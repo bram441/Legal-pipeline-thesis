@@ -1,0 +1,84 @@
+{
+  "query": {
+    "predicate": "is_alien",
+    "args": [
+      "ahmed"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "entailed",
+    "certain": true,
+    "possible": true,
+    "certainty_class": "decisive"
+  },
+  "extracted_case": {
+    "facts": [
+      "not provides_proof_of_belgian_nationality(ahmed).",
+      "not meets_entry_or_residence_conditions(ahmed)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "Person": [
+        "ahmed",
+        "belgian"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 0,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "provides_proof_of_belgian_nationality",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "is_alien"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 0,
+      "target": "is_alien(ahmed)",
+      "conditions": [
+        {
+          "atom": "provides_proof_of_belgian_nationality(ahmed)",
+          "status": "present"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "provides_proof_of_belgian_nationality",
+      "symbol_type": "predicate",
+      "atom": "provides_proof_of_belgian_nationality(ahmed)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "Ahmed cannot demonstrate that he possesses Belgian nationality.",
+        "He resides on Belgian territory without a valid residence permit."
+      ],
+      "deriving_rule_indices": []
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "genuinely_under_specified_case",
+    "secondary": [],
+    "rationale": "No single blocking category identified; case may lack explicit observables for a decisive proof."
+  }
+}

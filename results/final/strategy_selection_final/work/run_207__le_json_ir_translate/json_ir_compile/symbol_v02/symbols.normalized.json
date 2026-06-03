@@ -1,0 +1,85 @@
+{
+  "types": [
+    "Person",
+    "ImmovableProperty",
+    "Lease"
+  ],
+  "predicates": [
+    {
+      "name": "is_surviving_spouse_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the surviving spouse of the second (deceased) person."
+    },
+    {
+      "name": "is_deceased",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The person is deceased and their estate has opened."
+    },
+    {
+      "name": "is_heir_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is an heir of the second (deceased) person."
+    },
+    {
+      "name": "served_as_family_principal_residence_at_estate_opening",
+      "args": [
+        "ImmovableProperty",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The immovable property served as the family's principal residence at the time the estate of the deceased person opened."
+    },
+    {
+      "name": "property_subject_to_lease",
+      "args": [
+        "ImmovableProperty",
+        "Lease"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The immovable property is subject to the given lease."
+    },
+    {
+      "name": "acquires_right_to_lease",
+      "args": [
+        "Person",
+        "Lease"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "description": "The surviving spouse acquires the right to the lease of the immovable property that served as the family's principal residence at the time the estate opened."
+    },
+    {
+      "name": "excluded_from_lease_right",
+      "args": [
+        "Person",
+        "Lease"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The person (heir other than the surviving spouse) is excluded from the right to the lease."
+    }
+  ],
+  "functions": []
+}

@@ -1,0 +1,213 @@
+{
+  "types": [
+    "Company",
+    "FinancialYear"
+  ],
+  "predicates": [
+    {
+      "name": "has_legal_personality",
+      "args": [
+        "Company"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The company has legal personality (a background/prerequisite status directly assertable from case facts)."
+    },
+    {
+      "name": "is_starting_company",
+      "args": [
+        "Company"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The company is starting its business (first financial year)."
+    },
+    {
+      "name": "is_first_financial_year",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The financial year is the first financial year of the company."
+    },
+    {
+      "name": "employee_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The employee criterion is exceeded for the company in the financial year (annual average employees > 50)."
+    },
+    {
+      "name": "turnover_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The turnover criterion is exceeded for the company in the financial year (annual net turnover excl. VAT > 11,250,000 EUR)."
+    },
+    {
+      "name": "balance_sheet_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The balance sheet criterion is exceeded for the company in the financial year (balance sheet total > 6,000,000 EUR)."
+    },
+    {
+      "name": "more_than_one_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "More than one small-company criterion is exceeded for the company in the financial year."
+    },
+    {
+      "name": "not_more_than_one_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "Not more than one small-company criterion is exceeded for the company in the financial year."
+    },
+    {
+      "name": "estimated_employee_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The estimated employee criterion is exceeded for a starting company in the first financial year based on good-faith estimate."
+    },
+    {
+      "name": "estimated_turnover_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The estimated turnover criterion is exceeded for a starting company in the first financial year based on good-faith estimate."
+    },
+    {
+      "name": "estimated_balance_sheet_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The estimated balance sheet criterion is exceeded for a starting company in the first financial year based on good-faith estimate."
+    },
+    {
+      "name": "more_than_one_estimated_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "More than one estimated small-company criterion is exceeded for a starting company in the first financial year."
+    },
+    {
+      "name": "is_small_company",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "output_category": "classification",
+      "description": "The company qualifies as a small company in the relevant financial year."
+    }
+  ],
+  "functions": [
+    {
+      "name": "annual_average_employees",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Int",
+      "kind": "observable",
+      "description": "The annual average number of employees of the company in the financial year."
+    },
+    {
+      "name": "annual_net_turnover_excl_vat",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The annual net turnover excluding VAT of the company in the financial year, in euros."
+    },
+    {
+      "name": "balance_sheet_total",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The balance sheet total of the company in the financial year, in euros."
+    },
+    {
+      "name": "estimated_annual_average_employees",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Int",
+      "kind": "observable",
+      "description": "The good-faith estimate at the beginning of the first financial year of the annual average number of employees."
+    },
+    {
+      "name": "estimated_annual_net_turnover_excl_vat",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The good-faith estimate at the beginning of the first financial year of the annual net turnover excluding VAT, in euros."
+    },
+    {
+      "name": "estimated_balance_sheet_total",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The good-faith estimate at the beginning of the first financial year of the balance sheet total, in euros."
+    },
+    {
+      "name": "last_closed_financial_year",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "FinancialYear",
+      "kind": "observable",
+      "description": "The last closed financial year for the company relative to the given reference financial year."
+    }
+  ]
+}

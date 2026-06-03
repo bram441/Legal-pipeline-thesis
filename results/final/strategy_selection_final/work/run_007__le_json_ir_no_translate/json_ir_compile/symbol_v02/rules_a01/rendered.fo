@@ -1,0 +1,22 @@
+vocabulary V {
+  type Person
+  type Property
+  is_legal_cohabitant_of: Person * Person -> Bool
+  is_longest_living_legal_cohabitant: Person * Person -> Bool
+  is_deceased: Person -> Bool
+  inherits_together_with_heirs: Person * Person -> Bool
+  is_main_family_residence: Property * Person -> Bool
+  is_household_goods: Property * Property -> Bool
+  subject_to_legal_return_4_24: Property -> Bool
+  subject_to_legal_return_4_25: Property -> Bool
+  acquires_usufruct_of_residence: Person * Property -> Bool
+  acquires_usufruct_of_household_goods: Person * Property -> Bool
+  exercises_usufruct_despite_legal_return: Person * Property -> Bool
+}
+
+theory T:V {
+  ! survivor in Person, deceased in Person, prop in Property: (((is_longest_living_legal_cohabitant(survivor,deceased)) & (is_deceased(deceased)) & (inherits_together_with_heirs(survivor,deceased)) & (is_main_family_residence(prop,deceased)))) => ((acquires_usufruct_of_residence(survivor,prop))).
+  ! survivor in Person, deceased in Person, goods in Property, residence in Property: (((is_longest_living_legal_cohabitant(survivor,deceased)) & (is_deceased(deceased)) & (inherits_together_with_heirs(survivor,deceased)) & (is_main_family_residence(residence,deceased)) & (is_household_goods(goods,residence)))) => ((acquires_usufruct_of_household_goods(survivor,goods))).
+  ! survivor in Person, prop in Property: (((acquires_usufruct_of_residence(survivor,prop)) & ((subject_to_legal_return_4_24(prop)) | (subject_to_legal_return_4_25(prop))))) => ((exercises_usufruct_despite_legal_return(survivor,prop))).
+  ! survivor in Person, goods in Property: (((acquires_usufruct_of_household_goods(survivor,goods)) & ((subject_to_legal_return_4_24(goods)) | (subject_to_legal_return_4_25(goods))))) => ((exercises_usufruct_despite_legal_return(survivor,goods))).
+}

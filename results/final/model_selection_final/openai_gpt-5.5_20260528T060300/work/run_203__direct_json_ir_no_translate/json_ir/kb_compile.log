@@ -1,0 +1,110 @@
+KB compilation FAILED (invalid FO syntax after 1 repair attempts).
+
+Error:
+IDP failed to parse compiled KB: Error: line 62 - colStart 29 - colEnd 51 => Unknown symbol: _union_citizen
+
+=== LAST RAW KB ===
+vocabulary V {
+  type Person
+  fails_to_provide_proof_of_belgian_nationality: Person -> Bool
+  not_union_citizen: Person -> Bool
+  not_person_under_free_movement_law: Person -> Bool
+  present_on_territory: Person -> Bool
+  does_not_or_no_longer_satisfy_entry_or_stay_conditions: Person -> Bool
+  subject_to_removal_procedure: Person -> Bool
+  subject_to_international_protection_procedure: Person -> Bool
+  subject_to_responsible_state_determination_or_transfer_procedure: Person -> Bool
+  current_and_real_reasons_to_assume_absconding: Person -> Bool
+  individual_examination_performed: Person -> Bool
+  individual_circumstances_considered: Person -> Bool
+  failed_to_file_residence_application_after_illegal_entry_or_stay: Person -> Bool
+  failed_to_request_international_protection_within_statutory_period: Person -> Bool
+  used_false_or_misleading_information_in_relevant_procedure: Person -> Bool
+  used_false_or_falsified_documents_in_relevant_procedure: Person -> Bool
+  committed_fraud_in_relevant_procedure: Person -> Bool
+  used_other_unlawful_means_in_relevant_procedure: Person -> Bool
+  failed_to_cooperate_with_immigration_authorities: Person -> Bool
+  unwilling_or_failed_to_comply_with_transfer_refusal_or_removal_measure: Person -> Bool
+  unwilling_or_failed_to_comply_with_active_entry_ban: Person -> Bool
+  unwilling_or_failed_to_comply_with_less_coercive_guarantee_measure: Person -> Bool
+  unwilling_or_failed_to_comply_with_public_order_security_restrictive_measure: Person -> Bool
+  unwilling_or_failed_to_comply_with_equivalent_member_state_measure: Person -> Bool
+  subject_to_active_entry_ban_in_state_or_member_state: Person -> Bool
+  filed_new_residence_application_immediately_after_negative_decision_or_measure: Person -> Bool
+  filed_new_protection_request_immediately_after_negative_decision_or_measure: Person -> Bool
+  concealed_prior_fingerprints_in_bound_state_after_protection_request: Person -> Bool
+  multiple_protection_or_residence_applications_with_negative_or_no_title_outcome: Person -> Bool
+  concealed_prior_protection_request_in_bound_state: Person -> Bool
+  came_for_purpose_other_than_application_purpose: Person -> Bool
+  subject_to_fine_for_manifestly_unlawful_appeal: Person -> Bool
+  has_valid_travel_document: Person -> Bool
+  has_valid_passport: Person -> Bool
+  has_valid_identity_document: Person -> Bool
+  recognized_as_national_by_country_authority: Person -> Bool
+  country_authority_willing_to_issue_laissez_passer: Person -> Bool
+  nationality_category_allows_minister_laissez_passer: Person -> Bool
+  subject_to_absconding_risk_procedure: Person -> Bool
+  absconding_criterion_1_met: Person -> Bool
+  absconding_criterion_2_met: Person -> Bool
+  absconding_criterion_3_met: Person -> Bool
+  absconding_criterion_4_met: Person -> Bool
+  absconding_criterion_5_met: Person -> Bool
+  absconding_criterion_6_met: Person -> Bool
+  absconding_criterion_7_met: Person -> Bool
+  absconding_criterion_8_met: Person -> Bool
+  absconding_criterion_9_met: Person -> Bool
+  absconding_criterion_10_met: Person -> Bool
+  absconding_criterion_11_met: Person -> Bool
+  absconding_objective_criterion_met: Person -> Bool
+  is_foreigner: Person -> Bool
+  is_third_country_national: Person -> Bool
+  has_illegal_stay: Person -> Bool
+  risk_of_absconding: Person -> Bool
+  is_identified_foreigner: Person -> Bool
+}
+
+theory T:V {
+  ! person in Person: ((fails_to_provide_proof_of_belgian_nationality(person))) => ((is_foreigner(person))).
+  ! person in Person: (((not_union_citizen(person)) & (not_person_under_free_movement_law(person)))) => ((is_third_country_national(person))).
+  ! person in Person: (((present_on_territory(person)) & (is_foreigner(person)) & (does_not_or_no_longer_satisfy_entry_or_stay_conditions(person)))) => ((has_illegal_stay(person))).
+  ! person in Person: ((subject_to_removal_procedure(person))) => ((subject_to_absconding_risk_procedure(person))).
+  ! person in Person: ((subject_to_international_protection_procedure(person))) => ((subject_to_absconding_risk_procedure(person))).
+  ! person in Person: ((subject_to_responsible_state_determination_or_transfer_procedure(person))) => ((subject_to_absconding_risk_procedure(person))).
+  ! person in Person: ((failed_to_file_residence_application_after_illegal_entry_or_stay(person))) => ((absconding_criterion_1_met(person))).
+  ! person in Person: ((failed_to_request_international_protection_within_statutory_period(person))) => ((absconding_criterion_1_met(person))).
+  ! person in Person: ((used_false_or_misleading_information_in_relevant_procedure(person))) => ((absconding_criterion_2_met(person))).
+  ! person in Person: ((used_false_or_falsified_documents_in_relevant_procedure(person))) => ((absconding_criterion_2_met(person))).
+  ! person in Person: ((committed_fraud_in_relevant_procedure(person))) => ((absconding_criterion_2_met(person))).
+  ! person in Person: ((used_other_unlawful_means_in_relevant_procedure(person))) => ((absconding_criterion_2_met(person))).
+  ! person in Person: ((failed_to_cooperate_with_immigration_authorities(person))) => ((absconding_criterion_3_met(person))).
+  ! person in Person: ((unwilling_or_failed_to_comply_with_transfer_refusal_or_removal_measure(person))) => ((absconding_criterion_4_met(person))).
+  ! person in Person: ((unwilling_or_failed_to_comply_with_active_entry_ban(person))) => ((absconding_criterion_4_met(person))).
+  ! person in Person: ((unwilling_or_failed_to_comply_with_less_coercive_guarantee_measure(person))) => ((absconding_criterion_4_met(person))).
+  ! person in Person: ((unwilling_or_failed_to_comply_with_public_order_security_restrictive_measure(person))) => ((absconding_criterion_4_met(person))).
+  ! person in Person: ((unwilling_or_failed_to_comply_with_equivalent_member_state_measure(person))) => ((absconding_criterion_4_met(person))).
+  ! person in Person: ((subject_to_active_entry_ban_in_state_or_member_state(person))) => ((absconding_criterion_5_met(person))).
+  ! person in Person: ((filed_new_residence_application_immediately_after_negative_decision_or_measure(person))) => ((absconding_criterion_6_met(person))).
+  ! person in Person: ((filed_new_protection_request_immediately_after_negative_decision_or_measure(person))) => ((absconding_criterion_6_met(person))).
+  ! person in Person: ((concealed_prior_fingerprints_in_bound_state_after_protection_request(person))) => ((absconding_criterion_7_met(person))).
+  ! person in Person: ((multiple_protection_or_residence_applications_with_negative_or_no_title_outcome(person))) => ((absconding_criterion_8_met(person))).
+  ! person in Person: ((concealed_prior_protection_request_in_bound_state(person))) => ((absconding_criterion_9_met(person))).
+  ! person in Person: ((came_for_purpose_other_than_application_purpose(person))) => ((absconding_criterion_10_met(person))).
+  ! person in Person: ((subject_to_fine_for_manifestly_unlawful_appeal(person))) => ((absconding_criterion_11_met(person))).
+  ! person in Person: ((absconding_criterion_1_met(person))) => ((absconding_objective_criterion_met(person))).
+  ! person in Person: ((absconding_criterion_2_met(person))) => ((absconding_objective_criterion_met(person))).
+  ! person in Person: ((absconding_criterion_3_met(person))) => ((absconding_objective_criterion_met(person))).
+  ! person in Person: ((absconding_criterion_4_met(person))) => ((absconding_objective_criterion_met(person))).
+  ! person in Person: ((absconding_criterion_5_met(person))) => ((absconding_objective_criterion_met(person))).
+  ! person in Person: ((absconding_criterion_6_met(person))) => ((absconding_objective_criterion_met(person))).
+  ! person in Person: ((absconding_criterion_7_met(person))) => ((absconding_objective_criterion_met(person))).
+  ! person in Person: ((absconding_criterion_8_met(person))) => ((absconding_objective_criterion_met(person))).
+  ! person in Person: ((absconding_criterion_9_met(person))) => ((absconding_objective_criterion_met(person))).
+  ! person in Person: ((absconding_criterion_10_met(person))) => ((absconding_objective_criterion_met(person))).
+  ! person in Person: ((absconding_criterion_11_met(person))) => ((absconding_objective_criterion_met(person))).
+  ! person in Person: (((is_foreigner(person)) & (subject_to_absconding_risk_procedure(person)) & (current_and_real_reasons_to_assume_absconding(person)) & (individual_examination_performed(person)) & (individual_circumstances_considered(person)) & (absconding_objective_criterion_met(person)))) => ((risk_of_absconding(person))).
+  ! person in Person: (((is_foreigner(person)) & (has_valid_travel_document(person)))) => ((is_identified_foreigner(person))).
+  ! person in Person: (((is_foreigner(person)) & (has_valid_passport(person)))) => ((is_identified_foreigner(person))).
+  ! person in Person: (((is_foreigner(person)) & (has_valid_identity_document(person)))) => ((is_identified_foreigner(person))).
+  ! person in Person: (((is_foreigner(person)) & (recognized_as_national_by_country_authority(person)) & (country_authority_willing_to_issue_laissez_passer(person)))) => ((is_identified_foreigner(person))).
+  ! person in Person: (((is_foreigner(person)) & (nationality_category_allows_minister_laissez_passer(person)))) => ((is_identified_foreigner(person))).
+}

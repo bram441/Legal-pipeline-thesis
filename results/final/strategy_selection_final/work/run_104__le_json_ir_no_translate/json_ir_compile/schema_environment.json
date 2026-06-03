@@ -1,0 +1,256 @@
+{
+  "types": {
+    "Person": {
+      "name": "Person",
+      "kind": "entity",
+      "aliases": [],
+      "source": "kb_symbol_table"
+    },
+    "ImmovableProperty": {
+      "name": "ImmovableProperty",
+      "kind": "entity",
+      "aliases": [],
+      "source": "kb_symbol_table"
+    },
+    "HouseholdGoods": {
+      "name": "HouseholdGoods",
+      "kind": "entity",
+      "aliases": [],
+      "source": "kb_symbol_table"
+    },
+    "Estate": {
+      "name": "Estate",
+      "kind": "entity",
+      "aliases": [],
+      "source": "kb_symbol_table"
+    }
+  },
+  "predicates": {
+    "is_longest_living_legal_cohabitant_of": {
+      "name": "is_longest_living_legal_cohabitant_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person is the longest-living legal cohabitant of the second person (the deceased). This is a background status that may be directly asserted in a case.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "is_deceased": {
+      "name": "is_deceased",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person is deceased and their estate has opened.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "served_as_main_family_residence": {
+      "name": "served_as_main_family_residence",
+      "args": [
+        "ImmovableProperty",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The immovable property served as the main family residence at the opening of the estate of the deceased person.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "household_goods_present_in": {
+      "name": "household_goods_present_in",
+      "args": [
+        "HouseholdGoods",
+        "ImmovableProperty"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The household goods were present in the immovable property at the opening of the estate of the deceased.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "subject_to_legal_reversion_4_24": {
+      "name": "subject_to_legal_reversion_4_24",
+      "args": [
+        "ImmovableProperty"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The immovable property is subject to a right of legal reversion as referred to in article 4.24.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "subject_to_legal_reversion_4_25": {
+      "name": "subject_to_legal_reversion_4_25",
+      "args": [
+        "ImmovableProperty"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The immovable property is subject to a right of legal reversion as referred to in article 4.25.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "household_goods_subject_to_legal_reversion_4_24": {
+      "name": "household_goods_subject_to_legal_reversion_4_24",
+      "args": [
+        "HouseholdGoods"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The household goods are subject to a right of legal reversion as referred to in article 4.24.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "household_goods_subject_to_legal_reversion_4_25": {
+      "name": "household_goods_subject_to_legal_reversion_4_25",
+      "args": [
+        "HouseholdGoods"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The household goods are subject to a right of legal reversion as referred to in article 4.25.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "acquires_usufruct_of_immovable_property": {
+      "name": "acquires_usufruct_of_immovable_property",
+      "args": [
+        "Person",
+        "ImmovableProperty"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The longest-living legal cohabitant acquires usufruct of the immovable property that served as the main family residence at the opening of the estate of the deceased.",
+      "legal_output": true,
+      "output_category": "legal_effect",
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": true,
+      "temporal_support": false
+    },
+    "acquires_usufruct_of_household_goods": {
+      "name": "acquires_usufruct_of_household_goods",
+      "args": [
+        "Person",
+        "HouseholdGoods"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The longest-living legal cohabitant acquires usufruct of the household goods present in the main family residence at the opening of the estate of the deceased.",
+      "legal_output": true,
+      "output_category": "legal_effect",
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": true,
+      "temporal_support": false
+    }
+  },
+  "functions": {},
+  "assertable_case_symbols": {
+    "predicates": [
+      "household_goods_present_in",
+      "household_goods_subject_to_legal_reversion_4_24",
+      "household_goods_subject_to_legal_reversion_4_25",
+      "is_deceased",
+      "is_longest_living_legal_cohabitant_of",
+      "served_as_main_family_residence",
+      "subject_to_legal_reversion_4_24",
+      "subject_to_legal_reversion_4_25"
+    ],
+    "functions": []
+  },
+  "factual_case_input_predicates": [],
+  "factual_criteria_input_predicates": [],
+  "legal_output_query_targets": [
+    "acquires_usufruct_of_household_goods",
+    "acquires_usufruct_of_immovable_property"
+  ],
+  "temporal_support_symbols": []
+}

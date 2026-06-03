@@ -1,0 +1,88 @@
+{
+  "types": ["Company", "FinancialYear"],
+  "predicates": [
+    {
+      "name": "is_small_company_with_legal_personality",
+      "args": ["Company"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The company is a small company with legal personality."
+    },
+    {
+      "name": "is_subsidiary_company",
+      "args": ["Company"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The company is a subsidiary company."
+    },
+    {
+      "name": "is_parent_company",
+      "args": ["Company"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The company is a parent company."
+    },
+    {
+      "name": "employee_criterion_exceeded",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The employee criterion is exceeded for the company on the balance sheet date of the given financial year (annual average employees greater than 10)."
+    },
+    {
+      "name": "turnover_criterion_exceeded",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The turnover criterion is exceeded for the company on the balance sheet date of the given financial year (annual net turnover excluding VAT greater than 900000 euro)."
+    },
+    {
+      "name": "balance_sheet_criterion_exceeded",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The balance sheet criterion is exceeded for the company on the balance sheet date of the given financial year (balance sheet total greater than 450000 euro)."
+    },
+    {
+      "name": "more_than_one_micro_criterion_exceeded",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "More than one micro-company criterion is exceeded for the company in the given financial year."
+    },
+    {
+      "name": "is_micro_company",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "derived",
+      "output_category": "classification",
+      "description": "The company qualifies as a micro-company in the given financial year."
+    }
+  ],
+  "functions": [
+    {
+      "name": "annual_average_employees",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Int",
+      "kind": "observable",
+      "description": "The annual average number of employees of the company in the given financial year."
+    },
+    {
+      "name": "annual_net_turnover_excl_vat",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The annual net turnover of the company excluding value added tax in the given financial year, in euro."
+    },
+    {
+      "name": "balance_sheet_total",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The balance sheet total of the company in the given financial year, in euro."
+    }
+  ]
+}

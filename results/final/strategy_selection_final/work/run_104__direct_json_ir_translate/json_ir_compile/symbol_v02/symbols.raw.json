@@ -1,0 +1,54 @@
+{
+  "types": ["Person", "Property"],
+  "predicates": [
+    {
+      "name": "is_surviving_legally_cohabiting_partner_of",
+      "args": ["Person", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the surviving legally cohabiting partner of the second person (the deceased)."
+    },
+    {
+      "name": "is_heir_called_to_estate_of",
+      "args": ["Person", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is an heir called to the estate of the second person (the deceased)."
+    },
+    {
+      "name": "served_as_family_principal_residence_at_opening",
+      "args": ["Property", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The property served as the family's principal residence at the time the estate of the deceased opened."
+    },
+    {
+      "name": "is_household_effects_of",
+      "args": ["Property", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The property consists of household effects present in the family principal residence of the deceased."
+    },
+    {
+      "name": "subject_to_legal_reversion_right",
+      "args": ["Property"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The property is subject to a right of legal reversion as referred to in article 4.24 or article 4.25."
+    },
+    {
+      "name": "acquires_usufruct_of",
+      "args": ["Person", "Property"],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "description": "The surviving legally cohabiting partner acquires the usufruct of the property as a legal consequence of the law."
+    }
+  ],
+  "functions": []
+}

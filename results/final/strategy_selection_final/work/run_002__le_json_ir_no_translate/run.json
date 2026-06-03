@@ -1,0 +1,51 @@
+{
+  "id": "run_002",
+  "law": {
+    "path": "example_laws_clean/vreemdelingenwet_clean.txt"
+  },
+  "case": {
+    "text": "Ahmed kan niet aantonen dat hij de Belgische nationaliteit bezit. Hij verblijft zonder geldige verblijfsvergunning op het Belgische grondgebied."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Valt Ahmed onder de definitie van een vreemdeling in de zin van artikel 1 van deze wet?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "No Belgian nationality; residence without valid permit → foreign national under Art. 1.",
+        "target": "ahmed"
+      }
+    }
+  ],
+  "kb_compile_strategy": "le_json_ir_no_translate",
+  "kb_compile_backend": "json_ir",
+  "extraction_backend": "json_ir",
+  "pipeline_backend_mode": "json_ir",
+  "kb_compile_flags": {
+    "use_le": true,
+    "uses_translation": false,
+    "json_ir_generation": "symbols_then_rules"
+  },
+  "strategy_metadata": {
+    "strategy_name": "le_json_ir_no_translate",
+    "canonical_strategy_name": "le_json_ir_no_translate",
+    "kb_backend": "json_ir",
+    "pipeline_backend_mode": "json_ir",
+    "uses_le_intermediate": true,
+    "json_ir_generation": "symbols_then_rules",
+    "belief_scoring": false,
+    "law_scope_mode": "cited",
+    "repair_enabled": true,
+    "json_ir_structured_repair_enabled": true,
+    "json_ir_max_symbol_versions": 3,
+    "json_ir_max_rules_attempts_per_symbol_version": 2,
+    "json_ir_max_kb_llm_calls": 8,
+    "json_ir_outer_cache_retries_enabled": false,
+    "json_ir_outer_cache_max_attempts": 1,
+    "configured_translation": false,
+    "effective_translation": false,
+    "translation_source": "main_cli_no_translate",
+    "uses_translation": false
+  }
+}

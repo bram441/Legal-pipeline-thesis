@@ -1,0 +1,26 @@
+{
+  "case_entities_rendered_to_domains": {
+    "Company": [
+      "bv_orion"
+    ],
+    "FinancialYear": [
+      "most_recently_closed_fy"
+    ]
+  },
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "bv_orion",
+      "arg_index": 0,
+      "expected_type": "Company",
+      "predicate": "is_small_company"
+    },
+    {
+      "entity": "most_recently_closed_fy",
+      "arg_index": 1,
+      "expected_type": "FinancialYear",
+      "predicate": "is_small_company"
+    }
+  ],
+  "unmapped_case_entities": [],
+  "pre_solver_domain_validation_errors": []
+}

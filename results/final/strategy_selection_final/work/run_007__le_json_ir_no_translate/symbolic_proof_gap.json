@@ -1,0 +1,154 @@
+{
+  "query": {
+    "predicate": "acquires_usufruct_of_residence",
+    "args": [
+      "noor",
+      "woning"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "entailed",
+    "certain": true,
+    "possible": true,
+    "certainty_class": "decisive"
+  },
+  "extracted_case": {
+    "facts": [
+      "is_deceased(mira).",
+      "is_legal_cohabitant_of(noor,mira).",
+      "is_longest_living_legal_cohabitant(noor,mira).",
+      "inherits_together_with_heirs(noor,mira).",
+      "is_main_family_residence(woning,mira)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "Person": [
+        "mira",
+        "noor"
+      ],
+      "Property": [
+        "woning"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 0,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_longest_living_legal_cohabitant",
+            "args": [
+              "survivor",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "is_deceased",
+            "args": [
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "inherits_together_with_heirs",
+            "args": [
+              "survivor",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "is_main_family_residence",
+            "args": [
+              "prop",
+              "deceased"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "acquires_usufruct_of_residence"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 0,
+      "target": "acquires_usufruct_of_residence(noor,woning)",
+      "conditions": [
+        {
+          "atom": "is_longest_living_legal_cohabitant(noor,mira)",
+          "status": "present"
+        },
+        {
+          "atom": "is_deceased(mira)",
+          "status": "present"
+        },
+        {
+          "atom": "inherits_together_with_heirs(noor,mira)",
+          "status": "present"
+        },
+        {
+          "atom": "is_main_family_residence(woning,mira)",
+          "status": "present"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "is_longest_living_legal_cohabitant",
+      "symbol_type": "predicate",
+      "atom": "is_longest_living_legal_cohabitant(noor,mira)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "is_deceased",
+      "symbol_type": "predicate",
+      "atom": "is_deceased(mira)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "inherits_together_with_heirs",
+      "symbol_type": "predicate",
+      "atom": "inherits_together_with_heirs(noor,mira)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "is_main_family_residence",
+      "symbol_type": "predicate",
+      "atom": "is_main_family_residence(woning,mira)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "genuinely_under_specified_case",
+    "secondary": [],
+    "rationale": "No single blocking category identified; case may lack explicit observables for a decisive proof."
+  }
+}

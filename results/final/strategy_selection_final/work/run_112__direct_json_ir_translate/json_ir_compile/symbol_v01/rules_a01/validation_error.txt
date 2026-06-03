@@ -1,0 +1,1 @@
+JSON_IR_SCHEMA_DESIGN_ERROR: rules[0].then: observable predicate 'is_alien' is used as a rule consequent. Observable predicates are case-input facts and should normally not be derived by legal rules. Use a derived predicate for the legal consequence, or repair the symbol table if no derived predicate exists.

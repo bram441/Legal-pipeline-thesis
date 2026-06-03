@@ -1,0 +1,63 @@
+{
+  "generated_at": "2026-05-28T07:32:58.423477+00:00",
+  "timestamp": "20260528T060300",
+  "provider": "openrouter",
+  "output_root": "C:\\Users\\bramd\\Documents\\VUB\\Master Thesis\\Legal-pipeline\\results\\final\\model_selection_final",
+  "models": [
+    "google/gemini-3.1-pro-preview",
+    "openai/gpt-5.5"
+  ],
+  "models_file": "C:\\Users\\bramd\\Documents\\VUB\\Master Thesis\\Legal-pipeline\\config\\model_sweep_top3.txt",
+  "rows": [
+    {
+      "model": "google/gemini-3.1-pro-preview",
+      "provider": "openrouter",
+      "output_dir": "C:\\Users\\bramd\\Documents\\VUB\\Master Thesis\\Legal-pipeline\\results\\final\\model_selection_final\\google_gemini-3.1-pro-preview_20260528T060300",
+      "exit_code": 1,
+      "duration_sec": 7288.91,
+      "matrix_path": "C:\\Users\\bramd\\Documents\\VUB\\Master Thesis\\Legal-pipeline\\results\\final\\model_selection_final\\google_gemini-3.1-pro-preview_20260528T060300\\matrix.json",
+      "total_cells": 37,
+      "scored_cells": 24,
+      "correct_decisive": 11,
+      "wrong_decisive": 1,
+      "inconclusive": 11,
+      "law_compilation_failures": 12,
+      "completed_with_errors": 1,
+      "unsupported_intent": 0,
+      "strict_accuracy": 0.2972972972972973,
+      "coverage": 0.6486486486486487,
+      "decisive_precision": 0.9166666666666666,
+      "decisive_wrong_rate": 0.08333333333333333,
+      "total_llm_calls": 180,
+      "total_prompt_tokens": 1472896,
+      "total_completion_tokens": 827111,
+      "total_tokens": 2300007,
+      "estimated_cost_usd": null
+    },
+    {
+      "model": "openai/gpt-5.5",
+      "provider": "openrouter",
+      "output_dir": "C:\\Users\\bramd\\Documents\\VUB\\Master Thesis\\Legal-pipeline\\results\\final\\model_selection_final\\openai_gpt-5.5_20260528T060300",
+      "exit_code": 1,
+      "duration_sec": 5309.45,
+      "matrix_path": "C:\\Users\\bramd\\Documents\\VUB\\Master Thesis\\Legal-pipeline\\results\\final\\model_selection_final\\openai_gpt-5.5_20260528T060300\\matrix.json",
+      "total_cells": 37,
+      "scored_cells": 25,
+      "correct_decisive": 12,
+      "wrong_decisive": 0,
+      "inconclusive": 11,
+      "law_compilation_failures": 2,
+      "completed_with_errors": 2,
+      "unsupported_intent": 0,
+      "strict_accuracy": 0.32432432432432434,
+      "coverage": 0.6756756756756757,
+      "decisive_precision": 1.0,
+      "decisive_wrong_rate": 0.0,
+      "total_llm_calls": 180,
+      "total_prompt_tokens": 1388947,
+      "total_completion_tokens": 288546,
+      "total_tokens": 1677493,
+      "estimated_cost_usd": null
+    }
+  ]
+}

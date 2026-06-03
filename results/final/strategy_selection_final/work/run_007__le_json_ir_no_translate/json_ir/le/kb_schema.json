@@ -1,0 +1,379 @@
+{
+  "types": [
+    "Person",
+    "Property"
+  ],
+  "predicates": [
+    {
+      "name": "is_legal_cohabitant_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person is a legal cohabitant of the second person (the deceased).",
+      "directly_observable": true
+    },
+    {
+      "name": "is_longest_living_legal_cohabitant",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person is the longest-living legal cohabitant of the second person (the deceased).",
+      "directly_observable": true
+    },
+    {
+      "name": "is_deceased",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person is deceased and their estate has opened.",
+      "directly_observable": true
+    },
+    {
+      "name": "inherits_together_with_heirs",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person (surviving cohabitant) inherits together with any heirs of the second person (the deceased).",
+      "directly_observable": true
+    },
+    {
+      "name": "is_main_family_residence",
+      "args": [
+        "Property",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The property served as the main family residence at the time the estate of the deceased person opened.",
+      "directly_observable": true
+    },
+    {
+      "name": "is_household_goods",
+      "args": [
+        "Property",
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first property consists of household goods present in the second property (the main family residence) at the time the estate opened.",
+      "directly_observable": true
+    },
+    {
+      "name": "subject_to_legal_return_4_24",
+      "args": [
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The property is subject to a right of legal return as referred to in article 4.24.",
+      "directly_observable": true
+    },
+    {
+      "name": "subject_to_legal_return_4_25",
+      "args": [
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The property is subject to a right of legal return as referred to in article 4.25.",
+      "directly_observable": true
+    },
+    {
+      "name": "acquires_usufruct_of_residence",
+      "args": [
+        "Person",
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The longest-living legal cohabitant acquires usufruct of the immovable property that served as the main family residence.",
+      "legal_output": true
+    },
+    {
+      "name": "acquires_usufruct_of_household_goods",
+      "args": [
+        "Person",
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The longest-living legal cohabitant acquires usufruct of the household goods present in the main family residence.",
+      "legal_output": true
+    },
+    {
+      "name": "exercises_usufruct_despite_legal_return",
+      "args": [
+        "Person",
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The longest-living legal cohabitant exercises the right of usufruct over the property even if it is subject to a right of legal return under article 4.24 or 4.25.",
+      "legal_output": true
+    }
+  ],
+  "functions": [],
+  "rules": [
+    {
+      "forall": [
+        {
+          "var": "survivor",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "prop",
+          "type": "Property"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_longest_living_legal_cohabitant",
+              "args": [
+                "survivor",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_deceased",
+              "args": [
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "inherits_together_with_heirs",
+              "args": [
+                "survivor",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_main_family_residence",
+              "args": [
+                "prop",
+                "deceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "acquires_usufruct_of_residence",
+          "args": [
+            "survivor",
+            "prop"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "survivor",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "goods",
+          "type": "Property"
+        },
+        {
+          "var": "residence",
+          "type": "Property"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_longest_living_legal_cohabitant",
+              "args": [
+                "survivor",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_deceased",
+              "args": [
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "inherits_together_with_heirs",
+              "args": [
+                "survivor",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_main_family_residence",
+              "args": [
+                "residence",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_household_goods",
+              "args": [
+                "goods",
+                "residence"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "acquires_usufruct_of_household_goods",
+          "args": [
+            "survivor",
+            "goods"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "survivor",
+          "type": "Person"
+        },
+        {
+          "var": "prop",
+          "type": "Property"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "acquires_usufruct_of_residence",
+              "args": [
+                "survivor",
+                "prop"
+              ],
+              "negated": false
+            },
+            {
+              "or": [
+                {
+                  "pred": "subject_to_legal_return_4_24",
+                  "args": [
+                    "prop"
+                  ],
+                  "negated": false
+                },
+                {
+                  "pred": "subject_to_legal_return_4_25",
+                  "args": [
+                    "prop"
+                  ],
+                  "negated": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "exercises_usufruct_despite_legal_return",
+          "args": [
+            "survivor",
+            "prop"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "survivor",
+          "type": "Person"
+        },
+        {
+          "var": "goods",
+          "type": "Property"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "acquires_usufruct_of_household_goods",
+              "args": [
+                "survivor",
+                "goods"
+              ],
+              "negated": false
+            },
+            {
+              "or": [
+                {
+                  "pred": "subject_to_legal_return_4_24",
+                  "args": [
+                    "goods"
+                  ],
+                  "negated": false
+                },
+                {
+                  "pred": "subject_to_legal_return_4_25",
+                  "args": [
+                    "goods"
+                  ],
+                  "negated": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "exercises_usufruct_despite_legal_return",
+          "args": [
+            "survivor",
+            "goods"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    }
+  ]
+}

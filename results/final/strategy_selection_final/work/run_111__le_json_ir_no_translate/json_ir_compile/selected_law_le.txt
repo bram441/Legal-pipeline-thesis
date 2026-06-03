@@ -1,0 +1,73 @@
+A person is a foreigner if the person does not provide proof that the person holds Belgian nationality.
+
+A person is a third-country national if the person is not a Union citizen and the person is not a person who falls under Community law on free movement as defined in Article 2, point 5, of the Schengen Borders Code.
+
+A person is in illegal residence if the person is present on the territory and the person does not or no longer satisfies the conditions for access to or residence on the territory.
+
+A risk of absconding exists for a foreigner if there are reasons to believe that the foreigner, who is subject to a removal procedure or a procedure for granting international protection or a procedure for determining or transferring to the Member State responsible for examining the request for international protection, will abscond in view of the criteria listed in paragraph 2.
+
+A foreigner is an identified foreigner if the foreigner is in possession of a valid travel document, a valid passport, or a valid identity document.
+
+A foreigner is an identified foreigner if the foreigner has been recognised as a national by the national authority of the foreigner's country and that authority has declared itself willing to issue a laissez-passer.
+
+A foreigner is an identified foreigner if the foreigner falls under the category of nationalities for which the minister may issue a laissez-passer directly.
+
+A risk of absconding must be current and real.
+
+A risk of absconding is established after an individual examination and on the basis of one or more of the objective criteria listed in paragraph 2, taking into account all circumstances specific to each case.
+
+The criterion under paragraph 2(1) is present if the person did not submit a residence application after illegal entry or during illegal residence.
+
+The criterion under paragraph 2(1) is present if the person did not submit a request for international protection within the period provided by the law.
+
+The criterion under paragraph 2(2) is present if the person used false or misleading information in the context of a procedure for international protection, residence, removal, or refoulement.
+
+The criterion under paragraph 2(2) is present if the person used false or forged documents in the context of a procedure for international protection, residence, removal, or refoulement.
+
+The criterion under paragraph 2(2) is present if the person committed fraud in the context of a procedure for international protection, residence, removal, or refoulement.
+
+The criterion under paragraph 2(2) is present if the person used other unlawful means in the context of a procedure for international protection, residence, removal, or refoulement.
+
+The criterion under paragraph 2(3) is present if the person does not cooperate or has not cooperated in the context of relations with the authorities responsible for implementing and/or supervising compliance with the regulations on access to the territory, residence, establishment, and removal of foreigners.
+
+The criterion under paragraph 2(4) is present if the person has clearly indicated that the person does not wish to comply with a transfer, refoulement, or removal measure.
+
+The criterion under paragraph 2(4) is present if the person has already failed to comply with a transfer, refoulement, or removal measure.
+
+The criterion under paragraph 2(4) is present if the person has clearly indicated that the person does not wish to comply with an entry ban that has neither been lifted nor suspended.
+
+The criterion under paragraph 2(4) is present if the person has already failed to comply with an entry ban that has neither been lifted nor suspended.
+
+The criterion under paragraph 2(4) is present if the person has clearly indicated that the person does not wish to comply with a less coercive measure than a deprivation of liberty measure aimed at guaranteeing the person's transfer, refoulement, or removal, whether that measure is a freedom-restricting measure or another measure.
+
+The criterion under paragraph 2(4) is present if the person has already failed to comply with a less coercive measure than a deprivation of liberty measure aimed at guaranteeing the person's transfer, refoulement, or removal, whether that measure is a freedom-restricting measure or another measure.
+
+The criterion under paragraph 2(4) is present if the person has clearly indicated that the person does not wish to comply with a freedom-restricting measure aimed at guaranteeing public order or national security.
+
+The criterion under paragraph 2(4) is present if the person has already failed to comply with a freedom-restricting measure aimed at guaranteeing public order or national security.
+
+The criterion under paragraph 2(4) is present if the person has clearly indicated that the person does not wish to comply with a measure taken by another Member State that is equivalent to a measure referred to in paragraph 2(4)(a), (b), (c), or (d).
+
+The criterion under paragraph 2(4) is present if the person has already failed to comply with a measure taken by another Member State that is equivalent to a measure referred to in paragraph 2(4)(a), (b), (c), or (d).
+
+The criterion under paragraph 2(5) is present if the person is subject to an entry ban in the Kingdom that has neither been lifted nor suspended.
+
+The criterion under paragraph 2(5) is present if the person is subject to an entry ban in another Member State that has neither been lifted nor suspended.
+
+The criterion under paragraph 2(6) is present if the person submitted a new residence application or a new request for international protection immediately after having been subject to a decision refusing entry or residence.
+
+The criterion under paragraph 2(6) is present if the person submitted a new residence application or a new request for international protection immediately after having been subject to a decision ending the person's residence.
+
+The criterion under paragraph 2(6) is present if the person submitted a new residence application or a new request for international protection immediately after having been subject to a refoulement or removal measure.
+
+The criterion under paragraph 2(7) is present if the person, while being questioned on that point, concealed that the person had already provided fingerprints in another State bound by the European regulations on determining the State responsible for examining a request for international protection, after having submitted a request for international protection.
+
+The criterion under paragraph 2(8) is present if the person submitted multiple requests for international protection and/or residence applications in the Kingdom or in one or more other Member States that resulted in a negative decision or did not lead to the issuance of a residence permit.
+
+The criterion under paragraph 2(9) is present if the person, while being questioned on that point, concealed that the person had previously submitted a request for international protection in another State bound by the European regulations on determining the State responsible for examining a request for international protection.
+
+The criterion under paragraph 2(10) is present if the person declared that the person came to the Kingdom for purposes other than the purposes for which the person submitted a request for international protection or a residence application.
+
+The criterion under paragraph 2(10) is present if it appears from the person's file that the person came to the Kingdom for purposes other than the purposes for which the person submitted a request for international protection or a residence application.
+
+The criterion under paragraph 2(11) is present if the person is subject to a fine because the person submitted a manifestly unlawful appeal to the Council for Alien Law Litigation.

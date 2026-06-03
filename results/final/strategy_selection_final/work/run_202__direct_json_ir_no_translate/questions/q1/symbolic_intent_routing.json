@@ -1,0 +1,14 @@
+{
+  "question": "Heeft Ulla volgens artikel 4.17, paragraaf 1 recht op het vruchtgebruik van de gehele nalatenschap?",
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "scorable": true,
+  "fallback_intent": null,
+  "warnings": [],
+  "legal_output_symbols": [
+    "acquires_usufruct_of_entire_estate"
+  ],
+  "query_hint_type": "boolean",
+  "expected_question_type": "boolean"
+}

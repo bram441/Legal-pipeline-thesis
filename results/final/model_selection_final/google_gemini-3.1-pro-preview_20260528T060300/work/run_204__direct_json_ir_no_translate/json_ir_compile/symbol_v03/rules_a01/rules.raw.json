@@ -1,0 +1,348 @@
+{
+  "rules": [
+    {
+      "forall": [
+        {
+          "var": "x",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "provides_proof_of_belgian_nationality",
+          "args": [
+            "x"
+          ],
+          "negated": true
+        }
+      ],
+      "then": [
+        {
+          "pred": "is_foreigner",
+          "args": [
+            "x"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "x",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_union_citizen",
+              "args": [
+                "x"
+              ],
+              "negated": true
+            },
+            {
+              "pred": "covered_by_community_law_on_free_movement",
+              "args": [
+                "x"
+              ],
+              "negated": true
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "is_third_country_national",
+          "args": [
+            "x"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "x",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_foreigner",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "present_on_territory",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "meets_conditions_for_access_or_stay",
+              "args": [
+                "x"
+              ],
+              "negated": true
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "is_illegal_stay",
+          "args": [
+            "x"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "x",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_foreigner",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            },
+            {
+              "or": [
+                {
+                  "pred": "has_valid_travel_document_passport_or_id",
+                  "args": [
+                    "x"
+                  ],
+                  "negated": false
+                },
+                {
+                  "pred": "recognized_by_national_authorities_for_laissez_passer",
+                  "args": [
+                    "x"
+                  ],
+                  "negated": false
+                },
+                {
+                  "pred": "falls_under_ministerial_laissez_passer_nationality",
+                  "args": [
+                    "x"
+                  ],
+                  "negated": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "is_identified_foreigner",
+          "args": [
+            "x"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "x",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "or": [
+            {
+              "pred": "filed_residence_application_after_illegal_entry_or_during_stay",
+              "args": [
+                "x"
+              ],
+              "negated": true
+            },
+            {
+              "pred": "filed_international_protection_request_in_time",
+              "args": [
+                "x"
+              ],
+              "negated": true
+            },
+            {
+              "pred": "used_false_info_or_fraud_in_procedures",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "cooperates_with_authorities_on_access_stay_removal",
+              "args": [
+                "x"
+              ],
+              "negated": true
+            },
+            {
+              "pred": "refuses_or_fails_to_comply_with_listed_measure",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "subject_to_active_entry_ban_in_kingdom_or_member_state",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "filed_new_application_immediately_after_refusal_or_removal",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "hid_fingerprints_given_in_other_dublin_state",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "filed_multiple_unsuccessful_applications_in_kingdom_or_member_states",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "hid_previous_international_protection_request_in_other_dublin_state",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "came_to_kingdom_for_other_purposes_than_applied_for",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "subject_to_fine_for_manifestly_unlawful_appeal",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "meets_at_least_one_absconding_criterion",
+          "args": [
+            "x"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "x",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_foreigner",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            },
+            {
+              "or": [
+                {
+                  "pred": "subject_to_removal_procedure",
+                  "args": [
+                    "x"
+                  ],
+                  "negated": false
+                },
+                {
+                  "pred": "subject_to_international_protection_procedure",
+                  "args": [
+                    "x"
+                  ],
+                  "negated": false
+                },
+                {
+                  "pred": "subject_to_dublin_procedure",
+                  "args": [
+                    "x"
+                  ],
+                  "negated": false
+                }
+              ]
+            },
+            {
+              "pred": "individual_examination_performed",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "meets_at_least_one_absconding_criterion",
+              "args": [
+                "x"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "has_risk_of_absconding",
+          "args": [
+            "x"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    }
+  ]
+}

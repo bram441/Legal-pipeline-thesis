@@ -1,0 +1,131 @@
+{
+  "intent": "deduction",
+  "symbolic_status": "ok",
+  "status": "ok",
+  "scorable": true,
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "routing": {
+    "question": "Can this be an objective criterion for risk of absconding pursuant to Article 1, paragraph 2, point 2?",
+    "detected_question_type": "boolean",
+    "selected_intent": "deduction",
+    "selected_reason": "expected.mode=boolean",
+    "scorable": true,
+    "fallback_intent": null,
+    "warnings": [],
+    "legal_output_symbols": [
+      "risk_of_absconding"
+    ],
+    "query_hint_type": "boolean",
+    "expected_question_type": "boolean"
+  },
+  "satisfiability_check": {
+    "stage": "pre_query",
+    "kb_case_satisfiable": true,
+    "status": "ok",
+    "details": "theory satisfiable",
+    "intent_backend": "idp_z3.tasks.satisfiable_check",
+    "duration_seconds": 0.1215
+  },
+  "warnings": [],
+  "deduction": {
+    "intent": "deduction",
+    "status": "ok",
+    "output_kind": "epistemic_boolean",
+    "predicate": "risk_of_absconding",
+    "args": [
+      "dana"
+    ],
+    "possible": true,
+    "certain": true,
+    "label": "entailed",
+    "atom": "risk_of_absconding(x0)",
+    "constraint": "? x0 in Person: __sel0(x0) & risk_of_absconding(x0)",
+    "certainty_class": "decisive",
+    "sat": true,
+    "internal_intent": "deduction",
+    "antecedent_coverage": [
+      {
+        "rule_index": 22,
+        "target": "risk_of_absconding(dana)",
+        "conditions": [
+          {
+            "atom": "individual_examination_performed(dana)",
+            "status": "present"
+          },
+          {
+            "atom": "at_least_one_absconding_criterion_met(dana)",
+            "status": "helper_defined"
+          },
+          {
+            "atom": "subject_to_removal_procedure(dana)",
+            "status": "present"
+          },
+          {
+            "atom": "subject_to_international_protection_procedure(dana)",
+            "status": "missing"
+          },
+          {
+            "atom": "subject_to_dublin_transfer_procedure(dana)",
+            "status": "missing"
+          }
+        ]
+      }
+    ]
+  },
+  "model_expansion": null,
+  "get_range": null,
+  "satisfiable": null,
+  "explanation": null,
+  "execution_query": {
+    "type": "predicate",
+    "predicate": "risk_of_absconding",
+    "mode": "boolean",
+    "args": [
+      "dana"
+    ],
+    "explain": false,
+    "predicate_kind": "derived",
+    "query_type": "predicate_boolean",
+    "internal_intent": "deduction"
+  },
+  "output_kind": "epistemic_boolean",
+  "certainty_class": "decisive",
+  "predicate": "risk_of_absconding",
+  "args": [
+    "dana"
+  ],
+  "label": "entailed",
+  "possible": true,
+  "certain": true,
+  "sat": true,
+  "antecedent_coverage": [
+    {
+      "rule_index": 22,
+      "target": "risk_of_absconding(dana)",
+      "conditions": [
+        {
+          "atom": "individual_examination_performed(dana)",
+          "status": "present"
+        },
+        {
+          "atom": "at_least_one_absconding_criterion_met(dana)",
+          "status": "helper_defined"
+        },
+        {
+          "atom": "subject_to_removal_procedure(dana)",
+          "status": "present"
+        },
+        {
+          "atom": "subject_to_international_protection_procedure(dana)",
+          "status": "missing"
+        },
+        {
+          "atom": "subject_to_dublin_transfer_procedure(dana)",
+          "status": "missing"
+        }
+      ]
+    }
+  ]
+}

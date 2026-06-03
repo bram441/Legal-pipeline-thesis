@@ -1,0 +1,24 @@
+{
+  "case_entities_rendered_to_domains": {
+    "Person": [
+      "joris",
+      "karin"
+    ]
+  },
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "karin",
+      "arg_index": 0,
+      "expected_type": "Person",
+      "predicate": "preceding_provisions_not_applicable"
+    },
+    {
+      "entity": "joris",
+      "arg_index": 1,
+      "expected_type": "Person",
+      "predicate": "preceding_provisions_not_applicable"
+    }
+  ],
+  "unmapped_case_entities": [],
+  "pre_solver_domain_validation_errors": []
+}

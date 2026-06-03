@@ -1,0 +1,245 @@
+{
+  "types": [
+    "Person",
+    "ImmovableProperty"
+  ],
+  "predicates": [
+    {
+      "name": "is_surviving_spouse_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person is the surviving spouse of the second person (the deceased). This background status may be directly asserted in a case.",
+      "directly_observable": true
+    },
+    {
+      "name": "served_as_family_main_residence_at_estate_opening",
+      "args": [
+        "ImmovableProperty",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The immovable property served as the main residence of the family at the time the estate of the deceased opened.",
+      "directly_observable": true
+    },
+    {
+      "name": "is_heir_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person is an heir of the second person (the deceased).",
+      "directly_observable": true
+    },
+    {
+      "name": "acquires_right_to_lease",
+      "args": [
+        "Person",
+        "ImmovableProperty"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The surviving spouse acquires the right to the lease of the immovable property under article 4.20.",
+      "legal_output": true,
+      "output_category": "right"
+    },
+    {
+      "name": "excluded_from_right_to_lease",
+      "args": [
+        "Person",
+        "ImmovableProperty"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The person (heir) is excluded from the right to the lease of the immovable property in favour of the surviving spouse.",
+      "output_category": "prohibition"
+    },
+    {
+      "name": "is_sole_beneficiary_of_lease_right",
+      "args": [
+        "Person",
+        "ImmovableProperty"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The person is the sole beneficiary of the right to the lease of the immovable property.",
+      "output_category": "classification"
+    }
+  ],
+  "functions": [],
+  "rules": [
+    {
+      "forall": [
+        {
+          "var": "spouse",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "property",
+          "type": "ImmovableProperty"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_spouse_of",
+              "args": [
+                "spouse",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "served_as_family_main_residence_at_estate_opening",
+              "args": [
+                "property",
+                "deceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "acquires_right_to_lease",
+          "args": [
+            "spouse",
+            "property"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "spouse",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "property",
+          "type": "ImmovableProperty"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_spouse_of",
+              "args": [
+                "spouse",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "served_as_family_main_residence_at_estate_opening",
+              "args": [
+                "property",
+                "deceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "is_sole_beneficiary_of_lease_right",
+          "args": [
+            "spouse",
+            "property"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "heir",
+          "type": "Person"
+        },
+        {
+          "var": "spouse",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "property",
+          "type": "ImmovableProperty"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_heir_of",
+              "args": [
+                "heir",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_surviving_spouse_of",
+              "args": [
+                "spouse",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "acquires_right_to_lease",
+              "args": [
+                "spouse",
+                "property"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_surviving_spouse_of",
+              "args": [
+                "heir",
+                "deceased"
+              ],
+              "negated": true
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "excluded_from_right_to_lease",
+          "args": [
+            "heir",
+            "property"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    }
+  ]
+}

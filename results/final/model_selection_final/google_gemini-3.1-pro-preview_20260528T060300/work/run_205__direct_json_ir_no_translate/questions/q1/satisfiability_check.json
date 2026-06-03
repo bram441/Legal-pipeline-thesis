@@ -1,0 +1,8 @@
+{
+  "stage": "pre_query",
+  "kb_case_satisfiable": true,
+  "status": "ok",
+  "details": "theory satisfiable",
+  "intent_backend": "idp_z3.tasks.satisfiable_check",
+  "duration_seconds": 0.0717
+}

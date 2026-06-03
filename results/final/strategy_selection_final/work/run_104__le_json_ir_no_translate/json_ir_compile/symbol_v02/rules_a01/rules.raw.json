@@ -1,0 +1,46 @@
+{
+  "rules": [
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "property", "type": "ImmovableProperty"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_longest_living_legal_cohabitant_of", "args": ["survivor", "deceased"], "negated": false},
+            {"pred": "is_deceased", "args": ["deceased"], "negated": false},
+            {"pred": "served_as_main_family_residence", "args": ["property", "deceased"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "acquires_usufruct_of_immovable_property", "args": ["survivor", "property"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "goods", "type": "HouseholdGoods"},
+        {"var": "property", "type": "ImmovableProperty"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_longest_living_legal_cohabitant_of", "args": ["survivor", "deceased"], "negated": false},
+            {"pred": "is_deceased", "args": ["deceased"], "negated": false},
+            {"pred": "served_as_main_family_residence", "args": ["property", "deceased"], "negated": false},
+            {"pred": "household_goods_present_in", "args": ["goods", "property"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "acquires_usufruct_of_household_goods", "args": ["survivor", "goods"], "negated": false}
+      ],
+      "operator": "implies"
+    }
+  ]
+}

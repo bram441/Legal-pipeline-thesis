@@ -1,0 +1,100 @@
+{
+  "entities": {
+    "last_closed_fy": {
+      "declared_type": "FinancialYear",
+      "resolved_type": "FinancialYear",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_last_closed_financial_year",
+          "arg_index": 1,
+          "expected_type": "FinancialYear"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "annual_average_employees",
+          "arg_index": 1,
+          "expected_type": "FinancialYear"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "annual_net_turnover_excl_vat",
+          "arg_index": 1,
+          "expected_type": "FinancialYear"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "balance_sheet_total",
+          "arg_index": 1,
+          "expected_type": "FinancialYear"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "is_small_company",
+          "arg_index": 1,
+          "expected_type": "FinancialYear"
+        }
+      ]
+    },
+    "nv_atlas": {
+      "declared_type": "Company",
+      "resolved_type": "Company",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "has_legal_personality",
+          "arg_index": 0,
+          "expected_type": "Company"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "is_last_closed_financial_year",
+          "arg_index": 0,
+          "expected_type": "Company"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "annual_average_employees",
+          "arg_index": 0,
+          "expected_type": "Company"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "annual_net_turnover_excl_vat",
+          "arg_index": 0,
+          "expected_type": "Company"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "balance_sheet_total",
+          "arg_index": 0,
+          "expected_type": "Company"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "is_small_company",
+          "arg_index": 0,
+          "expected_type": "Company"
+        }
+      ]
+    }
+  },
+  "unmapped_entities": [],
+  "conflicts": [],
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "nv_atlas",
+      "arg_index": 0,
+      "expected_type": "Company",
+      "predicate": "is_small_company"
+    },
+    {
+      "entity": "last_closed_fy",
+      "arg_index": 1,
+      "expected_type": "FinancialYear",
+      "predicate": "is_small_company"
+    }
+  ]
+}

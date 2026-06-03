@@ -1,0 +1,179 @@
+{
+  "query": {
+    "predicate": "acquires_full_ownership_of_entire_estate",
+    "args": [
+      "filip",
+      "els_estate"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "entailed",
+    "certain": true,
+    "possible": true,
+    "certainty_class": "decisive"
+  },
+  "extracted_case": {
+    "facts": [
+      "is_deceased(els).",
+      "is_surviving_spouse_of(filip,els).",
+      "deceased_leaves_no_heirs(els).",
+      "estate_belongs_to(els_estate,els)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "Person": [
+        "els",
+        "filip"
+      ],
+      "Estate": [
+        "els_estate"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 0,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "deceased_leaves_other_heirs",
+            "args": [
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "deceased_leaves_no_heirs",
+            "args": [
+              "deceased"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "other_heirs_or_no_heirs_condition"
+      ]
+    },
+    {
+      "rule_index": 1,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_surviving_spouse_of",
+            "args": [
+              "spouse",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "is_deceased",
+            "args": [
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "estate_belongs_to",
+            "args": [
+              "estate",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "other_heirs_or_no_heirs_condition",
+            "args": [
+              "deceased"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "acquires_full_ownership_of_entire_estate"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 1,
+      "target": "acquires_full_ownership_of_entire_estate(filip,els_estate)",
+      "conditions": [
+        {
+          "atom": "is_surviving_spouse_of(filip,els)",
+          "status": "present"
+        },
+        {
+          "atom": "is_deceased(els)",
+          "status": "present"
+        },
+        {
+          "atom": "estate_belongs_to(els_estate,els)",
+          "status": "present"
+        },
+        {
+          "atom": "other_heirs_or_no_heirs_condition(els)",
+          "status": "helper_defined"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "is_surviving_spouse_of",
+      "symbol_type": "predicate",
+      "atom": "is_surviving_spouse_of(filip,els)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "is_deceased",
+      "symbol_type": "predicate",
+      "atom": "is_deceased(els)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "estate_belongs_to",
+      "symbol_type": "predicate",
+      "atom": "estate_belongs_to(els_estate,els)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "other_heirs_or_no_heirs_condition",
+      "symbol_type": "predicate",
+      "atom": "other_heirs_or_no_heirs_condition(els)",
+      "kind": "helper",
+      "gap_status": "derivable_from_rules",
+      "assertable_in_case": false,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "Els dies without descendants, without relatives in the ascending line, without close collateral relatives and without other heirs."
+      ],
+      "deriving_rule_indices": [
+        0
+      ]
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "genuinely_under_specified_case",
+    "secondary": [],
+    "rationale": "No single blocking category identified; case may lack explicit observables for a decisive proof."
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "cardinality_violations": [],
+  "numeric_provenance_issues": [],
+  "law_thresholds": [
+    420.0
+  ],
+  "missing_helper": null,
+  "secondary_missing_helpers": [],
+  "computed_observable_predicate": null,
+  "computed_observable_helper_kind_hint": null,
+  "temporal_support": {
+    "detected_temporal_terms": [],
+    "requires_temporal_support": false,
+    "legal_effect_context": true,
+    "has_period_like_types": false,
+    "has_temporal_support_symbols": false,
+    "existing_period_types": [],
+    "existing_temporal_symbols": [],
+    "legal_output_predicates": [
+      "obtains_exclusive_lease_right",
+      "excluded_from_lease_right"
+    ],
+    "missing_temporal_support_symbol": false,
+    "repair_route": null
+  },
+  "missing_temporal_support_symbol": false,
+  "repair_route": null,
+  "secondary_diagnostics_text": "",
+  "validation_evidence_fingerprint": "12ea5cf0b2a2e504",
+  "evidence_consumed_by_repair": false
+}

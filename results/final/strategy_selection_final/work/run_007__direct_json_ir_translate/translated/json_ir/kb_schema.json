@@ -1,0 +1,318 @@
+{
+  "types": [
+    "Person",
+    "Property"
+  ],
+  "predicates": [
+    {
+      "name": "is_surviving_legally_cohabiting_partner_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person is the surviving legally cohabiting partner of the second person (the deceased).",
+      "directly_observable": true
+    },
+    {
+      "name": "is_heir_called_to_estate_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person is an heir called to the estate of the second person (the deceased).",
+      "directly_observable": true
+    },
+    {
+      "name": "served_as_family_principal_residence_at_opening",
+      "args": [
+        "Property",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The property served as the family's principal residence at the time the estate of the deceased opened.",
+      "directly_observable": true
+    },
+    {
+      "name": "is_household_effects_of",
+      "args": [
+        "Property",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The property consists of household effects present in the family principal residence of the deceased at the time the estate opened.",
+      "directly_observable": true
+    },
+    {
+      "name": "subject_to_legal_reversion_right",
+      "args": [
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The property is subject to a right of legal reversion as referred to in article 4.24 or article 4.25.",
+      "directly_observable": true
+    },
+    {
+      "name": "acquires_usufruct_of",
+      "args": [
+        "Person",
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The surviving legally cohabiting partner acquires the usufruct of the property as a legal consequence of the law.",
+      "legal_output": true
+    }
+  ],
+  "functions": [],
+  "rules": [
+    {
+      "forall": [
+        {
+          "var": "survivor",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "prop",
+          "type": "Property"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_legally_cohabiting_partner_of",
+              "args": [
+                "survivor",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_heir_called_to_estate_of",
+              "args": [
+                "survivor",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "served_as_family_principal_residence_at_opening",
+              "args": [
+                "prop",
+                "deceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "acquires_usufruct_of",
+          "args": [
+            "survivor",
+            "prop"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "survivor",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "prop",
+          "type": "Property"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_legally_cohabiting_partner_of",
+              "args": [
+                "survivor",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_heir_called_to_estate_of",
+              "args": [
+                "survivor",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_household_effects_of",
+              "args": [
+                "prop",
+                "deceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "acquires_usufruct_of",
+          "args": [
+            "survivor",
+            "prop"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "survivor",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "prop",
+          "type": "Property"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_legally_cohabiting_partner_of",
+              "args": [
+                "survivor",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_heir_called_to_estate_of",
+              "args": [
+                "survivor",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "served_as_family_principal_residence_at_opening",
+              "args": [
+                "prop",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "subject_to_legal_reversion_right",
+              "args": [
+                "prop"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "acquires_usufruct_of",
+          "args": [
+            "survivor",
+            "prop"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "survivor",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "prop",
+          "type": "Property"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_legally_cohabiting_partner_of",
+              "args": [
+                "survivor",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_heir_called_to_estate_of",
+              "args": [
+                "survivor",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_household_effects_of",
+              "args": [
+                "prop",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "subject_to_legal_reversion_right",
+              "args": [
+                "prop"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "acquires_usufruct_of",
+          "args": [
+            "survivor",
+            "prop"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    }
+  ]
+}

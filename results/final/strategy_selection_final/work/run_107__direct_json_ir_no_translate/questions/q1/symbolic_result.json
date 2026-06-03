@@ -1,0 +1,120 @@
+{
+  "intent": "deduction",
+  "symbolic_status": "ok",
+  "status": "ok",
+  "scorable": true,
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "routing": {
+    "question": "Valt Ahmed onder de definitie van een vreemdeling in artikel 1, paragraaf 1, punt 1?",
+    "detected_question_type": "boolean",
+    "selected_intent": "deduction",
+    "selected_reason": "expected.mode=boolean",
+    "scorable": true,
+    "fallback_intent": null,
+    "warnings": [],
+    "legal_output_symbols": [
+      "is_identified_foreigner",
+      "risk_of_absconding"
+    ],
+    "query_hint_type": "boolean",
+    "expected_question_type": "boolean"
+  },
+  "satisfiability_check": {
+    "stage": "pre_query",
+    "kb_case_satisfiable": true,
+    "status": "ok",
+    "details": "theory satisfiable",
+    "intent_backend": "idp_z3.tasks.satisfiable_check",
+    "duration_seconds": 0.1564
+  },
+  "warnings": [],
+  "deduction": {
+    "intent": "deduction",
+    "status": "ok",
+    "output_kind": "epistemic_boolean",
+    "predicate": "is_foreigner",
+    "args": [
+      "ahmed"
+    ],
+    "possible": true,
+    "certain": true,
+    "label": "entailed",
+    "atom": "is_foreigner(x0)",
+    "constraint": "? x0 in Person: __sel0(x0) & is_foreigner(x0)",
+    "certainty_class": "decisive",
+    "sat": true,
+    "internal_intent": "deduction",
+    "antecedent_coverage": [
+      {
+        "rule_index": 0,
+        "target": "is_foreigner(ahmed)",
+        "conditions": [
+          {
+            "atom": "has_belgian_nationality(ahmed)",
+            "status": "present"
+          }
+        ]
+      },
+      {
+        "rule_index": 1,
+        "target": "is_foreigner(ahmed)",
+        "conditions": [
+          {
+            "atom": "has_belgian_nationality(ahmed)",
+            "status": "present"
+          }
+        ]
+      }
+    ]
+  },
+  "model_expansion": null,
+  "get_range": null,
+  "satisfiable": null,
+  "explanation": null,
+  "execution_query": {
+    "type": "predicate",
+    "predicate": "is_foreigner",
+    "mode": "boolean",
+    "args": [
+      "ahmed"
+    ],
+    "explain": false,
+    "predicate_kind": "derived",
+    "query_type": "predicate_boolean",
+    "internal_intent": "deduction"
+  },
+  "output_kind": "epistemic_boolean",
+  "certainty_class": "decisive",
+  "predicate": "is_foreigner",
+  "args": [
+    "ahmed"
+  ],
+  "label": "entailed",
+  "possible": true,
+  "certain": true,
+  "sat": true,
+  "antecedent_coverage": [
+    {
+      "rule_index": 0,
+      "target": "is_foreigner(ahmed)",
+      "conditions": [
+        {
+          "atom": "has_belgian_nationality(ahmed)",
+          "status": "present"
+        }
+      ]
+    },
+    {
+      "rule_index": 1,
+      "target": "is_foreigner(ahmed)",
+      "conditions": [
+        {
+          "atom": "has_belgian_nationality(ahmed)",
+          "status": "present"
+        }
+      ]
+    }
+  ]
+}

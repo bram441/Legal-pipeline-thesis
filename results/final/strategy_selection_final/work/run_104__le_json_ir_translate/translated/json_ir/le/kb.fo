@@ -1,0 +1,28 @@
+vocabulary V {
+  type Person
+  type Property
+  type Asset
+  is_surviving_legally_cohabiting_partner_of: Person * Person -> Bool
+  estate_has_opened: Person -> Bool
+  served_as_family_principal_residence: Property * Person -> Bool
+  is_household_effects_in: Asset * Property -> Bool
+  subject_to_legal_reversion_4_24: Property -> Bool
+  subject_to_legal_reversion_4_25: Property -> Bool
+  household_effects_subject_to_legal_reversion_4_24: Asset * Property -> Bool
+  household_effects_subject_to_legal_reversion_4_25: Asset * Property -> Bool
+  acquires_usufruct_of_family_residence: Person * Property -> Bool
+  acquires_usufruct_of_household_effects: Person * Asset -> Bool
+  exercises_usufruct_of_family_residence: Person * Property -> Bool
+  exercises_usufruct_of_household_effects: Person * Asset -> Bool
+  property_subject_to_any_legal_reversion: Property -> Bool
+  household_effects_subject_to_any_legal_reversion: Asset * Property -> Bool
+}
+
+theory T:V {
+  ! survivor in Person, deceased in Person, prop in Property: (((is_surviving_legally_cohabiting_partner_of(survivor,deceased)) & (estate_has_opened(deceased)) & (served_as_family_principal_residence(prop,deceased)))) => ((acquires_usufruct_of_family_residence(survivor,prop))).
+  ! survivor in Person, deceased in Person, prop in Property, asset in Asset: (((is_surviving_legally_cohabiting_partner_of(survivor,deceased)) & (estate_has_opened(deceased)) & (served_as_family_principal_residence(prop,deceased)) & (is_household_effects_in(asset,prop)))) => ((acquires_usufruct_of_household_effects(survivor,asset))).
+  ! prop in Property: (((subject_to_legal_reversion_4_24(prop)) | (subject_to_legal_reversion_4_25(prop)))) => ((property_subject_to_any_legal_reversion(prop))).
+  ! asset in Asset, prop in Property: (((household_effects_subject_to_legal_reversion_4_24(asset,prop)) | (household_effects_subject_to_legal_reversion_4_25(asset,prop)))) => ((household_effects_subject_to_any_legal_reversion(asset,prop))).
+  ! survivor in Person, deceased in Person, prop in Property: (((acquires_usufruct_of_family_residence(survivor,prop)) & (property_subject_to_any_legal_reversion(prop)))) => ((exercises_usufruct_of_family_residence(survivor,prop))).
+  ! survivor in Person, deceased in Person, prop in Property, asset in Asset: (((acquires_usufruct_of_household_effects(survivor,asset)) & (is_household_effects_in(asset,prop)) & (household_effects_subject_to_any_legal_reversion(asset,prop)))) => ((exercises_usufruct_of_household_effects(survivor,asset))).
+}

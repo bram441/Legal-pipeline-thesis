@@ -1,0 +1,55 @@
+{
+  "types": ["Person", "Estate"],
+  "predicates": [
+    {
+      "name": "is_surviving_spouse_of",
+      "args": ["Person", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the surviving spouse of the second (deceased) person."
+    },
+    {
+      "name": "is_deceased",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The person is deceased."
+    },
+    {
+      "name": "estate_belongs_to",
+      "args": ["Estate", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The estate belongs to the given person."
+    },
+    {
+      "name": "leaves_no_other_heirs",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deceased person leaves no other heirs besides the surviving spouse."
+    },
+    {
+      "name": "leaves_only_non_reducing_heirs",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deceased person leaves other heirs, but none of them are in the category that would reduce the surviving spouse to a lesser right under applicable inheritance rules."
+    },
+    {
+      "name": "acquires_full_ownership_of_estate",
+      "args": ["Person", "Estate"],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "output_category": "legal_effect",
+      "description": "The surviving spouse acquires full ownership of the entire estate as a legal consequence."
+    }
+  ],
+  "functions": []
+}

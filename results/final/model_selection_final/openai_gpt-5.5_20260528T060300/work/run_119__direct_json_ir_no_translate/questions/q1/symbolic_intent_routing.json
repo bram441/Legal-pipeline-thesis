@@ -1,0 +1,14 @@
+{
+  "question": "Moet BV Start volgens artikel 1:24, paragraaf 3 meteen rekening houden met het overschrijden van meer dan één criterium in het eerste boekjaar?",
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "scorable": true,
+  "fallback_intent": null,
+  "warnings": [],
+  "legal_output_symbols": [
+    "estimate_must_be_taken_into_account_immediately"
+  ],
+  "query_hint_type": "boolean",
+  "expected_question_type": "boolean"
+}

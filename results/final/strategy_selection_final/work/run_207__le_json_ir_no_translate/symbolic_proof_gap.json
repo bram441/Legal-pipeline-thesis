@@ -1,0 +1,109 @@
+{
+  "query": {
+    "predicate": "is_sole_beneficiary_of_lease_right",
+    "args": [
+      "willem",
+      "appartement_gent"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "entailed",
+    "certain": true,
+    "possible": true,
+    "certainty_class": "decisive"
+  },
+  "extracted_case": {
+    "facts": [
+      "is_surviving_spouse_of(willem,yara).",
+      "served_as_family_main_residence_at_estate_opening(appartement_gent,yara)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "ImmovableProperty": [
+        "appartement_gent"
+      ],
+      "Person": [
+        "gent",
+        "willem",
+        "yara"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 1,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_surviving_spouse_of",
+            "args": [
+              "spouse",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "served_as_family_main_residence_at_estate_opening",
+            "args": [
+              "property",
+              "deceased"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "is_sole_beneficiary_of_lease_right"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 1,
+      "target": "is_sole_beneficiary_of_lease_right(willem,appartement_gent)",
+      "conditions": [
+        {
+          "atom": "is_surviving_spouse_of(willem,yara)",
+          "status": "present"
+        },
+        {
+          "atom": "served_as_family_main_residence_at_estate_opening(appartement_gent,yara)",
+          "status": "present"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "is_surviving_spouse_of",
+      "symbol_type": "predicate",
+      "atom": "is_surviving_spouse_of(willem,yara)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "served_as_family_main_residence_at_estate_opening",
+      "symbol_type": "predicate",
+      "atom": "served_as_family_main_residence_at_estate_opening(appartement_gent,yara)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "genuinely_under_specified_case",
+    "secondary": [],
+    "rationale": "No single blocking category identified; case may lack explicit observables for a decisive proof."
+  }
+}

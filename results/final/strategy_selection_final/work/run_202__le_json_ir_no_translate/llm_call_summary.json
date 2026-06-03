@@ -1,0 +1,13 @@
+{
+  "call_count": 0,
+  "by_stage": {},
+  "by_model": {},
+  "by_run_id": {},
+  "by_strategy": {},
+  "total_prompt_tokens": null,
+  "total_completion_tokens": null,
+  "total_tokens": null,
+  "estimated_total_cost_usd": null,
+  "top_calls_by_total_tokens": [],
+  "cell_call_count": 0
+}

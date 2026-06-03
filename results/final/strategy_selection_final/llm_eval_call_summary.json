@@ -1,0 +1,1091 @@
+{
+  "call_count": 1098,
+  "by_stage": {
+    "case_extraction": 125,
+    "kb_rules": 186,
+    "kb_symbols": 314,
+    "le": 74,
+    "query_extraction": 177,
+    "translation": 222
+  },
+  "by_model": {
+    "anthropic/claude-sonnet-4.6": 1098
+  },
+  "by_run_id": {
+    "run_001": 26,
+    "run_002": 28,
+    "run_003": 27,
+    "run_004": 48,
+    "run_005": 30,
+    "run_006": 24,
+    "run_007": 29,
+    "run_008": 32,
+    "run_009": 27,
+    "run_101": 29,
+    "run_102": 48,
+    "run_103": 28,
+    "run_104": 29,
+    "run_105": 28,
+    "run_106": 28,
+    "run_107": 29,
+    "run_108": 29,
+    "run_109": 34,
+    "run_110": 29,
+    "run_111": 31,
+    "run_112": 30,
+    "run_113": 27,
+    "run_114": 29,
+    "run_115": 28,
+    "run_116": 33,
+    "run_117": 28,
+    "run_118": 27,
+    "run_119": 26,
+    "run_120": 27,
+    "run_201": 29,
+    "run_202": 28,
+    "run_203": 25,
+    "run_204": 28,
+    "run_205": 33,
+    "run_206": 33,
+    "run_207": 28,
+    "run_208": 26
+  },
+  "by_strategy": {
+    "direct_json_ir_no_translate": 203,
+    "direct_json_ir_translate": 321,
+    "le_json_ir_no_translate": 230,
+    "le_json_ir_translate": 344
+  },
+  "total_prompt_tokens": 8117760,
+  "total_completion_tokens": 1028039,
+  "total_tokens": 9145799,
+  "estimated_total_cost_usd": null,
+  "top_calls_by_total_tokens": [
+    {
+      "call_index": 8,
+      "stage": "kb_rules",
+      "run_id": "run_108",
+      "strategy": "le_json_ir_translate",
+      "model": "anthropic/claude-sonnet-4.6",
+      "total_tokens": 23871,
+      "prompt_tokens": 18137,
+      "completion_tokens": 5734,
+      "metadata": {
+        "response_format": "json_schema"
+      }
+    },
+    {
+      "call_index": 8,
+      "stage": "kb_rules",
+      "run_id": "run_204",
+      "strategy": "le_json_ir_translate",
+      "model": "anthropic/claude-sonnet-4.6",
+      "total_tokens": 23441,
+      "prompt_tokens": 18182,
+      "completion_tokens": 5259,
+      "metadata": {
+        "response_format": "json_schema"
+      }
+    },
+    {
+      "call_index": 8,
+      "stage": "kb_rules",
+      "run_id": "run_109",
+      "strategy": "le_json_ir_translate",
+      "model": "anthropic/claude-sonnet-4.6",
+      "total_tokens": 22736,
+      "prompt_tokens": 17668,
+      "completion_tokens": 5068,
+      "metadata": {
+        "response_format": "json_schema"
+      }
+    },
+    {
+      "call_index": 8,
+      "stage": "kb_rules",
+      "run_id": "run_111",
+      "strategy": "le_json_ir_translate",
+      "model": "anthropic/claude-sonnet-4.6",
+      "total_tokens": 22291,
+      "prompt_tokens": 17409,
+      "completion_tokens": 4882,
+      "metadata": {
+        "response_format": "json_schema"
+      }
+    },
+    {
+      "call_index": 5,
+      "stage": "kb_rules",
+      "run_id": "run_111",
+      "strategy": "le_json_ir_no_translate",
+      "model": "anthropic/claude-sonnet-4.6",
+      "total_tokens": 21722,
+      "prompt_tokens": 17082,
+      "completion_tokens": 4640,
+      "metadata": {
+        "response_format": "json_schema"
+      }
+    },
+    {
+      "call_index": 5,
+      "stage": "kb_rules",
+      "run_id": "run_108",
+      "strategy": "le_json_ir_no_translate",
+      "model": "anthropic/claude-sonnet-4.6",
+      "total_tokens": 21100,
+      "prompt_tokens": 16329,
+      "completion_tokens": 4771,
+      "metadata": {
+        "response_format": "json_schema"
+      }
+    },
+    {
+      "call_index": 10,
+      "stage": "query_extraction",
+      "run_id": "run_108",
+      "strategy": "le_json_ir_translate",
+      "model": "anthropic/claude-sonnet-4.6",
+      "total_tokens": 20991,
+      "prompt_tokens": 20958,
+      "completion_tokens": 33,
+      "metadata": {
+        "backend": "json_ir"
+      }
+    },
+    {
+      "call_index": 9,
+      "stage": "case_extraction",
+      "run_id": "run_108",
+      "strategy": "le_json_ir_translate",
+      "model": "anthropic/claude-sonnet-4.6",
+      "total_tokens": 20838,
+      "prompt_tokens": 20787,
+      "completion_tokens": 51,
+      "metadata": {
+        "backend": "json_ir"
+      }
+    },
+    {
+      "call_index": 6,
+      "stage": "kb_rules",
+      "run_id": "run_110",
+      "strategy": "le_json_ir_no_translate",
+      "model": "anthropic/claude-sonnet-4.6",
+      "total_tokens": 20706,
+      "prompt_tokens": 16660,
+      "completion_tokens": 4046,
+      "metadata": {
+        "response_format": "json_schema"
+      }
+    },
+    {
+      "call_index": 8,
+      "stage": "kb_rules",
+      "run_id": "run_002",
+      "strategy": "le_json_ir_translate",
+      "model": "anthropic/claude-sonnet-4.6",
+      "total_tokens": 20664,
+      "prompt_tokens": 16360,
+      "completion_tokens": 4304,
+      "metadata": {
+        "response_format": "json_schema"
+      }
+    }
+  ],
+  "eval_call_count": 0,
+  "budget_limits": {
+    "max_eval_calls": null,
+    "max_cell_calls": null,
+    "eval_calls_before": 0
+  },
+  "by_run_and_strategy": {
+    "run_001::direct_json_ir_no_translate": {
+      "run_id": "run_001",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 48069
+    },
+    "run_001::direct_json_ir_translate": {
+      "run_id": "run_001",
+      "strategy": "direct_json_ir_translate",
+      "calls": 8,
+      "total_tokens": 50793
+    },
+    "run_001::le_json_ir_no_translate": {
+      "run_id": "run_001",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 6,
+      "total_tokens": 56339
+    },
+    "run_001::le_json_ir_translate": {
+      "run_id": "run_001",
+      "strategy": "le_json_ir_translate",
+      "calls": 7,
+      "total_tokens": 33313
+    },
+    "run_002::direct_json_ir_no_translate": {
+      "run_id": "run_002",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 4,
+      "total_tokens": 52246
+    },
+    "run_002::direct_json_ir_translate": {
+      "run_id": "run_002",
+      "strategy": "direct_json_ir_translate",
+      "calls": 8,
+      "total_tokens": 65701
+    },
+    "run_002::le_json_ir_no_translate": {
+      "run_id": "run_002",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 6,
+      "total_tokens": 84239
+    },
+    "run_002::le_json_ir_translate": {
+      "run_id": "run_002",
+      "strategy": "le_json_ir_translate",
+      "calls": 10,
+      "total_tokens": 103090
+    },
+    "run_003::direct_json_ir_no_translate": {
+      "run_id": "run_003",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 51968
+    },
+    "run_003::direct_json_ir_translate": {
+      "run_id": "run_003",
+      "strategy": "direct_json_ir_translate",
+      "calls": 11,
+      "total_tokens": 82749
+    },
+    "run_003::le_json_ir_no_translate": {
+      "run_id": "run_003",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 45128
+    },
+    "run_003::le_json_ir_translate": {
+      "run_id": "run_003",
+      "strategy": "le_json_ir_translate",
+      "calls": 6,
+      "total_tokens": 28747
+    },
+    "run_004::direct_json_ir_no_translate": {
+      "run_id": "run_004",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 10,
+      "total_tokens": 92624
+    },
+    "run_004::direct_json_ir_translate": {
+      "run_id": "run_004",
+      "strategy": "direct_json_ir_translate",
+      "calls": 13,
+      "total_tokens": 101945
+    },
+    "run_004::le_json_ir_no_translate": {
+      "run_id": "run_004",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 11,
+      "total_tokens": 104742
+    },
+    "run_004::le_json_ir_translate": {
+      "run_id": "run_004",
+      "strategy": "le_json_ir_translate",
+      "calls": 14,
+      "total_tokens": 108845
+    },
+    "run_005::direct_json_ir_no_translate": {
+      "run_id": "run_005",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 62387
+    },
+    "run_005::direct_json_ir_translate": {
+      "run_id": "run_005",
+      "strategy": "direct_json_ir_translate",
+      "calls": 8,
+      "total_tokens": 61999
+    },
+    "run_005::le_json_ir_no_translate": {
+      "run_id": "run_005",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 7,
+      "total_tokens": 89494
+    },
+    "run_005::le_json_ir_translate": {
+      "run_id": "run_005",
+      "strategy": "le_json_ir_translate",
+      "calls": 10,
+      "total_tokens": 97950
+    },
+    "run_006::direct_json_ir_no_translate": {
+      "run_id": "run_006",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 4,
+      "total_tokens": 45990
+    },
+    "run_006::direct_json_ir_translate": {
+      "run_id": "run_006",
+      "strategy": "direct_json_ir_translate",
+      "calls": 8,
+      "total_tokens": 55352
+    },
+    "run_006::le_json_ir_no_translate": {
+      "run_id": "run_006",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 4,
+      "total_tokens": 33553
+    },
+    "run_006::le_json_ir_translate": {
+      "run_id": "run_006",
+      "strategy": "le_json_ir_translate",
+      "calls": 8,
+      "total_tokens": 60900
+    },
+    "run_007::direct_json_ir_no_translate": {
+      "run_id": "run_007",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 44638
+    },
+    "run_007::direct_json_ir_translate": {
+      "run_id": "run_007",
+      "strategy": "direct_json_ir_translate",
+      "calls": 8,
+      "total_tokens": 45739
+    },
+    "run_007::le_json_ir_no_translate": {
+      "run_id": "run_007",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 6,
+      "total_tokens": 46735
+    },
+    "run_007::le_json_ir_translate": {
+      "run_id": "run_007",
+      "strategy": "le_json_ir_translate",
+      "calls": 10,
+      "total_tokens": 58061
+    },
+    "run_008::direct_json_ir_no_translate": {
+      "run_id": "run_008",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 9,
+      "total_tokens": 108144
+    },
+    "run_008::direct_json_ir_translate": {
+      "run_id": "run_008",
+      "strategy": "direct_json_ir_translate",
+      "calls": 9,
+      "total_tokens": 81589
+    },
+    "run_008::le_json_ir_no_translate": {
+      "run_id": "run_008",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 4,
+      "total_tokens": 41365
+    },
+    "run_008::le_json_ir_translate": {
+      "run_id": "run_008",
+      "strategy": "le_json_ir_translate",
+      "calls": 10,
+      "total_tokens": 100448
+    },
+    "run_009::direct_json_ir_no_translate": {
+      "run_id": "run_009",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 44883
+    },
+    "run_009::direct_json_ir_translate": {
+      "run_id": "run_009",
+      "strategy": "direct_json_ir_translate",
+      "calls": 8,
+      "total_tokens": 48120
+    },
+    "run_009::le_json_ir_no_translate": {
+      "run_id": "run_009",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 4,
+      "total_tokens": 30757
+    },
+    "run_009::le_json_ir_translate": {
+      "run_id": "run_009",
+      "strategy": "le_json_ir_translate",
+      "calls": 10,
+      "total_tokens": 60414
+    },
+    "run_101::direct_json_ir_no_translate": {
+      "run_id": "run_101",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 40054
+    },
+    "run_101::direct_json_ir_translate": {
+      "run_id": "run_101",
+      "strategy": "direct_json_ir_translate",
+      "calls": 8,
+      "total_tokens": 43386
+    },
+    "run_101::le_json_ir_no_translate": {
+      "run_id": "run_101",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 6,
+      "total_tokens": 40707
+    },
+    "run_101::le_json_ir_translate": {
+      "run_id": "run_101",
+      "strategy": "le_json_ir_translate",
+      "calls": 10,
+      "total_tokens": 51683
+    },
+    "run_102::direct_json_ir_no_translate": {
+      "run_id": "run_102",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 10,
+      "total_tokens": 98473
+    },
+    "run_102::direct_json_ir_translate": {
+      "run_id": "run_102",
+      "strategy": "direct_json_ir_translate",
+      "calls": 13,
+      "total_tokens": 116403
+    },
+    "run_102::le_json_ir_no_translate": {
+      "run_id": "run_102",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 11,
+      "total_tokens": 109545
+    },
+    "run_102::le_json_ir_translate": {
+      "run_id": "run_102",
+      "strategy": "le_json_ir_translate",
+      "calls": 14,
+      "total_tokens": 109920
+    },
+    "run_103::direct_json_ir_no_translate": {
+      "run_id": "run_103",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 38383
+    },
+    "run_103::direct_json_ir_translate": {
+      "run_id": "run_103",
+      "strategy": "direct_json_ir_translate",
+      "calls": 8,
+      "total_tokens": 43218
+    },
+    "run_103::le_json_ir_no_translate": {
+      "run_id": "run_103",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 6,
+      "total_tokens": 43808
+    },
+    "run_103::le_json_ir_translate": {
+      "run_id": "run_103",
+      "strategy": "le_json_ir_translate",
+      "calls": 9,
+      "total_tokens": 47382
+    },
+    "run_104::direct_json_ir_no_translate": {
+      "run_id": "run_104",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 43813
+    },
+    "run_104::direct_json_ir_translate": {
+      "run_id": "run_104",
+      "strategy": "direct_json_ir_translate",
+      "calls": 8,
+      "total_tokens": 45846
+    },
+    "run_104::le_json_ir_no_translate": {
+      "run_id": "run_104",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 6,
+      "total_tokens": 45219
+    },
+    "run_104::le_json_ir_translate": {
+      "run_id": "run_104",
+      "strategy": "le_json_ir_translate",
+      "calls": 10,
+      "total_tokens": 60253
+    },
+    "run_105::direct_json_ir_no_translate": {
+      "run_id": "run_105",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 42757
+    },
+    "run_105::direct_json_ir_translate": {
+      "run_id": "run_105",
+      "strategy": "direct_json_ir_translate",
+      "calls": 8,
+      "total_tokens": 40841
+    },
+    "run_105::le_json_ir_no_translate": {
+      "run_id": "run_105",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 6,
+      "total_tokens": 40218
+    },
+    "run_105::le_json_ir_translate": {
+      "run_id": "run_105",
+      "strategy": "le_json_ir_translate",
+      "calls": 9,
+      "total_tokens": 43950
+    },
+    "run_106::direct_json_ir_no_translate": {
+      "run_id": "run_106",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 39534
+    },
+    "run_106::direct_json_ir_translate": {
+      "run_id": "run_106",
+      "strategy": "direct_json_ir_translate",
+      "calls": 8,
+      "total_tokens": 43369
+    },
+    "run_106::le_json_ir_no_translate": {
+      "run_id": "run_106",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 6,
+      "total_tokens": 40235
+    },
+    "run_106::le_json_ir_translate": {
+      "run_id": "run_106",
+      "strategy": "le_json_ir_translate",
+      "calls": 9,
+      "total_tokens": 44707
+    },
+    "run_107::direct_json_ir_no_translate": {
+      "run_id": "run_107",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 6,
+      "total_tokens": 75572
+    },
+    "run_107::direct_json_ir_translate": {
+      "run_id": "run_107",
+      "strategy": "direct_json_ir_translate",
+      "calls": 8,
+      "total_tokens": 63193
+    },
+    "run_107::le_json_ir_no_translate": {
+      "run_id": "run_107",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 6,
+      "total_tokens": 79390
+    },
+    "run_107::le_json_ir_translate": {
+      "run_id": "run_107",
+      "strategy": "le_json_ir_translate",
+      "calls": 9,
+      "total_tokens": 78875
+    },
+    "run_108::direct_json_ir_no_translate": {
+      "run_id": "run_108",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 62918
+    },
+    "run_108::direct_json_ir_translate": {
+      "run_id": "run_108",
+      "strategy": "direct_json_ir_translate",
+      "calls": 7,
+      "total_tokens": 51735
+    },
+    "run_108::le_json_ir_no_translate": {
+      "run_id": "run_108",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 7,
+      "total_tokens": 101967
+    },
+    "run_108::le_json_ir_translate": {
+      "run_id": "run_108",
+      "strategy": "le_json_ir_translate",
+      "calls": 10,
+      "total_tokens": 119220
+    },
+    "run_109::direct_json_ir_no_translate": {
+      "run_id": "run_109",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 63134
+    },
+    "run_109::direct_json_ir_translate": {
+      "run_id": "run_109",
+      "strategy": "direct_json_ir_translate",
+      "calls": 8,
+      "total_tokens": 65925
+    },
+    "run_109::le_json_ir_no_translate": {
+      "run_id": "run_109",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 11,
+      "total_tokens": 171019
+    },
+    "run_109::le_json_ir_translate": {
+      "run_id": "run_109",
+      "strategy": "le_json_ir_translate",
+      "calls": 10,
+      "total_tokens": 113295
+    },
+    "run_110::direct_json_ir_no_translate": {
+      "run_id": "run_110",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 4,
+      "total_tokens": 52436
+    },
+    "run_110::direct_json_ir_translate": {
+      "run_id": "run_110",
+      "strategy": "direct_json_ir_translate",
+      "calls": 7,
+      "total_tokens": 54660
+    },
+    "run_110::le_json_ir_no_translate": {
+      "run_id": "run_110",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 8,
+      "total_tokens": 117295
+    },
+    "run_110::le_json_ir_translate": {
+      "run_id": "run_110",
+      "strategy": "le_json_ir_translate",
+      "calls": 10,
+      "total_tokens": 103136
+    },
+    "run_111::direct_json_ir_no_translate": {
+      "run_id": "run_111",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 4,
+      "total_tokens": 49895
+    },
+    "run_111::direct_json_ir_translate": {
+      "run_id": "run_111",
+      "strategy": "direct_json_ir_translate",
+      "calls": 9,
+      "total_tokens": 85198
+    },
+    "run_111::le_json_ir_no_translate": {
+      "run_id": "run_111",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 8,
+      "total_tokens": 125523
+    },
+    "run_111::le_json_ir_translate": {
+      "run_id": "run_111",
+      "strategy": "le_json_ir_translate",
+      "calls": 10,
+      "total_tokens": 111013
+    },
+    "run_112::direct_json_ir_no_translate": {
+      "run_id": "run_112",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 6,
+      "total_tokens": 74639
+    },
+    "run_112::direct_json_ir_translate": {
+      "run_id": "run_112",
+      "strategy": "direct_json_ir_translate",
+      "calls": 9,
+      "total_tokens": 78526
+    },
+    "run_112::le_json_ir_no_translate": {
+      "run_id": "run_112",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 6,
+      "total_tokens": 79857
+    },
+    "run_112::le_json_ir_translate": {
+      "run_id": "run_112",
+      "strategy": "le_json_ir_translate",
+      "calls": 9,
+      "total_tokens": 84144
+    },
+    "run_113::direct_json_ir_no_translate": {
+      "run_id": "run_113",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 44868
+    },
+    "run_113::direct_json_ir_translate": {
+      "run_id": "run_113",
+      "strategy": "direct_json_ir_translate",
+      "calls": 8,
+      "total_tokens": 48141
+    },
+    "run_113::le_json_ir_no_translate": {
+      "run_id": "run_113",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 4,
+      "total_tokens": 30804
+    },
+    "run_113::le_json_ir_translate": {
+      "run_id": "run_113",
+      "strategy": "le_json_ir_translate",
+      "calls": 10,
+      "total_tokens": 60063
+    },
+    "run_114::direct_json_ir_no_translate": {
+      "run_id": "run_114",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 44869
+    },
+    "run_114::direct_json_ir_translate": {
+      "run_id": "run_114",
+      "strategy": "direct_json_ir_translate",
+      "calls": 8,
+      "total_tokens": 48114
+    },
+    "run_114::le_json_ir_no_translate": {
+      "run_id": "run_114",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 6,
+      "total_tokens": 47519
+    },
+    "run_114::le_json_ir_translate": {
+      "run_id": "run_114",
+      "strategy": "le_json_ir_translate",
+      "calls": 10,
+      "total_tokens": 60450
+    },
+    "run_115::direct_json_ir_no_translate": {
+      "run_id": "run_115",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 46963
+    },
+    "run_115::direct_json_ir_translate": {
+      "run_id": "run_115",
+      "strategy": "direct_json_ir_translate",
+      "calls": 10,
+      "total_tokens": 75348
+    },
+    "run_115::le_json_ir_no_translate": {
+      "run_id": "run_115",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 44360
+    },
+    "run_115::le_json_ir_translate": {
+      "run_id": "run_115",
+      "strategy": "le_json_ir_translate",
+      "calls": 8,
+      "total_tokens": 47019
+    },
+    "run_116::direct_json_ir_no_translate": {
+      "run_id": "run_116",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 46883
+    },
+    "run_116::direct_json_ir_translate": {
+      "run_id": "run_116",
+      "strategy": "direct_json_ir_translate",
+      "calls": 11,
+      "total_tokens": 81346
+    },
+    "run_116::le_json_ir_no_translate": {
+      "run_id": "run_116",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 8,
+      "total_tokens": 75971
+    },
+    "run_116::le_json_ir_translate": {
+      "run_id": "run_116",
+      "strategy": "le_json_ir_translate",
+      "calls": 9,
+      "total_tokens": 52168
+    },
+    "run_117::direct_json_ir_no_translate": {
+      "run_id": "run_117",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 7,
+      "total_tokens": 67884
+    },
+    "run_117::direct_json_ir_translate": {
+      "run_id": "run_117",
+      "strategy": "direct_json_ir_translate",
+      "calls": 10,
+      "total_tokens": 74146
+    },
+    "run_117::le_json_ir_no_translate": {
+      "run_id": "run_117",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 3,
+      "total_tokens": 25256
+    },
+    "run_117::le_json_ir_translate": {
+      "run_id": "run_117",
+      "strategy": "le_json_ir_translate",
+      "calls": 8,
+      "total_tokens": 47064
+    },
+    "run_118::direct_json_ir_no_translate": {
+      "run_id": "run_118",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 46849
+    },
+    "run_118::direct_json_ir_translate": {
+      "run_id": "run_118",
+      "strategy": "direct_json_ir_translate",
+      "calls": 8,
+      "total_tokens": 55278
+    },
+    "run_118::le_json_ir_no_translate": {
+      "run_id": "run_118",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 6,
+      "total_tokens": 48739
+    },
+    "run_118::le_json_ir_translate": {
+      "run_id": "run_118",
+      "strategy": "le_json_ir_translate",
+      "calls": 8,
+      "total_tokens": 46730
+    },
+    "run_119::direct_json_ir_no_translate": {
+      "run_id": "run_119",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 6,
+      "total_tokens": 58021
+    },
+    "run_119::direct_json_ir_translate": {
+      "run_id": "run_119",
+      "strategy": "direct_json_ir_translate",
+      "calls": 9,
+      "total_tokens": 58227
+    },
+    "run_119::le_json_ir_no_translate": {
+      "run_id": "run_119",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 49085
+    },
+    "run_119::le_json_ir_translate": {
+      "run_id": "run_119",
+      "strategy": "le_json_ir_translate",
+      "calls": 6,
+      "total_tokens": 32275
+    },
+    "run_120::direct_json_ir_no_translate": {
+      "run_id": "run_120",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 4,
+      "total_tokens": 45910
+    },
+    "run_120::direct_json_ir_translate": {
+      "run_id": "run_120",
+      "strategy": "direct_json_ir_translate",
+      "calls": 8,
+      "total_tokens": 55705
+    },
+    "run_120::le_json_ir_no_translate": {
+      "run_id": "run_120",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 7,
+      "total_tokens": 69506
+    },
+    "run_120::le_json_ir_translate": {
+      "run_id": "run_120",
+      "strategy": "le_json_ir_translate",
+      "calls": 8,
+      "total_tokens": 56491
+    },
+    "run_201::direct_json_ir_no_translate": {
+      "run_id": "run_201",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 38415
+    },
+    "run_201::direct_json_ir_translate": {
+      "run_id": "run_201",
+      "strategy": "direct_json_ir_translate",
+      "calls": 8,
+      "total_tokens": 43855
+    },
+    "run_201::le_json_ir_no_translate": {
+      "run_id": "run_201",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 6,
+      "total_tokens": 40816
+    },
+    "run_201::le_json_ir_translate": {
+      "run_id": "run_201",
+      "strategy": "le_json_ir_translate",
+      "calls": 10,
+      "total_tokens": 51663
+    },
+    "run_202::direct_json_ir_no_translate": {
+      "run_id": "run_202",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 38393
+    },
+    "run_202::direct_json_ir_translate": {
+      "run_id": "run_202",
+      "strategy": "direct_json_ir_translate",
+      "calls": 8,
+      "total_tokens": 41552
+    },
+    "run_202::le_json_ir_no_translate": {
+      "run_id": "run_202",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 6,
+      "total_tokens": 39403
+    },
+    "run_202::le_json_ir_translate": {
+      "run_id": "run_202",
+      "strategy": "le_json_ir_translate",
+      "calls": 9,
+      "total_tokens": 46133
+    },
+    "run_203::direct_json_ir_no_translate": {
+      "run_id": "run_203",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 62069
+    },
+    "run_203::direct_json_ir_translate": {
+      "run_id": "run_203",
+      "strategy": "direct_json_ir_translate",
+      "calls": 7,
+      "total_tokens": 53729
+    },
+    "run_203::le_json_ir_no_translate": {
+      "run_id": "run_203",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 6,
+      "total_tokens": 81133
+    },
+    "run_203::le_json_ir_translate": {
+      "run_id": "run_203",
+      "strategy": "le_json_ir_translate",
+      "calls": 7,
+      "total_tokens": 51231
+    },
+    "run_204::direct_json_ir_no_translate": {
+      "run_id": "run_204",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 62081
+    },
+    "run_204::direct_json_ir_translate": {
+      "run_id": "run_204",
+      "strategy": "direct_json_ir_translate",
+      "calls": 7,
+      "total_tokens": 54229
+    },
+    "run_204::le_json_ir_no_translate": {
+      "run_id": "run_204",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 6,
+      "total_tokens": 68713
+    },
+    "run_204::le_json_ir_translate": {
+      "run_id": "run_204",
+      "strategy": "le_json_ir_translate",
+      "calls": 10,
+      "total_tokens": 117768
+    },
+    "run_205::direct_json_ir_no_translate": {
+      "run_id": "run_205",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 7,
+      "total_tokens": 67840
+    },
+    "run_205::direct_json_ir_translate": {
+      "run_id": "run_205",
+      "strategy": "direct_json_ir_translate",
+      "calls": 11,
+      "total_tokens": 80435
+    },
+    "run_205::le_json_ir_no_translate": {
+      "run_id": "run_205",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 6,
+      "total_tokens": 48762
+    },
+    "run_205::le_json_ir_translate": {
+      "run_id": "run_205",
+      "strategy": "le_json_ir_translate",
+      "calls": 9,
+      "total_tokens": 51942
+    },
+    "run_206::direct_json_ir_no_translate": {
+      "run_id": "run_206",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 7,
+      "total_tokens": 68005
+    },
+    "run_206::direct_json_ir_translate": {
+      "run_id": "run_206",
+      "strategy": "direct_json_ir_translate",
+      "calls": 10,
+      "total_tokens": 76801
+    },
+    "run_206::le_json_ir_no_translate": {
+      "run_id": "run_206",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 7,
+      "total_tokens": 59344
+    },
+    "run_206::le_json_ir_translate": {
+      "run_id": "run_206",
+      "strategy": "le_json_ir_translate",
+      "calls": 9,
+      "total_tokens": 52159
+    },
+    "run_207::direct_json_ir_no_translate": {
+      "run_id": "run_207",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 39370
+    },
+    "run_207::direct_json_ir_translate": {
+      "run_id": "run_207",
+      "strategy": "direct_json_ir_translate",
+      "calls": 8,
+      "total_tokens": 43329
+    },
+    "run_207::le_json_ir_no_translate": {
+      "run_id": "run_207",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 6,
+      "total_tokens": 41965
+    },
+    "run_207::le_json_ir_translate": {
+      "run_id": "run_207",
+      "strategy": "le_json_ir_translate",
+      "calls": 9,
+      "total_tokens": 49272
+    },
+    "run_208::direct_json_ir_no_translate": {
+      "run_id": "run_208",
+      "strategy": "direct_json_ir_no_translate",
+      "calls": 5,
+      "total_tokens": 44858
+    },
+    "run_208::direct_json_ir_translate": {
+      "run_id": "run_208",
+      "strategy": "direct_json_ir_translate",
+      "calls": 8,
+      "total_tokens": 48312
+    },
+    "run_208::le_json_ir_no_translate": {
+      "run_id": "run_208",
+      "strategy": "le_json_ir_no_translate",
+      "calls": 3,
+      "total_tokens": 24425
+    },
+    "run_208::le_json_ir_translate": {
+      "run_id": "run_208",
+      "strategy": "le_json_ir_translate",
+      "calls": 10,
+      "total_tokens": 60420
+    }
+  }
+}

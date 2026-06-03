@@ -1,0 +1,120 @@
+{
+  "types": ["Company", "FinancialYear"],
+  "predicates": [
+    {
+      "name": "has_legal_personality",
+      "args": ["Company"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The company has legal personality (a background factual status directly assertable from case facts)."
+    },
+    {
+      "name": "employee_criterion_exceeded",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds the annual average employee criterion in the financial year."
+    },
+    {
+      "name": "turnover_criterion_exceeded",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds the annual net turnover criterion in the financial year."
+    },
+    {
+      "name": "balance_sheet_criterion_exceeded",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds the balance sheet total criterion in the financial year."
+    },
+    {
+      "name": "more_than_one_criterion_exceeded",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds more than one of the three criteria in the financial year."
+    },
+    {
+      "name": "more_than_one_criterion_exceeded_two_consecutive_years",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company exceeds more than one criterion in this financial year and in the immediately preceding financial year."
+    },
+    {
+      "name": "no_longer_exceeds_more_than_one_criterion_two_consecutive_years",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The company no longer exceeds more than one criterion in this financial year and in the immediately preceding financial year."
+    },
+    {
+      "name": "is_small_company",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The company qualifies as a small company in the financial year under the statutory criteria.",
+      "output_category": "classification"
+    },
+    {
+      "name": "loses_small_company_status_from",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The company loses small company status starting from this financial year as a consequence of exceeding more than one criterion for two consecutive years.",
+      "legal_output": true,
+      "output_category": "legal_effect"
+    },
+    {
+      "name": "gains_small_company_status_from",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The company gains small company status starting from this financial year as a consequence of no longer exceeding more than one criterion for two consecutive years.",
+      "legal_output": true,
+      "output_category": "legal_effect"
+    },
+    {
+      "name": "previous_financial_year",
+      "args": ["FinancialYear", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The second financial year is the immediately preceding financial year relative to the first."
+    },
+    {
+      "name": "next_financial_year",
+      "args": ["FinancialYear", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The second financial year is the immediately following financial year relative to the first."
+    }
+  ],
+  "functions": [
+    {
+      "name": "annual_average_employees",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Int",
+      "kind": "observable",
+      "description": "The annual average number of employees of the company in the financial year."
+    },
+    {
+      "name": "annual_net_turnover_excl_vat",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The annual net turnover of the company excluding VAT in the financial year, in euros."
+    },
+    {
+      "name": "balance_sheet_total",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The balance sheet total of the company in the financial year, in euros."
+    }
+  ]
+}

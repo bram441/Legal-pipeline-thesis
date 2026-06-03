@@ -1,0 +1,96 @@
+{
+  "id": "run_109",
+  "law": {
+    "text": "Artikel 1. Definities\n\npar. 1. Voor de toepassing van deze wet wordt verstaan onder:\n\n(1) vreemdeling: al wie het bewijs niet levert dat hij de Belgische nationaliteit bezit.\n\n(3) onderdaan van een derde land: eenieder die geen burger van de Unie is en die geen persoon is die onder het gemeenschapsrecht inzake vrij verkeer valt, als bepaald in artikel 2, punt 5, van de Schengengrenscode.\n\n(4) illegaal verblijf: de aanwezigheid op het grondgebied van een vreemdeling die niet of niet langer voldoet aan de voorwaarden voor de toegang tot of het verblijf op het grondgebied.\n\n(11) risico op onderduiken: het feit dat er redenen bestaan om aan te nemen dat een vreemdeling die het voorwerp uitmaakt van een verwijderingsprocedure, een procedure voor toekenning van internationale bescherming of een procedure tot vaststelling van of tot overdracht naar de lidstaat die verantwoordelijk is voor de behandeling van het verzoek om internationale bescherming, met het oog op de criteria die opgesomd worden in paragraaf 2 zal onderduiken.\n\n(14) geïdentificeerde vreemdeling: iedere vreemdeling:\n(a) die in het bezit is van een geldig reisdocument, een geldig paspoort of een geldig identiteitsdocument; of\n(b) die werd erkend als onderdaan door de nationale overheid van zijn land, die zich bereid verklaarde een doorlaatbewijs af te leveren; of\n(c) die valt onder de categorie nationaliteiten waarvoor de minister zelf een doorlaatbewijs kan afleveren.\n\npar. 2. Het in paragraaf 1, (11), bedoelde risico op onderduiken moet actueel en reëel zijn. Het wordt na een individueel onderzoek en op basis van een of meer van de volgende objectieve criteria vastgesteld, rekening houdend met alle omstandigheden die eigen zijn aan elk geval:\n\n(1) De betrokkene heeft na zijn illegale binnenkomst of tijdens zijn illegaal verblijf geen verblijfsaanvraag ingediend, of heeft zijn verzoek om internationale bescherming niet binnen de door deze wet voorziene termijn gedaan.\n\n(2) De betrokkene heeft in het kader van een procedure voor internationale bescherming, verblijf, verwijdering of terugdrijving valse of misleidende informatie of valse of vervalste documenten gebruikt, of heeft fraude gepleegd of andere onwettige middelen gebruikt.\n\n(3) De betrokkene werkt niet mee of heeft niet meegewerkt in het kader van zijn betrekkingen met de overheden die belast zijn met de uitvoering van en/of het toezicht op de naleving van de reglementering inzake de toegang tot het grondgebied, het verblijf, de vestiging en de verwijdering van vreemdelingen.\n\n(4) De betrokkene heeft duidelijk gemaakt dat hij zich niet aan een van de volgende maatregelen wil houden of heeft zich reeds niet aan een van deze maatregelen gehouden:\n(a) een overdrachts-, terugdrijvings- of verwijderingsmaatregel;\n(b) een inreisverbod dat noch opgeheven, noch opgeschort is;\n(c) een minder dwingende maatregel dan een vrijheidsberovende maatregel die erop gericht is om zijn overdracht, terugdrijving of zijn verwijdering te garanderen, ongeacht of het om een vrijheidsbeperkende maatregel of een andere maatregel gaat;\n(d) een vrijheidsbeperkende maatregel die erop gericht is om de openbare orde of de nationale veiligheid te garanderen;\n(e) een door een andere lidstaat genomen maatregel die gelijkwaardig is aan de maatregelen bedoeld in (a), (b), (c) of (d).\n\n(5) De betrokkene maakt het voorwerp uit van een inreisverbod in het Rijk en/of in een andere lidstaat dat noch opgeheven, noch opgeschort werd.\n\n(6) De betrokkene heeft onmiddellijk na het voorwerp te hebben uitgemaakt van een beslissing tot weigering van binnenkomst of verblijf of een beslissing die een einde heeft gemaakt aan zijn verblijf, of onmiddellijk na het voorwerp te hebben uitgemaakt van een terugdrijvings- of verwijderingsmaatregel, een nieuwe verblijfsaanvraag of een nieuw verzoek om internationale bescherming ingediend.\n\n(7) Terwijl hij in verband met dat punt ondervraagd werd, heeft de betrokkene verborgen dat hij zijn vingerafdrukken reeds heeft gegeven in een andere Staat die gebonden is door de Europese reglementering met betrekking tot de bepaling van de Staat die verantwoordelijk is voor de behandeling van een verzoek om internationale bescherming, na een verzoek om internationale bescherming te hebben ingediend.\n\n(8) De betrokkene heeft in het Rijk of in een of meerdere andere lidstaten meerdere verzoeken om internationale bescherming en/of verblijfsaanvragen ingediend, die aanleiding hebben gegeven tot een negatieve beslissing of die niet tot de afgifte van een verblijfstitel hebben geleid.\n\n(9) Terwijl hij in verband met dat punt ondervraagd werd, heeft de betrokkene verborgen dat hij vroeger reeds een verzoek om internationale bescherming heeft ingediend in een andere staat die gebonden is door de Europese reglementering met betrekking tot de bepaling van de staat die verantwoordelijk is voor de behandeling van een verzoek om internationale bescherming.\n\n(10) De betrokkene heeft verklaard of uit zijn dossier blijkt dat hij voor andere doeleinden dan de doeleinden waarvoor hij een verzoek om internationale bescherming of een verblijfsaanvraag heeft ingediend naar het Rijk gekomen is.\n\n(11) De betrokkene maakt het voorwerp uit van een geldboete omdat hij een kennelijk onrechtmatig beroep heeft ingediend bij de Raad voor Vreemdelingenbetwistingen."
+  },
+  "kb_used": {
+    "fo": "vocabulary V {\n  type Person\n  type MemberState\n  type Document\n  type Procedure\n  provides_proof_of_belgian_nationality: Person -> Bool\n  is_foreigner: Person -> Bool\n  is_citizen_of_union: Person -> Bool\n  falls_under_community_free_movement_law: Person -> Bool\n  is_third_country_national: Person -> Bool\n  present_on_territory: Person -> Bool\n  satisfies_conditions_for_access_or_residence: Person -> Bool\n  in_illegal_residence: Person -> Bool\n  reasons_to_believe_will_abscond: Person -> Bool\n  subject_to_removal_or_protection_procedure: Person -> Bool\n  individual_examination_performed: Person -> Bool\n  risk_of_absconding_is_current_and_real: Person -> Bool\n  at_least_one_objective_criterion_present: Person -> Bool\n  risk_of_absconding: Person -> Bool\n  has_valid_travel_document: Person -> Bool\n  recognised_as_national_by_authority_willing_to_issue_laissez_passer: Person -> Bool\n  falls_under_nationality_category_for_ministerial_laissez_passer: Person -> Bool\n  is_identified_foreigner: Person -> Bool\n  criterion_failure_to_apply: Person -> Bool\n  did_not_submit_residence_application_after_illegal_entry_or_during_illegal_residence: Person -> Bool\n  did_not_submit_protection_application_within_legal_period: Person -> Bool\n  criterion_fraud: Person -> Bool\n  used_false_or_misleading_information_or_documents: Person -> Bool\n  criterion_non_cooperation: Person -> Bool\n  does_not_cooperate_with_authorities: Person -> Bool\n  criterion_non_compliance_with_measures: Person -> Bool\n  indicated_non_compliance_with_transfer_pushback_removal: Person -> Bool\n  indicated_non_compliance_with_entry_ban: Person -> Bool\n  indicated_non_compliance_with_less_coercive_measure: Person -> Bool\n  indicated_non_compliance_with_freedom_restricting_measure: Person -> Bool\n  indicated_non_compliance_with_equivalent_measure_other_member_state: Person -> Bool\n  criterion_entry_ban: Person -> Bool\n  subject_to_unlifted_entry_ban: Person -> Bool\n  criterion_new_application_after_decision: Person -> Bool\n  submitted_new_application_after_negative_decision: Person -> Bool\n  criterion_concealment_of_fingerprints: Person -> Bool\n  concealed_fingerprints_in_other_state: Person -> Bool\n  criterion_multiple_applications: Person -> Bool\n  submitted_multiple_applications_with_negative_outcome: Person -> Bool\n  criterion_concealment_of_prior_application: Person -> Bool\n  concealed_prior_application_in_other_state: Person -> Bool\n  criterion_declared_purpose: Person -> Bool\n  came_for_purposes_other_than_application: Person -> Bool\n  criterion_manifestly_unfounded_appeal: Person -> Bool\n  subject_to_fine_for_manifestly_unlawful_appeal: Person -> Bool\n}\n\ntheory T:V {\n  ! p in Person: ((~provides_proof_of_belgian_nationality(p))) => ((is_foreigner(p))).\n  ! p in Person: (((~is_citizen_of_union(p)) & (~falls_under_community_free_movement_law(p)))) => ((is_third_country_national(p))).\n  ! p in Person: (((is_foreigner(p)) & (present_on_territory(p)) & (~satisfies_conditions_for_access_or_residence(p)))) => ((in_illegal_residence(p))).\n  ! p in Person: (((reasons_to_believe_will_abscond(p)) & (subject_to_removal_or_protection_procedure(p)) & (at_least_one_objective_criterion_present(p)) & (risk_of_absconding_is_current_and_real(p)) & (individual_examination_performed(p)))) => ((risk_of_absconding(p))).\n  ! p in Person: (((reasons_to_believe_will_abscond(p)) & (subject_to_removal_or_protection_procedure(p)) & (at_least_one_objective_criterion_present(p)) & (individual_examination_performed(p)))) => ((risk_of_absconding_is_current_and_real(p))).\n  ! p in Person: ((has_valid_travel_document(p))) => ((is_identified_foreigner(p))).\n  ! p in Person: ((recognised_as_national_by_authority_willing_to_issue_laissez_passer(p))) => ((is_identified_foreigner(p))).\n  ! p in Person: ((falls_under_nationality_category_for_ministerial_laissez_passer(p))) => ((is_identified_foreigner(p))).\n  ! p in Person: ((did_not_submit_residence_application_after_illegal_entry_or_during_illegal_residence(p))) => ((criterion_failure_to_apply(p))).\n  ! p in Person: ((did_not_submit_protection_application_within_legal_period(p))) => ((criterion_failure_to_apply(p))).\n  ! p in Person: ((used_false_or_misleading_information_or_documents(p))) => ((criterion_fraud(p))).\n  ! p in Person: ((does_not_cooperate_with_authorities(p))) => ((criterion_non_cooperation(p))).\n  ! p in Person: ((indicated_non_compliance_with_transfer_pushback_removal(p))) => ((criterion_non_compliance_with_measures(p))).\n  ! p in Person: ((indicated_non_compliance_with_entry_ban(p))) => ((criterion_non_compliance_with_measures(p))).\n  ! p in Person: ((indicated_non_compliance_with_less_coercive_measure(p))) => ((criterion_non_compliance_with_measures(p))).\n  ! p in Person: ((indicated_non_compliance_with_freedom_restricting_measure(p))) => ((criterion_non_compliance_with_measures(p))).\n  ! p in Person: ((indicated_non_compliance_with_equivalent_measure_other_member_state(p))) => ((criterion_non_compliance_with_measures(p))).\n  ! p in Person: ((subject_to_unlifted_entry_ban(p))) => ((criterion_entry_ban(p))).\n  ! p in Person: ((submitted_new_application_after_negative_decision(p))) => ((criterion_new_application_after_decision(p))).\n  ! p in Person: ((concealed_fingerprints_in_other_state(p))) => ((criterion_concealment_of_fingerprints(p))).\n  ! p in Person: ((submitted_multiple_applications_with_negative_outcome(p))) => ((criterion_multiple_applications(p))).\n  ! p in Person: ((concealed_prior_application_in_other_state(p))) => ((criterion_concealment_of_prior_application(p))).\n  ! p in Person: ((came_for_purposes_other_than_application(p))) => ((criterion_declared_purpose(p))).\n  ! p in Person: ((subject_to_fine_for_manifestly_unlawful_appeal(p))) => ((criterion_manifestly_unfounded_appeal(p))).\n  ! p in Person: ((criterion_failure_to_apply(p))) => ((at_least_one_objective_criterion_present(p))).\n  ! p in Person: ((criterion_fraud(p))) => ((at_least_one_objective_criterion_present(p))).\n  ! p in Person: ((criterion_non_cooperation(p))) => ((at_least_one_objective_criterion_present(p))).\n  ! p in Person: ((criterion_non_compliance_with_measures(p))) => ((at_least_one_objective_criterion_present(p))).\n  ! p in Person: ((criterion_entry_ban(p))) => ((at_least_one_objective_criterion_present(p))).\n  ! p in Person: ((criterion_new_application_after_decision(p))) => ((at_least_one_objective_criterion_present(p))).\n  ! p in Person: ((criterion_concealment_of_fingerprints(p))) => ((at_least_one_objective_criterion_present(p))).\n  ! p in Person: ((criterion_multiple_applications(p))) => ((at_least_one_objective_criterion_present(p))).\n  ! p in Person: ((criterion_concealment_of_prior_application(p))) => ((at_least_one_objective_criterion_present(p))).\n  ! p in Person: ((criterion_declared_purpose(p))) => ((at_least_one_objective_criterion_present(p))).\n  ! p in Person: ((criterion_manifestly_unfounded_appeal(p))) => ((at_least_one_objective_criterion_present(p))).\n}"
+  },
+  "case": {
+    "text": "Bilal is een vreemdeling. Hij is aanwezig op het Belgische grondgebied en voldoet niet langer aan de voorwaarden voor verblijf op het grondgebied."
+  },
+  "kb_compile_strategy": "le_json_ir_no_translate",
+  "kb_compile_backend": "json_ir",
+  "extraction_backend": "json_ir",
+  "pipeline_backend_mode": "json_ir",
+  "kb_compile_flags": {
+    "use_le": true,
+    "uses_translation": false,
+    "json_ir_generation": "symbols_then_rules"
+  },
+  "strategy_metadata": {
+    "strategy_name": "le_json_ir_no_translate",
+    "canonical_strategy_name": "le_json_ir_no_translate",
+    "kb_backend": "json_ir",
+    "pipeline_backend_mode": "json_ir",
+    "uses_le_intermediate": true,
+    "json_ir_generation": "symbols_then_rules",
+    "belief_scoring": false,
+    "law_scope_mode": "cited",
+    "repair_enabled": true,
+    "json_ir_structured_repair_enabled": true,
+    "json_ir_max_symbol_versions": 3,
+    "json_ir_max_rules_attempts_per_symbol_version": 2,
+    "json_ir_max_kb_llm_calls": 8,
+    "json_ir_outer_cache_retries_enabled": false,
+    "json_ir_outer_cache_max_attempts": 1,
+    "configured_translation": false,
+    "effective_translation": false,
+    "translation_source": "main_cli_no_translate",
+    "uses_translation": false
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Is er sprake van illegaal verblijf in de zin van artikel 1, paragraaf 1, punt 4?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "Illegal stay is the presence on the territory of a foreigner who does not or no longer meets the conditions for entry or stay."
+      },
+      "pipeline": {
+        "sat": null,
+        "case": {
+          "facts": [
+            "present_on_territory(bilal).",
+            "not satisfies_conditions_for_access_or_residence(bilal).",
+            "not provides_proof_of_belgian_nationality(bilal)."
+          ],
+          "case_given_factual_inputs": [],
+          "entities": {
+            "Person": [
+              "belgische",
+              "bilal",
+              "hij"
+            ]
+          }
+        },
+        "query": null,
+        "symbolic_result": null,
+        "natural_language": null,
+        "explanation": null,
+        "extraction_prompt": null,
+        "raw_extracted": {
+          "case": {
+            "facts": [
+              "present_on_territory(bilal).",
+              "not satisfies_conditions_for_access_or_residence(bilal).",
+              "not provides_proof_of_belgian_nationality(bilal)."
+            ],
+            "case_given_factual_inputs": [],
+            "entities": {
+              "Person": [
+                "belgische",
+                "bilal",
+                "hij"
+              ]
+            }
+          },
+          "query": null
+        },
+        "error_stage": "extraction",
+        "error": "Query extraction failed after 6 repair attempts: Selected observable predicate 'is_citizen_of_union' for a legal-conclusion question. Observable predicates are case facts and should not be used as final answers to legal-effect questions. Choose a derived predicate that directly represents the requested legal status, right, obligation, permission, prohibition, validity result, entitlement, exclusion, classification, or legal consequence."
+      }
+    }
+  ]
+}

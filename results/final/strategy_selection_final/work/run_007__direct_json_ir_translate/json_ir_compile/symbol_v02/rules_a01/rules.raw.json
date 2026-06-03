@@ -1,0 +1,86 @@
+{
+  "rules": [
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "prop", "type": "Property"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_surviving_legally_cohabiting_partner_of", "args": ["survivor", "deceased"], "negated": false},
+            {"pred": "is_heir_called_to_estate_of", "args": ["survivor", "deceased"], "negated": false},
+            {"pred": "served_as_family_principal_residence_at_opening", "args": ["prop", "deceased"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "acquires_usufruct_of", "args": ["survivor", "prop"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "prop", "type": "Property"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_surviving_legally_cohabiting_partner_of", "args": ["survivor", "deceased"], "negated": false},
+            {"pred": "is_heir_called_to_estate_of", "args": ["survivor", "deceased"], "negated": false},
+            {"pred": "is_household_effects_of", "args": ["prop", "deceased"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "acquires_usufruct_of", "args": ["survivor", "prop"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "prop", "type": "Property"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_surviving_legally_cohabiting_partner_of", "args": ["survivor", "deceased"], "negated": false},
+            {"pred": "is_heir_called_to_estate_of", "args": ["survivor", "deceased"], "negated": false},
+            {"pred": "served_as_family_principal_residence_at_opening", "args": ["prop", "deceased"], "negated": false},
+            {"pred": "subject_to_legal_reversion_right", "args": ["prop"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "acquires_usufruct_of", "args": ["survivor", "prop"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "prop", "type": "Property"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_surviving_legally_cohabiting_partner_of", "args": ["survivor", "deceased"], "negated": false},
+            {"pred": "is_heir_called_to_estate_of", "args": ["survivor", "deceased"], "negated": false},
+            {"pred": "is_household_effects_of", "args": ["prop", "deceased"], "negated": false},
+            {"pred": "subject_to_legal_reversion_right", "args": ["prop"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "acquires_usufruct_of", "args": ["survivor", "prop"], "negated": false}
+      ],
+      "operator": "implies"
+    }
+  ]
+}

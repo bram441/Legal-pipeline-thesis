@@ -1,0 +1,76 @@
+vocabulary V {
+  type Person
+  provides_proof_of_belgian_nationality: Person -> Bool
+  is_union_citizen: Person -> Bool
+  falls_under_eu_free_movement_law: Person -> Bool
+  present_on_territory: Person -> Bool
+  does_not_meet_entry_or_stay_conditions: Person -> Bool
+  subject_to_removal_procedure: Person -> Bool
+  subject_to_international_protection_procedure: Person -> Bool
+  subject_to_responsible_member_state_procedure: Person -> Bool
+  individual_examination_performed: Person -> Bool
+  risk_is_actual_and_real: Person -> Bool
+  no_residence_application_after_illegal_entry_or_stay: Person -> Bool
+  international_protection_request_not_within_deadline: Person -> Bool
+  used_false_or_fraudulent_means_in_relevant_procedure: Person -> Bool
+  failed_to_cooperate_with_immigration_authorities: Person -> Bool
+  unwilling_or_failed_to_comply_with_transfer_refusal_or_removal_measure: Person -> Bool
+  unwilling_or_failed_to_comply_with_active_entry_ban: Person -> Bool
+  unwilling_or_failed_to_comply_with_less_coercive_measure: Person -> Bool
+  unwilling_or_failed_to_comply_with_public_order_restriction_measure: Person -> Bool
+  unwilling_or_failed_to_comply_with_equivalent_other_member_state_measure: Person -> Bool
+  active_entry_ban_in_kingdom_or_member_state: Person -> Bool
+  submitted_new_application_immediately_after_negative_or_removal_decision: Person -> Bool
+  concealed_prior_fingerprints_in_dublin_state: Person -> Bool
+  multiple_applications_with_negative_or_no_residence_title: Person -> Bool
+  concealed_prior_international_protection_request_in_dublin_state: Person -> Bool
+  came_for_purposes_other_than_application_purposes: Person -> Bool
+  fined_for_manifestly_unlawful_appeal: Person -> Bool
+  has_valid_travel_document: Person -> Bool
+  has_valid_passport: Person -> Bool
+  has_valid_identity_document: Person -> Bool
+  recognized_by_national_authority_willing_to_issue_pass: Person -> Bool
+  nationality_category_allows_minister_pass: Person -> Bool
+  subject_to_relevant_absconding_procedure: Person -> Bool
+  absconding_criterion_no_application_or_late_request_met: Person -> Bool
+  absconding_criterion_measure_noncompliance_met: Person -> Bool
+  at_least_one_absconding_criterion_met: Person -> Bool
+  is_foreigner: Person -> Bool
+  is_third_country_national: Person -> Bool
+  has_illegal_stay: Person -> Bool
+  risk_of_absconding: Person -> Bool
+  is_identified_foreigner: Person -> Bool
+}
+
+theory T:V {
+  ! p in Person: ((~provides_proof_of_belgian_nationality(p))) => ((is_foreigner(p))).
+  ! p in Person: ((~is_union_citizen(p)) & (~falls_under_eu_free_movement_law(p))) => ((is_third_country_national(p))).
+  ! p in Person: ((present_on_territory(p)) & (is_foreigner(p)) & (does_not_meet_entry_or_stay_conditions(p))) => ((has_illegal_stay(p))).
+  ! p in Person: ((subject_to_removal_procedure(p))) => ((subject_to_relevant_absconding_procedure(p))).
+  ! p in Person: ((subject_to_international_protection_procedure(p))) => ((subject_to_relevant_absconding_procedure(p))).
+  ! p in Person: ((subject_to_responsible_member_state_procedure(p))) => ((subject_to_relevant_absconding_procedure(p))).
+  ! p in Person: ((no_residence_application_after_illegal_entry_or_stay(p))) => ((absconding_criterion_no_application_or_late_request_met(p))).
+  ! p in Person: ((international_protection_request_not_within_deadline(p))) => ((absconding_criterion_no_application_or_late_request_met(p))).
+  ! p in Person: ((unwilling_or_failed_to_comply_with_transfer_refusal_or_removal_measure(p))) => ((absconding_criterion_measure_noncompliance_met(p))).
+  ! p in Person: ((unwilling_or_failed_to_comply_with_active_entry_ban(p))) => ((absconding_criterion_measure_noncompliance_met(p))).
+  ! p in Person: ((unwilling_or_failed_to_comply_with_less_coercive_measure(p))) => ((absconding_criterion_measure_noncompliance_met(p))).
+  ! p in Person: ((unwilling_or_failed_to_comply_with_public_order_restriction_measure(p))) => ((absconding_criterion_measure_noncompliance_met(p))).
+  ! p in Person: ((unwilling_or_failed_to_comply_with_equivalent_other_member_state_measure(p))) => ((absconding_criterion_measure_noncompliance_met(p))).
+  ! p in Person: ((absconding_criterion_no_application_or_late_request_met(p))) => ((at_least_one_absconding_criterion_met(p))).
+  ! p in Person: ((used_false_or_fraudulent_means_in_relevant_procedure(p))) => ((at_least_one_absconding_criterion_met(p))).
+  ! p in Person: ((failed_to_cooperate_with_immigration_authorities(p))) => ((at_least_one_absconding_criterion_met(p))).
+  ! p in Person: ((absconding_criterion_measure_noncompliance_met(p))) => ((at_least_one_absconding_criterion_met(p))).
+  ! p in Person: ((active_entry_ban_in_kingdom_or_member_state(p))) => ((at_least_one_absconding_criterion_met(p))).
+  ! p in Person: ((submitted_new_application_immediately_after_negative_or_removal_decision(p))) => ((at_least_one_absconding_criterion_met(p))).
+  ! p in Person: ((concealed_prior_fingerprints_in_dublin_state(p))) => ((at_least_one_absconding_criterion_met(p))).
+  ! p in Person: ((multiple_applications_with_negative_or_no_residence_title(p))) => ((at_least_one_absconding_criterion_met(p))).
+  ! p in Person: ((concealed_prior_international_protection_request_in_dublin_state(p))) => ((at_least_one_absconding_criterion_met(p))).
+  ! p in Person: ((came_for_purposes_other_than_application_purposes(p))) => ((at_least_one_absconding_criterion_met(p))).
+  ! p in Person: ((fined_for_manifestly_unlawful_appeal(p))) => ((at_least_one_absconding_criterion_met(p))).
+  ! p in Person: ((is_foreigner(p)) & (subject_to_relevant_absconding_procedure(p)) & (risk_is_actual_and_real(p)) & (individual_examination_performed(p)) & (at_least_one_absconding_criterion_met(p))) => ((risk_of_absconding(p))).
+  ! p in Person: ((is_foreigner(p)) & (has_valid_travel_document(p))) => ((is_identified_foreigner(p))).
+  ! p in Person: ((is_foreigner(p)) & (has_valid_passport(p))) => ((is_identified_foreigner(p))).
+  ! p in Person: ((is_foreigner(p)) & (has_valid_identity_document(p))) => ((is_identified_foreigner(p))).
+  ! p in Person: ((is_foreigner(p)) & (recognized_by_national_authority_willing_to_issue_pass(p))) => ((is_identified_foreigner(p))).
+  ! p in Person: ((is_foreigner(p)) & (nationality_category_allows_minister_pass(p))) => ((is_identified_foreigner(p))).
+}

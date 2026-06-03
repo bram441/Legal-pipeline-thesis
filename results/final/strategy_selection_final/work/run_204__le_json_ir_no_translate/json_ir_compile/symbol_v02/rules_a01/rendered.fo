@@ -1,0 +1,60 @@
+vocabulary V {
+  type Person
+  type Document
+  provides_proof_of_belgian_nationality: Person -> Bool
+  is_citizen_of_union: Person -> Bool
+  falls_under_community_free_movement_law: Person -> Bool
+  is_present_on_territory: Person -> Bool
+  satisfies_conditions_for_access_or_residence: Person -> Bool
+  reasons_to_believe_will_abscond: Person -> Bool
+  subject_to_removal_procedure: Person -> Bool
+  subject_to_international_protection_procedure: Person -> Bool
+  subject_to_responsible_member_state_determination_procedure: Person -> Bool
+  individual_examination_performed: Person -> Bool
+  possesses_valid_travel_document: Person -> Bool
+  recognised_as_national_by_own_authority: Person -> Bool
+  own_authority_willing_to_issue_laissez_passer: Person -> Bool
+  falls_under_nationality_category_for_ministerial_laissez_passer: Person -> Bool
+  criterion_1_no_residence_or_protection_application: Person -> Bool
+  criterion_2_false_information_or_fraud: Person -> Bool
+  criterion_3_non_cooperation_with_authorities: Person -> Bool
+  criterion_4_non_compliance_with_measures: Person -> Bool
+  criterion_5_subject_to_entry_ban: Person -> Bool
+  criterion_6_new_application_after_negative_decision: Person -> Bool
+  criterion_7_concealed_fingerprints_in_other_state: Person -> Bool
+  criterion_8_multiple_applications_with_negative_outcome: Person -> Bool
+  criterion_9_concealed_prior_protection_request: Person -> Bool
+  criterion_10_declared_purpose_inconsistent_with_application: Person -> Bool
+  criterion_11_fined_for_manifestly_unlawful_appeal: Person -> Bool
+  at_least_one_absconding_criterion_met: Person -> Bool
+  subject_to_relevant_procedure: Person -> Bool
+  is_foreigner: Person -> Bool
+  is_third_country_national: Person -> Bool
+  is_in_illegal_residence: Person -> Bool
+  is_identified_foreigner: Person -> Bool
+  risk_of_absconding_exists: Person -> Bool
+}
+
+theory T:V {
+  ! p in Person: ((~provides_proof_of_belgian_nationality(p))) => ((is_foreigner(p))).
+  ! p in Person: (((~is_citizen_of_union(p)) & (~falls_under_community_free_movement_law(p)))) => ((is_third_country_national(p))).
+  ! p in Person: (((is_present_on_territory(p)) & (~satisfies_conditions_for_access_or_residence(p)))) => ((is_in_illegal_residence(p))).
+  ! p in Person: ((possesses_valid_travel_document(p))) => ((is_identified_foreigner(p))).
+  ! p in Person: (((recognised_as_national_by_own_authority(p)) & (own_authority_willing_to_issue_laissez_passer(p)))) => ((is_identified_foreigner(p))).
+  ! p in Person: ((falls_under_nationality_category_for_ministerial_laissez_passer(p))) => ((is_identified_foreigner(p))).
+  ! p in Person: ((criterion_1_no_residence_or_protection_application(p))) => ((at_least_one_absconding_criterion_met(p))).
+  ! p in Person: ((criterion_2_false_information_or_fraud(p))) => ((at_least_one_absconding_criterion_met(p))).
+  ! p in Person: ((criterion_3_non_cooperation_with_authorities(p))) => ((at_least_one_absconding_criterion_met(p))).
+  ! p in Person: ((criterion_4_non_compliance_with_measures(p))) => ((at_least_one_absconding_criterion_met(p))).
+  ! p in Person: ((criterion_5_subject_to_entry_ban(p))) => ((at_least_one_absconding_criterion_met(p))).
+  ! p in Person: ((criterion_6_new_application_after_negative_decision(p))) => ((at_least_one_absconding_criterion_met(p))).
+  ! p in Person: ((criterion_7_concealed_fingerprints_in_other_state(p))) => ((at_least_one_absconding_criterion_met(p))).
+  ! p in Person: ((criterion_8_multiple_applications_with_negative_outcome(p))) => ((at_least_one_absconding_criterion_met(p))).
+  ! p in Person: ((criterion_9_concealed_prior_protection_request(p))) => ((at_least_one_absconding_criterion_met(p))).
+  ! p in Person: ((criterion_10_declared_purpose_inconsistent_with_application(p))) => ((at_least_one_absconding_criterion_met(p))).
+  ! p in Person: ((criterion_11_fined_for_manifestly_unlawful_appeal(p))) => ((at_least_one_absconding_criterion_met(p))).
+  ! p in Person: ((subject_to_removal_procedure(p))) => ((subject_to_relevant_procedure(p))).
+  ! p in Person: ((subject_to_international_protection_procedure(p))) => ((subject_to_relevant_procedure(p))).
+  ! p in Person: ((subject_to_responsible_member_state_determination_procedure(p))) => ((subject_to_relevant_procedure(p))).
+  ! p in Person: (((reasons_to_believe_will_abscond(p)) & (subject_to_relevant_procedure(p)) & (individual_examination_performed(p)) & (at_least_one_absconding_criterion_met(p)))) => ((risk_of_absconding_exists(p))).
+}

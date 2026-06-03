@@ -1,0 +1,77 @@
+vocabulary V {
+  type Person
+  type Procedure
+  provides_proof_of_belgian_nationality: Person -> Bool
+  is_foreigner: Person -> Bool
+  is_citizen_of_union: Person -> Bool
+  falls_under_community_free_movement_law: Person -> Bool
+  is_third_country_national: Person -> Bool
+  present_on_territory: Person -> Bool
+  satisfies_conditions_for_access_or_residence: Person -> Bool
+  in_illegal_residence: Person -> Bool
+  subject_to_removal_procedure: Person -> Bool
+  subject_to_international_protection_procedure: Person -> Bool
+  subject_to_dublin_transfer_procedure: Person -> Bool
+  individual_examination_performed: Person -> Bool
+  risk_of_absconding: Person -> Bool
+  possesses_valid_travel_document: Person -> Bool
+  recognised_as_national_by_country_authority: Person -> Bool
+  falls_under_laissez_passer_nationality_category: Person -> Bool
+  is_identified_foreigner: Person -> Bool
+  did_not_submit_residence_application_after_illegal_entry_or_during_illegal_residence: Person -> Bool
+  did_not_submit_protection_application_within_legal_period: Person -> Bool
+  criterion_failure_to_apply_met: Person -> Bool
+  used_false_or_misleading_information: Person -> Bool
+  criterion_fraud_met: Person -> Bool
+  does_not_cooperate_with_authorities: Person -> Bool
+  criterion_non_cooperation_met: Person -> Bool
+  non_compliant_with_transfer_refoulement_or_removal_measure: Person -> Bool
+  non_compliant_with_entry_ban: Person -> Bool
+  non_compliant_with_less_coercive_measure: Person -> Bool
+  non_compliant_with_freedom_restricting_measure_for_public_order: Person -> Bool
+  non_compliant_with_equivalent_measure_by_other_member_state: Person -> Bool
+  criterion_non_compliance_with_measures_met: Person -> Bool
+  subject_to_active_entry_ban: Person -> Bool
+  criterion_entry_ban_met: Person -> Bool
+  submitted_new_application_after_negative_decision: Person -> Bool
+  criterion_new_application_after_decision_met: Person -> Bool
+  concealed_fingerprints_in_other_dublin_state: Person -> Bool
+  criterion_concealment_of_fingerprints_met: Person -> Bool
+  submitted_multiple_applications_with_negative_outcome: Person -> Bool
+  criterion_multiple_applications_met: Person -> Bool
+  concealed_prior_application_in_other_dublin_state: Person -> Bool
+  criterion_concealment_of_prior_application_met: Person -> Bool
+  declared_or_file_shows_purpose_other_than_application: Person -> Bool
+  criterion_declared_purpose_met: Person -> Bool
+  subject_to_fine_for_manifestly_unlawful_appeal: Person -> Bool
+  criterion_manifestly_unfounded_appeal_met: Person -> Bool
+  at_least_one_absconding_criterion_met: Person -> Bool
+  subject_to_relevant_procedure: Person -> Bool
+}
+
+theory T:V {
+  ! p in Person: ((~provides_proof_of_belgian_nationality(p))) => ((is_foreigner(p))).
+  ! p in Person: (((~is_citizen_of_union(p)) & (~falls_under_community_free_movement_law(p)))) => ((is_third_country_national(p))).
+  ! p in Person: (((present_on_territory(p)) & (~satisfies_conditions_for_access_or_residence(p)))) => ((in_illegal_residence(p))).
+  ! p in Person: (((subject_to_removal_procedure(p)) | (subject_to_international_protection_procedure(p)) | (subject_to_dublin_transfer_procedure(p)))) => ((subject_to_relevant_procedure(p))).
+  ! p in Person: (((is_foreigner(p)) & (subject_to_relevant_procedure(p)) & (individual_examination_performed(p)) & (at_least_one_absconding_criterion_met(p)))) => ((risk_of_absconding(p))).
+  ! p in Person: ((possesses_valid_travel_document(p))) => ((is_identified_foreigner(p))).
+  ! p in Person: ((recognised_as_national_by_country_authority(p))) => ((is_identified_foreigner(p))).
+  ! p in Person: ((falls_under_laissez_passer_nationality_category(p))) => ((is_identified_foreigner(p))).
+  ! p in Person: (((did_not_submit_residence_application_after_illegal_entry_or_during_illegal_residence(p)) | (did_not_submit_protection_application_within_legal_period(p)))) => ((criterion_failure_to_apply_met(p))).
+  ! p in Person: ((used_false_or_misleading_information(p))) => ((criterion_fraud_met(p))).
+  ! p in Person: ((does_not_cooperate_with_authorities(p))) => ((criterion_non_cooperation_met(p))).
+  ! p in Person: ((non_compliant_with_transfer_refoulement_or_removal_measure(p))) => ((criterion_non_compliance_with_measures_met(p))).
+  ! p in Person: ((non_compliant_with_entry_ban(p))) => ((criterion_non_compliance_with_measures_met(p))).
+  ! p in Person: ((non_compliant_with_less_coercive_measure(p))) => ((criterion_non_compliance_with_measures_met(p))).
+  ! p in Person: ((non_compliant_with_freedom_restricting_measure_for_public_order(p))) => ((criterion_non_compliance_with_measures_met(p))).
+  ! p in Person: ((non_compliant_with_equivalent_measure_by_other_member_state(p))) => ((criterion_non_compliance_with_measures_met(p))).
+  ! p in Person: ((subject_to_active_entry_ban(p))) => ((criterion_entry_ban_met(p))).
+  ! p in Person: ((submitted_new_application_after_negative_decision(p))) => ((criterion_new_application_after_decision_met(p))).
+  ! p in Person: ((concealed_fingerprints_in_other_dublin_state(p))) => ((criterion_concealment_of_fingerprints_met(p))).
+  ! p in Person: ((submitted_multiple_applications_with_negative_outcome(p))) => ((criterion_multiple_applications_met(p))).
+  ! p in Person: ((concealed_prior_application_in_other_dublin_state(p))) => ((criterion_concealment_of_prior_application_met(p))).
+  ! p in Person: ((declared_or_file_shows_purpose_other_than_application(p))) => ((criterion_declared_purpose_met(p))).
+  ! p in Person: ((subject_to_fine_for_manifestly_unlawful_appeal(p))) => ((criterion_manifestly_unfounded_appeal_met(p))).
+  ! p in Person: (((criterion_failure_to_apply_met(p)) | (criterion_fraud_met(p)) | (criterion_non_cooperation_met(p)) | (criterion_non_compliance_with_measures_met(p)) | (criterion_entry_ban_met(p)) | (criterion_new_application_after_decision_met(p)) | (criterion_concealment_of_fingerprints_met(p)) | (criterion_multiple_applications_met(p)) | (criterion_concealment_of_prior_application_met(p)) | (criterion_declared_purpose_met(p)) | (criterion_manifestly_unfounded_appeal_met(p)))) => ((at_least_one_absconding_criterion_met(p))).
+}

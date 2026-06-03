@@ -1,0 +1,70 @@
+{
+  "types": ["Person", "ImmovableProperty", "Lease"],
+  "predicates": [
+    {
+      "name": "is_surviving_spouse",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The person is the surviving spouse of the deceased whose estate has opened."
+    },
+    {
+      "name": "is_deceased_spouse",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The person is the deceased whose estate has opened."
+    },
+    {
+      "name": "is_heir",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The person is an heir of the deceased."
+    },
+    {
+      "name": "served_as_family_principal_residence_at_estate_opening",
+      "args": ["ImmovableProperty"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The immovable property served as the family's principal residence at the time the estate of the deceased opened."
+    },
+    {
+      "name": "property_subject_to_lease",
+      "args": ["ImmovableProperty", "Lease"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The immovable property is subject to the given lease."
+    },
+    {
+      "name": "property_qualifies_for_lease_right",
+      "args": ["ImmovableProperty", "Lease"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The immovable property served as the family principal residence at estate opening and is subject to the given lease, making it qualify for the surviving spouse lease right."
+    },
+    {
+      "name": "acquires_right_to_lease",
+      "args": ["Person", "Lease"],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "output_category": "right",
+      "description": "The surviving spouse acquires the right to the lease of the immovable property that served as the family's principal residence at the time the estate opened."
+    },
+    {
+      "name": "excluded_from_lease_right",
+      "args": ["Person", "Lease"],
+      "returns": "Bool",
+      "kind": "derived",
+      "output_category": "exclusion",
+      "description": "The person (heir other than the surviving spouse) is excluded from the right to the lease."
+    }
+  ],
+  "functions": []
+}

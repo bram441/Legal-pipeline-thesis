@@ -1,0 +1,64 @@
+{
+  "entities": {
+    "bv_horizon": {
+      "declared_type": "Company",
+      "resolved_type": "Company",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "has_legal_personality",
+          "arg_index": 0,
+          "expected_type": "Company"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "case_given_more_than_one_criterion_exceeded_for_two_consecutive_years",
+          "arg_index": 0,
+          "expected_type": "Company"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "loses_small_company_status_from",
+          "arg_index": 0,
+          "expected_type": "Company"
+        }
+      ]
+    },
+    "financial_year_2025": {
+      "declared_type": "FinancialYear",
+      "resolved_type": "FinancialYear",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "case_given_more_than_one_criterion_exceeded_for_two_consecutive_years",
+          "arg_index": 1,
+          "expected_type": "FinancialYear"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "loses_small_company_status_from",
+          "arg_index": 1,
+          "expected_type": "FinancialYear"
+        }
+      ]
+    }
+  },
+  "unmapped_entities": [],
+  "conflicts": [],
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "bv_horizon",
+      "arg_index": 0,
+      "expected_type": "Company",
+      "predicate": "loses_small_company_status_from"
+    },
+    {
+      "entity": "financial_year_2025",
+      "arg_index": 1,
+      "expected_type": "FinancialYear",
+      "predicate": "loses_small_company_status_from"
+    }
+  ]
+}

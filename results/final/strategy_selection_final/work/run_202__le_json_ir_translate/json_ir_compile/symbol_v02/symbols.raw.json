@@ -1,0 +1,68 @@
+{
+  "types": ["Person", "Estate"],
+  "predicates": [
+    {
+      "name": "is_surviving_spouse_of",
+      "args": ["Person", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the surviving spouse of the second (deceased) person."
+    },
+    {
+      "name": "has_descendants",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The person has descendants."
+    },
+    {
+      "name": "has_adopted_children",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The person has adopted children."
+    },
+    {
+      "name": "has_descendants_of_adopted_children",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The person has descendants of adopted children."
+    },
+    {
+      "name": "leaves_descendants",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The deceased person leaves descendants."
+    },
+    {
+      "name": "leaves_adopted_children",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The deceased person leaves adopted children."
+    },
+    {
+      "name": "leaves_descendants_of_adopted_children",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The deceased person leaves descendants of adopted children."
+    },
+    {
+      "name": "acquires_usufruct_of_entire_estate",
+      "args": ["Person", "Person"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The first person (surviving spouse) acquires the usufruct of the entire estate of the second person (deceased).",
+      "legal_output": true,
+      "output_category": "right"
+    }
+  ],
+  "functions": []
+}

@@ -1,0 +1,174 @@
+{
+  "types": [
+    "Company",
+    "FinancialYear"
+  ],
+  "predicates": [
+    {
+      "name": "has_legal_personality",
+      "args": [
+        "Company"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The company has legal personality."
+    },
+    {
+      "name": "employee_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The employee criterion is exceeded for the company in the financial year (annual average employees > 50)."
+    },
+    {
+      "name": "turnover_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The turnover criterion is exceeded for the company in the financial year (annual net turnover excl. VAT > 11,250,000 EUR)."
+    },
+    {
+      "name": "balance_sheet_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The balance sheet criterion is exceeded for the company in the financial year (balance sheet total > 6,000,000 EUR)."
+    },
+    {
+      "name": "more_than_one_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "More than one small-company criterion is exceeded for the company in the financial year."
+    },
+    {
+      "name": "not_more_than_one_criterion_exceeded",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "Not more than one small-company criterion is exceeded for the company in the financial year."
+    },
+    {
+      "name": "following_financial_year",
+      "args": [
+        "FinancialYear",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The second financial year immediately follows the first financial year (Y1, Y2 where Y2 follows Y1)."
+    },
+    {
+      "name": "more_than_one_criterion_exceeded_second_consecutive_time",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "More than one small-company criterion is exceeded for the company for the second consecutive time in this financial year (Y2), meaning it was also exceeded in the immediately preceding financial year."
+    },
+    {
+      "name": "more_than_one_criterion_no_longer_exceeded_second_consecutive_time",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "More than one small-company criterion is no longer exceeded for the company for the second consecutive time in this financial year (Y2), meaning it was also not exceeded in the immediately preceding financial year and was exceeded before that."
+    },
+    {
+      "name": "more_than_one_criterion_exceeded_before",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "More than one small-company criterion was exceeded for the company before the given financial year."
+    },
+    {
+      "name": "is_small_company",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "output_category": "classification",
+      "description": "The company qualifies as a small company in the given financial year, assessed on the balance sheet date of the last closed financial year."
+    },
+    {
+      "name": "small_company_status_change_takes_effect_from",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "output_category": "timing",
+      "description": "A change in the small company status of the company takes effect from this financial year (the year following the second consecutive year in which the exceeding or no-longer-exceeding condition held)."
+    }
+  ],
+  "functions": [
+    {
+      "name": "annual_average_employees",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Int",
+      "kind": "observable",
+      "description": "The annual average number of employees of the company in the financial year."
+    },
+    {
+      "name": "annual_net_turnover_excl_vat",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The annual net turnover of the company excluding value added tax in the financial year, in euros."
+    },
+    {
+      "name": "balance_sheet_total",
+      "args": [
+        "Company",
+        "FinancialYear"
+      ],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The balance sheet total of the company in the financial year, in euros."
+    },
+    {
+      "name": "last_closed_financial_year",
+      "args": [
+        "Company"
+      ],
+      "returns": "FinancialYear",
+      "kind": "observable",
+      "description": "The last closed financial year of the company on the balance sheet date."
+    }
+  ]
+}

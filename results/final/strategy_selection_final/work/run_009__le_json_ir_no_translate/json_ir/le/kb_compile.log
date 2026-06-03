@@ -1,0 +1,33 @@
+KB compilation FAILED (invalid FO syntax after 1 repair attempts).
+
+Error:
+IDP failed to parse compiled KB: Error: line 24 - colStart 106 - colEnd 160 => Unknown symbol: _more_than_one_small_company_criterion_exceeded
+
+=== LAST RAW KB ===
+vocabulary V {
+  type Company
+  type FinancialYear
+  has_legal_personality: Company -> Bool
+  employee_criterion_exceeded: Company * FinancialYear -> Bool
+  turnover_criterion_exceeded: Company * FinancialYear -> Bool
+  balance_sheet_criterion_exceeded: Company * FinancialYear -> Bool
+  more_than_one_small_company_criterion_exceeded: Company * FinancialYear -> Bool
+  not_more_than_one_small_company_criterion_exceeded: Company * FinancialYear -> Bool
+  is_last_closed_financial_year: Company * FinancialYear -> Bool
+  is_small_company: Company * FinancialYear -> Bool
+  annual_average_employees: Company * FinancialYear -> Int
+  annual_net_turnover_excl_vat: Company * FinancialYear -> Real
+  balance_sheet_total: Company * FinancialYear -> Real
+}
+
+theory T:V {
+  ! c in Company, fy in FinancialYear: ((annual_average_employees(c,fy) > 50)) => ((employee_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((annual_net_turnover_excl_vat(c,fy) > 11250000.0)) => ((turnover_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((balance_sheet_total(c,fy) > 6000000.0)) => ((balance_sheet_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: (((employee_criterion_exceeded(c,fy)) & (turnover_criterion_exceeded(c,fy)))) => ((more_than_one_small_company_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: (((employee_criterion_exceeded(c,fy)) & (balance_sheet_criterion_exceeded(c,fy)))) => ((more_than_one_small_company_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: (((turnover_criterion_exceeded(c,fy)) & (balance_sheet_criterion_exceeded(c,fy)))) => ((more_than_one_small_company_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: ((~more_than_one_small_company_criterion_exceeded(c,fy))) => ((not_more_than_one_small_company_criterion_exceeded(c,fy))).
+  ! c in Company, fy in FinancialYear: (((has_legal_personality(c)) & (is_last_closed_financial_year(c,fy)) & (not_more_than_one_small_company_criterion_exceeded(c,fy)))) => ((is_small_company(c,fy))).
+  ! c in Company, fy in FinancialYear: (((is_last_closed_financial_year(c,fy)) & (more_than_one_small_company_criterion_exceeded(c,fy)))) => ((~is_small_company(c,fy))).
+}

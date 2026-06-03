@@ -1,0 +1,128 @@
+{
+  "intent": "deduction",
+  "symbolic_status": "ok",
+  "status": "ok",
+  "scorable": true,
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "routing": {
+    "question": "Heeft Noor volgens artikel 4.23, paragraaf 1 het vruchtgebruik van de gezinswoning?",
+    "detected_question_type": "boolean",
+    "selected_intent": "deduction",
+    "selected_reason": "expected.mode=boolean",
+    "scorable": true,
+    "fallback_intent": null,
+    "warnings": [],
+    "legal_output_symbols": [
+      "acquires_usufruct_of_household_goods",
+      "acquires_usufruct_of_residence",
+      "exercises_usufruct_despite_legal_return"
+    ],
+    "query_hint_type": "boolean",
+    "expected_question_type": "boolean"
+  },
+  "satisfiability_check": {
+    "stage": "pre_query",
+    "kb_case_satisfiable": true,
+    "status": "ok",
+    "details": "theory satisfiable",
+    "intent_backend": "idp_z3.tasks.satisfiable_check",
+    "duration_seconds": 0.0556
+  },
+  "warnings": [],
+  "deduction": {
+    "intent": "deduction",
+    "status": "ok",
+    "output_kind": "epistemic_boolean",
+    "predicate": "acquires_usufruct_of_residence",
+    "args": [
+      "noor",
+      "woning"
+    ],
+    "possible": true,
+    "certain": true,
+    "label": "entailed",
+    "atom": "acquires_usufruct_of_residence(x0,x1)",
+    "constraint": "? x0 in Person, x1 in Property: __sel0(x0) & __sel1(x1) & acquires_usufruct_of_residence(x0,x1)",
+    "certainty_class": "decisive",
+    "sat": true,
+    "internal_intent": "deduction",
+    "antecedent_coverage": [
+      {
+        "rule_index": 0,
+        "target": "acquires_usufruct_of_residence(noor,woning)",
+        "conditions": [
+          {
+            "atom": "is_longest_living_legal_cohabitant(noor,mira)",
+            "status": "present"
+          },
+          {
+            "atom": "is_deceased(mira)",
+            "status": "present"
+          },
+          {
+            "atom": "inherits_together_with_heirs(noor,mira)",
+            "status": "present"
+          },
+          {
+            "atom": "is_main_family_residence(woning,mira)",
+            "status": "present"
+          }
+        ]
+      }
+    ]
+  },
+  "model_expansion": null,
+  "get_range": null,
+  "satisfiable": null,
+  "explanation": null,
+  "execution_query": {
+    "type": "predicate",
+    "predicate": "acquires_usufruct_of_residence",
+    "mode": "boolean",
+    "args": [
+      "noor",
+      "woning"
+    ],
+    "explain": false,
+    "predicate_kind": "derived",
+    "query_type": "predicate_boolean",
+    "internal_intent": "deduction"
+  },
+  "output_kind": "epistemic_boolean",
+  "certainty_class": "decisive",
+  "predicate": "acquires_usufruct_of_residence",
+  "args": [
+    "noor",
+    "woning"
+  ],
+  "label": "entailed",
+  "possible": true,
+  "certain": true,
+  "sat": true,
+  "antecedent_coverage": [
+    {
+      "rule_index": 0,
+      "target": "acquires_usufruct_of_residence(noor,woning)",
+      "conditions": [
+        {
+          "atom": "is_longest_living_legal_cohabitant(noor,mira)",
+          "status": "present"
+        },
+        {
+          "atom": "is_deceased(mira)",
+          "status": "present"
+        },
+        {
+          "atom": "inherits_together_with_heirs(noor,mira)",
+          "status": "present"
+        },
+        {
+          "atom": "is_main_family_residence(woning,mira)",
+          "status": "present"
+        }
+      ]
+    }
+  ]
+}

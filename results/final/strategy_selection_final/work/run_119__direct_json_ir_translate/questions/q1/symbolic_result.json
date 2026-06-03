@@ -1,0 +1,78 @@
+{
+  "intent": "deduction",
+  "symbolic_status": "ok",
+  "status": "ok",
+  "scorable": true,
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "routing": {
+    "question": "Must BV Start immediately take into account the exceeding of more than one criterion in the first financial year pursuant to Article 1:24, paragraph 3?",
+    "detected_question_type": "boolean",
+    "selected_intent": "deduction",
+    "selected_reason": "expected.mode=boolean",
+    "scorable": true,
+    "fallback_intent": null,
+    "warnings": [],
+    "legal_output_symbols": [
+      "criteria_must_be_taken_into_account_immediately"
+    ],
+    "query_hint_type": "boolean",
+    "expected_question_type": "boolean"
+  },
+  "satisfiability_check": {
+    "stage": "pre_query",
+    "kb_case_satisfiable": true,
+    "status": "ok",
+    "details": "theory satisfiable",
+    "intent_backend": "idp_z3.tasks.satisfiable_check",
+    "duration_seconds": 0.0623
+  },
+  "warnings": [],
+  "deduction": {
+    "intent": "deduction",
+    "status": "ok",
+    "output_kind": "epistemic_boolean",
+    "predicate": "more_than_one_criterion_exceeded",
+    "args": [
+      "bv_start",
+      "fy1"
+    ],
+    "possible": true,
+    "certain": true,
+    "label": "entailed",
+    "atom": "more_than_one_criterion_exceeded(x0,x1)",
+    "constraint": "? x0 in Company, x1 in FinancialYear: __sel0(x0) & __sel1(x1) & more_than_one_criterion_exceeded(x0,x1)",
+    "certainty_class": "decisive",
+    "sat": true,
+    "internal_intent": "deduction"
+  },
+  "model_expansion": null,
+  "get_range": null,
+  "satisfiable": null,
+  "explanation": null,
+  "execution_query": {
+    "type": "predicate",
+    "predicate": "more_than_one_criterion_exceeded",
+    "mode": "boolean",
+    "args": [
+      "bv_start",
+      "fy1"
+    ],
+    "explain": false,
+    "predicate_kind": "derived",
+    "query_type": "predicate_boolean",
+    "internal_intent": "deduction"
+  },
+  "output_kind": "epistemic_boolean",
+  "certainty_class": "decisive",
+  "predicate": "more_than_one_criterion_exceeded",
+  "args": [
+    "bv_start",
+    "fy1"
+  ],
+  "label": "entailed",
+  "possible": true,
+  "certain": true,
+  "sat": true
+}

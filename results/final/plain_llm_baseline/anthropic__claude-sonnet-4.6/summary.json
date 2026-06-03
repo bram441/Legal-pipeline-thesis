@@ -1,0 +1,21 @@
+{
+  "model": "anthropic/claude-sonnet-4.6",
+  "counts": {
+    "total": 37,
+    "valid_output": 35,
+    "invalid_output": 2,
+    "gold_available": 37,
+    "correct": 35,
+    "wrong": 0,
+    "unknown_predicted": 0,
+    "true_predicted": 24,
+    "false_predicted": 11,
+    "errors": 0,
+    "prompt_tokens": 75279,
+    "completion_tokens": 500,
+    "total_tokens": 75779
+  },
+  "valid_output_rate": 0.9459459459459459,
+  "accuracy_if_gold_available": 0.9459459459459459,
+  "wrong_rate_if_gold_available": 0.0
+}

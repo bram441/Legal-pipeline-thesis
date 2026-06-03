@@ -1,0 +1,112 @@
+{
+  "entities": {
+    "bv_start": {
+      "declared_type": "Company",
+      "resolved_type": "Company",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "has_legal_personality",
+          "arg_index": 0,
+          "expected_type": "Company"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "first_financial_year",
+          "arg_index": 0,
+          "expected_type": "Company"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "good_faith_estimate_at_beginning_of_year",
+          "arg_index": 0,
+          "expected_type": "Company"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "estimated_annual_average_employees",
+          "arg_index": 0,
+          "expected_type": "Company"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "estimated_annual_net_turnover_excluding_vat",
+          "arg_index": 0,
+          "expected_type": "Company"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "estimated_balance_sheet_total",
+          "arg_index": 0,
+          "expected_type": "Company"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "estimate_must_be_taken_into_account_immediately",
+          "arg_index": 0,
+          "expected_type": "Company"
+        }
+      ]
+    },
+    "eerste_boekjaar": {
+      "declared_type": "FinancialYear",
+      "resolved_type": "FinancialYear",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "first_financial_year",
+          "arg_index": 1,
+          "expected_type": "FinancialYear"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "good_faith_estimate_at_beginning_of_year",
+          "arg_index": 1,
+          "expected_type": "FinancialYear"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "estimated_annual_average_employees",
+          "arg_index": 1,
+          "expected_type": "FinancialYear"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "estimated_annual_net_turnover_excluding_vat",
+          "arg_index": 1,
+          "expected_type": "FinancialYear"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "estimated_balance_sheet_total",
+          "arg_index": 1,
+          "expected_type": "FinancialYear"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "estimate_must_be_taken_into_account_immediately",
+          "arg_index": 1,
+          "expected_type": "FinancialYear"
+        }
+      ]
+    }
+  },
+  "unmapped_entities": [],
+  "conflicts": [],
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "bv_start",
+      "arg_index": 0,
+      "expected_type": "Company",
+      "predicate": "estimate_must_be_taken_into_account_immediately"
+    },
+    {
+      "entity": "eerste_boekjaar",
+      "arg_index": 1,
+      "expected_type": "FinancialYear",
+      "predicate": "estimate_must_be_taken_into_account_immediately"
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "types": ["Person", "ImmovableProperty", "HouseholdGoods", "Estate"],
+  "predicates": [
+    {
+      "name": "is_longest_living_legal_cohabitant_of",
+      "args": ["Person", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the longest-living legal cohabitant of the second person (the deceased). This is a background status that may be directly asserted in a case."
+    },
+    {
+      "name": "is_deceased",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The person is deceased and their estate has opened."
+    },
+    {
+      "name": "served_as_main_family_residence",
+      "args": ["ImmovableProperty", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The immovable property served as the main family residence at the opening of the estate of the deceased person."
+    },
+    {
+      "name": "household_goods_present_in",
+      "args": ["HouseholdGoods", "ImmovableProperty"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The household goods were present in the immovable property at the opening of the estate of the deceased."
+    },
+    {
+      "name": "subject_to_legal_reversion_4_24",
+      "args": ["ImmovableProperty"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The immovable property is subject to a right of legal reversion as referred to in article 4.24."
+    },
+    {
+      "name": "subject_to_legal_reversion_4_25",
+      "args": ["ImmovableProperty"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The immovable property is subject to a right of legal reversion as referred to in article 4.25."
+    },
+    {
+      "name": "household_goods_subject_to_legal_reversion_4_24",
+      "args": ["HouseholdGoods"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The household goods are subject to a right of legal reversion as referred to in article 4.24."
+    },
+    {
+      "name": "household_goods_subject_to_legal_reversion_4_25",
+      "args": ["HouseholdGoods"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The household goods are subject to a right of legal reversion as referred to in article 4.25."
+    },
+    {
+      "name": "acquires_usufruct_of_immovable_property",
+      "args": ["Person", "ImmovableProperty"],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "output_category": "legal_effect",
+      "description": "The longest-living legal cohabitant acquires usufruct of the immovable property that served as the main family residence at the opening of the estate of the deceased."
+    },
+    {
+      "name": "acquires_usufruct_of_household_goods",
+      "args": ["Person", "HouseholdGoods"],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "output_category": "legal_effect",
+      "description": "The longest-living legal cohabitant acquires usufruct of the household goods present in the main family residence at the opening of the estate of the deceased."
+    }
+  ],
+  "functions": []
+}

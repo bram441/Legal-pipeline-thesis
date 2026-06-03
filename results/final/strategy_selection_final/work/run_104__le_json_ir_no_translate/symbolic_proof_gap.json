@@ -1,0 +1,135 @@
+{
+  "query": {
+    "predicate": "acquires_usufruct_of_immovable_property",
+    "args": [
+      "hannah",
+      "woning_leuven"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "entailed",
+    "certain": true,
+    "possible": true,
+    "certainty_class": "decisive"
+  },
+  "extracted_case": {
+    "facts": [
+      "is_deceased(greet).",
+      "is_longest_living_legal_cohabitant_of(hannah,greet).",
+      "served_as_main_family_residence(woning_leuven,greet).",
+      "household_goods_present_in(huisraad_woning_leuven,woning_leuven)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "Person": [
+        "greet",
+        "hannah",
+        "leuven"
+      ],
+      "HouseholdGoods": [
+        "huisraad_woning_leuven"
+      ],
+      "ImmovableProperty": [
+        "woning_leuven"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 0,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_longest_living_legal_cohabitant_of",
+            "args": [
+              "survivor",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "is_deceased",
+            "args": [
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "served_as_main_family_residence",
+            "args": [
+              "property",
+              "deceased"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "acquires_usufruct_of_immovable_property"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 0,
+      "target": "acquires_usufruct_of_immovable_property(hannah,woning_leuven)",
+      "conditions": [
+        {
+          "atom": "is_longest_living_legal_cohabitant_of(hannah,greet)",
+          "status": "present"
+        },
+        {
+          "atom": "is_deceased(greet)",
+          "status": "present"
+        },
+        {
+          "atom": "served_as_main_family_residence(woning_leuven,greet)",
+          "status": "present"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "is_longest_living_legal_cohabitant_of",
+      "symbol_type": "predicate",
+      "atom": "is_longest_living_legal_cohabitant_of(hannah,greet)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "is_deceased",
+      "symbol_type": "predicate",
+      "atom": "is_deceased(greet)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "served_as_main_family_residence",
+      "symbol_type": "predicate",
+      "atom": "served_as_main_family_residence(woning_leuven,greet)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "genuinely_under_specified_case",
+    "secondary": [],
+    "rationale": "No single blocking category identified; case may lack explicit observables for a decisive proof."
+  }
+}

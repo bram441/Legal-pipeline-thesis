@@ -1,0 +1,52 @@
+{
+  "types": [
+    "Person"
+  ],
+  "predicates": [
+    {
+      "name": "is_surviving_legally_cohabiting_partner_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the surviving legally cohabiting partner of the second (predeceased) person."
+    },
+    {
+      "name": "is_descendant_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is a descendant of the second person."
+    },
+    {
+      "name": "foregoing_provisions_apply",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "description": "The foregoing provisions apply to the surviving legally cohabiting partner (first arg) with respect to the predeceased legally cohabiting partner (second arg)."
+    },
+    {
+      "name": "exclusion_from_foregoing_provisions_applies",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "output_category": "exception",
+      "description": "The exclusion from the foregoing provisions applies because the surviving legally cohabiting partner (first arg) is a descendant of the predeceased legally cohabiting partner (second arg)."
+    }
+  ],
+  "functions": []
+}

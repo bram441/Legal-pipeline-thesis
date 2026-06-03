@@ -1,0 +1,89 @@
+vocabulary V {
+  type Person
+  type MemberState
+  type Document
+  type Procedure
+  provides_proof_of_belgian_nationality: Person -> Bool
+  is_foreigner: Person -> Bool
+  is_citizen_of_union: Person -> Bool
+  falls_under_community_free_movement_law: Person -> Bool
+  is_third_country_national: Person -> Bool
+  present_on_territory: Person -> Bool
+  satisfies_conditions_for_access_or_residence: Person -> Bool
+  in_illegal_residence: Person -> Bool
+  reasons_to_believe_will_abscond: Person -> Bool
+  subject_to_removal_or_protection_procedure: Person -> Bool
+  individual_examination_performed: Person -> Bool
+  risk_of_absconding_is_current_and_real: Person -> Bool
+  at_least_one_objective_criterion_present: Person -> Bool
+  risk_of_absconding: Person -> Bool
+  has_valid_travel_document: Person -> Bool
+  recognised_as_national_by_authority_willing_to_issue_laissez_passer: Person -> Bool
+  falls_under_nationality_category_for_ministerial_laissez_passer: Person -> Bool
+  is_identified_foreigner: Person -> Bool
+  criterion_failure_to_apply: Person -> Bool
+  did_not_submit_residence_application_after_illegal_entry_or_during_illegal_residence: Person -> Bool
+  did_not_submit_protection_application_within_legal_period: Person -> Bool
+  criterion_fraud: Person -> Bool
+  used_false_or_misleading_information_or_documents: Person -> Bool
+  criterion_non_cooperation: Person -> Bool
+  does_not_cooperate_with_authorities: Person -> Bool
+  criterion_non_compliance_with_measures: Person -> Bool
+  indicated_non_compliance_with_transfer_pushback_removal: Person -> Bool
+  indicated_non_compliance_with_entry_ban: Person -> Bool
+  indicated_non_compliance_with_less_coercive_measure: Person -> Bool
+  indicated_non_compliance_with_freedom_restricting_measure: Person -> Bool
+  indicated_non_compliance_with_equivalent_measure_other_member_state: Person -> Bool
+  criterion_entry_ban: Person -> Bool
+  subject_to_unlifted_entry_ban: Person -> Bool
+  criterion_new_application_after_decision: Person -> Bool
+  submitted_new_application_after_negative_decision: Person -> Bool
+  criterion_concealment_of_fingerprints: Person -> Bool
+  concealed_fingerprints_in_other_state: Person -> Bool
+  criterion_multiple_applications: Person -> Bool
+  submitted_multiple_applications_with_negative_outcome: Person -> Bool
+  criterion_concealment_of_prior_application: Person -> Bool
+  concealed_prior_application_in_other_state: Person -> Bool
+  criterion_declared_purpose: Person -> Bool
+  came_for_purposes_other_than_application: Person -> Bool
+  criterion_manifestly_unfounded_appeal: Person -> Bool
+  subject_to_fine_for_manifestly_unlawful_appeal: Person -> Bool
+}
+
+theory T:V {
+  ! p in Person: ((~provides_proof_of_belgian_nationality(p))) => ((is_foreigner(p))).
+  ! p in Person: (((~is_citizen_of_union(p)) & (~falls_under_community_free_movement_law(p)))) => ((is_third_country_national(p))).
+  ! p in Person: (((is_foreigner(p)) & (present_on_territory(p)) & (~satisfies_conditions_for_access_or_residence(p)))) => ((in_illegal_residence(p))).
+  ! p in Person: (((reasons_to_believe_will_abscond(p)) & (subject_to_removal_or_protection_procedure(p)) & (at_least_one_objective_criterion_present(p)) & (risk_of_absconding_is_current_and_real(p)) & (individual_examination_performed(p)))) => ((risk_of_absconding(p))).
+  ! p in Person: (((reasons_to_believe_will_abscond(p)) & (subject_to_removal_or_protection_procedure(p)) & (at_least_one_objective_criterion_present(p)) & (individual_examination_performed(p)))) => ((risk_of_absconding_is_current_and_real(p))).
+  ! p in Person: ((has_valid_travel_document(p))) => ((is_identified_foreigner(p))).
+  ! p in Person: ((recognised_as_national_by_authority_willing_to_issue_laissez_passer(p))) => ((is_identified_foreigner(p))).
+  ! p in Person: ((falls_under_nationality_category_for_ministerial_laissez_passer(p))) => ((is_identified_foreigner(p))).
+  ! p in Person: ((did_not_submit_residence_application_after_illegal_entry_or_during_illegal_residence(p))) => ((criterion_failure_to_apply(p))).
+  ! p in Person: ((did_not_submit_protection_application_within_legal_period(p))) => ((criterion_failure_to_apply(p))).
+  ! p in Person: ((used_false_or_misleading_information_or_documents(p))) => ((criterion_fraud(p))).
+  ! p in Person: ((does_not_cooperate_with_authorities(p))) => ((criterion_non_cooperation(p))).
+  ! p in Person: ((indicated_non_compliance_with_transfer_pushback_removal(p))) => ((criterion_non_compliance_with_measures(p))).
+  ! p in Person: ((indicated_non_compliance_with_entry_ban(p))) => ((criterion_non_compliance_with_measures(p))).
+  ! p in Person: ((indicated_non_compliance_with_less_coercive_measure(p))) => ((criterion_non_compliance_with_measures(p))).
+  ! p in Person: ((indicated_non_compliance_with_freedom_restricting_measure(p))) => ((criterion_non_compliance_with_measures(p))).
+  ! p in Person: ((indicated_non_compliance_with_equivalent_measure_other_member_state(p))) => ((criterion_non_compliance_with_measures(p))).
+  ! p in Person: ((subject_to_unlifted_entry_ban(p))) => ((criterion_entry_ban(p))).
+  ! p in Person: ((submitted_new_application_after_negative_decision(p))) => ((criterion_new_application_after_decision(p))).
+  ! p in Person: ((concealed_fingerprints_in_other_state(p))) => ((criterion_concealment_of_fingerprints(p))).
+  ! p in Person: ((submitted_multiple_applications_with_negative_outcome(p))) => ((criterion_multiple_applications(p))).
+  ! p in Person: ((concealed_prior_application_in_other_state(p))) => ((criterion_concealment_of_prior_application(p))).
+  ! p in Person: ((came_for_purposes_other_than_application(p))) => ((criterion_declared_purpose(p))).
+  ! p in Person: ((subject_to_fine_for_manifestly_unlawful_appeal(p))) => ((criterion_manifestly_unfounded_appeal(p))).
+  ! p in Person: ((criterion_failure_to_apply(p))) => ((at_least_one_objective_criterion_present(p))).
+  ! p in Person: ((criterion_fraud(p))) => ((at_least_one_objective_criterion_present(p))).
+  ! p in Person: ((criterion_non_cooperation(p))) => ((at_least_one_objective_criterion_present(p))).
+  ! p in Person: ((criterion_non_compliance_with_measures(p))) => ((at_least_one_objective_criterion_present(p))).
+  ! p in Person: ((criterion_entry_ban(p))) => ((at_least_one_objective_criterion_present(p))).
+  ! p in Person: ((criterion_new_application_after_decision(p))) => ((at_least_one_objective_criterion_present(p))).
+  ! p in Person: ((criterion_concealment_of_fingerprints(p))) => ((at_least_one_objective_criterion_present(p))).
+  ! p in Person: ((criterion_multiple_applications(p))) => ((at_least_one_objective_criterion_present(p))).
+  ! p in Person: ((criterion_concealment_of_prior_application(p))) => ((at_least_one_objective_criterion_present(p))).
+  ! p in Person: ((criterion_declared_purpose(p))) => ((at_least_one_objective_criterion_present(p))).
+  ! p in Person: ((criterion_manifestly_unfounded_appeal(p))) => ((at_least_one_objective_criterion_present(p))).
+}

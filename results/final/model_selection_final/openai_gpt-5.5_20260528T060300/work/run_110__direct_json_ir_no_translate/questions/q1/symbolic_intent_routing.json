@@ -1,0 +1,18 @@
+{
+  "question": "Is Carlos een onderdaan van een derde land volgens artikel 1, paragraaf 1, punt 3?",
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "scorable": true,
+  "fallback_intent": null,
+  "warnings": [],
+  "legal_output_symbols": [
+    "has_illegal_stay",
+    "is_foreigner",
+    "is_identified_foreigner",
+    "is_third_country_national",
+    "risk_of_absconding"
+  ],
+  "query_hint_type": "boolean",
+  "expected_question_type": "boolean"
+}

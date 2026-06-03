@@ -1,0 +1,28 @@
+{
+  "case_entities_rendered_to_domains": {
+    "ImmovableProperty": [
+      "appartement_gent"
+    ],
+    "Person": [
+      "gent",
+      "willem",
+      "yara"
+    ]
+  },
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "willem",
+      "arg_index": 0,
+      "expected_type": "Person",
+      "predicate": "is_sole_beneficiary_of_lease_right"
+    },
+    {
+      "entity": "appartement_gent",
+      "arg_index": 1,
+      "expected_type": "ImmovableProperty",
+      "predicate": "is_sole_beneficiary_of_lease_right"
+    }
+  ],
+  "unmapped_case_entities": [],
+  "pre_solver_domain_validation_errors": []
+}

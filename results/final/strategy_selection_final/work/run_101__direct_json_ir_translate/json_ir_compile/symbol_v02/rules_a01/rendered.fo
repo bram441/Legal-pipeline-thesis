@@ -1,0 +1,17 @@
+vocabulary V {
+  type Person
+  type Asset
+  is_surviving_spouse_of: Person * Person -> Bool
+  is_deceased: Person -> Bool
+  leaves_descendants: Person -> Bool
+  leaves_adopted_children: Person -> Bool
+  leaves_descendants_of_adopted_children: Person -> Bool
+  qualifies_as_estate_of: Asset * Person -> Bool
+  qualifying_heirs_exist: Person -> Bool
+  acquires_usufruct_of_estate: Person * Person -> Bool
+}
+
+theory T:V {
+  ! deceased in Person: (((leaves_descendants(deceased)) | (leaves_adopted_children(deceased)) | (leaves_descendants_of_adopted_children(deceased)))) => ((qualifying_heirs_exist(deceased))).
+  ! spouse in Person, deceased in Person: (((is_surviving_spouse_of(spouse,deceased)) & (is_deceased(deceased)) & (qualifying_heirs_exist(deceased)))) => ((acquires_usufruct_of_estate(spouse,deceased))).
+}

@@ -1,0 +1,21 @@
+vocabulary V {
+  type Person
+  type ImmovableProperty
+  type HouseholdGoods
+  type Estate
+  is_longest_living_legal_cohabitant_of: Person * Person -> Bool
+  is_deceased: Person -> Bool
+  served_as_main_family_residence: ImmovableProperty * Person -> Bool
+  household_goods_present_in: HouseholdGoods * ImmovableProperty -> Bool
+  subject_to_legal_reversion_4_24: ImmovableProperty -> Bool
+  subject_to_legal_reversion_4_25: ImmovableProperty -> Bool
+  household_goods_subject_to_legal_reversion_4_24: HouseholdGoods -> Bool
+  household_goods_subject_to_legal_reversion_4_25: HouseholdGoods -> Bool
+  acquires_usufruct_of_immovable_property: Person * ImmovableProperty -> Bool
+  acquires_usufruct_of_household_goods: Person * HouseholdGoods -> Bool
+}
+
+theory T:V {
+  ! survivor in Person, deceased in Person, property in ImmovableProperty: (((is_longest_living_legal_cohabitant_of(survivor,deceased)) & (is_deceased(deceased)) & (served_as_main_family_residence(property,deceased)))) => ((acquires_usufruct_of_immovable_property(survivor,property))).
+  ! survivor in Person, deceased in Person, goods in HouseholdGoods, property in ImmovableProperty: (((is_longest_living_legal_cohabitant_of(survivor,deceased)) & (is_deceased(deceased)) & (served_as_main_family_residence(property,deceased)) & (household_goods_present_in(goods,property)))) => ((acquires_usufruct_of_household_goods(survivor,goods))).
+}

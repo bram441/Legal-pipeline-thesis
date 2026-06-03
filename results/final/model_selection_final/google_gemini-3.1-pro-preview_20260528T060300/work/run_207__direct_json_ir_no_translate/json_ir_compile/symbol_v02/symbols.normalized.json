@@ -1,0 +1,73 @@
+{
+  "types": [
+    "Person",
+    "Property"
+  ],
+  "predicates": [
+    {
+      "name": "is_surviving_spouse_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the surviving spouse of the second person."
+    },
+    {
+      "name": "is_heir_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is an heir of the second person."
+    },
+    {
+      "name": "is_immovable_property",
+      "args": [
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The property is an immovable property."
+    },
+    {
+      "name": "served_as_principal_residence_at_opening_of_succession",
+      "args": [
+        "Property",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The property served as the principal residence of the family at the time of the opening of the succession of the deceased person."
+    },
+    {
+      "name": "acquires_right_to_rent",
+      "args": [
+        "Person",
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "description": "The person acquires the right to rent the property."
+    },
+    {
+      "name": "is_excluded_from_right_to_rent",
+      "args": [
+        "Person",
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "description": "The person is excluded from the right to rent the property."
+    }
+  ],
+  "functions": []
+}

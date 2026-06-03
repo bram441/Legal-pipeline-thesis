@@ -1,0 +1,28 @@
+vocabulary V {
+  type Person
+  type Asset
+  is_surviving_spouse_of: Person * Person -> Bool
+  deceased_leaves_ascendant_relatives: Person -> Bool
+  deceased_leaves_close_collateral_relatives: Person -> Bool
+  deceased_leaves_qualifying_relatives: Person -> Bool
+  share_in_community_property_of_deceased: Asset * Person -> Bool
+  share_in_exclusive_spousal_co_owned_property_of_deceased: Asset * Person -> Bool
+  other_asset_of_deceased_own_property: Asset * Person -> Bool
+  subject_to_statutory_return_right: Asset -> Bool
+  contrary_provision_in_gift_deed: Asset -> Bool
+  contrary_provision_in_will: Asset -> Bool
+  contrary_provision_for_statutory_return_asset: Asset -> Bool
+  receives_full_ownership_of: Person * Asset -> Bool
+  receives_usufruct_of: Person * Asset -> Bool
+}
+
+theory T:V {
+  ! deceased in Person: ((deceased_leaves_ascendant_relatives(deceased))) => ((deceased_leaves_qualifying_relatives(deceased))).
+  ! deceased in Person: ((deceased_leaves_close_collateral_relatives(deceased))) => ((deceased_leaves_qualifying_relatives(deceased))).
+  ! asset in Asset: ((contrary_provision_in_gift_deed(asset))) => ((contrary_provision_for_statutory_return_asset(asset))).
+  ! asset in Asset: ((contrary_provision_in_will(asset))) => ((contrary_provision_for_statutory_return_asset(asset))).
+  ! spouse in Person, deceased in Person, asset in Asset: ((is_surviving_spouse_of(spouse,deceased)) & (deceased_leaves_qualifying_relatives(deceased)) & (share_in_community_property_of_deceased(asset,deceased))) => ((receives_full_ownership_of(spouse,asset))).
+  ! spouse in Person, deceased in Person, asset in Asset: ((is_surviving_spouse_of(spouse,deceased)) & (deceased_leaves_qualifying_relatives(deceased)) & (share_in_exclusive_spousal_co_owned_property_of_deceased(asset,deceased))) => ((receives_full_ownership_of(spouse,asset))).
+  ! spouse in Person, deceased in Person, asset in Asset: ((is_surviving_spouse_of(spouse,deceased)) & (deceased_leaves_qualifying_relatives(deceased)) & (other_asset_of_deceased_own_property(asset,deceased))) => ((receives_usufruct_of(spouse,asset))).
+  ! spouse in Person, deceased in Person, asset in Asset: ((is_surviving_spouse_of(spouse,deceased)) & (deceased_leaves_qualifying_relatives(deceased)) & (subject_to_statutory_return_right(asset)) & (~contrary_provision_for_statutory_return_asset(asset))) => ((receives_usufruct_of(spouse,asset))).
+}

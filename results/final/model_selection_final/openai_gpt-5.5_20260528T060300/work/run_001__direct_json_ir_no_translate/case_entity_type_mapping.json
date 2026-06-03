@@ -1,0 +1,64 @@
+{
+  "entities": {
+    "anna": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_surviving_spouse_of",
+          "arg_index": 0,
+          "expected_type": "Person"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "obtains_usufruct_of_entire_estate",
+          "arg_index": 0,
+          "expected_type": "Person"
+        }
+      ]
+    },
+    "bert": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_surviving_spouse_of",
+          "arg_index": 1,
+          "expected_type": "Person"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "deceased_leaves_descendants",
+          "arg_index": 0,
+          "expected_type": "Person"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "obtains_usufruct_of_entire_estate",
+          "arg_index": 1,
+          "expected_type": "Person"
+        }
+      ]
+    }
+  },
+  "unmapped_entities": [],
+  "conflicts": [],
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "anna",
+      "arg_index": 0,
+      "expected_type": "Person",
+      "predicate": "obtains_usufruct_of_entire_estate"
+    },
+    {
+      "entity": "bert",
+      "arg_index": 1,
+      "expected_type": "Person",
+      "predicate": "obtains_usufruct_of_entire_estate"
+    }
+  ]
+}

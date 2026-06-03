@@ -1,0 +1,162 @@
+{
+  "types": ["Company", "FinancialYear"],
+  "predicates": [
+    {
+      "name": "incorporated_as_legal_person",
+      "args": ["Company"],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The company is incorporated as a legal person."
+    },
+    {
+      "name": "has_legal_personality",
+      "args": ["Company"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The company has legal personality."
+    },
+    {
+      "name": "employee_criterion_exceeded",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The employee criterion is exceeded for the company in the financial year."
+    },
+    {
+      "name": "turnover_criterion_exceeded",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The turnover criterion is exceeded for the company in the financial year."
+    },
+    {
+      "name": "balance_sheet_criterion_exceeded",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The balance sheet criterion is exceeded for the company in the financial year."
+    },
+    {
+      "name": "more_than_one_small_company_criterion_exceeded",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "More than one small-company criterion is exceeded for the company in the financial year."
+    },
+    {
+      "name": "not_more_than_one_small_company_criterion_exceeded",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "Not more than one small-company criterion is exceeded for the company in the financial year."
+    },
+    {
+      "name": "is_last_closed_financial_year",
+      "args": ["FinancialYear", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first financial year is the last closed financial year on the balance sheet date of the second financial year."
+    },
+    {
+      "name": "qualifies_as_small_company",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The company qualifies as a small company in the financial year.",
+      "legal_output": true,
+      "output_category": "classification"
+    },
+    {
+      "name": "consecutive_financial_year_following",
+      "args": ["FinancialYear", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first financial year (Y2) is the consecutive financial year immediately following the second financial year (Y1)."
+    },
+    {
+      "name": "consecutive_pair_exceeded",
+      "args": ["Company", "FinancialYear", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "Y1 and Y2 form a consecutive pair where more than one small-company criterion is exceeded for the company in both years."
+    },
+    {
+      "name": "consecutive_pair_no_longer_exceeded",
+      "args": ["Company", "FinancialYear", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "Y1 and Y2 form a consecutive pair where not more than one small-company criterion is exceeded for the company in both years."
+    },
+    {
+      "name": "threshold_crossing_event",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "A threshold-crossing event occurs for the company at the given financial year (Y2), meaning more than one criterion was exceeded in both Y1 and Y2."
+    },
+    {
+      "name": "no_longer_exceeded_event",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "A no-longer-exceeded event occurs for the company at the given financial year (Y2), meaning not more than one criterion was exceeded in both Y1 and Y2."
+    },
+    {
+      "name": "effect_financial_year_after_threshold_crossing",
+      "args": ["Company", "FinancialYear", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "Y3 is the effect financial year for the company following a threshold-crossing event at Y2."
+    },
+    {
+      "name": "effect_financial_year_after_no_longer_exceeded",
+      "args": ["Company", "FinancialYear", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "Y3 is the effect financial year for the company following a no-longer-exceeded event at Y2."
+    },
+    {
+      "name": "loses_small_company_status_from",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The company loses small-company status from the given effect financial year.",
+      "legal_output": true,
+      "output_category": "legal_effect"
+    },
+    {
+      "name": "gains_small_company_status_from",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The company gains small-company status from the given effect financial year.",
+      "legal_output": true,
+      "output_category": "legal_effect"
+    }
+  ],
+  "functions": [
+    {
+      "name": "annual_average_employees",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Int",
+      "kind": "observable",
+      "description": "The annual average number of employees of the company in the financial year."
+    },
+    {
+      "name": "annual_net_turnover",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The annual net turnover of the company in the financial year, exclusive of value added tax."
+    },
+    {
+      "name": "balance_sheet_total",
+      "args": ["Company", "FinancialYear"],
+      "returns": "Real",
+      "kind": "observable",
+      "description": "The balance sheet total of the company in the financial year."
+    }
+  ]
+}

@@ -1,0 +1,635 @@
+{
+  "id": "run_119",
+  "law": {
+    "text": "Chapter 1. Small companies\n\nArt. 1:24. Small companies\n\npar. 1. Small companies are companies with legal personality that on the balance sheet date of the last closed financial year do not exceed more than one of the following criteria:\n(1) annual average number of employees: 50;\n(2) annual net turnover as referred to in article 1:26/1, exclusive of value added tax: 11,250,000 euros;\n(3) balance sheet total: 6,000,000 euros.\n\npar. 2. When more than one of the criteria referred to in paragraph 1 are exceeded or are no longer exceeded, this only has consequences when this occurs during two consecutive financial years. The consequences shall in that case take effect from the financial year following the financial year during which more than one of the criteria were exceeded or were no longer exceeded for the second time.\n\npar. 3. For companies that are starting their business, for the purpose of applying the criteria mentioned in paragraph 1, these figures shall be estimated in good faith at the beginning of the financial year. If this estimate indicates that more than one of the criteria will be exceeded during the first financial year, this must be taken into account immediately for that first financial year.\n\npar. 4. If the financial year exceptionally has a duration of less or more than twelve months, whereby this duration cannot be longer than twenty-four months minus one calendar day, then the amount of the net turnover exclusive of value added tax referred to in paragraph 1 shall be multiplied by a fraction of which the denominator is twelve and the numerator is the number of months of the financial year concerned, whereby each commenced month is counted as a full month.\n\npar. 5. The average number of employees employed, referred to in paragraph 1, is the average of the number of employees expressed in full-time equivalents registered in the DIMONA database in accordance with the royal decree of 5 November 2002 introducing an immediate declaration of employment, with application of article 38 of the law of 26 July 1996 on the modernisation of social security and safeguarding the viability of the statutory pension schemes, at the end of each month of the financial year, or if the employment does not fall within the scope of application of this royal decree, the average number of employees employed expressed in full-time equivalents of the employees registered in the general personnel register or an equivalent document at the end of each month of the financial year under consideration.\n\nThe number of employees expressed in full-time equivalents is equal to the volume of work expressed in full-time employed equivalents, to be calculated for part-time employees on the basis of the contractual number of hours to be performed, related to the normal working time of a comparable full-time employee.\n\nWhen the income arising from the ordinary business of a company consists for more than half of income that does not correspond to the description of the item net turnover, then for the purpose of paragraph 1, net turnover shall be understood to mean: the total of operating and financial income with the exclusion of non-recurring income.\n\nThe balance sheet total referred to in paragraph 1 is the total book value of the assets as it appears from the balance sheet format established by royal decree adopted in execution of article 3:1, paragraph 1.\n\npar. 6. If the company is affiliated with one or more other companies as referred to in article 1:20, the criteria regarding net turnover and balance sheet total referred to in paragraph 1 shall be calculated on a consolidated basis. With regard to the criterion of number of employees, the number of employees, calculated in accordance with the provisions of paragraph 5, that each of the affiliated companies concerned employs on an annual average, shall be added together.\n\nIf, when calculating the threshold amounts referred to in paragraph 1, the eliminations referred to in the royal decree adopted in execution of article 3:30, paragraph 1, and any resulting omission are not carried out, then these threshold amounts relating to the balance sheet total and the net turnover shall be increased by twenty percent.\n\npar. 7. Paragraph 6 does not apply to companies other than parent companies as referred to in article 1:15, (1), except where such companies have been established with the sole purpose of evading the reporting of certain information.\n\nFor the purpose of this paragraph and paragraph 6, companies forming a consortium as referred to in article 1:19 shall be equated with a parent company.\n\nArt. 1:25. Micro-companies\n\npar. 1. Micro-companies shall be understood to mean: small companies with legal personality that are not a subsidiary or parent company and that on the balance sheet date of the last closed financial year do not exceed more than one of the following criteria:\n(1) annual average number of employees: 10;\n(2) annual net turnover referred to in article 1:26/1, exclusive of value added tax: 900,000 euros;\n(3) balance sheet total: 450,000 euros.\n\npar. 2. Article 1:24, paragraphs 2 to 5 and paragraph 8, shall apply."
+  },
+  "kb_used": {
+    "fo": "vocabulary V {\n  type Company\n  type FinancialYear\n  is_starting_company: Company * FinancialYear -> Bool\n  has_legal_personality: Company -> Bool\n  good_faith_estimate_exceeds_more_than_one_criterion: Company * FinancialYear -> Bool\n  employee_threshold_exceeded: Company * FinancialYear -> Bool\n  turnover_threshold_exceeded: Company * FinancialYear -> Bool\n  balance_sheet_threshold_exceeded: Company * FinancialYear -> Bool\n  more_than_one_criterion_exceeded: Company * FinancialYear -> Bool\n  is_small_company: Company * FinancialYear -> Bool\n  criteria_must_be_taken_into_account_immediately: Company * FinancialYear -> Bool\n  annual_average_employees: Company * FinancialYear -> Int\n  annual_net_turnover_excl_vat: Company * FinancialYear -> Real\n  balance_sheet_total: Company * FinancialYear -> Real\n}\n\ntheory T:V {\n  ! c in Company, fy in FinancialYear: ((annual_average_employees(c,fy) > 50)) => ((employee_threshold_exceeded(c,fy))).\n  ! c in Company, fy in FinancialYear: ((annual_net_turnover_excl_vat(c,fy) > 11250000.0)) => ((turnover_threshold_exceeded(c,fy))).\n  ! c in Company, fy in FinancialYear: ((balance_sheet_total(c,fy) > 6000000.0)) => ((balance_sheet_threshold_exceeded(c,fy))).\n  ! c in Company, fy in FinancialYear: (((employee_threshold_exceeded(c,fy)) & (turnover_threshold_exceeded(c,fy)))) => ((more_than_one_criterion_exceeded(c,fy))).\n  ! c in Company, fy in FinancialYear: (((employee_threshold_exceeded(c,fy)) & (balance_sheet_threshold_exceeded(c,fy)))) => ((more_than_one_criterion_exceeded(c,fy))).\n  ! c in Company, fy in FinancialYear: (((turnover_threshold_exceeded(c,fy)) & (balance_sheet_threshold_exceeded(c,fy)))) => ((more_than_one_criterion_exceeded(c,fy))).\n  ! c in Company, fy in FinancialYear: (((has_legal_personality(c)) & (more_than_one_criterion_exceeded(c,fy)))) => ((~is_small_company(c,fy))).\n  ! c in Company, fy in FinancialYear: (((has_legal_personality(c)) & (~more_than_one_criterion_exceeded(c,fy)))) => ((is_small_company(c,fy))).\n  ! c in Company, fy in FinancialYear: (((is_starting_company(c,fy)) & (good_faith_estimate_exceeds_more_than_one_criterion(c,fy)))) => ((criteria_must_be_taken_into_account_immediately(c,fy))).\n}"
+  },
+  "case": {
+    "text": "BV Start commences its business. At the beginning of the first financial year, it estimates in good faith 55 employees, 12,000,000 euros net turnover excluding VAT and 5,000,000 euros balance sheet total."
+  },
+  "kb_compile_strategy": "direct_json_ir_translate",
+  "kb_compile_backend": "json_ir",
+  "extraction_backend": "json_ir",
+  "pipeline_backend_mode": "json_ir",
+  "kb_compile_flags": {
+    "use_le": false,
+    "uses_translation": true,
+    "json_ir_generation": "symbols_then_rules"
+  },
+  "strategy_metadata": {
+    "strategy_name": "direct_json_ir_translate",
+    "canonical_strategy_name": "direct_json_ir_translate",
+    "kb_backend": "json_ir",
+    "pipeline_backend_mode": "json_ir",
+    "uses_le_intermediate": false,
+    "json_ir_generation": "symbols_then_rules",
+    "belief_scoring": false,
+    "law_scope_mode": "cited",
+    "repair_enabled": true,
+    "json_ir_structured_repair_enabled": true,
+    "json_ir_max_symbol_versions": 3,
+    "json_ir_max_rules_attempts_per_symbol_version": 2,
+    "json_ir_max_kb_llm_calls": 8,
+    "json_ir_outer_cache_retries_enabled": false,
+    "json_ir_outer_cache_max_attempts": 1,
+    "configured_translation": true,
+    "effective_translation": true,
+    "translation_source": "strategy",
+    "uses_translation": true
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Must BV Start immediately take into account the exceeding of more than one criterion in the first financial year pursuant to Article 1:24, paragraph 3?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "Under Article 1:24, a small company may exceed at most one threshold (50 employees, 11,250,000 euro turnover, 6,000,000 euro balance sheet). For a starting company, Article 1:24 par. 3 requires immediate account when the good-faith estimate exceeds more than one criterion in the first year: here 55 employees and 12,000,000 euro turnover, while the balance sheet total of 5,000,000 does not exceed 6,000,000."
+      },
+      "pipeline": {
+        "sat": true,
+        "case": {
+          "facts": [
+            "is_starting_company(bv_start,fy1).",
+            "good_faith_estimate_exceeds_more_than_one_criterion(bv_start,fy1).",
+            "annual_average_employees(bv_start,fy1) = 55.",
+            "annual_net_turnover_excl_vat(bv_start,fy1) = 12000000.0.",
+            "balance_sheet_total(bv_start,fy1) = 5000000.0."
+          ],
+          "case_given_factual_inputs": [],
+          "entities": {
+            "Company": [
+              "bv_start"
+            ],
+            "FinancialYear": [
+              "fy1"
+            ]
+          },
+          "schema_environment": {
+            "types": {
+              "Company": {
+                "name": "Company",
+                "kind": "entity",
+                "aliases": [],
+                "source": "kb_symbol_table"
+              },
+              "FinancialYear": {
+                "name": "FinancialYear",
+                "kind": "period",
+                "aliases": [],
+                "source": "kb_symbol_table"
+              }
+            },
+            "predicates": {
+              "is_starting_company": {
+                "name": "is_starting_company",
+                "args": [
+                  "Company",
+                  "FinancialYear"
+                ],
+                "returns": "Bool",
+                "kind": "observable",
+                "description": "The company is starting its business in the given financial year (directly asserted as a background fact).",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": true,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "has_legal_personality": {
+                "name": "has_legal_personality",
+                "args": [
+                  "Company"
+                ],
+                "returns": "Bool",
+                "kind": "observable",
+                "description": "The company has legal personality.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": true,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "good_faith_estimate_exceeds_more_than_one_criterion": {
+                "name": "good_faith_estimate_exceeds_more_than_one_criterion",
+                "args": [
+                  "Company",
+                  "FinancialYear"
+                ],
+                "returns": "Bool",
+                "kind": "observable",
+                "description": "The good-faith estimate at the beginning of the financial year indicates that more than one criterion will be exceeded during the first financial year.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": true,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "employee_threshold_exceeded": {
+                "name": "employee_threshold_exceeded",
+                "args": [
+                  "Company",
+                  "FinancialYear"
+                ],
+                "returns": "Bool",
+                "kind": "helper",
+                "description": "The company exceeds the annual average employee threshold in the financial year.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": false,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": false,
+                "factual_case_input": true,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": "case_given_employee_threshold_exceeded",
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "turnover_threshold_exceeded": {
+                "name": "turnover_threshold_exceeded",
+                "args": [
+                  "Company",
+                  "FinancialYear"
+                ],
+                "returns": "Bool",
+                "kind": "helper",
+                "description": "The company exceeds the annual net turnover threshold (exclusive of VAT) in the financial year.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": false,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": false,
+                "factual_case_input": true,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": "case_given_turnover_threshold_exceeded",
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "balance_sheet_threshold_exceeded": {
+                "name": "balance_sheet_threshold_exceeded",
+                "args": [
+                  "Company",
+                  "FinancialYear"
+                ],
+                "returns": "Bool",
+                "kind": "helper",
+                "description": "The company exceeds the balance sheet total threshold in the financial year.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": false,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": false,
+                "factual_case_input": true,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": "case_given_balance_sheet_threshold_exceeded",
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "more_than_one_criterion_exceeded": {
+                "name": "more_than_one_criterion_exceeded",
+                "args": [
+                  "Company",
+                  "FinancialYear"
+                ],
+                "returns": "Bool",
+                "kind": "helper",
+                "description": "The company exceeds more than one of the three listed criteria in the financial year.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": false,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": false,
+                "factual_case_input": true,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": "case_given_more_than_one_criterion_exceeded",
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "is_small_company": {
+                "name": "is_small_company",
+                "args": [
+                  "Company",
+                  "FinancialYear"
+                ],
+                "returns": "Bool",
+                "kind": "derived",
+                "description": "The company qualifies as a small company with legal personality in the given financial year under the statutory criteria.",
+                "legal_output": null,
+                "output_category": "classification",
+                "directly_observable": false,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": false,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "criteria_must_be_taken_into_account_immediately": {
+                "name": "criteria_must_be_taken_into_account_immediately",
+                "args": [
+                  "Company",
+                  "FinancialYear"
+                ],
+                "returns": "Bool",
+                "kind": "derived",
+                "description": "The exceeding of more than one criterion must be taken into account immediately for the first financial year, because the good-faith estimate at the start of that year indicated that more than one criterion would be exceeded.",
+                "legal_output": true,
+                "output_category": "legal_effect",
+                "directly_observable": false,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": false,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": true,
+                "temporal_support": false
+              }
+            },
+            "functions": {
+              "annual_average_employees": {
+                "name": "annual_average_employees",
+                "args": [
+                  "Company",
+                  "FinancialYear"
+                ],
+                "returns": "Int",
+                "kind": "observable",
+                "description": "The annual average number of employees of the company in the financial year.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": false,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "annual_net_turnover_excl_vat": {
+                "name": "annual_net_turnover_excl_vat",
+                "args": [
+                  "Company",
+                  "FinancialYear"
+                ],
+                "returns": "Real",
+                "kind": "observable",
+                "description": "The annual net turnover of the company exclusive of value added tax in the financial year, in euros.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": false,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "balance_sheet_total": {
+                "name": "balance_sheet_total",
+                "args": [
+                  "Company",
+                  "FinancialYear"
+                ],
+                "returns": "Real",
+                "kind": "observable",
+                "description": "The balance sheet total of the company in the financial year, in euros.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": false,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              }
+            },
+            "assertable_case_symbols": {
+              "predicates": [
+                "good_faith_estimate_exceeds_more_than_one_criterion",
+                "has_legal_personality",
+                "is_starting_company"
+              ],
+              "functions": [
+                "annual_average_employees",
+                "annual_net_turnover_excl_vat",
+                "balance_sheet_total"
+              ]
+            },
+            "factual_case_input_predicates": [
+              "balance_sheet_threshold_exceeded",
+              "employee_threshold_exceeded",
+              "more_than_one_criterion_exceeded",
+              "turnover_threshold_exceeded"
+            ],
+            "factual_criteria_input_predicates": [],
+            "legal_output_query_targets": [
+              "criteria_must_be_taken_into_account_immediately"
+            ],
+            "temporal_support_symbols": []
+          },
+          "entity_type_mapping": {
+            "entities": {
+              "bv_start": {
+                "declared_type": "Company",
+                "resolved_type": "Company",
+                "source": "fact_argument+query_argument",
+                "evidence": [
+                  {
+                    "source": "fact_argument",
+                    "symbol": "is_starting_company",
+                    "arg_index": 0,
+                    "expected_type": "Company"
+                  },
+                  {
+                    "source": "fact_argument",
+                    "symbol": "good_faith_estimate_exceeds_more_than_one_criterion",
+                    "arg_index": 0,
+                    "expected_type": "Company"
+                  },
+                  {
+                    "source": "fact_argument",
+                    "symbol": "annual_average_employees",
+                    "arg_index": 0,
+                    "expected_type": "Company"
+                  },
+                  {
+                    "source": "fact_argument",
+                    "symbol": "annual_net_turnover_excl_vat",
+                    "arg_index": 0,
+                    "expected_type": "Company"
+                  },
+                  {
+                    "source": "fact_argument",
+                    "symbol": "balance_sheet_total",
+                    "arg_index": 0,
+                    "expected_type": "Company"
+                  },
+                  {
+                    "source": "query_argument",
+                    "symbol": "more_than_one_criterion_exceeded",
+                    "arg_index": 0,
+                    "expected_type": "Company"
+                  }
+                ]
+              },
+              "fy1": {
+                "declared_type": "FinancialYear",
+                "resolved_type": "FinancialYear",
+                "source": "fact_argument+query_argument",
+                "evidence": [
+                  {
+                    "source": "fact_argument",
+                    "symbol": "is_starting_company",
+                    "arg_index": 1,
+                    "expected_type": "FinancialYear"
+                  },
+                  {
+                    "source": "fact_argument",
+                    "symbol": "good_faith_estimate_exceeds_more_than_one_criterion",
+                    "arg_index": 1,
+                    "expected_type": "FinancialYear"
+                  },
+                  {
+                    "source": "fact_argument",
+                    "symbol": "annual_average_employees",
+                    "arg_index": 1,
+                    "expected_type": "FinancialYear"
+                  },
+                  {
+                    "source": "fact_argument",
+                    "symbol": "annual_net_turnover_excl_vat",
+                    "arg_index": 1,
+                    "expected_type": "FinancialYear"
+                  },
+                  {
+                    "source": "fact_argument",
+                    "symbol": "balance_sheet_total",
+                    "arg_index": 1,
+                    "expected_type": "FinancialYear"
+                  },
+                  {
+                    "source": "query_argument",
+                    "symbol": "more_than_one_criterion_exceeded",
+                    "arg_index": 1,
+                    "expected_type": "FinancialYear"
+                  }
+                ]
+              }
+            },
+            "unmapped_entities": [],
+            "conflicts": [],
+            "query_arguments_with_inferred_types": [
+              {
+                "entity": "bv_start",
+                "arg_index": 0,
+                "expected_type": "Company",
+                "predicate": "more_than_one_criterion_exceeded"
+              },
+              {
+                "entity": "fy1",
+                "arg_index": 1,
+                "expected_type": "FinancialYear",
+                "predicate": "more_than_one_criterion_exceeded"
+              }
+            ]
+          },
+          "resolved_entity_domains": {
+            "Company": [
+              "bv_start"
+            ],
+            "FinancialYear": [
+              "fy1"
+            ]
+          }
+        },
+        "query": {
+          "type": "predicate",
+          "predicate": "more_than_one_criterion_exceeded",
+          "mode": "boolean",
+          "args": [
+            "bv_start",
+            "fy1"
+          ],
+          "explain": false,
+          "predicate_kind": "derived",
+          "query_type": "predicate_boolean",
+          "internal_intent": "deduction"
+        },
+        "symbolic_result": {
+          "intent": "deduction",
+          "symbolic_status": "ok",
+          "status": "ok",
+          "scorable": true,
+          "detected_question_type": "boolean",
+          "selected_intent": "deduction",
+          "selected_reason": "expected.mode=boolean",
+          "routing": {
+            "question": "Must BV Start immediately take into account the exceeding of more than one criterion in the first financial year pursuant to Article 1:24, paragraph 3?",
+            "detected_question_type": "boolean",
+            "selected_intent": "deduction",
+            "selected_reason": "expected.mode=boolean",
+            "scorable": true,
+            "fallback_intent": null,
+            "warnings": [],
+            "legal_output_symbols": [
+              "criteria_must_be_taken_into_account_immediately"
+            ],
+            "query_hint_type": "boolean",
+            "expected_question_type": "boolean"
+          },
+          "satisfiability_check": {
+            "stage": "pre_query",
+            "kb_case_satisfiable": true,
+            "status": "ok",
+            "details": "theory satisfiable",
+            "intent_backend": "idp_z3.tasks.satisfiable_check",
+            "duration_seconds": 0.0623
+          },
+          "warnings": [],
+          "deduction": {
+            "intent": "deduction",
+            "status": "ok",
+            "output_kind": "epistemic_boolean",
+            "predicate": "more_than_one_criterion_exceeded",
+            "args": [
+              "bv_start",
+              "fy1"
+            ],
+            "possible": true,
+            "certain": true,
+            "label": "entailed",
+            "atom": "more_than_one_criterion_exceeded(x0,x1)",
+            "constraint": "? x0 in Company, x1 in FinancialYear: __sel0(x0) & __sel1(x1) & more_than_one_criterion_exceeded(x0,x1)",
+            "certainty_class": "decisive",
+            "sat": true,
+            "internal_intent": "deduction"
+          },
+          "model_expansion": null,
+          "get_range": null,
+          "satisfiable": null,
+          "explanation": null,
+          "execution_query": {
+            "type": "predicate",
+            "predicate": "more_than_one_criterion_exceeded",
+            "mode": "boolean",
+            "args": [
+              "bv_start",
+              "fy1"
+            ],
+            "explain": false,
+            "predicate_kind": "derived",
+            "query_type": "predicate_boolean",
+            "internal_intent": "deduction"
+          },
+          "output_kind": "epistemic_boolean",
+          "certainty_class": "decisive",
+          "predicate": "more_than_one_criterion_exceeded",
+          "args": [
+            "bv_start",
+            "fy1"
+          ],
+          "label": "entailed",
+          "possible": true,
+          "certain": true,
+          "sat": true
+        },
+        "symbolic_intent_routing": {
+          "question": "Must BV Start immediately take into account the exceeding of more than one criterion in the first financial year pursuant to Article 1:24, paragraph 3?",
+          "detected_question_type": "boolean",
+          "selected_intent": "deduction",
+          "selected_reason": "expected.mode=boolean",
+          "scorable": true,
+          "fallback_intent": null,
+          "warnings": [],
+          "legal_output_symbols": [
+            "criteria_must_be_taken_into_account_immediately"
+          ],
+          "query_hint_type": "boolean",
+          "expected_question_type": "boolean"
+        },
+        "prediction": {
+          "query_type": "predicate_boolean",
+          "internal_intent": "deduction",
+          "output_kind": "epistemic_boolean",
+          "status": "ok",
+          "certainty_class": "decisive",
+          "mode": "boolean",
+          "label": "entailed",
+          "belief_yes": 1.0,
+          "credence_yes_pct": 100,
+          "verdict_strength_pct": 100
+        },
+        "natural_language": "Yes. Bv_start, Fy1: The company exceeds more than one of the three listed criteria in the financial year.",
+        "explanation": null,
+        "extraction_prompt": "You are debugging a legal extraction failure.\n\nGiven KB_SCHEMA, CASE, and QUESTION, identify the likely generic cause of failure.\nFocus on schema mismatch, missing observable facts, wrong argument order, wrong entity type, selected observable instead of derived predicate, or unsupported query shape.\n\nDo not invent new law-specific fixes.\nReturn concise bullet points and one generic repair suggestion.\n\nKB_SCHEMA:\n{\n  \"types\": [\n    \"Company\",\n    \"FinancialYear\"\n  ],\n  \"predicates\": [\n    {\n      \"name\": \"is_starting_company\",\n      \"args\": [\n        \"Company\",\n        \"FinancialYear\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"observable\",\n      \"description\": \"The company is starting its business in the given financial year (directly asserted as a background fact).\",\n      \"directly_observable\": true\n    },\n    {\n      \"name\": \"has_legal_personality\",\n      \"args\": [\n        \"Company\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"observable\",\n      \"description\": \"The company has legal personality.\",\n      \"directly_observable\": true\n    },\n    {\n      \"name\": \"good_faith_estimate_exceeds_more_than_one_criterion\",\n      \"args\": [\n        \"Company\",\n        \"FinancialYear\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"observable\",\n      \"description\": \"The good-faith estimate at the beginning of the financial year indicates that more than one criterion will be exceeded during the first financial year.\",\n      \"directly_observable\": true\n    },\n    {\n      \"name\": \"employee_threshold_exceeded\",\n      \"args\": [\n        \"Company\",\n        \"FinancialYear\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"helper\",\n      \"description\": \"The company exceeds the annual average employee threshold in the financial year.\"\n    },\n    {\n      \"name\": \"turnover_threshold_exceeded\",\n      \"args\": [\n        \"Company\",\n        \"FinancialYear\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"helper\",\n      \"description\": \"The company exceeds the annual net turnover threshold (exclusive of VAT) in the financial year.\"\n    },\n    {\n      \"name\": \"balance_sheet_threshold_exceeded\",\n      \"args\": [\n        \"Company\",\n        \"FinancialYear\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"helper\",\n      \"description\": \"The company exceeds the balance sheet total threshold in the financial year.\"\n    },\n    {\n      \"name\": \"more_than_one_criterion_exceeded\",\n      \"args\": [\n        \"Company\",\n        \"FinancialYear\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"helper\",\n      \"description\": \"The company exceeds more than one of the three listed criteria in the financial year.\"\n    },\n    {\n      \"name\": \"is_small_company\",\n      \"args\": [\n        \"Company\",\n        \"FinancialYear\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"derived\",\n      \"description\": \"The company qualifies as a small company with legal personality in the given financial year under the statutory criteria.\",\n      \"output_category\": \"classification\"\n    },\n    {\n      \"name\": \"criteria_must_be_taken_into_account_immediately\",\n      \"args\": [\n        \"Company\",\n        \"FinancialYear\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"derived\",\n      \"description\": \"The exceeding of more than one criterion must be taken into account immediately for the first financial year, because the good-faith estimate at the start of that year indicated that more than one criterion would be exceeded.\",\n      \"legal_output\": true,\n      \"output_category\": \"legal_effect\"\n    }\n  ],\n  \"functions\": [\n    {\n      \"name\": \"annual_average_employees\",\n      \"args\": [\n        \"Company\",\n        \"FinancialYear\"\n      ],\n      \"returns\": \"Int\",\n      \"kind\": \"observable\",\n      \"description\": \"The annual average number of employees of the company in the financial year.\"\n    },\n    {\n      \"name\": \"annual_net_turnover_excl_vat\",\n      \"args\": [\n        \"Company\",\n        \"FinancialYear\"\n      ],\n      \"returns\": \"Real\",\n      \"kind\": \"observable\",\n      \"description\": \"The annual net turnover of the company exclusive of value added tax in the financial year, in euros.\"\n    },\n    {\n      \"name\": \"balance_sheet_total\",\n      \"args\": [\n        \"Company\",\n        \"FinancialYear\"\n      ],\n      \"returns\": \"Real\",\n      \"kind\": \"observable\",\n      \"description\": \"The balance sheet total of the company in the financial year, in euros.\"\n    }\n  ],\n  \"rules\": [\n    {\n      \"forall\": [\n        {\n          \"var\": \"c\",\n          \"type\": \"Company\"\n        },\n        {\n          \"var\": \"fy\",\n          \"type\": \"FinancialYear\"\n        }\n      ],\n      \"if\": [\n        {\n          \"compare\": {\n            \"left\": {\n              \"func\": \"annual_average_employees\",\n              \"args\": [\n                \"c\",\n                \"fy\"\n              ]\n            },\n            \"op\": \">\",\n            \"right\": 50\n          }\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"employee_threshold_exceeded\",\n          \"args\": [\n            \"c\",\n            \"fy\"\n          ],\n          \"negated\": false\n        }\n      ],\n      \"operator\": \"implies\"\n    },\n    {\n      \"forall\": [\n        {\n          \"var\": \"c\",\n          \"type\": \"Company\"\n        },\n        {\n          \"var\": \"fy\",\n          \"type\": \"FinancialYear\"\n        }\n      ],\n      \"if\": [\n        {\n          \"compare\": {\n            \"left\": {\n              \"func\": \"annual_net_turnover_excl_vat\",\n              \"args\": [\n                \"c\",\n                \"fy\"\n              ]\n            },\n            \"op\": \">\",\n            \"right\": 11250000.0\n          }\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"turnover_threshold_exceeded\",\n          \"args\": [\n            \"c\",\n            \"fy\"\n          ],\n          \"negated\": false\n        }\n      ],\n      \"operator\": \"implies\"\n    },\n    {\n      \"forall\": [\n        {\n          \"var\": \"c\",\n          \"type\": \"Company\"\n        },\n        {\n          \"var\": \"fy\",\n          \"type\": \"FinancialYear\"\n        }\n      ],\n      \"if\": [\n        {\n          \"compare\": {\n            \"left\": {\n              \"func\": \"balance_sheet_total\",\n              \"args\": [\n                \"c\",\n                \"fy\"\n              ]\n            },\n            \"op\": \">\",\n            \"right\": 6000000.0\n          }\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"balance_sheet_threshold_exceeded\",\n          \"args\": [\n            \"c\",\n            \"fy\"\n          ],\n          \"negated\": false\n        }\n      ],\n      \"operator\": \"implies\"\n    },\n    {\n      \"forall\": [\n        {\n          \"var\": \"c\",\n          \"type\": \"Company\"\n        },\n        {\n          \"var\": \"fy\",\n          \"type\": \"FinancialYear\"\n        }\n      ],\n      \"if\": [\n        {\n          \"and\": [\n            {\n              \"pred\": \"employee_threshold_exceeded\",\n              \"args\": [\n                \"c\",\n                \"fy\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"turnover_threshold_exceeded\",\n              \"args\": [\n                \"c\",\n                \"fy\"\n              ],\n              \"negated\": false\n            }\n          ]\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"more_than_one_criterion_exceeded\",\n          \"args\": [\n            \"c\",\n            \"fy\"\n          ],\n          \"negated\": false\n        }\n      ],\n      \"operator\": \"implies\"\n    },\n    {\n      \"forall\": [\n        {\n          \"var\": \"c\",\n          \"type\": \"Company\"\n        },\n        {\n          \"var\": \"fy\",\n          \"type\": \"FinancialYear\"\n        }\n      ],\n      \"if\": [\n        {\n          \"and\": [\n            {\n              \"pred\": \"employee_threshold_exceeded\",\n              \"args\": [\n                \"c\",\n                \"fy\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"balance_sheet_threshold_exceeded\",\n              \"args\": [\n                \"c\",\n                \"fy\"\n              ],\n              \"negated\": false\n            }\n          ]\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"more_than_one_criterion_exceeded\",\n          \"args\": [\n            \"c\",\n            \"fy\"\n          ],\n          \"negated\": false\n        }\n      ],\n      \"operator\": \"implies\"\n    },\n    {\n      \"forall\": [\n        {\n          \"var\": \"c\",\n          \"type\": \"Company\"\n        },\n        {\n          \"var\": \"fy\",\n          \"type\": \"FinancialYear\"\n        }\n      ],\n      \"if\": [\n        {\n          \"and\": [\n            {\n              \"pred\": \"turnover_threshold_exceeded\",\n              \"args\": [\n                \"c\",\n                \"fy\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"balance_sheet_threshold_exceeded\",\n              \"args\": [\n                \"c\",\n                \"fy\"\n              ],\n              \"negated\": false\n            }\n          ]\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"more_than_one_criterion_exceeded\",\n          \"args\": [\n            \"c\",\n            \"fy\"\n          ],\n          \"negated\": false\n        }\n      ],\n      \"operator\": \"implies\"\n    },\n    {\n      \"forall\": [\n        {\n          \"var\": \"c\",\n          \"type\": \"Company\"\n        },\n        {\n          \"var\": \"fy\",\n          \"type\": \"FinancialYear\"\n        }\n      ],\n      \"if\": [\n        {\n          \"and\": [\n            {\n              \"pred\": \"has_legal_personality\",\n              \"args\": [\n                \"c\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"more_than_one_criterion_exceeded\",\n              \"args\": [\n                \"c\",\n                \"fy\"\n              ],\n              \"negated\": false\n            }\n          ]\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"is_small_company\",\n          \"args\": [\n            \"c\",\n            \"fy\"\n          ],\n          \"negated\": true\n        }\n      ],\n      \"operator\": \"implies\"\n    },\n    {\n      \"forall\": [\n        {\n          \"var\": \"c\",\n          \"type\": \"Company\"\n        },\n        {\n          \"var\": \"fy\",\n          \"type\": \"FinancialYear\"\n        }\n      ],\n      \"if\": [\n        {\n          \"and\": [\n            {\n              \"pred\": \"has_legal_personality\",\n              \"args\": [\n                \"c\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"more_than_one_criterion_exceeded\",\n              \"args\": [\n                \"c\",\n                \"fy\"\n              ],\n              \"negated\": true\n            }\n          ]\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"is_small_company\",\n          \"args\": [\n            \"c\",\n            \"fy\"\n          ],\n          \"negated\": false\n        }\n      ],\n      \"operator\": \"implies\"\n    },\n    {\n      \"forall\": [\n        {\n          \"var\": \"c\",\n          \"type\": \"Company\"\n        },\n        {\n          \"var\": \"fy\",\n          \"type\": \"FinancialYear\"\n        }\n      ],\n      \"if\": [\n        {\n          \"and\": [\n            {\n              \"pred\": \"is_starting_company\",\n              \"args\": [\n                \"c\",\n                \"fy\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"good_faith_estimate_exceeds_more_than_one_criterion\",\n              \"args\": [\n                \"c\",\n                \"fy\"\n              ],\n              \"negated\": false\n            }\n          ]\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"criteria_must_be_taken_into_account_immediately\",\n          \"args\": [\n            \"c\",\n            \"fy\"\n          ],\n          \"negated\": false\n        }\n      ],\n      \"operator\": \"implies\"\n    }\n  ]\n}\n\nCASE:\nBV Start commences its business. At the beginning of the first financial year, it estimates in good faith 55 employees, 12,000,000 euros net turnover excluding VAT and 5,000,000 euros balance sheet total.\n\nQUESTION:\nMust BV Start immediately take into account the exceeding of more than one criterion in the first financial year pursuant to Article 1:24, paragraph 3?",
+        "raw_extracted": {
+          "case": {
+            "facts": [
+              "is_starting_company(bv_start,fy1).",
+              "good_faith_estimate_exceeds_more_than_one_criterion(bv_start,fy1).",
+              "annual_average_employees(bv_start,fy1) = 55.",
+              "annual_net_turnover_excl_vat(bv_start,fy1) = 12000000.0.",
+              "balance_sheet_total(bv_start,fy1) = 5000000.0."
+            ],
+            "case_given_factual_inputs": [],
+            "entities": {
+              "Company": [
+                "bv_start"
+              ],
+              "FinancialYear": [
+                "fy1"
+              ]
+            }
+          },
+          "query": {
+            "type": "predicate",
+            "predicate": "more_than_one_criterion_exceeded",
+            "mode": "boolean",
+            "args": [
+              "bv_start",
+              "fy1"
+            ],
+            "explain": false,
+            "predicate_kind": "derived",
+            "query_type": "predicate_boolean",
+            "internal_intent": "deduction"
+          }
+        }
+      }
+    }
+  ]
+}

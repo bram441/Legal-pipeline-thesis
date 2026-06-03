@@ -1,0 +1,466 @@
+{
+  "query": {
+    "predicate": "risk_of_absconding",
+    "args": [
+      "rami"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "entailed",
+    "certain": true,
+    "possible": true,
+    "certainty_class": "decisive"
+  },
+  "extracted_case": {
+    "facts": [
+      "is_alien(rami).",
+      "is_subject_to_removal_procedure(rami).",
+      "used_false_information_or_documents(rami).",
+      "individual_examination_performed(rami)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "Person": [
+        "rami"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 4,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "no_residence_application_after_illegal_entry_or_stay",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 5,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "no_international_protection_application_within_time_limit",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 6,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "used_false_information_or_documents",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 7,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "committed_fraud_or_unlawful_means",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 8,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "does_not_cooperate_with_authorities",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 9,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "declared_unwillingness_to_comply_with_measure",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 10,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "failed_to_comply_with_measure",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 11,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "subject_to_unlifted_entry_ban_in_kingdom",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 12,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "subject_to_unlifted_entry_ban_in_member_state",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 13,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "submitted_new_application_immediately_after_negative_decision",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 14,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "concealed_fingerprints_in_other_state",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 15,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "submitted_multiple_applications_with_negative_outcome",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 16,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "concealed_prior_international_protection_application",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 17,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "declared_or_file_shows_purpose_other_than_application",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 18,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "subject_to_fine_for_manifestly_unlawful_appeal",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_absconding_criterion_met"
+      ]
+    },
+    {
+      "rule_index": 19,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "qualifies_as_alien",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "is_subject_to_removal_procedure",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "is_subject_to_international_protection_procedure",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "is_subject_to_responsible_member_state_determination_procedure",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "individual_examination_performed",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "at_least_one_absconding_criterion_met",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "risk_of_absconding"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 19,
+      "target": "risk_of_absconding(rami)",
+      "conditions": [
+        {
+          "atom": "qualifies_as_alien(rami)",
+          "status": "unknown"
+        },
+        {
+          "atom": "is_subject_to_removal_procedure(rami)",
+          "status": "present"
+        },
+        {
+          "atom": "is_subject_to_international_protection_procedure(rami)",
+          "status": "missing"
+        },
+        {
+          "atom": "is_subject_to_responsible_member_state_determination_procedure(rami)",
+          "status": "missing"
+        },
+        {
+          "atom": "individual_examination_performed(rami)",
+          "status": "present"
+        },
+        {
+          "atom": "at_least_one_absconding_criterion_met(rami)",
+          "status": "helper_defined"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "qualifies_as_alien",
+      "symbol_type": "predicate",
+      "atom": "qualifies_as_alien(rami)",
+      "kind": "derived",
+      "gap_status": "derivable_from_rules",
+      "assertable_in_case": false,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        0
+      ]
+    },
+    {
+      "symbol": "is_subject_to_removal_procedure",
+      "symbol_type": "predicate",
+      "atom": "is_subject_to_removal_procedure(rami)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "He is the subject of a removal procedure and has used false documents in a residence application."
+      ],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "is_subject_to_international_protection_procedure",
+      "symbol_type": "predicate",
+      "atom": "is_subject_to_international_protection_procedure(rami)",
+      "kind": "observable",
+      "gap_status": "missing_entirely",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "He is the subject of a removal procedure and has used false documents in a residence application."
+      ],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "is_subject_to_responsible_member_state_determination_procedure",
+      "symbol_type": "predicate",
+      "atom": "is_subject_to_responsible_member_state_determination_procedure(rami)",
+      "kind": "observable",
+      "gap_status": "missing_entirely",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "He is the subject of a removal procedure and has used false documents in a residence application."
+      ],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "individual_examination_performed",
+      "symbol_type": "predicate",
+      "atom": "individual_examination_performed(rami)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "at_least_one_absconding_criterion_met",
+      "symbol_type": "predicate",
+      "atom": "at_least_one_absconding_criterion_met(rami)",
+      "kind": "helper",
+      "gap_status": "derivable_from_rules",
+      "assertable_in_case": false,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ]
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "extraction_gap",
+    "secondary": [],
+    "rationale": "Assertable observables or temporal facts required by the derivation chain were not extracted from the case although the case text contains relevant qualitative evidence."
+  }
+}

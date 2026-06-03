@@ -1,0 +1,216 @@
+{
+  "types": [
+    "Person",
+    "ImmovableProperty"
+  ],
+  "predicates": [
+    {
+      "name": "is_surviving_spouse_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the surviving spouse of the second person."
+    },
+    {
+      "name": "is_heir_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is an heir of the second person."
+    },
+    {
+      "name": "property_is_leased",
+      "args": [
+        "ImmovableProperty"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The immovable property is subject to a lease."
+    },
+    {
+      "name": "served_as_family_principal_residence_at_estate_opening",
+      "args": [
+        "ImmovableProperty",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The immovable property served the family as principal residence when the estate of the person opened."
+    },
+    {
+      "name": "has_right_to_lease",
+      "args": [
+        "Person",
+        "ImmovableProperty"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "output_category": "right",
+      "description": "The person has the legal right to the lease of the immovable property."
+    },
+    {
+      "name": "excluded_from_lease_right",
+      "args": [
+        "Person",
+        "ImmovableProperty"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "output_category": "legal_effect",
+      "description": "The person is excluded from the legal right to the lease of the immovable property."
+    }
+  ],
+  "functions": [],
+  "rules": [
+    {
+      "forall": [
+        {
+          "var": "spouse",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "property",
+          "type": "ImmovableProperty"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_spouse_of",
+              "args": [
+                "spouse",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "property_is_leased",
+              "args": [
+                "property"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "served_as_family_principal_residence_at_estate_opening",
+              "args": [
+                "property",
+                "deceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "has_right_to_lease",
+          "args": [
+            "spouse",
+            "property"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "spouse",
+          "type": "Person"
+        },
+        {
+          "var": "heir",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "property",
+          "type": "ImmovableProperty"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_spouse_of",
+              "args": [
+                "spouse",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_heir_of",
+              "args": [
+                "heir",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "compare": {
+                "left": "heir",
+                "op": "!=",
+                "right": "spouse"
+              }
+            },
+            {
+              "pred": "property_is_leased",
+              "args": [
+                "property"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "served_as_family_principal_residence_at_estate_opening",
+              "args": [
+                "property",
+                "deceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "excluded_from_lease_right",
+          "args": [
+            "heir",
+            "property"
+          ],
+          "negated": false
+        },
+        {
+          "pred": "has_right_to_lease",
+          "args": [
+            "heir",
+            "property"
+          ],
+          "negated": true
+        }
+      ],
+      "operator": "implies"
+    }
+  ]
+}

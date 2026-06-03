@@ -1,0 +1,21 @@
+{
+  "model": "google/gemini-3.1-pro-preview",
+  "counts": {
+    "total": 37,
+    "valid_output": 37,
+    "invalid_output": 0,
+    "gold_available": 37,
+    "correct": 36,
+    "wrong": 1,
+    "unknown_predicted": 1,
+    "true_predicted": 24,
+    "false_predicted": 12,
+    "errors": 0,
+    "prompt_tokens": 65307,
+    "completion_tokens": 12458,
+    "total_tokens": 77765
+  },
+  "valid_output_rate": 1.0,
+  "accuracy_if_gold_available": 0.972972972972973,
+  "wrong_rate_if_gold_available": 0.02702702702702703
+}

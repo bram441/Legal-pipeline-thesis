@@ -1,0 +1,45 @@
+vocabulary V {
+  type Person
+  type Document
+  type MemberState
+  type Procedure
+  is_alien: Person -> Bool
+  is_union_citizen: Person -> Bool
+  has_community_right_of_free_movement: Person -> Bool
+  is_third_country_national: Person -> Bool
+  meets_entry_or_residence_conditions: Person -> Bool
+  is_in_illegal_residence: Person -> Bool
+  is_subject_of_removal_procedure: Person -> Bool
+  is_subject_of_international_protection_procedure: Person -> Bool
+  is_subject_of_responsibility_determination_procedure: Person -> Bool
+  individual_examination_performed: Person -> Bool
+  risk_of_absconding_is_current_and_real: Person -> Bool
+  has_risk_of_absconding: Person -> Bool
+  is_identified_alien: Person -> Bool
+  possesses_valid_travel_document: Person -> Bool
+  recognised_by_national_authority_willing_to_issue_laissez_passer: Person -> Bool
+  falls_within_ministerial_laissez_passer_nationality_category: Person -> Bool
+  criterion_no_residence_application_after_illegal_entry: Person -> Bool
+  criterion_used_false_information_or_documents: Person -> Bool
+  criterion_non_cooperation_with_authorities: Person -> Bool
+  criterion_declared_or_failed_to_comply_with_measure: Person -> Bool
+  criterion_subject_of_active_entry_ban: Person -> Bool
+  criterion_new_application_after_negative_decision: Person -> Bool
+  criterion_concealed_fingerprints_in_other_state: Person -> Bool
+  criterion_multiple_applications_with_negative_outcome: Person -> Bool
+  criterion_concealed_prior_international_protection_application: Person -> Bool
+  criterion_declared_purpose_inconsistent_with_application: Person -> Bool
+  criterion_fined_for_manifestly_unlawful_appeal: Person -> Bool
+  at_least_one_absconding_criterion_met: Person -> Bool
+  is_subject_of_relevant_procedure: Person -> Bool
+}
+
+theory T:V {
+  ! p in Person: ((is_alien(p)) & (~is_union_citizen(p)) & (~has_community_right_of_free_movement(p))) => ((is_third_country_national(p))).
+  ! p in Person: ((is_alien(p)) & (~meets_entry_or_residence_conditions(p))) => ((is_in_illegal_residence(p))).
+  ! p in Person: (((is_subject_of_removal_procedure(p)) | (is_subject_of_international_protection_procedure(p)) | (is_subject_of_responsibility_determination_procedure(p)))) => ((is_subject_of_relevant_procedure(p))).
+  ! p in Person: (((criterion_no_residence_application_after_illegal_entry(p)) | (criterion_used_false_information_or_documents(p)) | (criterion_non_cooperation_with_authorities(p)) | (criterion_declared_or_failed_to_comply_with_measure(p)) | (criterion_subject_of_active_entry_ban(p)) | (criterion_new_application_after_negative_decision(p)) | (criterion_concealed_fingerprints_in_other_state(p)) | (criterion_multiple_applications_with_negative_outcome(p)) | (criterion_concealed_prior_international_protection_application(p)) | (criterion_declared_purpose_inconsistent_with_application(p)) | (criterion_fined_for_manifestly_unlawful_appeal(p)))) => ((at_least_one_absconding_criterion_met(p))).
+  ! p in Person: ((individual_examination_performed(p)) & (at_least_one_absconding_criterion_met(p)) & (is_subject_of_relevant_procedure(p))) => ((risk_of_absconding_is_current_and_real(p))).
+  ! p in Person: ((risk_of_absconding_is_current_and_real(p))) => ((has_risk_of_absconding(p))).
+  ! p in Person: ((is_alien(p)) & ((possesses_valid_travel_document(p)) | (recognised_by_national_authority_willing_to_issue_laissez_passer(p)) | (falls_within_ministerial_laissez_passer_nationality_category(p)))) => ((is_identified_alien(p))).
+}

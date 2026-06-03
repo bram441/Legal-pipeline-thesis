@@ -1,0 +1,58 @@
+{
+  "rules": [
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "predeceased", "type": "Person"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_surviving_legally_cohabiting_partner_of", "args": ["survivor", "predeceased"], "negated": false},
+            {"pred": "is_descendant_of", "args": ["survivor", "predeceased"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "exclusion_from_foregoing_provisions_applies", "args": ["survivor", "predeceased"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "predeceased", "type": "Person"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_surviving_legally_cohabiting_partner_of", "args": ["survivor", "predeceased"], "negated": false},
+            {"pred": "exclusion_from_foregoing_provisions_applies", "args": ["survivor", "predeceased"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "foregoing_provisions_apply", "args": ["survivor", "predeceased"], "negated": true}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "predeceased", "type": "Person"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_surviving_legally_cohabiting_partner_of", "args": ["survivor", "predeceased"], "negated": false},
+            {"pred": "exclusion_from_foregoing_provisions_applies", "args": ["survivor", "predeceased"], "negated": true}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "foregoing_provisions_apply", "args": ["survivor", "predeceased"], "negated": false}
+      ],
+      "operator": "implies"
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "types": [
+    "Person"
+  ],
+  "predicates": [
+    {
+      "name": "is_surviving_legally_cohabiting_partner_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the surviving legally cohabiting partner of the second (predeceased) person."
+    },
+    {
+      "name": "is_descendant_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is a descendant of the second person."
+    },
+    {
+      "name": "exception_applies_surviving_partner_is_descendant",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The exception under par. 4 applies: the foregoing provisions do not apply because the surviving legally cohabiting partner is a descendant of the predeceased legally cohabiting partner.",
+      "legal_output": true,
+      "output_category": "exception"
+    }
+  ],
+  "functions": [],
+  "rules": [
+    {
+      "forall": [
+        {
+          "var": "survivor",
+          "type": "Person"
+        },
+        {
+          "var": "predeceased",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_legally_cohabiting_partner_of",
+              "args": [
+                "survivor",
+                "predeceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_descendant_of",
+              "args": [
+                "survivor",
+                "predeceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "exception_applies_surviving_partner_is_descendant",
+          "args": [
+            "survivor",
+            "predeceased"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    }
+  ]
+}

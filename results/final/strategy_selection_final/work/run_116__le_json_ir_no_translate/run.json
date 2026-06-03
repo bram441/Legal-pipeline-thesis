@@ -1,0 +1,20 @@
+{
+  "id": "run_116",
+  "law": {
+    "path": "example_laws_clean/microvennootschappen_clean.txt"
+  },
+  "case": {
+    "text": "BV Nova heeft rechtspersoonlijkheid. Zij is geen dochtervennootschap en geen moedervennootschap. Op balansdatum heeft zij 11 voltijdse equivalenten, een jaarlijkse netto-omzet van 850.000 euro exclusief btw en een balanstotaal van 420.000 euro."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Is BV Nova een microvennootschap volgens artikel 1:25, paragraaf 1?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "Nova exceeds only one micro threshold, employees > 10. Article 1:25 allows not more than one exceeded criterion."
+      }
+    }
+  ]
+}

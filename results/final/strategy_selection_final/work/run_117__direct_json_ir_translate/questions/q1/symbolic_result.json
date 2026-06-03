@@ -1,0 +1,218 @@
+{
+  "intent": "deduction",
+  "symbolic_status": "ok",
+  "status": "ok",
+  "scorable": true,
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "routing": {
+    "question": "Is BV Sigma a micro company pursuant to Article 1:25, paragraph 1?",
+    "detected_question_type": "boolean",
+    "selected_intent": "deduction",
+    "selected_reason": "expected.mode=boolean",
+    "scorable": true,
+    "fallback_intent": null,
+    "warnings": [],
+    "legal_output_symbols": [
+      "is_micro_company"
+    ],
+    "query_hint_type": "boolean",
+    "expected_question_type": "boolean"
+  },
+  "satisfiability_check": {
+    "stage": "pre_query",
+    "kb_case_satisfiable": true,
+    "status": "ok",
+    "details": "theory satisfiable",
+    "intent_backend": "idp_z3.tasks.satisfiable_check",
+    "duration_seconds": 0.1257
+  },
+  "warnings": [],
+  "deduction": {
+    "intent": "deduction",
+    "status": "ok",
+    "output_kind": "epistemic_boolean",
+    "predicate": "is_micro_company",
+    "args": [
+      "bv_sigma",
+      "fy_last"
+    ],
+    "possible": false,
+    "certain": false,
+    "label": "contradicted",
+    "atom": "is_micro_company(x0,x1)",
+    "constraint": "? x0 in Company, x1 in FinancialYear: __sel0(x0) & __sel1(x1) & is_micro_company(x0,x1)",
+    "certainty_class": "decisive",
+    "sat": true,
+    "internal_intent": "deduction",
+    "antecedent_coverage": [
+      {
+        "rule_index": 6,
+        "target": "is_micro_company(bv_sigma,fy_last)",
+        "conditions": [
+          {
+            "atom": "is_small_company(bv_sigma)",
+            "status": "present"
+          },
+          {
+            "atom": "has_legal_personality(bv_sigma)",
+            "status": "present"
+          },
+          {
+            "atom": "is_subsidiary(bv_sigma)",
+            "status": "present"
+          },
+          {
+            "atom": "is_parent_company(bv_sigma)",
+            "status": "present"
+          },
+          {
+            "atom": "is_last_closed_financial_year(bv_sigma,fy_last)",
+            "status": "present"
+          },
+          {
+            "atom": "more_than_one_micro_criterion_exceeded(bv_sigma,fy_last)",
+            "status": "helper_defined"
+          }
+        ]
+      },
+      {
+        "rule_index": 7,
+        "target": "is_micro_company(bv_sigma,fy_last)",
+        "conditions": [
+          {
+            "atom": "more_than_one_micro_criterion_exceeded(bv_sigma,fy_last)",
+            "status": "helper_defined"
+          }
+        ]
+      },
+      {
+        "rule_index": 8,
+        "target": "is_micro_company(bv_sigma,fy_last)",
+        "conditions": [
+          {
+            "atom": "is_last_closed_financial_year(bv_sigma,fy_last)",
+            "status": "present"
+          },
+          {
+            "atom": "is_subsidiary(bv_sigma)",
+            "status": "present"
+          }
+        ]
+      },
+      {
+        "rule_index": 9,
+        "target": "is_micro_company(bv_sigma,fy_last)",
+        "conditions": [
+          {
+            "atom": "is_last_closed_financial_year(bv_sigma,fy_last)",
+            "status": "present"
+          },
+          {
+            "atom": "is_parent_company(bv_sigma)",
+            "status": "present"
+          }
+        ]
+      }
+    ]
+  },
+  "model_expansion": null,
+  "get_range": null,
+  "satisfiable": null,
+  "explanation": null,
+  "execution_query": {
+    "type": "predicate",
+    "predicate": "is_micro_company",
+    "mode": "boolean",
+    "args": [
+      "bv_sigma",
+      "fy_last"
+    ],
+    "explain": false,
+    "predicate_kind": "derived",
+    "query_type": "predicate_boolean",
+    "internal_intent": "deduction"
+  },
+  "output_kind": "epistemic_boolean",
+  "certainty_class": "decisive",
+  "predicate": "is_micro_company",
+  "args": [
+    "bv_sigma",
+    "fy_last"
+  ],
+  "label": "contradicted",
+  "possible": false,
+  "certain": false,
+  "sat": true,
+  "antecedent_coverage": [
+    {
+      "rule_index": 6,
+      "target": "is_micro_company(bv_sigma,fy_last)",
+      "conditions": [
+        {
+          "atom": "is_small_company(bv_sigma)",
+          "status": "present"
+        },
+        {
+          "atom": "has_legal_personality(bv_sigma)",
+          "status": "present"
+        },
+        {
+          "atom": "is_subsidiary(bv_sigma)",
+          "status": "present"
+        },
+        {
+          "atom": "is_parent_company(bv_sigma)",
+          "status": "present"
+        },
+        {
+          "atom": "is_last_closed_financial_year(bv_sigma,fy_last)",
+          "status": "present"
+        },
+        {
+          "atom": "more_than_one_micro_criterion_exceeded(bv_sigma,fy_last)",
+          "status": "helper_defined"
+        }
+      ]
+    },
+    {
+      "rule_index": 7,
+      "target": "is_micro_company(bv_sigma,fy_last)",
+      "conditions": [
+        {
+          "atom": "more_than_one_micro_criterion_exceeded(bv_sigma,fy_last)",
+          "status": "helper_defined"
+        }
+      ]
+    },
+    {
+      "rule_index": 8,
+      "target": "is_micro_company(bv_sigma,fy_last)",
+      "conditions": [
+        {
+          "atom": "is_last_closed_financial_year(bv_sigma,fy_last)",
+          "status": "present"
+        },
+        {
+          "atom": "is_subsidiary(bv_sigma)",
+          "status": "present"
+        }
+      ]
+    },
+    {
+      "rule_index": 9,
+      "target": "is_micro_company(bv_sigma,fy_last)",
+      "conditions": [
+        {
+          "atom": "is_last_closed_financial_year(bv_sigma,fy_last)",
+          "status": "present"
+        },
+        {
+          "atom": "is_parent_company(bv_sigma)",
+          "status": "present"
+        }
+      ]
+    }
+  ]
+}

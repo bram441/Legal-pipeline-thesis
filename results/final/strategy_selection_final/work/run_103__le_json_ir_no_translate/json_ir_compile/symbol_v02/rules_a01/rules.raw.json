@@ -1,0 +1,45 @@
+{
+  "rules": [
+    {
+      "forall": [
+        {"var": "spouse", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "estate", "type": "Estate"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_surviving_spouse_of", "args": ["spouse", "deceased"], "negated": false},
+            {"pred": "estate_belongs_to_deceased", "args": ["estate", "deceased"], "negated": false},
+            {"pred": "deceased_leaves_no_other_heirs", "args": ["deceased"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "acquires_full_ownership_of_estate", "args": ["spouse", "estate"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "spouse", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "estate", "type": "Estate"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_surviving_spouse_of", "args": ["spouse", "deceased"], "negated": false},
+            {"pred": "estate_belongs_to_deceased", "args": ["estate", "deceased"], "negated": false},
+            {"pred": "deceased_leaves_other_heirs", "args": ["deceased"], "negated": false},
+            {"pred": "other_heirs_reduce_surviving_spouse_right", "args": ["deceased"], "negated": true}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "acquires_full_ownership_of_estate", "args": ["spouse", "estate"], "negated": false}
+      ],
+      "operator": "implies"
+    }
+  ]
+}

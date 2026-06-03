@@ -1,0 +1,373 @@
+{
+  "query": {
+    "predicate": "acquires_usufruct_of",
+    "args": [
+      "hannah",
+      "woning_leuven"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "entailed",
+    "certain": true,
+    "possible": true,
+    "certainty_class": "decisive"
+  },
+  "extracted_case": {
+    "facts": [
+      "is_surviving_legal_cohabitant_of(hannah,greet).",
+      "is_heir_of(hannah,greet).",
+      "is_main_family_residence_at_opening_of_estate(woning_leuven,greet).",
+      "is_household_contents_of(huisraad_woning_leuven,woning_leuven)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "Person": [
+        "greet",
+        "hannah",
+        "leuven"
+      ],
+      "Asset": [
+        "huisraad_woning_leuven",
+        "woning_leuven"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 0,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_surviving_legal_cohabitant_of",
+            "args": [
+              "survivor",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "is_heir_of",
+            "args": [
+              "survivor",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "is_main_family_residence_at_opening_of_estate",
+            "args": [
+              "residence",
+              "deceased"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "acquires_usufruct_of"
+      ]
+    },
+    {
+      "rule_index": 1,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_surviving_legal_cohabitant_of",
+            "args": [
+              "survivor",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "is_heir_of",
+            "args": [
+              "survivor",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "is_main_family_residence_at_opening_of_estate",
+            "args": [
+              "residence",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "is_household_contents_of",
+            "args": [
+              "contents",
+              "residence"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "acquires_usufruct_of"
+      ]
+    },
+    {
+      "rule_index": 2,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "subject_to_legal_reversion_4_24",
+            "args": [
+              "asset"
+            ]
+          },
+          {
+            "predicate": "subject_to_legal_reversion_4_25",
+            "args": [
+              "asset"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "subject_to_legal_reversion"
+      ]
+    },
+    {
+      "rule_index": 3,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_surviving_legal_cohabitant_of",
+            "args": [
+              "survivor",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "is_heir_of",
+            "args": [
+              "survivor",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "is_main_family_residence_at_opening_of_estate",
+            "args": [
+              "residence",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "subject_to_legal_reversion",
+            "args": [
+              "residence"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "acquires_usufruct_of"
+      ]
+    },
+    {
+      "rule_index": 4,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_surviving_legal_cohabitant_of",
+            "args": [
+              "survivor",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "is_heir_of",
+            "args": [
+              "survivor",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "is_main_family_residence_at_opening_of_estate",
+            "args": [
+              "residence",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "is_household_contents_of",
+            "args": [
+              "contents",
+              "residence"
+            ]
+          },
+          {
+            "predicate": "subject_to_legal_reversion",
+            "args": [
+              "contents"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "acquires_usufruct_of"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 0,
+      "target": "acquires_usufruct_of(hannah,woning_leuven)",
+      "conditions": [
+        {
+          "atom": "is_surviving_legal_cohabitant_of(hannah,greet)",
+          "status": "present"
+        },
+        {
+          "atom": "is_heir_of(hannah,greet)",
+          "status": "present"
+        },
+        {
+          "atom": "is_main_family_residence_at_opening_of_estate(woning_leuven,greet)",
+          "status": "present"
+        }
+      ]
+    },
+    {
+      "rule_index": 1,
+      "target": "acquires_usufruct_of(hannah,woning_leuven)",
+      "conditions": [
+        {
+          "atom": "is_surviving_legal_cohabitant_of(hannah,greet)",
+          "status": "present"
+        },
+        {
+          "atom": "is_heir_of(hannah,greet)",
+          "status": "present"
+        },
+        {
+          "atom": "is_main_family_residence_at_opening_of_estate(woning_leuven,greet)",
+          "status": "present"
+        },
+        {
+          "atom": "is_household_contents_of(woning_leuven,woning_leuven)",
+          "status": "missing_non_blocking"
+        }
+      ]
+    },
+    {
+      "rule_index": 3,
+      "target": "acquires_usufruct_of(hannah,woning_leuven)",
+      "conditions": [
+        {
+          "atom": "is_surviving_legal_cohabitant_of(hannah,greet)",
+          "status": "present"
+        },
+        {
+          "atom": "is_heir_of(hannah,greet)",
+          "status": "present"
+        },
+        {
+          "atom": "is_main_family_residence_at_opening_of_estate(woning_leuven,greet)",
+          "status": "present"
+        },
+        {
+          "atom": "subject_to_legal_reversion(woning_leuven)",
+          "status": "helper_defined"
+        }
+      ]
+    },
+    {
+      "rule_index": 4,
+      "target": "acquires_usufruct_of(hannah,woning_leuven)",
+      "conditions": [
+        {
+          "atom": "is_surviving_legal_cohabitant_of(hannah,greet)",
+          "status": "present"
+        },
+        {
+          "atom": "is_heir_of(hannah,greet)",
+          "status": "present"
+        },
+        {
+          "atom": "is_main_family_residence_at_opening_of_estate(woning_leuven,greet)",
+          "status": "present"
+        },
+        {
+          "atom": "is_household_contents_of(woning_leuven,woning_leuven)",
+          "status": "missing_non_blocking"
+        },
+        {
+          "atom": "subject_to_legal_reversion(woning_leuven)",
+          "status": "helper_defined"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "is_surviving_legal_cohabitant_of",
+      "symbol_type": "predicate",
+      "atom": "is_surviving_legal_cohabitant_of(hannah,greet)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "is_heir_of",
+      "symbol_type": "predicate",
+      "atom": "is_heir_of(hannah,greet)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "is_main_family_residence_at_opening_of_estate",
+      "symbol_type": "predicate",
+      "atom": "is_main_family_residence_at_opening_of_estate(woning_leuven,greet)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "is_household_contents_of",
+      "symbol_type": "predicate",
+      "atom": "is_household_contents_of(woning_leuven,woning_leuven)",
+      "kind": "observable",
+      "gap_status": "missing_entirely",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "subject_to_legal_reversion",
+      "symbol_type": "predicate",
+      "atom": "subject_to_legal_reversion(woning_leuven)",
+      "kind": "helper",
+      "gap_status": "derivable_from_rules",
+      "assertable_in_case": false,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        2
+      ]
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "extraction_gap",
+    "secondary": [],
+    "rationale": "Assertable observables or temporal facts required by the derivation chain were not extracted from the case although the case text contains relevant qualitative evidence."
+  }
+}

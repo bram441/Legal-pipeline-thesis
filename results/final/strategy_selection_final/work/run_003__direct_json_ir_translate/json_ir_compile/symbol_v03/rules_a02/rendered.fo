@@ -1,0 +1,30 @@
+vocabulary V {
+  type Company
+  type FinancialYear
+  has_legal_personality: Company -> Bool
+  is_small_company: Company * FinancialYear -> Bool
+  is_subsidiary: Company -> Bool
+  is_parent_company: Company -> Bool
+  employee_threshold_exceeded: Company * FinancialYear -> Bool
+  turnover_threshold_exceeded: Company * FinancialYear -> Bool
+  balance_sheet_threshold_exceeded: Company * FinancialYear -> Bool
+  more_than_one_criterion_exceeded: Company * FinancialYear -> Bool
+  previous_financial_year: FinancialYear * FinancialYear -> Bool
+  next_financial_year: FinancialYear * FinancialYear -> Bool
+  last_closed_financial_year: Company * FinancialYear -> Bool
+  is_micro_company: Company -> Bool
+  annual_average_employees: Company * FinancialYear -> Int
+  annual_net_turnover_excl_vat: Company * FinancialYear -> Real
+  balance_sheet_total: Company * FinancialYear -> Real
+}
+
+theory T:V {
+  ! c in Company, y in FinancialYear: ((last_closed_financial_year(c,y)) & (annual_average_employees(c,y) > 10)) => ((employee_threshold_exceeded(c,y))).
+  ! c in Company, y in FinancialYear: ((last_closed_financial_year(c,y)) & (annual_net_turnover_excl_vat(c,y) > 900000.0)) => ((turnover_threshold_exceeded(c,y))).
+  ! c in Company, y in FinancialYear: ((last_closed_financial_year(c,y)) & (balance_sheet_total(c,y) > 450000.0)) => ((balance_sheet_threshold_exceeded(c,y))).
+  ! c in Company, y in FinancialYear: ((((employee_threshold_exceeded(c,y)) & (turnover_threshold_exceeded(c,y))) | ((employee_threshold_exceeded(c,y)) & (balance_sheet_threshold_exceeded(c,y))) | ((turnover_threshold_exceeded(c,y)) & (balance_sheet_threshold_exceeded(c,y))))) => ((more_than_one_criterion_exceeded(c,y))).
+  ! c in Company, y in FinancialYear: ((has_legal_personality(c)) & (is_small_company(c,y)) & (~is_subsidiary(c)) & (~is_parent_company(c)) & (last_closed_financial_year(c,y)) & (~more_than_one_criterion_exceeded(c,y))) => ((is_micro_company(c))).
+  ! c in Company, y in FinancialYear: ((last_closed_financial_year(c,y)) & (more_than_one_criterion_exceeded(c,y))) => ((~is_micro_company(c))).
+  ! c in Company, y in FinancialYear: ((last_closed_financial_year(c,y)) & (is_subsidiary(c))) => ((~is_micro_company(c))).
+  ! c in Company, y in FinancialYear: ((last_closed_financial_year(c,y)) & (is_parent_company(c))) => ((~is_micro_company(c))).
+}

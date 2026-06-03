@@ -1,0 +1,14 @@
+vocabulary V {
+  type Person
+  type Estate
+  is_surviving_spouse_of: Person * Person -> Bool
+  is_estate_of: Estate * Person -> Bool
+  deceased_leaves_other_heirs: Person -> Bool
+  deceased_leaves_no_heirs: Person -> Bool
+  obtains_full_ownership_of_entire_estate: Person * Estate -> Bool
+}
+
+theory T:V {
+  ! spouse in Person, deceased in Person, estate in Estate: (((is_surviving_spouse_of(spouse,deceased)) & (is_estate_of(estate,deceased)) & (deceased_leaves_other_heirs(deceased)))) => ((obtains_full_ownership_of_entire_estate(spouse,estate))).
+  ! spouse in Person, deceased in Person, estate in Estate: (((is_surviving_spouse_of(spouse,deceased)) & (is_estate_of(estate,deceased)) & (deceased_leaves_no_heirs(deceased)))) => ((obtains_full_ownership_of_entire_estate(spouse,estate))).
+}

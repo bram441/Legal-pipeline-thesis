@@ -1,0 +1,189 @@
+{
+  "types": [
+    "Person"
+  ],
+  "predicates": [
+    {
+      "name": "is_surviving_legally_cohabiting_partner_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person is the surviving legally cohabiting partner of the second (predeceased) person.",
+      "directly_observable": true
+    },
+    {
+      "name": "is_descendant_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person is a descendant of the second person.",
+      "directly_observable": true
+    },
+    {
+      "name": "foregoing_provisions_apply",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The foregoing provisions apply to the surviving legally cohabiting partner (first arg) with respect to the predeceased legally cohabiting partner (second arg).",
+      "legal_output": true
+    },
+    {
+      "name": "exclusion_from_foregoing_provisions_applies",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The exclusion from the foregoing provisions applies because the surviving legally cohabiting partner (first arg) is a descendant of the predeceased legally cohabiting partner (second arg).",
+      "output_category": "exception"
+    }
+  ],
+  "functions": [],
+  "rules": [
+    {
+      "forall": [
+        {
+          "var": "survivor",
+          "type": "Person"
+        },
+        {
+          "var": "predeceased",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_legally_cohabiting_partner_of",
+              "args": [
+                "survivor",
+                "predeceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_descendant_of",
+              "args": [
+                "survivor",
+                "predeceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "exclusion_from_foregoing_provisions_applies",
+          "args": [
+            "survivor",
+            "predeceased"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "survivor",
+          "type": "Person"
+        },
+        {
+          "var": "predeceased",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_legally_cohabiting_partner_of",
+              "args": [
+                "survivor",
+                "predeceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "exclusion_from_foregoing_provisions_applies",
+              "args": [
+                "survivor",
+                "predeceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "foregoing_provisions_apply",
+          "args": [
+            "survivor",
+            "predeceased"
+          ],
+          "negated": true
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "survivor",
+          "type": "Person"
+        },
+        {
+          "var": "predeceased",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_legally_cohabiting_partner_of",
+              "args": [
+                "survivor",
+                "predeceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "exclusion_from_foregoing_provisions_applies",
+              "args": [
+                "survivor",
+                "predeceased"
+              ],
+              "negated": true
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "foregoing_provisions_apply",
+          "args": [
+            "survivor",
+            "predeceased"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    }
+  ]
+}

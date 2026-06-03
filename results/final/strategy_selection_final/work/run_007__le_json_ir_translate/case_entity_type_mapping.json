@@ -1,0 +1,89 @@
+{
+  "entities": {
+    "dwelling": {
+      "declared_type": "Property",
+      "resolved_type": "Property",
+      "source": "fact_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_family_principal_residence",
+          "arg_index": 0,
+          "expected_type": "Property"
+        }
+      ]
+    },
+    "mira": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_surviving_legally_cohabiting_partner_of",
+          "arg_index": 1,
+          "expected_type": "Person"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "is_family_principal_residence",
+          "arg_index": 1,
+          "expected_type": "Person"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "called_to_estate_with_heirs",
+          "arg_index": 1,
+          "expected_type": "Person"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "acquires_usufruct_of_principal_residence",
+          "arg_index": 1,
+          "expected_type": "Person"
+        }
+      ]
+    },
+    "noor": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_surviving_legally_cohabiting_partner_of",
+          "arg_index": 0,
+          "expected_type": "Person"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "called_to_estate_with_heirs",
+          "arg_index": 0,
+          "expected_type": "Person"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "acquires_usufruct_of_principal_residence",
+          "arg_index": 0,
+          "expected_type": "Person"
+        }
+      ]
+    }
+  },
+  "unmapped_entities": [],
+  "conflicts": [],
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "noor",
+      "arg_index": 0,
+      "expected_type": "Person",
+      "predicate": "acquires_usufruct_of_principal_residence"
+    },
+    {
+      "entity": "mira",
+      "arg_index": 1,
+      "expected_type": "Person",
+      "predicate": "acquires_usufruct_of_principal_residence"
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "rules": [
+    {
+      "forall": [
+        {"var": "prop", "type": "ImmovableProperty"},
+        {"var": "lease", "type": "Lease"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "served_as_family_principal_residence_at_estate_opening", "args": ["prop"], "negated": false},
+            {"pred": "property_subject_to_lease", "args": ["prop", "lease"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "property_qualifies_for_lease_right", "args": ["prop", "lease"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "person", "type": "Person"},
+        {"var": "prop", "type": "ImmovableProperty"},
+        {"var": "lease", "type": "Lease"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_surviving_spouse", "args": ["person"], "negated": false},
+            {"pred": "property_qualifies_for_lease_right", "args": ["prop", "lease"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "acquires_right_to_lease", "args": ["person", "lease"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "person", "type": "Person"},
+        {"var": "prop", "type": "ImmovableProperty"},
+        {"var": "lease", "type": "Lease"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_heir", "args": ["person"], "negated": false},
+            {"pred": "is_surviving_spouse", "args": ["person"], "negated": true},
+            {"pred": "property_qualifies_for_lease_right", "args": ["prop", "lease"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "excluded_from_lease_right", "args": ["person", "lease"], "negated": false}
+      ],
+      "operator": "implies"
+    }
+  ]
+}

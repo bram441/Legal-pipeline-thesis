@@ -1,0 +1,50 @@
+{
+  "id": "run_119",
+  "law": {
+    "path": "example_laws_clean/microvennootschappen_clean.txt"
+  },
+  "case": {
+    "text": "BV Start begint met haar bedrijf. Bij het begin van het eerste boekjaar schat zij te goeder trouw 55 werknemers, 12.000.000 euro netto-omzet exclusief btw en 5.000.000 euro balanstotaal."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Moet BV Start volgens artikel 1:24, paragraaf 3 meteen rekening houden met het overschrijden van meer dan één criterium in het eerste boekjaar?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "Under Article 1:24, a small company may exceed at most one threshold (50 employees, 11,250,000 euro turnover, 6,000,000 euro balance sheet). For a starting company, Article 1:24 par. 3 requires immediate account when the good-faith estimate exceeds more than one criterion in the first year: here 55 employees and 12,000,000 euro turnover, while the balance sheet total of 5,000,000 does not exceed 6,000,000."
+      }
+    }
+  ],
+  "kb_compile_strategy": "direct_json_ir_translate",
+  "kb_compile_backend": "json_ir",
+  "extraction_backend": "json_ir",
+  "pipeline_backend_mode": "json_ir",
+  "kb_compile_flags": {
+    "use_le": false,
+    "uses_translation": true,
+    "json_ir_generation": "symbols_then_rules"
+  },
+  "strategy_metadata": {
+    "strategy_name": "direct_json_ir_translate",
+    "canonical_strategy_name": "direct_json_ir_translate",
+    "kb_backend": "json_ir",
+    "pipeline_backend_mode": "json_ir",
+    "uses_le_intermediate": false,
+    "json_ir_generation": "symbols_then_rules",
+    "belief_scoring": false,
+    "law_scope_mode": "cited",
+    "repair_enabled": true,
+    "json_ir_structured_repair_enabled": true,
+    "json_ir_max_symbol_versions": 3,
+    "json_ir_max_rules_attempts_per_symbol_version": 2,
+    "json_ir_max_kb_llm_calls": 8,
+    "json_ir_outer_cache_retries_enabled": false,
+    "json_ir_outer_cache_max_attempts": 1,
+    "configured_translation": true,
+    "effective_translation": true,
+    "translation_source": "strategy",
+    "uses_translation": true
+  }
+}

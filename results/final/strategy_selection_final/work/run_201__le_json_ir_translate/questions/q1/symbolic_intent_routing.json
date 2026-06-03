@@ -1,0 +1,17 @@
+{
+  "question": "Does Peter have the right, pursuant to Article 4.17, paragraph 1, to the usufruct of the entire estate?",
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "scorable": true,
+  "fallback_intent": null,
+  "warnings": [],
+  "legal_output_symbols": [
+    "acquires_usufruct_of_entire_estate",
+    "leaves_adopted_children",
+    "leaves_descendants",
+    "leaves_descendants_of_adopted_children"
+  ],
+  "query_hint_type": "boolean",
+  "expected_question_type": "boolean"
+}

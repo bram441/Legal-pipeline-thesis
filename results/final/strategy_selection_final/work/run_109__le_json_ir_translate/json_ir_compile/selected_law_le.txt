@@ -1,0 +1,75 @@
+A person is an alien if the person does not provide proof that they possess Belgian nationality.
+
+A person is a third-country national if the person is not a Union citizen and the person is not a person enjoying the Community right of free movement as defined in Article 2, point 5, of the Schengen Borders Code.
+
+An alien has illegal residence if the alien is present on the territory and the alien does not meet the conditions for entry to or residence on the territory.
+
+An alien has illegal residence if the alien is present on the territory and the alien no longer meets the conditions for entry to or residence on the territory.
+
+An alien is an identified alien if the alien is in possession of a valid travel document.
+
+An alien is an identified alien if the alien is in possession of a valid passport.
+
+An alien is an identified alien if the alien is in possession of a valid identity document.
+
+An alien is an identified alien if the alien has been recognised as a national by the national authority of their country and that national authority has declared itself willing to issue a laissez-passer.
+
+An alien is an identified alien if the alien falls within the category of nationalities for which the minister may personally issue a laissez-passer.
+
+A risk of absconding exists for an alien if the alien is the subject of a removal procedure or a procedure for the granting of international protection or a procedure for determining or transferring to the Member State responsible for examining the application for international protection, and there are reasons to believe that the alien will abscond, and the risk is current and real, and the risk is established following an individual examination, and the risk is established on the basis of one or more of the objective criteria listed in paragraph 2, taking into account all circumstances specific to the case.
+
+The absconding criterion under paragraph 2(1) is met for a person if the person entered the territory illegally and did not submit a residence application following that illegal entry.
+
+The absconding criterion under paragraph 2(1) is met for a person if the person is in illegal residence and did not submit a residence application during that illegal residence.
+
+The absconding criterion under paragraph 2(1) is met for a person if the person did not make their application for international protection within the time limit provided for by this Act.
+
+The absconding criterion under paragraph 2(2) is met for a person if the person used false or misleading information in the context of a procedure for international protection, residence, removal, or refusal of entry.
+
+The absconding criterion under paragraph 2(2) is met for a person if the person used false or falsified documents in the context of a procedure for international protection, residence, removal, or refusal of entry.
+
+The absconding criterion under paragraph 2(2) is met for a person if the person committed fraud in the context of a procedure for international protection, residence, removal, or refusal of entry.
+
+The absconding criterion under paragraph 2(2) is met for a person if the person used other unlawful means in the context of a procedure for international protection, residence, removal, or refusal of entry.
+
+The absconding criterion under paragraph 2(3) is met for a person if the person does not cooperate or has not cooperated in the context of their relations with the authorities responsible for the implementation of or supervision of compliance with the regulations concerning access to the territory, residence, establishment, and removal of aliens.
+
+The absconding criterion under paragraph 2(4) is met for a person if the person has made clear that they do not wish to comply with a transfer, refusal of entry, or removal measure.
+
+The absconding criterion under paragraph 2(4) is met for a person if the person has already failed to comply with a transfer, refusal of entry, or removal measure.
+
+The absconding criterion under paragraph 2(4) is met for a person if the person has made clear that they do not wish to comply with an entry ban that has neither been lifted nor suspended.
+
+The absconding criterion under paragraph 2(4) is met for a person if the person has already failed to comply with an entry ban that has neither been lifted nor suspended.
+
+The absconding criterion under paragraph 2(4) is met for a person if the person has made clear that they do not wish to comply with a less coercive measure than a deprivation of liberty measure aimed at guaranteeing their transfer, refusal of entry, or removal, whether that measure is a liberty-restricting measure or another measure.
+
+The absconding criterion under paragraph 2(4) is met for a person if the person has already failed to comply with a less coercive measure than a deprivation of liberty measure aimed at guaranteeing their transfer, refusal of entry, or removal, whether that measure is a liberty-restricting measure or another measure.
+
+The absconding criterion under paragraph 2(4) is met for a person if the person has made clear that they do not wish to comply with a liberty-restricting measure aimed at guaranteeing public order or national security.
+
+The absconding criterion under paragraph 2(4) is met for a person if the person has already failed to comply with a liberty-restricting measure aimed at guaranteeing public order or national security.
+
+The absconding criterion under paragraph 2(4) is met for a person if the person has made clear that they do not wish to comply with a measure taken by another Member State equivalent to a transfer, refusal of entry, or removal measure, an entry ban that has neither been lifted nor suspended, a less coercive measure than a deprivation of liberty measure aimed at guaranteeing transfer, refusal of entry, or removal, or a liberty-restricting measure aimed at guaranteeing public order or national security.
+
+The absconding criterion under paragraph 2(4) is met for a person if the person has already failed to comply with a measure taken by another Member State equivalent to a transfer, refusal of entry, or removal measure, an entry ban that has neither been lifted nor suspended, a less coercive measure than a deprivation of liberty measure aimed at guaranteeing transfer, refusal of entry, or removal, or a liberty-restricting measure aimed at guaranteeing public order or national security.
+
+The absconding criterion under paragraph 2(5) is met for a person if the person is the subject of an entry ban in the Kingdom that has neither been lifted nor suspended.
+
+The absconding criterion under paragraph 2(5) is met for a person if the person is the subject of an entry ban in another Member State that has neither been lifted nor suspended.
+
+The absconding criterion under paragraph 2(6) is met for a person if the person was the subject of a decision refusing entry or residence or a decision terminating their residence and immediately after that decision the person submitted a new residence application or a new application for international protection.
+
+The absconding criterion under paragraph 2(6) is met for a person if the person was the subject of a refusal of entry or removal measure and immediately after that measure the person submitted a new residence application or a new application for international protection.
+
+The absconding criterion under paragraph 2(7) is met for a person if the person was questioned about whether they had previously provided their fingerprints in another State bound by the European regulations concerning the determination of the State responsible for examining an application for international protection after having submitted an application for international protection, and the person concealed that fact.
+
+The absconding criterion under paragraph 2(8) is met for a person if the person has submitted multiple applications for international protection or multiple residence applications in the Kingdom or in one or more other Member States, and those applications have given rise to a negative decision or have not resulted in the issuance of a residence permit.
+
+The absconding criterion under paragraph 2(9) is met for a person if the person was questioned about whether they had previously submitted an application for international protection in another State bound by the European regulations concerning the determination of the State responsible for examining an application for international protection, and the person concealed that fact.
+
+The absconding criterion under paragraph 2(10) is met for a person if the person has declared that they came to the Kingdom for purposes other than those for which they submitted an application for international protection or a residence application.
+
+The absconding criterion under paragraph 2(10) is met for a person if it appears from the person's file that they came to the Kingdom for purposes other than those for which they submitted an application for international protection or a residence application.
+
+The absconding criterion under paragraph 2(11) is met for a person if the person is the subject of a fine because they submitted a manifestly unlawful appeal to the Council for Alien Law Litigation.

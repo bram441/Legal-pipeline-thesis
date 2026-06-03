@@ -1,0 +1,61 @@
+{
+  "ignore_local_config": true,
+  "config_profile": "C:\\Users\\bramd\\Documents\\VUB\\Master Thesis\\Legal-pipeline\\config\\ablation_medium.json",
+  "json_ir": {
+    "scope_mode": "cited",
+    "allow_partial_kb": false,
+    "close_world_observables": true,
+    "max_symbol_versions": 3,
+    "max_rules_attempts_per_symbol_version": 2,
+    "max_kb_llm_calls": 8,
+    "repeated_error_limit": 2,
+    "max_rules_before_symbol_escalation": 2,
+    "allow_evidence_extension": true,
+    "max_evidence_extension_calls": 1,
+    "allow_outer_cache_retries": false
+  },
+  "le": {
+    "use_le": false
+  },
+  "extraction": {
+    "backend": "json_ir",
+    "provider": "auto",
+    "max_retries": 6,
+    "enable_domain_heuristics": false
+  },
+  "llm": {
+    "provider": "openrouter",
+    "model": "anthropic/claude-sonnet-4.6",
+    "base_url": null,
+    "use_seed": null,
+    "use_response_format": null,
+    "use_reasoning_effort": false,
+    "timeout_seconds": null
+  },
+  "openai": {
+    "temperature": 0.0,
+    "top_p": 1.0,
+    "seed": null
+  },
+  "evaluation": {
+    "belief_scoring": false,
+    "boolean_belief_threshold": 0.5,
+    "open_world_p_yes": 0.5,
+    "run_pre_query_satisfiability_check": true,
+    "continue_if_satisfiability_unsupported": true,
+    "continue_if_satisfiability_error": false,
+    "enable_intent_diagnostics_on_unknown": false,
+    "model_expansion_max_models": 3,
+    "pragmatic_factual_criteria_mode": false
+  },
+  "debug": {
+    "trace": false,
+    "quiet": true,
+    "llm_call_tracking": true
+  },
+  "llm_runtime": {
+    "provider": "openrouter",
+    "model": "anthropic/claude-sonnet-4.6",
+    "base_url_host": "openrouter.ai"
+  }
+}

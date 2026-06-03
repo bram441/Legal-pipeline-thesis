@@ -1,0 +1,16 @@
+{
+  "question": "Does Sofie fall under the definition of an alien in Article 1, paragraph 1, point 1?",
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "scorable": true,
+  "fallback_intent": null,
+  "warnings": [],
+  "legal_output_symbols": [
+    "absconding_criterion_new_application_after_negative_decision",
+    "has_illegal_residence",
+    "risk_of_absconding_exists"
+  ],
+  "query_hint_type": "boolean",
+  "expected_question_type": "boolean"
+}

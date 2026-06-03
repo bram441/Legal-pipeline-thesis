@@ -1,0 +1,85 @@
+{
+  "types": [
+    "Person",
+    "Asset"
+  ],
+  "predicates": [
+    {
+      "name": "is_surviving_legal_cohabitant_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the surviving legal cohabitant of the second person."
+    },
+    {
+      "name": "is_immovable_property",
+      "args": [
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset is immovable property."
+    },
+    {
+      "name": "served_as_principal_family_dwelling_at_estate_opening",
+      "args": [
+        "Asset",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset served as the family's principal dwelling when the estate of the person opened."
+    },
+    {
+      "name": "is_household_effect",
+      "args": [
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset is household furniture or a household effect."
+    },
+    {
+      "name": "present_in_dwelling_at_estate_opening",
+      "args": [
+        "Asset",
+        "Asset",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first asset was present in the second asset as dwelling when the estate of the person opened."
+    },
+    {
+      "name": "subject_to_legal_return_right",
+      "args": [
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The asset is subject to a right of legal return."
+    },
+    {
+      "name": "obtains_usufruct_over",
+      "args": [
+        "Person",
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "output_category": "right",
+      "description": "The person obtains usufruct over the asset as a legal right."
+    }
+  ],
+  "functions": []
+}

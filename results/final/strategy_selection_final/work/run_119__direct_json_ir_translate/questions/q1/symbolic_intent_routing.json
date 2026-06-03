@@ -1,0 +1,14 @@
+{
+  "question": "Must BV Start immediately take into account the exceeding of more than one criterion in the first financial year pursuant to Article 1:24, paragraph 3?",
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "scorable": true,
+  "fallback_intent": null,
+  "warnings": [],
+  "legal_output_symbols": [
+    "criteria_must_be_taken_into_account_immediately"
+  ],
+  "query_hint_type": "boolean",
+  "expected_question_type": "boolean"
+}

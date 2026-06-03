@@ -1,0 +1,26 @@
+{
+  "case_entities_rendered_to_domains": {
+    "FinancialYear": [
+      "boekjaar_1"
+    ],
+    "Company": [
+      "bv_start"
+    ]
+  },
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "bv_start",
+      "arg_index": 0,
+      "expected_type": "Company",
+      "predicate": "is_small_company"
+    },
+    {
+      "entity": "boekjaar_1",
+      "arg_index": 1,
+      "expected_type": "FinancialYear",
+      "predicate": "is_small_company"
+    }
+  ],
+  "unmapped_case_entities": [],
+  "pre_solver_domain_validation_errors": []
+}

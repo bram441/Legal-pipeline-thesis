@@ -1,0 +1,108 @@
+{
+  "entities": {
+    "greet": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_deceased",
+          "arg_index": 0,
+          "expected_type": "Person"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "is_longest_living_legal_cohabitant_of",
+          "arg_index": 1,
+          "expected_type": "Person"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "served_as_main_family_residence",
+          "arg_index": 1,
+          "expected_type": "Person"
+        }
+      ]
+    },
+    "hannah": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_longest_living_legal_cohabitant_of",
+          "arg_index": 0,
+          "expected_type": "Person"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "acquires_usufruct_of_immovable_property",
+          "arg_index": 0,
+          "expected_type": "Person"
+        }
+      ]
+    },
+    "huisraad_woning_leuven": {
+      "declared_type": "HouseholdGoods",
+      "resolved_type": "HouseholdGoods",
+      "source": "fact_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "household_goods_present_in",
+          "arg_index": 0,
+          "expected_type": "HouseholdGoods"
+        }
+      ]
+    },
+    "leuven": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "declared",
+      "evidence": []
+    },
+    "woning_leuven": {
+      "declared_type": "ImmovableProperty",
+      "resolved_type": "ImmovableProperty",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "served_as_main_family_residence",
+          "arg_index": 0,
+          "expected_type": "ImmovableProperty"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "household_goods_present_in",
+          "arg_index": 1,
+          "expected_type": "ImmovableProperty"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "acquires_usufruct_of_immovable_property",
+          "arg_index": 1,
+          "expected_type": "ImmovableProperty"
+        }
+      ]
+    }
+  },
+  "unmapped_entities": [],
+  "conflicts": [],
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "hannah",
+      "arg_index": 0,
+      "expected_type": "Person",
+      "predicate": "acquires_usufruct_of_immovable_property"
+    },
+    {
+      "entity": "woning_leuven",
+      "arg_index": 1,
+      "expected_type": "ImmovableProperty",
+      "predicate": "acquires_usufruct_of_immovable_property"
+    }
+  ]
+}

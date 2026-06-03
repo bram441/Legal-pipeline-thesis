@@ -1,0 +1,33 @@
+{
+  "case_entities_rendered_to_domains": {
+    "ImmovableProperty": [
+      "appartement"
+    ],
+    "Person": [
+      "lotte",
+      "milan"
+    ]
+  },
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "lotte",
+      "arg_index": 0,
+      "expected_type": "Person",
+      "predicate": "obtains_exclusive_lease_right"
+    },
+    {
+      "entity": "appartement",
+      "arg_index": 1,
+      "expected_type": "ImmovableProperty",
+      "predicate": "obtains_exclusive_lease_right"
+    },
+    {
+      "entity": "milan",
+      "arg_index": 2,
+      "expected_type": "Person",
+      "predicate": "obtains_exclusive_lease_right"
+    }
+  ],
+  "unmapped_case_entities": [],
+  "pre_solver_domain_validation_errors": []
+}

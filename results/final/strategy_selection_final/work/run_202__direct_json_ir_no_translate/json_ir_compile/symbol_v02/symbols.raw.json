@@ -1,0 +1,54 @@
+{
+  "types": ["Person", "Estate"],
+  "predicates": [
+    {
+      "name": "is_surviving_spouse_of",
+      "args": ["Person", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the surviving spouse of the second person (the deceased)."
+    },
+    {
+      "name": "leaves_descendants",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deceased person leaves descendants."
+    },
+    {
+      "name": "leaves_adopted_children",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deceased person leaves adopted children."
+    },
+    {
+      "name": "leaves_descendants_of_adopted_children",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The deceased person leaves descendants of adopted children."
+    },
+    {
+      "name": "has_qualifying_issue",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The deceased person leaves descendants, adopted children, or descendants of adopted children."
+    },
+    {
+      "name": "acquires_usufruct_of_entire_estate",
+      "args": ["Person", "Person"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The first person (surviving spouse) acquires usufruct over the entire estate of the second person (the deceased) as a legal consequence.",
+      "legal_output": true,
+      "output_category": "legal_effect"
+    }
+  ],
+  "functions": []
+}

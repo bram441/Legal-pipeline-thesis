@@ -1,0 +1,99 @@
+{
+  "intent": "deduction",
+  "symbolic_status": "ok",
+  "status": "ok",
+  "scorable": true,
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "routing": {
+    "question": "Valt Nina onder de definitie van een vreemdeling in artikel 1, paragraaf 1, punt 1?",
+    "detected_question_type": "boolean",
+    "selected_intent": "deduction",
+    "selected_reason": "expected.mode=boolean",
+    "scorable": true,
+    "fallback_intent": null,
+    "warnings": [],
+    "legal_output_symbols": [
+      "risk_of_absconding"
+    ],
+    "query_hint_type": "boolean",
+    "expected_question_type": "boolean"
+  },
+  "satisfiability_check": {
+    "stage": "pre_query",
+    "kb_case_satisfiable": true,
+    "status": "ok",
+    "details": "theory satisfiable",
+    "intent_backend": "idp_z3.tasks.satisfiable_check",
+    "duration_seconds": 0.1539
+  },
+  "warnings": [],
+  "deduction": {
+    "intent": "deduction",
+    "status": "ok",
+    "output_kind": "epistemic_boolean",
+    "predicate": "is_foreigner",
+    "args": [
+      "nina"
+    ],
+    "possible": true,
+    "certain": false,
+    "label": "unknown",
+    "atom": "is_foreigner(x0)",
+    "constraint": "? x0 in Person: __sel0(x0) & is_foreigner(x0)",
+    "certainty_class": "inconclusive",
+    "sat": true,
+    "internal_intent": "deduction",
+    "antecedent_coverage": [
+      {
+        "rule_index": 0,
+        "target": "is_foreigner(nina)",
+        "conditions": [
+          {
+            "atom": "provides_proof_of_belgian_nationality(nina)",
+            "status": "present"
+          }
+        ]
+      }
+    ]
+  },
+  "model_expansion": null,
+  "get_range": null,
+  "satisfiable": null,
+  "explanation": null,
+  "execution_query": {
+    "type": "predicate",
+    "predicate": "is_foreigner",
+    "mode": "boolean",
+    "args": [
+      "nina"
+    ],
+    "explain": false,
+    "predicate_kind": "derived",
+    "query_type": "predicate_boolean",
+    "internal_intent": "deduction"
+  },
+  "output_kind": "epistemic_boolean",
+  "certainty_class": "inconclusive",
+  "predicate": "is_foreigner",
+  "args": [
+    "nina"
+  ],
+  "label": "unknown",
+  "possible": true,
+  "certain": false,
+  "sat": true,
+  "antecedent_coverage": [
+    {
+      "rule_index": 0,
+      "target": "is_foreigner(nina)",
+      "conditions": [
+        {
+          "atom": "provides_proof_of_belgian_nationality(nina)",
+          "status": "present"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+vocabulary V {
+  type Company
+  type FinancialYear
+  has_legal_personality: Company -> Bool
+  employee_criterion_exceeded: Company * FinancialYear -> Bool
+  turnover_criterion_exceeded: Company * FinancialYear -> Bool
+  balance_sheet_criterion_exceeded: Company * FinancialYear -> Bool
+  more_than_one_small_company_criterion_exceeded: Company * FinancialYear -> Bool
+  is_small_company: Company * FinancialYear -> Bool
+  is_last_closed_financial_year: Company * FinancialYear -> Bool
+  annual_average_employees: Company * FinancialYear -> Int
+  annual_net_turnover_excl_vat: Company * FinancialYear -> Real
+  balance_sheet_total: Company * FinancialYear -> Real
+}
+
+theory T:V {
+  ! c in Company, y in FinancialYear: ((is_last_closed_financial_year(c,y)) & (annual_average_employees(c,y) > 50)) => ((employee_criterion_exceeded(c,y))).
+  ! c in Company, y in FinancialYear: ((is_last_closed_financial_year(c,y)) & (annual_net_turnover_excl_vat(c,y) > 11250000.0)) => ((turnover_criterion_exceeded(c,y))).
+  ! c in Company, y in FinancialYear: ((is_last_closed_financial_year(c,y)) & (balance_sheet_total(c,y) > 6000000.0)) => ((balance_sheet_criterion_exceeded(c,y))).
+  ! c in Company, y in FinancialYear: ((employee_criterion_exceeded(c,y)) & (turnover_criterion_exceeded(c,y))) => ((more_than_one_small_company_criterion_exceeded(c,y))).
+  ! c in Company, y in FinancialYear: ((employee_criterion_exceeded(c,y)) & (balance_sheet_criterion_exceeded(c,y))) => ((more_than_one_small_company_criterion_exceeded(c,y))).
+  ! c in Company, y in FinancialYear: ((turnover_criterion_exceeded(c,y)) & (balance_sheet_criterion_exceeded(c,y))) => ((more_than_one_small_company_criterion_exceeded(c,y))).
+  ! c in Company, y in FinancialYear: ((has_legal_personality(c)) & (is_last_closed_financial_year(c,y)) & (~more_than_one_small_company_criterion_exceeded(c,y))) => ((is_small_company(c,y))).
+  ! c in Company, y in FinancialYear: ((is_last_closed_financial_year(c,y)) & (more_than_one_small_company_criterion_exceeded(c,y))) => ((~is_small_company(c,y))).
+}

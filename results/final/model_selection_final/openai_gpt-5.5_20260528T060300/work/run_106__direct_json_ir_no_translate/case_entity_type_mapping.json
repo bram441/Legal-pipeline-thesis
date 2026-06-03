@@ -1,0 +1,89 @@
+{
+  "entities": {
+    "appartement": {
+      "declared_type": "ImmovableProperty",
+      "resolved_type": "ImmovableProperty",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "served_as_family_principal_dwelling_at_estate_opening",
+          "arg_index": 0,
+          "expected_type": "ImmovableProperty"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "obtains_exclusive_lease_right",
+          "arg_index": 1,
+          "expected_type": "ImmovableProperty"
+        }
+      ]
+    },
+    "lotte": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_surviving_spouse_of",
+          "arg_index": 0,
+          "expected_type": "Person"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "obtains_exclusive_lease_right",
+          "arg_index": 0,
+          "expected_type": "Person"
+        }
+      ]
+    },
+    "milan": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_surviving_spouse_of",
+          "arg_index": 1,
+          "expected_type": "Person"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "served_as_family_principal_dwelling_at_estate_opening",
+          "arg_index": 1,
+          "expected_type": "Person"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "obtains_exclusive_lease_right",
+          "arg_index": 2,
+          "expected_type": "Person"
+        }
+      ]
+    }
+  },
+  "unmapped_entities": [],
+  "conflicts": [],
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "lotte",
+      "arg_index": 0,
+      "expected_type": "Person",
+      "predicate": "obtains_exclusive_lease_right"
+    },
+    {
+      "entity": "appartement",
+      "arg_index": 1,
+      "expected_type": "ImmovableProperty",
+      "predicate": "obtains_exclusive_lease_right"
+    },
+    {
+      "entity": "milan",
+      "arg_index": 2,
+      "expected_type": "Person",
+      "predicate": "obtains_exclusive_lease_right"
+    }
+  ]
+}

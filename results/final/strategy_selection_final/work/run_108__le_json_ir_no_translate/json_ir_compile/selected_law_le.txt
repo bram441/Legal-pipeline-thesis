@@ -1,0 +1,45 @@
+A person is a foreigner if that person does not provide proof that they hold Belgian nationality.
+
+A person is a national of a third country if that person is not a citizen of the Union and that person is not a person who falls under Community law on free movement as defined in Article 2, point 5, of the Schengen Borders Code.
+
+A person is in illegal residence if that person is present on the territory and does not or no longer satisfies the conditions for access to or residence on the territory.
+
+A person is an identified foreigner if that person is in possession of a valid travel document, a valid passport, or a valid identity document.
+
+A person is an identified foreigner if that person has been recognised as a national by the national authority of their country and that authority has declared itself willing to issue a laissez-passer.
+
+A person is an identified foreigner if that person falls under a category of nationalities for which the minister may issue a laissez-passer directly.
+
+A risk of absconding exists for a foreigner if that foreigner is subject to a removal procedure, a procedure for granting international protection, or a procedure for determining or transferring to the member state responsible for examining the application for international protection, and there are reasons to believe that the foreigner will abscond, based on one or more objective criteria established in paragraph 2, after an individual examination and taking into account all circumstances specific to each case.
+
+A risk of absconding must be current and real.
+
+The no-application criterion is met for a foreigner if that foreigner did not submit a residence application after illegal entry or during illegal residence, or did not submit a request for international protection within the period provided by the law.
+
+The false-information criterion is met for a foreigner if that foreigner used false or misleading information, false or falsified documents, committed fraud, or used other unlawful means in the context of a procedure for international protection, residence, removal, or refoulement.
+
+The non-cooperation criterion is met for a foreigner if that foreigner does not cooperate or has not cooperated in the context of their relations with the authorities responsible for the implementation of and/or supervision of compliance with the regulations on access to the territory, residence, establishment, and removal of foreigners.
+
+The non-compliance criterion is met for a foreigner if that foreigner has indicated that they do not wish to comply with, or has already failed to comply with, a transfer, refoulement, or removal measure.
+
+The non-compliance criterion is met for a foreigner if that foreigner has indicated that they do not wish to comply with, or has already failed to comply with, an entry ban that has neither been lifted nor suspended.
+
+The non-compliance criterion is met for a foreigner if that foreigner has indicated that they do not wish to comply with, or has already failed to comply with, a less coercive measure than a deprivation of liberty measure aimed at guaranteeing their transfer, refoulement, or removal, whether a freedom-restricting measure or another measure.
+
+The non-compliance criterion is met for a foreigner if that foreigner has indicated that they do not wish to comply with, or has already failed to comply with, a freedom-restricting measure aimed at guaranteeing public order or national security.
+
+The non-compliance criterion is met for a foreigner if that foreigner has indicated that they do not wish to comply with, or has already failed to comply with, a measure taken by another member state that is equivalent to a transfer, refoulement, or removal measure, an entry ban, a less coercive measure, or a freedom-restricting measure as referred to above.
+
+The entry-ban criterion is met for a foreigner if that foreigner is subject to an entry ban in the Kingdom and/or in another member state that has neither been lifted nor suspended.
+
+The new-application criterion is met for a foreigner if that foreigner submitted a new residence application or a new request for international protection immediately after having been subject to a decision refusing entry or residence, a decision ending their residence, or a refoulement or removal measure.
+
+The concealed-fingerprints criterion is met for a foreigner if that foreigner, while being questioned on that point, concealed that they had already provided fingerprints in another state bound by the European regulations on determining the state responsible for examining a request for international protection, after having submitted a request for international protection.
+
+The multiple-applications criterion is met for a foreigner if that foreigner has submitted multiple requests for international protection and/or residence applications in the Kingdom or in one or more other member states that have resulted in a negative decision or have not led to the issuance of a residence permit.
+
+The concealed-prior-application criterion is met for a foreigner if that foreigner, while being questioned on that point, concealed that they had previously submitted a request for international protection in another state bound by the European regulations on determining the state responsible for examining a request for international protection.
+
+The other-purposes criterion is met for a foreigner if that foreigner has declared or if it appears from their file that they came to the Kingdom for purposes other than those for which they submitted a request for international protection or a residence application.
+
+The manifestly-unfounded-appeal criterion is met for a foreigner if that foreigner is subject to a fine because they submitted a manifestly unlawful appeal to the Council for Alien Law Litigation.

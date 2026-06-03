@@ -1,0 +1,23 @@
+vocabulary V {
+  type Person
+  type Property
+  is_surviving_legally_cohabiting_partner_of: Person * Person -> Bool
+  is_family_principal_residence: Property * Person -> Bool
+  is_household_effects_of: Property * Property -> Bool
+  called_to_estate_with_heirs: Person * Person -> Bool
+  subject_to_legal_reversion_4_24: Property -> Bool
+  subject_to_legal_reversion_4_25: Property -> Bool
+  subject_to_legal_reversion: Property -> Bool
+  acquires_usufruct_of_principal_residence: Person * Person -> Bool
+  acquires_usufruct_of_household_effects: Person * Person -> Bool
+  exercises_usufruct_of_principal_residence: Person * Property -> Bool
+  exercises_usufruct_of_household_effects: Person * Property -> Bool
+}
+
+theory T:V {
+  ! survivor in Person, deceased in Person, prop in Property: (((is_surviving_legally_cohabiting_partner_of(survivor,deceased)) & (is_family_principal_residence(prop,deceased)) & (called_to_estate_with_heirs(survivor,deceased)))) => ((acquires_usufruct_of_principal_residence(survivor,deceased))).
+  ! survivor in Person, deceased in Person, prop in Property, effects in Property: (((is_surviving_legally_cohabiting_partner_of(survivor,deceased)) & (is_family_principal_residence(prop,deceased)) & (is_household_effects_of(effects,prop)) & (called_to_estate_with_heirs(survivor,deceased)))) => ((acquires_usufruct_of_household_effects(survivor,deceased))).
+  ! prop in Property: (((subject_to_legal_reversion_4_24(prop)) | (subject_to_legal_reversion_4_25(prop)))) => ((subject_to_legal_reversion(prop))).
+  ! survivor in Person, deceased in Person, prop in Property: (((is_surviving_legally_cohabiting_partner_of(survivor,deceased)) & (is_family_principal_residence(prop,deceased)) & (acquires_usufruct_of_principal_residence(survivor,deceased)) & (subject_to_legal_reversion(prop)))) => ((exercises_usufruct_of_principal_residence(survivor,prop))).
+  ! survivor in Person, deceased in Person, prop in Property, effects in Property: (((is_surviving_legally_cohabiting_partner_of(survivor,deceased)) & (is_family_principal_residence(prop,deceased)) & (is_household_effects_of(effects,prop)) & (acquires_usufruct_of_household_effects(survivor,deceased)) & (subject_to_legal_reversion(effects)))) => ((exercises_usufruct_of_household_effects(survivor,effects))).
+}

@@ -1,0 +1,120 @@
+{
+  "intent": "deduction",
+  "symbolic_status": "ok",
+  "status": "ok",
+  "scorable": true,
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "routing": {
+    "question": "Gaan de gevolgen volgens artikel 1:24, paragraaf 2 in vanaf het boekjaar dat volgt op boekjaar 2025?",
+    "detected_question_type": "boolean",
+    "selected_intent": "deduction",
+    "selected_reason": "expected.mode=boolean",
+    "scorable": true,
+    "fallback_intent": null,
+    "warnings": [],
+    "legal_output_symbols": [
+      "gains_small_company_status_from",
+      "is_small_company",
+      "loses_small_company_status_from"
+    ],
+    "query_hint_type": "boolean",
+    "expected_question_type": "boolean"
+  },
+  "satisfiability_check": {
+    "stage": "pre_query",
+    "kb_case_satisfiable": true,
+    "status": "ok",
+    "details": "theory satisfiable",
+    "intent_backend": "idp_z3.tasks.satisfiable_check",
+    "duration_seconds": 0.1526
+  },
+  "warnings": [],
+  "deduction": {
+    "intent": "deduction",
+    "status": "ok",
+    "output_kind": "epistemic_boolean",
+    "predicate": "loses_small_company_status_from",
+    "args": [
+      "bv_horizon",
+      "financial_year_2025"
+    ],
+    "possible": true,
+    "certain": false,
+    "label": "unknown",
+    "atom": "loses_small_company_status_from(x0,x1)",
+    "constraint": "? x0 in Company, x1 in FinancialYear: __sel0(x0) & __sel1(x1) & loses_small_company_status_from(x0,x1)",
+    "certainty_class": "inconclusive",
+    "sat": true,
+    "internal_intent": "deduction",
+    "antecedent_coverage": [
+      {
+        "rule_index": 12,
+        "target": "loses_small_company_status_from(bv_horizon,financial_year_2025)",
+        "conditions": [
+          {
+            "atom": "has_legal_personality(bv_horizon)",
+            "status": "present"
+          },
+          {
+            "atom": "more_than_one_criterion_exceeded_for_two_consecutive_years",
+            "status": "unknown"
+          },
+          {
+            "atom": "next_financial_year",
+            "status": "unknown"
+          }
+        ]
+      }
+    ]
+  },
+  "model_expansion": null,
+  "get_range": null,
+  "satisfiable": null,
+  "explanation": null,
+  "execution_query": {
+    "type": "predicate",
+    "predicate": "loses_small_company_status_from",
+    "mode": "boolean",
+    "args": [
+      "bv_horizon",
+      "financial_year_2025"
+    ],
+    "explain": false,
+    "predicate_kind": "derived",
+    "query_type": "predicate_boolean",
+    "internal_intent": "deduction"
+  },
+  "output_kind": "epistemic_boolean",
+  "certainty_class": "inconclusive",
+  "predicate": "loses_small_company_status_from",
+  "args": [
+    "bv_horizon",
+    "financial_year_2025"
+  ],
+  "label": "unknown",
+  "possible": true,
+  "certain": false,
+  "sat": true,
+  "antecedent_coverage": [
+    {
+      "rule_index": 12,
+      "target": "loses_small_company_status_from(bv_horizon,financial_year_2025)",
+      "conditions": [
+        {
+          "atom": "has_legal_personality(bv_horizon)",
+          "status": "present"
+        },
+        {
+          "atom": "more_than_one_criterion_exceeded_for_two_consecutive_years",
+          "status": "unknown"
+        },
+        {
+          "atom": "next_financial_year",
+          "status": "unknown"
+        }
+      ]
+    }
+  ]
+}

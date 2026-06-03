@@ -1,0 +1,182 @@
+{
+  "cardinality_violations": [],
+  "numeric_provenance_issues": [],
+  "law_thresholds": [
+    10.0,
+    450000.0,
+    900000.0
+  ],
+  "missing_helper": {
+    "helper_name": "more_than_one_micro_criterion_exceeded",
+    "helper_signature": "Company * FinancialYear -> Bool",
+    "helper_kind": "predicate",
+    "helper_kind_hint": "cardinality",
+    "helper_kind_hints": [
+      "cardinality",
+      "threshold"
+    ],
+    "used_in_rules": [
+      {
+        "rule_index": 3,
+        "side": "if",
+        "negated": false,
+        "then_predicates": [
+          "employee_threshold_exceeded",
+          "turnover_threshold_exceeded",
+          "employee_threshold_exceeded",
+          "balance_sheet_threshold_exceeded",
+          "turnover_threshold_exceeded",
+          "balance_sheet_threshold_exceeded"
+        ],
+        "then_legal_output_predicates": []
+      },
+      {
+        "rule_index": 4,
+        "side": "if",
+        "negated": true,
+        "then_predicates": [
+          "is_micro_company"
+        ],
+        "then_legal_output_predicates": [
+          "is_micro_company"
+        ]
+      },
+      {
+        "rule_index": 5,
+        "side": "if",
+        "negated": false,
+        "then_predicates": [
+          "is_micro_company"
+        ],
+        "then_legal_output_predicates": [
+          "is_micro_company"
+        ]
+      }
+    ],
+    "derives_legal_output": true,
+    "used_in_legal_output_rule": true,
+    "legal_output_predicates_in_then": [
+      "is_micro_company"
+    ],
+    "candidate_lower_level_symbols": [
+      {
+        "name": "employee_threshold_exceeded",
+        "kind": "helper",
+        "description": "The company exceeds the annual average employee threshold of 10 in the financial year."
+      },
+      {
+        "name": "turnover_threshold_exceeded",
+        "kind": "helper",
+        "description": "The company exceeds the annual net turnover threshold of 900,000 euros (excluding VAT) in the financial year."
+      },
+      {
+        "name": "balance_sheet_threshold_exceeded",
+        "kind": "helper",
+        "description": "The company exceeds the balance sheet total threshold of 450,000 euros in the financial year."
+      },
+      {
+        "name": "is_micro_company",
+        "kind": "derived",
+        "description": "The company qualifies as a micro-company in the given financial year under the statutory definition."
+      },
+      {
+        "name": "has_legal_personality",
+        "kind": "observable",
+        "description": "The company has legal personality."
+      },
+      {
+        "name": "is_subsidiary",
+        "kind": "observable",
+        "description": "The company is a subsidiary of another company."
+      },
+      {
+        "name": "is_parent_company",
+        "kind": "observable",
+        "description": "The company is a parent company of another company."
+      },
+      {
+        "name": "is_small_company",
+        "kind": "observable",
+        "description": "The company qualifies as a small company in the given financial year."
+      },
+      {
+        "name": "annual_average_employees",
+        "kind": "observable",
+        "description": "The annual average number of employees of the company in the financial year."
+      },
+      {
+        "name": "annual_net_turnover_excl_vat",
+        "kind": "observable",
+        "description": "The annual net turnover of the company excluding value added tax in the financial year, in euros."
+      },
+      {
+        "name": "balance_sheet_total",
+        "kind": "observable",
+        "description": "The balance sheet total of the company in the financial year, in euros."
+      }
+    ],
+    "threshold_helper_candidates": [
+      {
+        "name": "employee_threshold_exceeded",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "The company exceeds the annual average employee threshold of 10 in the financial year."
+      },
+      {
+        "name": "turnover_threshold_exceeded",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "The company exceeds the annual net turnover threshold of 900,000 euros (excluding VAT) in the financial year."
+      },
+      {
+        "name": "balance_sheet_threshold_exceeded",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "The company exceeds the balance sheet total threshold of 450,000 euros in the financial year."
+      },
+      {
+        "name": "more_than_one_micro_criterion_exceeded",
+        "kind": "helper",
+        "role": "threshold_helper",
+        "description": "The company exceeds more than one of the three micro-company criteria in the financial year."
+      }
+    ],
+    "temporal_relation_candidates": [],
+    "legal_output_candidates": [
+      {
+        "name": "is_micro_company",
+        "kind": "derived",
+        "role": "legal_output",
+        "description": "The company qualifies as a micro-company in the given financial year under the statutory definition."
+      }
+    ],
+    "missing_temporal_support_symbol": true,
+    "undeclared_temporal_funcs_in_rules": [],
+    "legal_effect_context": true,
+    "is_secondary": false
+  },
+  "secondary_missing_helpers": [],
+  "computed_observable_predicate": null,
+  "computed_observable_helper_kind_hint": null,
+  "temporal_support": {
+    "detected_temporal_terms": [],
+    "requires_temporal_support": false,
+    "legal_effect_context": true,
+    "has_period_like_types": true,
+    "has_temporal_support_symbols": false,
+    "existing_period_types": [
+      "FinancialYear"
+    ],
+    "existing_temporal_symbols": [],
+    "legal_output_predicates": [
+      "is_micro_company"
+    ],
+    "missing_temporal_support_symbol": false,
+    "repair_route": null
+  },
+  "missing_temporal_support_symbol": true,
+  "repair_route": "symbols_repair_required",
+  "secondary_diagnostics_text": "missing_helper_definition (legal-effect context=True):\n  helper: more_than_one_micro_criterion_exceeded (signature=Company * FinancialYear -> Bool; kind=cardinality; hints=cardinality, threshold)\n  repair: define 'more_than_one_micro_criterion_exceeded' in THEN with rules, or reclassify as case_input/background only if safe; do not rename without defining.\n  threshold hint: prefer pairwise/conjunctive THEN definitions ((A&B) OR (A&C) OR (B&C)) for more-than-one helpers.\n  missing_temporal_support_symbol: true (escalate to symbols repair)\n  legal-output THEN predicate(s): is_micro_company\n  - rules[3].if\n  - rules[4].if negated -> THEN: is_micro_company\n  - rules[5].if -> THEN: is_micro_company\n  threshold helper candidates:\n    - employee_threshold_exceeded (helper)\n    - turnover_threshold_exceeded (helper)\n    - balance_sheet_threshold_exceeded (helper)\n    - more_than_one_micro_criterion_exceeded (helper)\n  temporal relation candidates: (none in symbol table)\n  other lower-level symbols:\n    - employee_threshold_exceeded (helper)\n    - turnover_threshold_exceeded (helper)\n    - balance_sheet_threshold_exceeded (helper)\n    - is_micro_company (derived)\n    - has_legal_personality (observable)\n    - is_subsidiary (observable)\n    - is_parent_company (observable)\n    - is_small_company (observable)\nmissing_temporal_support_symbol: true\nrepair_route: symbols_repair_required",
+  "validation_evidence_fingerprint": "22a3f1d1abb0ba6c",
+  "evidence_consumed_by_repair": false
+}

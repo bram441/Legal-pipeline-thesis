@@ -1,0 +1,26 @@
+{
+  "case_entities_rendered_to_domains": {
+    "Company": [
+      "bv_start"
+    ],
+    "FinancialYear": [
+      "eerste_boekjaar"
+    ]
+  },
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "bv_start",
+      "arg_index": 0,
+      "expected_type": "Company",
+      "predicate": "estimate_must_be_taken_into_account_immediately"
+    },
+    {
+      "entity": "eerste_boekjaar",
+      "arg_index": 1,
+      "expected_type": "FinancialYear",
+      "predicate": "estimate_must_be_taken_into_account_immediately"
+    }
+  ],
+  "unmapped_case_entities": [],
+  "pre_solver_domain_validation_errors": []
+}

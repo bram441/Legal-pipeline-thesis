@@ -1,0 +1,15 @@
+vocabulary V {
+  type Person
+  type ImmovableProperty
+  is_surviving_spouse_of: Person * Person -> Bool
+  is_heir_of: Person * Person -> Bool
+  property_is_leased: ImmovableProperty -> Bool
+  served_as_family_principal_residence_at_estate_opening: ImmovableProperty * Person -> Bool
+  has_right_to_lease: Person * ImmovableProperty -> Bool
+  excluded_from_lease_right: Person * ImmovableProperty -> Bool
+}
+
+theory T:V {
+  ! s in Person, d in Person, p in ImmovableProperty: ((is_surviving_spouse_of(s,d)) & (property_is_leased(p)) & (served_as_family_principal_residence_at_estate_opening(p,d))) => ((has_right_to_lease(s,p))).
+  ! s in Person, h in Person, d in Person, p in ImmovableProperty: ((is_surviving_spouse_of(s,d)) & (is_heir_of(h,d)) & (~is_surviving_spouse_of(h,d)) & (property_is_leased(p)) & (served_as_family_principal_residence_at_estate_opening(p,d))) => ((excluded_from_lease_right(h,p))).
+}

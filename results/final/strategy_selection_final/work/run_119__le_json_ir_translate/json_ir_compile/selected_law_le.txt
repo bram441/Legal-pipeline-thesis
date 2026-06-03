@@ -1,0 +1,35 @@
+A company has legal personality.
+
+A company is a small company if the company has legal personality and not more than one small-company criterion is exceeded for the company on the balance sheet date of the last closed financial year.
+
+The employee criterion is exceeded for a company on the balance sheet date of the last closed financial year if the annual average number of employees of the company exceeds 50.
+
+The turnover criterion is exceeded for a company on the balance sheet date of the last closed financial year if the annual net turnover of the company, exclusive of value added tax, as referred to in article 1:26/1, exceeds 11,250,000 euros.
+
+The balance sheet criterion is exceeded for a company on the balance sheet date of the last closed financial year if the balance sheet total of the company exceeds 6,000,000 euros.
+
+More than one small-company criterion is exceeded for a company on the balance sheet date of the last closed financial year if the employee criterion and the turnover criterion are both exceeded for the company on that date.
+
+More than one small-company criterion is exceeded for a company on the balance sheet date of the last closed financial year if the employee criterion and the balance sheet criterion are both exceeded for the company on that date.
+
+More than one small-company criterion is exceeded for a company on the balance sheet date of the last closed financial year if the turnover criterion and the balance sheet criterion are both exceeded for the company on that date.
+
+Not more than one small-company criterion is exceeded for a company on the balance sheet date of the last closed financial year if more than one small-company criterion is not exceeded for the company on that date.
+
+A company is a starting company if the company is starting its business.
+
+For a starting company, the small-company criteria are applied on the basis of figures estimated in good faith at the beginning of the first financial year.
+
+The estimated employee criterion is exceeded for a starting company in the first financial year if the estimated annual average number of employees exceeds 50.
+
+The estimated turnover criterion is exceeded for a starting company in the first financial year if the estimated annual net turnover, exclusive of value added tax, as referred to in article 1:26/1, exceeds 11,250,000 euros.
+
+The estimated balance sheet criterion is exceeded for a starting company in the first financial year if the estimated balance sheet total exceeds 6,000,000 euros.
+
+More than one estimated small-company criterion is exceeded for a starting company in the first financial year if the estimated employee criterion and the estimated turnover criterion are both exceeded.
+
+More than one estimated small-company criterion is exceeded for a starting company in the first financial year if the estimated employee criterion and the estimated balance sheet criterion are both exceeded.
+
+More than one estimated small-company criterion is exceeded for a starting company in the first financial year if the estimated turnover criterion and the estimated balance sheet criterion are both exceeded.
+
+A starting company is not a small company in the first financial year if more than one estimated small-company criterion is exceeded for that company in the first financial year.

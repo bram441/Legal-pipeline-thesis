@@ -1,0 +1,69 @@
+{
+  "rules": [
+    {
+      "forall": [
+        {"var": "spouse", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "estate", "type": "Estate"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_surviving_spouse_of", "args": ["spouse", "deceased"], "negated": false},
+            {"pred": "deceased_leaves_qualifying_descendants_or_adopted", "args": ["deceased"], "negated": false},
+            {"pred": "is_estate_of", "args": ["estate", "deceased"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "receives_usufruct_of_entire_estate", "args": ["spouse", "estate"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "deceased", "type": "Person"},
+        {"var": "descendant", "type": "Person"}
+      ],
+      "if": [
+        {"pred": "is_descendant_of", "args": ["descendant", "deceased"], "negated": false}
+      ],
+      "then": [
+        {"pred": "deceased_leaves_qualifying_descendants_or_adopted", "args": ["deceased"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "deceased", "type": "Person"},
+        {"var": "adopted", "type": "Person"}
+      ],
+      "if": [
+        {"pred": "is_adopted_child_of", "args": ["adopted", "deceased"], "negated": false}
+      ],
+      "then": [
+        {"pred": "deceased_leaves_qualifying_descendants_or_adopted", "args": ["deceased"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "deceased", "type": "Person"},
+        {"var": "adopted", "type": "Person"},
+        {"var": "descendant_of_adopted", "type": "Person"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_adopted_child_of", "args": ["adopted", "deceased"], "negated": false},
+            {"pred": "is_descendant_of", "args": ["descendant_of_adopted", "adopted"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "deceased_leaves_qualifying_descendants_or_adopted", "args": ["deceased"], "negated": false}
+      ],
+      "operator": "implies"
+    }
+  ]
+}

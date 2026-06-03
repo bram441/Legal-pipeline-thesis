@@ -1,0 +1,97 @@
+{
+  "rules": [
+    {
+      "forall": [
+        {
+          "var": "deceased",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "or": [
+            {
+              "pred": "leaves_behind_descendants",
+              "args": [
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "or": [
+                {
+                  "pred": "leaves_behind_adopted_children",
+                  "args": [
+                    "deceased"
+                  ],
+                  "negated": false
+                },
+                {
+                  "pred": "leaves_behind_descendants_of_adopted_children",
+                  "args": [
+                    "deceased"
+                  ],
+                  "negated": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "leaves_behind_relevant_offspring",
+          "args": [
+            "deceased"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "spouse",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_spouse_of",
+              "args": [
+                "spouse",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "leaves_behind_relevant_offspring",
+              "args": [
+                "deceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "acquires_usufruct_of_entire_estate",
+          "args": [
+            "spouse",
+            "deceased"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    }
+  ]
+}

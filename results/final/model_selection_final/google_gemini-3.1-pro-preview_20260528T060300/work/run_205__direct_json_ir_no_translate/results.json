@@ -1,0 +1,763 @@
+{
+  "id": "run_205",
+  "law": {
+    "text": "Hoofdstuk 1. Kleine vennootschappen\n\nArt. 1:24. Kleine vennootschappen\n\npar. 1. Kleine vennootschappen zijn vennootschappen met rechtspersoonlijkheid die op balansdatum van het laatst afgesloten boekjaar niet meer dan één van de volgende criteria overschrijden:\n(1) jaargemiddelde van het aantal werknemers: 50;\n(2) jaarlijkse netto-omzet als bedoeld in artikel 1:26/1, exclusief de belasting over de toegevoegde waarde: 11.250.000 euro;\n(3) balanstotaal: 6.000.000 euro.\n\npar. 2. Wanneer meer dan één van de in paragraaf 1 bedoelde criteria worden overschreden of niet meer worden overschreden, heeft dit slechts gevolgen wanneer dit zich gedurende twee achtereenvolgende boekjaren voordoet. De gevolgen gaan in dat geval in vanaf het boekjaar dat volgt op het boekjaar gedurende hetwelk meer dan één van de criteria voor de tweede keer werden overschreden of niet meer werden overschreden.\n\npar. 3. Voor vennootschappen die met hun bedrijf starten, worden voor de toepassing van de in paragraaf 1 vermelde criteria deze cijfers bij het begin van het boekjaar te goeder trouw geschat. Indien uit deze schatting blijkt dat meer dan één van de criteria zullen worden overschreden gedurende het eerste boekjaar, moet daarmee voor dat eerste boekjaar meteen rekening worden gehouden.\n\npar. 4. Heeft het boekjaar uitzonderlijk een duur van minder of meer dan twaalf maanden, waarbij deze duur niet langer kan zijn dan vierentwintig maanden min één kalenderdag, dan wordt het bedrag van de netto-omzet exclusief de belasting over de toegevoegde waarde bedoeld in paragraaf 1 vermenigvuldigd met een breuk waarvan de noemer twaalf is en de teller het aantal maanden van het betrokken boekjaar, waarbij elke begonnen maand voor een volle maand wordt geteld.\n\npar. 5. Het gemiddeld aantal tewerkgestelde werknemers, bedoeld in paragraaf 1, is het gemiddelde van het aantal werknemers uitgedrukt in voltijdse equivalenten dat is geregistreerd in de DIMONA-databank overeenkomstig het koninklijk besluit van 5 november 2002 tot invoering van een onmiddellijke aangifte van tewerkstelling, met toepassing van artikel 38 van de wet van 26 juli 1996 tot modernisering van de sociale zekerheid en tot vrijwaring van de leefbaarheid van de wettelijke pensioenstelsels, per einde van elke maand van het boekjaar, of indien de tewerkstelling niet behoort tot het toepassingsgebied van dit koninklijk besluit, het gemiddelde aantal tewerkgestelde werknemers uitgedrukt in voltijdse equivalenten van de in het algemene personeelsregister of een gelijkwaardig document ingeschreven werknemers per einde van elke maand van het beschouwde boekjaar.\n\nHet aantal werknemers uitgedrukt in voltijdse equivalenten is gelijk aan het arbeidsvolume uitgedrukt in voltijds tewerkgestelde equivalenten, te berekenen voor de deeltijdse werknemers op basis van het contractueel aantal te presteren uren, gerelateerd ten opzichte van de normale arbeidsduur van een vergelijkbare voltijdse werknemer.\n\nWanneer de opbrengsten die voortspruiten uit het gewoon bedrijf van een vennootschap voor meer dan de helft bestaan uit opbrengsten die niet aan de omschrijving beantwoorden van de post netto-omzet, dan wordt voor de toepassing van paragraaf 1 onder netto-omzet verstaan: het totaal van de bedrijfs- en financiële opbrengsten met uitsluiting van de niet-recurrente opbrengsten.\n\nHet in paragraaf 1 bedoelde balanstotaal is de totale boekwaarde van de activa zoals ze blijkt uit het balansschema dat vastgesteld is bij koninklijk besluit genomen ter uitvoering van artikel 3:1, paragraaf 1.\n\npar. 6. Als de vennootschap met één of meer andere vennootschappen is verbonden als bedoeld in artikel 1:20, worden de criteria inzake netto-omzet en balanstotaal bedoeld in paragraaf 1 berekend op geconsolideerde basis. Wat het criterium aantal werknemers betreft, wordt het aantal werknemers, berekend volgens de bepalingen van paragraaf 5, dat elk van de betrokken verbonden vennootschappen jaarlijks gemiddeld tewerkstelt, opgeteld.\n\nIndien, bij de berekening van de in paragraaf 1 genoemde grensbedragen, de in het koninklijk besluit genomen ter uitvoering van artikel 3:30, paragraaf 1, bedoelde verrekeningen en elke daaruit voortvloeiende weglating niet worden verricht, dan worden deze grensbedragen betreffende het balanstotaal en de netto-omzet vermeerderd met twintig procent.\n\npar. 7. Paragraaf 6 is niet van toepassing op andere vennootschappen dan moedervennootschappen als bedoeld in artikel 1:15, (1), behalve indien dergelijke vennootschappen zijn opgericht met als enig doel de verslaggeving van bepaalde informatie te ontwijken.\n\nVoor de toepassing van deze paragraaf en paragraaf 6 worden vennootschappen die een consortium vormen als bedoeld in artikel 1:19, gelijkgesteld met een moedervennootschap.\n\nArt. 1:25. Microvennootschappen\n\npar. 1. Onder microvennootschappen wordt verstaan: kleine vennootschappen met rechtspersoonlijkheid die geen dochtervennootschap of moedervennootschap zijn en die op balansdatum van het laatst afgesloten boekjaar niet meer dan één van de volgende criteria overschrijden:\n(1) jaargemiddelde van het aantal werknemers: 10;\n(2) jaarlijkse netto-omzet bedoeld in artikel 1:26/1, exclusief de belasting over de toegevoegde waarde: 900.000 euro;\n(3) balanstotaal: 450.000 euro.\n\npar. 2. Artikel 1:24, paragrafen 2 tot 5 en paragraaf 8, is van toepassing."
+  },
+  "kb_used": {
+    "fo": "vocabulary V {\n  type Company\n  type FinancialYear\n  is_small_company: Company * FinancialYear -> Bool\n  has_legal_personality: Company -> Bool\n  is_subsidiary: Company * FinancialYear -> Bool\n  is_parent_company: Company * FinancialYear -> Bool\n  employee_threshold_exceeded: Company * FinancialYear -> Bool\n  turnover_threshold_exceeded: Company * FinancialYear -> Bool\n  balance_sheet_threshold_exceeded: Company * FinancialYear -> Bool\n  more_than_one_criterion_exceeded: Company * FinancialYear -> Bool\n  is_micro_company: Company * FinancialYear -> Bool\n  annual_average_employees: Company * FinancialYear -> Real\n  annual_net_turnover_excluding_vat: Company * FinancialYear -> Real\n  balance_sheet_total: Company * FinancialYear -> Real\n}\n\ntheory T:V {\n  ! c in Company, fy in FinancialYear: ((annual_average_employees(c,fy) > 10.0)) => ((employee_threshold_exceeded(c,fy))).\n  ! c in Company, fy in FinancialYear: ((annual_net_turnover_excluding_vat(c,fy) > 900000.0)) => ((turnover_threshold_exceeded(c,fy))).\n  ! c in Company, fy in FinancialYear: ((balance_sheet_total(c,fy) > 450000.0)) => ((balance_sheet_threshold_exceeded(c,fy))).\n  ! c in Company, fy in FinancialYear: (((employee_threshold_exceeded(c,fy)) & (turnover_threshold_exceeded(c,fy)))) => ((more_than_one_criterion_exceeded(c,fy))).\n  ! c in Company, fy in FinancialYear: (((employee_threshold_exceeded(c,fy)) & (balance_sheet_threshold_exceeded(c,fy)))) => ((more_than_one_criterion_exceeded(c,fy))).\n  ! c in Company, fy in FinancialYear: (((turnover_threshold_exceeded(c,fy)) & (balance_sheet_threshold_exceeded(c,fy)))) => ((more_than_one_criterion_exceeded(c,fy))).\n  ! c in Company, fy in FinancialYear: (((is_small_company(c,fy)) & (has_legal_personality(c)) & (~is_subsidiary(c,fy)) & (~is_parent_company(c,fy)) & (~more_than_one_criterion_exceeded(c,fy)))) => ((is_micro_company(c,fy))).\n  ! c in Company, fy in FinancialYear: ((more_than_one_criterion_exceeded(c,fy))) => ((~is_micro_company(c,fy))).\n  ! c in Company, fy in FinancialYear: ((is_subsidiary(c,fy))) => ((~is_micro_company(c,fy))).\n  ! c in Company, fy in FinancialYear: ((is_parent_company(c,fy))) => ((~is_micro_company(c,fy))).\n}"
+  },
+  "case": {
+    "text": "BV Pico heeft rechtspersoonlijkheid. Op balansdatum van het laatst afgesloten boekjaar: 8 voltijdse equivalenten, jaarlijkse netto-omzet 700.000 euro (exclusief btw), balanstotaal 300.000 euro. BV Pico is geen moeder- of dochtervennootschap."
+  },
+  "kb_compile_strategy": "direct_json_ir_no_translate",
+  "kb_compile_backend": "json_ir",
+  "extraction_backend": "json_ir",
+  "pipeline_backend_mode": "json_ir",
+  "kb_compile_flags": {
+    "use_le": false,
+    "uses_translation": false,
+    "json_ir_generation": "symbols_then_rules"
+  },
+  "strategy_metadata": {
+    "strategy_name": "direct_json_ir_no_translate",
+    "canonical_strategy_name": "direct_json_ir_no_translate",
+    "kb_backend": "json_ir",
+    "pipeline_backend_mode": "json_ir",
+    "uses_le_intermediate": false,
+    "json_ir_generation": "symbols_then_rules",
+    "belief_scoring": false,
+    "law_scope_mode": "cited",
+    "repair_enabled": true,
+    "json_ir_structured_repair_enabled": true,
+    "json_ir_max_symbol_versions": 3,
+    "json_ir_max_rules_attempts_per_symbol_version": 2,
+    "json_ir_max_kb_llm_calls": 8,
+    "json_ir_outer_cache_retries_enabled": false,
+    "json_ir_outer_cache_max_attempts": 1,
+    "configured_translation": false,
+    "effective_translation": false,
+    "translation_source": "main_cli_no_translate",
+    "uses_translation": false
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Is BV Pico een microvennootschap volgens artikel 1:25, paragraaf 1?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "Micro-company: legal personality, not parent/subsidiary, and exceeds none of the three micro thresholds (10 employees, 900000 turnover, 450000 balance sheet)."
+      },
+      "pipeline": {
+        "sat": true,
+        "case": {
+          "facts": [
+            "has_legal_personality(bv_pico).",
+            "not is_parent_company(bv_pico,laatst_afgesloten_boekjaar).",
+            "not is_subsidiary(bv_pico,laatst_afgesloten_boekjaar).",
+            "annual_average_employees(bv_pico,laatst_afgesloten_boekjaar) = 8.0.",
+            "annual_net_turnover_excluding_vat(bv_pico,laatst_afgesloten_boekjaar) = 700000.0.",
+            "balance_sheet_total(bv_pico,laatst_afgesloten_boekjaar) = 300000.0."
+          ],
+          "case_given_factual_inputs": [],
+          "entities": {
+            "Company": [
+              "bv_pico"
+            ],
+            "FinancialYear": [
+              "laatst_afgesloten_boekjaar"
+            ]
+          },
+          "schema_environment": {
+            "types": {
+              "Company": {
+                "name": "Company",
+                "kind": "entity",
+                "aliases": [],
+                "source": "kb_symbol_table"
+              },
+              "FinancialYear": {
+                "name": "FinancialYear",
+                "kind": "period",
+                "aliases": [],
+                "source": "kb_symbol_table"
+              }
+            },
+            "predicates": {
+              "is_small_company": {
+                "name": "is_small_company",
+                "args": [
+                  "Company",
+                  "FinancialYear"
+                ],
+                "returns": "Bool",
+                "kind": "observable",
+                "description": "The company is considered a small company in the financial year.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": true,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "has_legal_personality": {
+                "name": "has_legal_personality",
+                "args": [
+                  "Company"
+                ],
+                "returns": "Bool",
+                "kind": "observable",
+                "description": "The company has legal personality.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": true,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "is_subsidiary": {
+                "name": "is_subsidiary",
+                "args": [
+                  "Company",
+                  "FinancialYear"
+                ],
+                "returns": "Bool",
+                "kind": "observable",
+                "description": "The company is a subsidiary company in the financial year.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": true,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "is_parent_company": {
+                "name": "is_parent_company",
+                "args": [
+                  "Company",
+                  "FinancialYear"
+                ],
+                "returns": "Bool",
+                "kind": "observable",
+                "description": "The company is a parent company in the financial year.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": true,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "employee_threshold_exceeded": {
+                "name": "employee_threshold_exceeded",
+                "args": [
+                  "Company",
+                  "FinancialYear"
+                ],
+                "returns": "Bool",
+                "kind": "helper",
+                "description": "The company exceeds the employee threshold in the financial year.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": false,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": false,
+                "factual_case_input": true,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": "case_given_employee_threshold_exceeded",
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "turnover_threshold_exceeded": {
+                "name": "turnover_threshold_exceeded",
+                "args": [
+                  "Company",
+                  "FinancialYear"
+                ],
+                "returns": "Bool",
+                "kind": "helper",
+                "description": "The company exceeds the turnover threshold in the financial year.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": false,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": false,
+                "factual_case_input": true,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": "case_given_turnover_threshold_exceeded",
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "balance_sheet_threshold_exceeded": {
+                "name": "balance_sheet_threshold_exceeded",
+                "args": [
+                  "Company",
+                  "FinancialYear"
+                ],
+                "returns": "Bool",
+                "kind": "helper",
+                "description": "The company exceeds the balance sheet total threshold in the financial year.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": false,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": false,
+                "factual_case_input": true,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": "case_given_balance_sheet_threshold_exceeded",
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "more_than_one_criterion_exceeded": {
+                "name": "more_than_one_criterion_exceeded",
+                "args": [
+                  "Company",
+                  "FinancialYear"
+                ],
+                "returns": "Bool",
+                "kind": "helper",
+                "description": "The company exceeds more than one of the listed criteria in the financial year.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": false,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": false,
+                "factual_case_input": true,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": "case_given_more_than_one_criterion_exceeded",
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "is_micro_company": {
+                "name": "is_micro_company",
+                "args": [
+                  "Company",
+                  "FinancialYear"
+                ],
+                "returns": "Bool",
+                "kind": "derived",
+                "description": "The company qualifies as a micro-company in the financial year.",
+                "legal_output": true,
+                "output_category": "classification",
+                "directly_observable": false,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": false,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": true,
+                "temporal_support": false
+              }
+            },
+            "functions": {
+              "annual_average_employees": {
+                "name": "annual_average_employees",
+                "args": [
+                  "Company",
+                  "FinancialYear"
+                ],
+                "returns": "Real",
+                "kind": "observable",
+                "description": "The annual average number of employees of the company in the financial year.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": false,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "annual_net_turnover_excluding_vat": {
+                "name": "annual_net_turnover_excluding_vat",
+                "args": [
+                  "Company",
+                  "FinancialYear"
+                ],
+                "returns": "Real",
+                "kind": "observable",
+                "description": "The annual net turnover excluding VAT of the company in the financial year.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": false,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "balance_sheet_total": {
+                "name": "balance_sheet_total",
+                "args": [
+                  "Company",
+                  "FinancialYear"
+                ],
+                "returns": "Real",
+                "kind": "observable",
+                "description": "The balance sheet total of the company in the financial year.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": false,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              }
+            },
+            "assertable_case_symbols": {
+              "predicates": [
+                "has_legal_personality",
+                "is_parent_company",
+                "is_small_company",
+                "is_subsidiary"
+              ],
+              "functions": [
+                "annual_average_employees",
+                "annual_net_turnover_excluding_vat",
+                "balance_sheet_total"
+              ]
+            },
+            "factual_case_input_predicates": [
+              "balance_sheet_threshold_exceeded",
+              "employee_threshold_exceeded",
+              "more_than_one_criterion_exceeded",
+              "turnover_threshold_exceeded"
+            ],
+            "factual_criteria_input_predicates": [],
+            "legal_output_query_targets": [
+              "is_micro_company"
+            ],
+            "temporal_support_symbols": []
+          },
+          "entity_type_mapping": {
+            "entities": {
+              "bv_pico": {
+                "declared_type": "Company",
+                "resolved_type": "Company",
+                "source": "fact_argument+query_argument",
+                "evidence": [
+                  {
+                    "source": "fact_argument",
+                    "symbol": "has_legal_personality",
+                    "arg_index": 0,
+                    "expected_type": "Company"
+                  },
+                  {
+                    "source": "fact_argument",
+                    "symbol": "is_parent_company",
+                    "arg_index": 0,
+                    "expected_type": "Company"
+                  },
+                  {
+                    "source": "fact_argument",
+                    "symbol": "is_subsidiary",
+                    "arg_index": 0,
+                    "expected_type": "Company"
+                  },
+                  {
+                    "source": "fact_argument",
+                    "symbol": "annual_average_employees",
+                    "arg_index": 0,
+                    "expected_type": "Company"
+                  },
+                  {
+                    "source": "fact_argument",
+                    "symbol": "annual_net_turnover_excluding_vat",
+                    "arg_index": 0,
+                    "expected_type": "Company"
+                  },
+                  {
+                    "source": "fact_argument",
+                    "symbol": "balance_sheet_total",
+                    "arg_index": 0,
+                    "expected_type": "Company"
+                  },
+                  {
+                    "source": "query_argument",
+                    "symbol": "is_micro_company",
+                    "arg_index": 0,
+                    "expected_type": "Company"
+                  }
+                ]
+              },
+              "laatst_afgesloten_boekjaar": {
+                "declared_type": "FinancialYear",
+                "resolved_type": "FinancialYear",
+                "source": "fact_argument+query_argument",
+                "evidence": [
+                  {
+                    "source": "fact_argument",
+                    "symbol": "is_parent_company",
+                    "arg_index": 1,
+                    "expected_type": "FinancialYear"
+                  },
+                  {
+                    "source": "fact_argument",
+                    "symbol": "is_subsidiary",
+                    "arg_index": 1,
+                    "expected_type": "FinancialYear"
+                  },
+                  {
+                    "source": "fact_argument",
+                    "symbol": "annual_average_employees",
+                    "arg_index": 1,
+                    "expected_type": "FinancialYear"
+                  },
+                  {
+                    "source": "fact_argument",
+                    "symbol": "annual_net_turnover_excluding_vat",
+                    "arg_index": 1,
+                    "expected_type": "FinancialYear"
+                  },
+                  {
+                    "source": "fact_argument",
+                    "symbol": "balance_sheet_total",
+                    "arg_index": 1,
+                    "expected_type": "FinancialYear"
+                  },
+                  {
+                    "source": "query_argument",
+                    "symbol": "is_micro_company",
+                    "arg_index": 1,
+                    "expected_type": "FinancialYear"
+                  }
+                ]
+              }
+            },
+            "unmapped_entities": [],
+            "conflicts": [],
+            "query_arguments_with_inferred_types": [
+              {
+                "entity": "bv_pico",
+                "arg_index": 0,
+                "expected_type": "Company",
+                "predicate": "is_micro_company"
+              },
+              {
+                "entity": "laatst_afgesloten_boekjaar",
+                "arg_index": 1,
+                "expected_type": "FinancialYear",
+                "predicate": "is_micro_company"
+              }
+            ]
+          },
+          "resolved_entity_domains": {
+            "Company": [
+              "bv_pico"
+            ],
+            "FinancialYear": [
+              "laatst_afgesloten_boekjaar"
+            ]
+          }
+        },
+        "query": {
+          "type": "predicate",
+          "predicate": "is_micro_company",
+          "mode": "boolean",
+          "args": [
+            "bv_pico",
+            "laatst_afgesloten_boekjaar"
+          ],
+          "explain": false,
+          "predicate_kind": "derived",
+          "query_type": "predicate_boolean",
+          "internal_intent": "deduction"
+        },
+        "symbolic_result": {
+          "intent": "deduction",
+          "symbolic_status": "ok",
+          "status": "ok",
+          "scorable": true,
+          "detected_question_type": "boolean",
+          "selected_intent": "deduction",
+          "selected_reason": "expected.mode=boolean",
+          "routing": {
+            "question": "Is BV Pico een microvennootschap volgens artikel 1:25, paragraaf 1?",
+            "detected_question_type": "boolean",
+            "selected_intent": "deduction",
+            "selected_reason": "expected.mode=boolean",
+            "scorable": true,
+            "fallback_intent": null,
+            "warnings": [],
+            "legal_output_symbols": [
+              "is_micro_company"
+            ],
+            "query_hint_type": "boolean",
+            "expected_question_type": "boolean"
+          },
+          "satisfiability_check": {
+            "stage": "pre_query",
+            "kb_case_satisfiable": true,
+            "status": "ok",
+            "details": "theory satisfiable",
+            "intent_backend": "idp_z3.tasks.satisfiable_check",
+            "duration_seconds": 0.0717
+          },
+          "warnings": [],
+          "deduction": {
+            "intent": "deduction",
+            "status": "ok",
+            "output_kind": "epistemic_boolean",
+            "predicate": "is_micro_company",
+            "args": [
+              "bv_pico",
+              "laatst_afgesloten_boekjaar"
+            ],
+            "possible": true,
+            "certain": false,
+            "label": "unknown",
+            "atom": "is_micro_company(x0,x1)",
+            "constraint": "? x0 in Company, x1 in FinancialYear: __sel0(x0) & __sel1(x1) & is_micro_company(x0,x1)",
+            "certainty_class": "inconclusive",
+            "sat": true,
+            "internal_intent": "deduction",
+            "antecedent_coverage": [
+              {
+                "rule_index": 6,
+                "target": "is_micro_company(bv_pico,laatst_afgesloten_boekjaar)",
+                "conditions": [
+                  {
+                    "atom": "is_small_company(bv_pico,laatst_afgesloten_boekjaar)",
+                    "status": "missing"
+                  },
+                  {
+                    "atom": "has_legal_personality(bv_pico)",
+                    "status": "present"
+                  },
+                  {
+                    "atom": "is_subsidiary(bv_pico,laatst_afgesloten_boekjaar)",
+                    "status": "present"
+                  },
+                  {
+                    "atom": "is_parent_company(bv_pico,laatst_afgesloten_boekjaar)",
+                    "status": "present"
+                  },
+                  {
+                    "atom": "more_than_one_criterion_exceeded(bv_pico,laatst_afgesloten_boekjaar)",
+                    "status": "helper_defined"
+                  }
+                ]
+              },
+              {
+                "rule_index": 7,
+                "target": "is_micro_company(bv_pico,laatst_afgesloten_boekjaar)",
+                "conditions": [
+                  {
+                    "atom": "more_than_one_criterion_exceeded(bv_pico,laatst_afgesloten_boekjaar)",
+                    "status": "helper_defined"
+                  }
+                ]
+              },
+              {
+                "rule_index": 8,
+                "target": "is_micro_company(bv_pico,laatst_afgesloten_boekjaar)",
+                "conditions": [
+                  {
+                    "atom": "is_subsidiary(bv_pico,laatst_afgesloten_boekjaar)",
+                    "status": "present"
+                  }
+                ]
+              },
+              {
+                "rule_index": 9,
+                "target": "is_micro_company(bv_pico,laatst_afgesloten_boekjaar)",
+                "conditions": [
+                  {
+                    "atom": "is_parent_company(bv_pico,laatst_afgesloten_boekjaar)",
+                    "status": "present"
+                  }
+                ]
+              }
+            ],
+            "extraction_repair_hint": "The selected legal conclusion could not be proven because an observable antecedent required by the KB rule was not asserted from the case. Re-check the case text for facts matching these observable schema symbols: is_small_company: The company is considered a small company in the financial year.."
+          },
+          "model_expansion": null,
+          "get_range": null,
+          "satisfiable": null,
+          "explanation": null,
+          "execution_query": {
+            "type": "predicate",
+            "predicate": "is_micro_company",
+            "mode": "boolean",
+            "args": [
+              "bv_pico",
+              "laatst_afgesloten_boekjaar"
+            ],
+            "explain": false,
+            "predicate_kind": "derived",
+            "query_type": "predicate_boolean",
+            "internal_intent": "deduction"
+          },
+          "output_kind": "epistemic_boolean",
+          "certainty_class": "inconclusive",
+          "predicate": "is_micro_company",
+          "args": [
+            "bv_pico",
+            "laatst_afgesloten_boekjaar"
+          ],
+          "label": "unknown",
+          "possible": true,
+          "certain": false,
+          "sat": true,
+          "antecedent_coverage": [
+            {
+              "rule_index": 6,
+              "target": "is_micro_company(bv_pico,laatst_afgesloten_boekjaar)",
+              "conditions": [
+                {
+                  "atom": "is_small_company(bv_pico,laatst_afgesloten_boekjaar)",
+                  "status": "missing"
+                },
+                {
+                  "atom": "has_legal_personality(bv_pico)",
+                  "status": "present"
+                },
+                {
+                  "atom": "is_subsidiary(bv_pico,laatst_afgesloten_boekjaar)",
+                  "status": "present"
+                },
+                {
+                  "atom": "is_parent_company(bv_pico,laatst_afgesloten_boekjaar)",
+                  "status": "present"
+                },
+                {
+                  "atom": "more_than_one_criterion_exceeded(bv_pico,laatst_afgesloten_boekjaar)",
+                  "status": "helper_defined"
+                }
+              ]
+            },
+            {
+              "rule_index": 7,
+              "target": "is_micro_company(bv_pico,laatst_afgesloten_boekjaar)",
+              "conditions": [
+                {
+                  "atom": "more_than_one_criterion_exceeded(bv_pico,laatst_afgesloten_boekjaar)",
+                  "status": "helper_defined"
+                }
+              ]
+            },
+            {
+              "rule_index": 8,
+              "target": "is_micro_company(bv_pico,laatst_afgesloten_boekjaar)",
+              "conditions": [
+                {
+                  "atom": "is_subsidiary(bv_pico,laatst_afgesloten_boekjaar)",
+                  "status": "present"
+                }
+              ]
+            },
+            {
+              "rule_index": 9,
+              "target": "is_micro_company(bv_pico,laatst_afgesloten_boekjaar)",
+              "conditions": [
+                {
+                  "atom": "is_parent_company(bv_pico,laatst_afgesloten_boekjaar)",
+                  "status": "present"
+                }
+              ]
+            }
+          ],
+          "extraction_repair_hint": "The selected legal conclusion could not be proven because an observable antecedent required by the KB rule was not asserted from the case. Re-check the case text for facts matching these observable schema symbols: is_small_company: The company is considered a small company in the financial year.."
+        },
+        "symbolic_intent_routing": {
+          "question": "Is BV Pico een microvennootschap volgens artikel 1:25, paragraaf 1?",
+          "detected_question_type": "boolean",
+          "selected_intent": "deduction",
+          "selected_reason": "expected.mode=boolean",
+          "scorable": true,
+          "fallback_intent": null,
+          "warnings": [],
+          "legal_output_symbols": [
+            "is_micro_company"
+          ],
+          "query_hint_type": "boolean",
+          "expected_question_type": "boolean"
+        },
+        "prediction": {
+          "query_type": "predicate_boolean",
+          "internal_intent": "deduction",
+          "output_kind": "epistemic_boolean",
+          "status": "ok",
+          "certainty_class": "inconclusive",
+          "mode": "boolean",
+          "label": "unknown",
+          "belief_yes": 0.5,
+          "credence_yes_pct": 50,
+          "verdict_strength_pct": 0
+        },
+        "natural_language": "Cannot determine with certainty. is_micro_company(bv_pico, laatst_afgesloten_boekjaar) is not logically forced either way (label: unknown).",
+        "explanation": null,
+        "extraction_prompt": "You are debugging a legal extraction failure.\n\nGiven KB_SCHEMA, CASE, and QUESTION, identify the likely generic cause of failure.\nFocus on schema mismatch, missing observable facts, wrong argument order, wrong entity type, selected observable instead of derived predicate, or unsupported query shape.\n\nDo not invent new law-specific fixes.\nReturn concise bullet points and one generic repair suggestion.\n\nKB_SCHEMA:\n{\n  \"types\": [\n    \"Company\",\n    \"FinancialYear\"\n  ],\n  \"predicates\": [\n    {\n      \"name\": \"is_small_company\",\n      \"args\": [\n        \"Company\",\n        \"FinancialYear\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"observable\",\n      \"description\": \"The company is considered a small company in the financial year.\",\n      \"directly_observable\": true\n    },\n    {\n      \"name\": \"has_legal_personality\",\n      \"args\": [\n        \"Company\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"observable\",\n      \"description\": \"The company has legal personality.\",\n      \"directly_observable\": true\n    },\n    {\n      \"name\": \"is_subsidiary\",\n      \"args\": [\n        \"Company\",\n        \"FinancialYear\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"observable\",\n      \"description\": \"The company is a subsidiary company in the financial year.\",\n      \"directly_observable\": true\n    },\n    {\n      \"name\": \"is_parent_company\",\n      \"args\": [\n        \"Company\",\n        \"FinancialYear\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"observable\",\n      \"description\": \"The company is a parent company in the financial year.\",\n      \"directly_observable\": true\n    },\n    {\n      \"name\": \"employee_threshold_exceeded\",\n      \"args\": [\n        \"Company\",\n        \"FinancialYear\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"helper\",\n      \"description\": \"The company exceeds the employee threshold in the financial year.\"\n    },\n    {\n      \"name\": \"turnover_threshold_exceeded\",\n      \"args\": [\n        \"Company\",\n        \"FinancialYear\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"helper\",\n      \"description\": \"The company exceeds the turnover threshold in the financial year.\"\n    },\n    {\n      \"name\": \"balance_sheet_threshold_exceeded\",\n      \"args\": [\n        \"Company\",\n        \"FinancialYear\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"helper\",\n      \"description\": \"The company exceeds the balance sheet total threshold in the financial year.\"\n    },\n    {\n      \"name\": \"more_than_one_criterion_exceeded\",\n      \"args\": [\n        \"Company\",\n        \"FinancialYear\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"helper\",\n      \"description\": \"The company exceeds more than one of the listed criteria in the financial year.\"\n    },\n    {\n      \"name\": \"is_micro_company\",\n      \"args\": [\n        \"Company\",\n        \"FinancialYear\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"derived\",\n      \"description\": \"The company qualifies as a micro-company in the financial year.\",\n      \"legal_output\": true,\n      \"output_category\": \"classification\"\n    }\n  ],\n  \"functions\": [\n    {\n      \"name\": \"annual_average_employees\",\n      \"args\": [\n        \"Company\",\n        \"FinancialYear\"\n      ],\n      \"returns\": \"Real\",\n      \"kind\": \"observable\",\n      \"description\": \"The annual average number of employees of the company in the financial year.\"\n    },\n    {\n      \"name\": \"annual_net_turnover_excluding_vat\",\n      \"args\": [\n        \"Company\",\n        \"FinancialYear\"\n      ],\n      \"returns\": \"Real\",\n      \"kind\": \"observable\",\n      \"description\": \"The annual net turnover excluding VAT of the company in the financial year.\"\n    },\n    {\n      \"name\": \"balance_sheet_total\",\n      \"args\": [\n        \"Company\",\n        \"FinancialYear\"\n      ],\n      \"returns\": \"Real\",\n      \"kind\": \"observable\",\n      \"description\": \"The balance sheet total of the company in the financial year.\"\n    }\n  ],\n  \"rules\": [\n    {\n      \"forall\": [\n        {\n          \"var\": \"c\",\n          \"type\": \"Company\"\n        },\n        {\n          \"var\": \"fy\",\n          \"type\": \"FinancialYear\"\n        }\n      ],\n      \"if\": [\n        {\n          \"compare\": {\n            \"left\": {\n              \"func\": \"annual_average_employees\",\n              \"args\": [\n                \"c\",\n                \"fy\"\n              ]\n            },\n            \"op\": \">\",\n            \"right\": 10.0\n          }\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"employee_threshold_exceeded\",\n          \"args\": [\n            \"c\",\n            \"fy\"\n          ],\n          \"negated\": false\n        }\n      ],\n      \"operator\": \"implies\"\n    },\n    {\n      \"forall\": [\n        {\n          \"var\": \"c\",\n          \"type\": \"Company\"\n        },\n        {\n          \"var\": \"fy\",\n          \"type\": \"FinancialYear\"\n        }\n      ],\n      \"if\": [\n        {\n          \"compare\": {\n            \"left\": {\n              \"func\": \"annual_net_turnover_excluding_vat\",\n              \"args\": [\n                \"c\",\n                \"fy\"\n              ]\n            },\n            \"op\": \">\",\n            \"right\": 900000.0\n          }\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"turnover_threshold_exceeded\",\n          \"args\": [\n            \"c\",\n            \"fy\"\n          ],\n          \"negated\": false\n        }\n      ],\n      \"operator\": \"implies\"\n    },\n    {\n      \"forall\": [\n        {\n          \"var\": \"c\",\n          \"type\": \"Company\"\n        },\n        {\n          \"var\": \"fy\",\n          \"type\": \"FinancialYear\"\n        }\n      ],\n      \"if\": [\n        {\n          \"compare\": {\n            \"left\": {\n              \"func\": \"balance_sheet_total\",\n              \"args\": [\n                \"c\",\n                \"fy\"\n              ]\n            },\n            \"op\": \">\",\n            \"right\": 450000.0\n          }\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"balance_sheet_threshold_exceeded\",\n          \"args\": [\n            \"c\",\n            \"fy\"\n          ],\n          \"negated\": false\n        }\n      ],\n      \"operator\": \"implies\"\n    },\n    {\n      \"forall\": [\n        {\n          \"var\": \"c\",\n          \"type\": \"Company\"\n        },\n        {\n          \"var\": \"fy\",\n          \"type\": \"FinancialYear\"\n        }\n      ],\n      \"if\": [\n        {\n          \"and\": [\n            {\n              \"pred\": \"employee_threshold_exceeded\",\n              \"args\": [\n                \"c\",\n                \"fy\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"turnover_threshold_exceeded\",\n              \"args\": [\n                \"c\",\n                \"fy\"\n              ],\n              \"negated\": false\n            }\n          ]\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"more_than_one_criterion_exceeded\",\n          \"args\": [\n            \"c\",\n            \"fy\"\n          ],\n          \"negated\": false\n        }\n      ],\n      \"operator\": \"implies\"\n    },\n    {\n      \"forall\": [\n        {\n          \"var\": \"c\",\n          \"type\": \"Company\"\n        },\n        {\n          \"var\": \"fy\",\n          \"type\": \"FinancialYear\"\n        }\n      ],\n      \"if\": [\n        {\n          \"and\": [\n            {\n              \"pred\": \"employee_threshold_exceeded\",\n              \"args\": [\n                \"c\",\n                \"fy\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"balance_sheet_threshold_exceeded\",\n              \"args\": [\n                \"c\",\n                \"fy\"\n              ],\n              \"negated\": false\n            }\n          ]\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"more_than_one_criterion_exceeded\",\n          \"args\": [\n            \"c\",\n            \"fy\"\n          ],\n          \"negated\": false\n        }\n      ],\n      \"operator\": \"implies\"\n    },\n    {\n      \"forall\": [\n        {\n          \"var\": \"c\",\n          \"type\": \"Company\"\n        },\n        {\n          \"var\": \"fy\",\n          \"type\": \"FinancialYear\"\n        }\n      ],\n      \"if\": [\n        {\n          \"and\": [\n            {\n              \"pred\": \"turnover_threshold_exceeded\",\n              \"args\": [\n                \"c\",\n                \"fy\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"balance_sheet_threshold_exceeded\",\n              \"args\": [\n                \"c\",\n                \"fy\"\n              ],\n              \"negated\": false\n            }\n          ]\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"more_than_one_criterion_exceeded\",\n          \"args\": [\n            \"c\",\n            \"fy\"\n          ],\n          \"negated\": false\n        }\n      ],\n      \"operator\": \"implies\"\n    },\n    {\n      \"forall\": [\n        {\n          \"var\": \"c\",\n          \"type\": \"Company\"\n        },\n        {\n          \"var\": \"fy\",\n          \"type\": \"FinancialYear\"\n        }\n      ],\n      \"if\": [\n        {\n          \"and\": [\n            {\n              \"pred\": \"is_small_company\",\n              \"args\": [\n                \"c\",\n                \"fy\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"has_legal_personality\",\n              \"args\": [\n                \"c\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"is_subsidiary\",\n              \"args\": [\n                \"c\",\n                \"fy\"\n              ],\n              \"negated\": true\n            },\n            {\n              \"pred\": \"is_parent_company\",\n              \"args\": [\n                \"c\",\n                \"fy\"\n              ],\n              \"negated\": true\n            },\n            {\n              \"pred\": \"more_than_one_criterion_exceeded\",\n              \"args\": [\n                \"c\",\n                \"fy\"\n              ],\n              \"negated\": true\n            }\n          ]\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"is_micro_company\",\n          \"args\": [\n            \"c\",\n            \"fy\"\n          ],\n          \"negated\": false\n        }\n      ],\n      \"operator\": \"implies\"\n    },\n    {\n      \"forall\": [\n        {\n          \"var\": \"c\",\n          \"type\": \"Company\"\n        },\n        {\n          \"var\": \"fy\",\n          \"type\": \"FinancialYear\"\n        }\n      ],\n      \"if\": [\n        {\n          \"pred\": \"more_than_one_criterion_exceeded\",\n          \"args\": [\n            \"c\",\n            \"fy\"\n          ],\n          \"negated\": false\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"is_micro_company\",\n          \"args\": [\n            \"c\",\n            \"fy\"\n          ],\n          \"negated\": true\n        }\n      ],\n      \"operator\": \"implies\"\n    },\n    {\n      \"forall\": [\n        {\n          \"var\": \"c\",\n          \"type\": \"Company\"\n        },\n        {\n          \"var\": \"fy\",\n          \"type\": \"FinancialYear\"\n        }\n      ],\n      \"if\": [\n        {\n          \"pred\": \"is_subsidiary\",\n          \"args\": [\n            \"c\",\n            \"fy\"\n          ],\n          \"negated\": false\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"is_micro_company\",\n          \"args\": [\n            \"c\",\n            \"fy\"\n          ],\n          \"negated\": true\n        }\n      ],\n      \"operator\": \"implies\"\n    },\n    {\n      \"forall\": [\n        {\n          \"var\": \"c\",\n          \"type\": \"Company\"\n        },\n        {\n          \"var\": \"fy\",\n          \"type\": \"FinancialYear\"\n        }\n      ],\n      \"if\": [\n        {\n          \"pred\": \"is_parent_company\",\n          \"args\": [\n            \"c\",\n            \"fy\"\n          ],\n          \"negated\": false\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"is_micro_company\",\n          \"args\": [\n            \"c\",\n            \"fy\"\n          ],\n          \"negated\": true\n        }\n      ],\n      \"operator\": \"implies\"\n    }\n  ]\n}\n\nCASE:\nBV Pico heeft rechtspersoonlijkheid. Op balansdatum van het laatst afgesloten boekjaar: 8 voltijdse equivalenten, jaarlijkse netto-omzet 700.000 euro (exclusief btw), balanstotaal 300.000 euro. BV Pico is geen moeder- of dochtervennootschap.\n\nQUESTION:\nIs BV Pico een microvennootschap volgens artikel 1:25, paragraaf 1?",
+        "raw_extracted": {
+          "case": {
+            "facts": [
+              "has_legal_personality(bv_pico).",
+              "not is_parent_company(bv_pico,laatst_afgesloten_boekjaar).",
+              "not is_subsidiary(bv_pico,laatst_afgesloten_boekjaar).",
+              "annual_average_employees(bv_pico,laatst_afgesloten_boekjaar) = 8.0.",
+              "annual_net_turnover_excluding_vat(bv_pico,laatst_afgesloten_boekjaar) = 700000.0.",
+              "balance_sheet_total(bv_pico,laatst_afgesloten_boekjaar) = 300000.0."
+            ],
+            "case_given_factual_inputs": [],
+            "entities": {
+              "Company": [
+                "bv_pico",
+                "bv"
+              ],
+              "FinancialYear": [
+                "laatst_afgesloten_boekjaar"
+              ]
+            }
+          },
+          "query": {
+            "type": "predicate",
+            "predicate": "is_micro_company",
+            "mode": "boolean",
+            "args": [
+              "bv_pico",
+              "laatst_afgesloten_boekjaar"
+            ],
+            "explain": false,
+            "predicate_kind": "derived",
+            "query_type": "predicate_boolean",
+            "internal_intent": "deduction"
+          }
+        }
+      }
+    }
+  ]
+}

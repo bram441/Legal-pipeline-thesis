@@ -1,0 +1,28 @@
+{
+  "case_entities_rendered_to_domains": {
+    "ImmovableProperty": [
+      "appartement_in_gent"
+    ],
+    "Person": [
+      "gent",
+      "willem",
+      "yara"
+    ]
+  },
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "willem",
+      "arg_index": 0,
+      "expected_type": "Person",
+      "predicate": "has_right_to_lease"
+    },
+    {
+      "entity": "appartement_in_gent",
+      "arg_index": 1,
+      "expected_type": "ImmovableProperty",
+      "predicate": "has_right_to_lease"
+    }
+  ],
+  "unmapped_case_entities": [],
+  "pre_solver_domain_validation_errors": []
+}

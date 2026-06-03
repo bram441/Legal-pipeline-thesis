@@ -1,0 +1,24 @@
+{
+  "symbol_version_count": 2,
+  "rules_attempt_count": 1,
+  "total_kb_llm_calls": 4,
+  "repair_layers_used": [
+    "symbols_repair_required"
+  ],
+  "final_failure_category": null,
+  "final_normalized_error_code": "unknown_validation_error",
+  "final_normalized_error_signature": "schema::observable_in_then::is_alien",
+  "repeated_error_detected": false,
+  "repair_stalled": false,
+  "budget_exhausted": false,
+  "symbol_budget_exhausted": false,
+  "distinct_errors": [
+    "JSON_IR_SCHEMA_DESIGN_ERROR: rules[0].then: observable predicate 'is_alien' is used as a rule consequent. Observable predicates are case-input facts and should normally not be derived by legal rules. Use a derived predicate for the legal consequence, or repair the symbol table if no derived predicate exists."
+  ],
+  "validation_evidence_path": "C:\\Users\\bramd\\Documents\\VUB\\Master Thesis\\Legal-pipeline\\results\\final\\strategy_selection_final\\work\\run_008__direct_json_ir_translate\\json_ir_compile\\symbol_v01\\rules_a01\\validation_evidence.json",
+  "validation_evidence_fingerprint": "12ea5cf0b2a2e504",
+  "evidence_consumed_by_repair": false,
+  "evidence_extension_used": false,
+  "evidence_extension_calls": 0,
+  "evidence_extension_reason": null
+}

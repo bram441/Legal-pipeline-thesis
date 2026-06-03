@@ -1,0 +1,159 @@
+{
+  "query": {
+    "predicate": "acquires_usufruct_of_estate",
+    "args": [
+      "anna",
+      "bert"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "entailed",
+    "certain": true,
+    "possible": true,
+    "certainty_class": "decisive"
+  },
+  "extracted_case": {
+    "facts": [
+      "is_deceased(bert).",
+      "is_surviving_spouse_of(anna,bert).",
+      "leaves_descendants(bert)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "Person": [
+        "anna",
+        "bert"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 0,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "leaves_descendants",
+            "args": [
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "leaves_adopted_children",
+            "args": [
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "leaves_descendants_of_adopted_children",
+            "args": [
+              "deceased"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "qualifying_heirs_exist"
+      ]
+    },
+    {
+      "rule_index": 1,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_surviving_spouse_of",
+            "args": [
+              "spouse",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "is_deceased",
+            "args": [
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "qualifying_heirs_exist",
+            "args": [
+              "deceased"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "acquires_usufruct_of_estate"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 1,
+      "target": "acquires_usufruct_of_estate(anna,bert)",
+      "conditions": [
+        {
+          "atom": "is_surviving_spouse_of(anna,bert)",
+          "status": "present"
+        },
+        {
+          "atom": "is_deceased(bert)",
+          "status": "present"
+        },
+        {
+          "atom": "qualifying_heirs_exist(bert)",
+          "status": "helper_defined"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "is_surviving_spouse_of",
+      "symbol_type": "predicate",
+      "atom": "is_surviving_spouse_of(anna,bert)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "is_deceased",
+      "symbol_type": "predicate",
+      "atom": "is_deceased(bert)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "qualifying_heirs_exist",
+      "symbol_type": "predicate",
+      "atom": "qualifying_heirs_exist(bert)",
+      "kind": "helper",
+      "gap_status": "derivable_from_rules",
+      "assertable_in_case": false,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "Bert dies without a will and leaves behind two children."
+      ],
+      "deriving_rule_indices": [
+        0
+      ]
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "genuinely_under_specified_case",
+    "secondary": [],
+    "rationale": "No single blocking category identified; case may lack explicit observables for a decisive proof."
+  }
+}

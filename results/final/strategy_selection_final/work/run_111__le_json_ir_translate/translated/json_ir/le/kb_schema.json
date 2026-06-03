@@ -1,0 +1,1808 @@
+{
+  "types": [
+    "Person",
+    "Procedure"
+  ],
+  "predicates": [
+    {
+      "name": "proves_belgian_nationality",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person provides proof that they possess Belgian nationality.",
+      "directly_observable": true
+    },
+    {
+      "name": "is_alien",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The person is an alien because they do not prove Belgian nationality."
+    },
+    {
+      "name": "is_union_citizen",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person is a Union citizen (background status directly assertable from case facts).",
+      "directly_observable": true
+    },
+    {
+      "name": "enjoys_community_free_movement_right",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person enjoys the Community right of free movement as defined in Article 2(5) of the Schengen Borders Code.",
+      "directly_observable": true
+    },
+    {
+      "name": "is_third_country_national",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The person is a third-country national: not a Union citizen and not enjoying Community free movement rights."
+    },
+    {
+      "name": "meets_entry_or_stay_conditions",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person meets the conditions for entry to or stay on the territory.",
+      "directly_observable": true
+    },
+    {
+      "name": "has_illegal_stay",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The person's stay is illegal: they are an alien who does not or no longer meets entry or stay conditions.",
+      "legal_output": true
+    },
+    {
+      "name": "possesses_valid_travel_document",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person is in possession of a valid travel document, passport, or identity document.",
+      "directly_observable": true
+    },
+    {
+      "name": "national_authority_recognised_as_national",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The national authority of the person's country has recognised the person as a national and declared willingness to issue a laissez-passer.",
+      "directly_observable": true
+    },
+    {
+      "name": "falls_within_minister_laissez_passer_nationality_category",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person falls within the category of nationalities for which the minister may personally issue a laissez-passer.",
+      "directly_observable": true
+    },
+    {
+      "name": "is_identified_alien",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The person is an identified alien based on one of the three identification grounds.",
+      "legal_output": true
+    },
+    {
+      "name": "is_subject_of_removal_or_protection_procedure",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person is the subject of a removal procedure, a procedure for granting international protection, or a procedure for determining or transferring to the responsible Member State.",
+      "directly_observable": true
+    },
+    {
+      "name": "reasons_to_believe_will_abscond",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "There are reasons to believe that the alien will abscond.",
+      "directly_observable": true
+    },
+    {
+      "name": "risk_established_by_paragraph2_criteria",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The risk of absconding is established having regard to the criteria listed in paragraph 2."
+    },
+    {
+      "name": "risk_of_absconding",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "A risk of absconding exists for the alien.",
+      "legal_output": true
+    },
+    {
+      "name": "individual_examination_performed",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The risk of absconding was established following an individual examination.",
+      "directly_observable": true
+    },
+    {
+      "name": "at_least_one_paragraph2_criterion_met",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "At least one objective criterion from paragraph 2 is met for the person."
+    },
+    {
+      "name": "risk_of_absconding_current_and_real",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The risk of absconding is current and real, established by individual examination and at least one objective criterion from paragraph 2.",
+      "legal_output": true
+    },
+    {
+      "name": "criterion_2_1_met",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The objective criterion in paragraph 2(1) is met: no residence application after illegal entry or during illegal stay, or no international protection application within the time limit."
+    },
+    {
+      "name": "no_residence_application_after_illegal_entry_or_stay",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person has not submitted a residence application following their illegal entry or during their illegal stay.",
+      "directly_observable": true
+    },
+    {
+      "name": "no_protection_application_within_time_limit",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person has not made their application for international protection within the time limit provided for by the Act.",
+      "directly_observable": true
+    },
+    {
+      "name": "criterion_2_2_met",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The objective criterion in paragraph 2(2) is met: use of false information, false documents, fraud, or other unlawful means in a relevant procedure."
+    },
+    {
+      "name": "used_false_or_misleading_information",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person has used false or misleading information in the context of a procedure for international protection, residence, removal, or refusal of entry.",
+      "directly_observable": true
+    },
+    {
+      "name": "used_false_or_falsified_documents",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person has used false or falsified documents in the context of a relevant procedure.",
+      "directly_observable": true
+    },
+    {
+      "name": "committed_fraud_in_procedure",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person has committed fraud in the context of a relevant procedure.",
+      "directly_observable": true
+    },
+    {
+      "name": "used_other_unlawful_means",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person has used other unlawful means in the context of a relevant procedure.",
+      "directly_observable": true
+    },
+    {
+      "name": "criterion_2_3_met",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The objective criterion in paragraph 2(3) is met: non-cooperation with authorities responsible for access, residence, establishment, and removal."
+    },
+    {
+      "name": "does_not_cooperate_with_authorities",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person does not cooperate or has not cooperated with the authorities responsible for implementation of or supervision of compliance with regulations concerning access, residence, establishment, and removal of aliens.",
+      "directly_observable": true
+    },
+    {
+      "name": "criterion_2_4_met",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The objective criterion in paragraph 2(4) is met: declared unwillingness or prior failure to comply with a transfer, removal, entry ban, less coercive, liberty-restricting, or equivalent Member State measure."
+    },
+    {
+      "name": "declared_unwilling_to_comply_with_transfer_or_removal",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person has made clear they do not wish to comply with a transfer, refusal-of-entry, or removal measure.",
+      "directly_observable": true
+    },
+    {
+      "name": "failed_to_comply_with_transfer_or_removal",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person has already failed to comply with a transfer, refusal-of-entry, or removal measure.",
+      "directly_observable": true
+    },
+    {
+      "name": "declared_unwilling_to_comply_with_entry_ban",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person has made clear they do not wish to comply with an entry ban that has neither been lifted nor suspended.",
+      "directly_observable": true
+    },
+    {
+      "name": "failed_to_comply_with_entry_ban",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person has already failed to comply with an entry ban that has neither been lifted nor suspended.",
+      "directly_observable": true
+    },
+    {
+      "name": "declared_unwilling_to_comply_with_less_coercive_measure",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person has made clear they do not wish to comply with a less coercive measure than deprivation of liberty aimed at guaranteeing transfer, refusal of entry, or removal.",
+      "directly_observable": true
+    },
+    {
+      "name": "failed_to_comply_with_less_coercive_measure",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person has already failed to comply with a less coercive measure than deprivation of liberty aimed at guaranteeing transfer, refusal of entry, or removal.",
+      "directly_observable": true
+    },
+    {
+      "name": "declared_unwilling_to_comply_with_liberty_restricting_measure",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person has made clear they do not wish to comply with a liberty-restricting measure aimed at guaranteeing public order or national security.",
+      "directly_observable": true
+    },
+    {
+      "name": "failed_to_comply_with_liberty_restricting_measure",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person has already failed to comply with a liberty-restricting measure aimed at guaranteeing public order or national security.",
+      "directly_observable": true
+    },
+    {
+      "name": "declared_unwilling_to_comply_with_equivalent_member_state_measure",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person has made clear they do not wish to comply with a measure taken by another Member State equivalent to a transfer, removal, entry ban, less coercive, or liberty-restricting measure.",
+      "directly_observable": true
+    },
+    {
+      "name": "failed_to_comply_with_equivalent_member_state_measure",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person has already failed to comply with a measure taken by another Member State equivalent to a transfer, removal, entry ban, less coercive, or liberty-restricting measure.",
+      "directly_observable": true
+    },
+    {
+      "name": "criterion_2_5_met",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The objective criterion in paragraph 2(5) is met: the person is subject to an active entry ban in the Kingdom or another Member State."
+    },
+    {
+      "name": "subject_to_entry_ban_in_kingdom",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person is the subject of an entry ban in the Kingdom that has neither been lifted nor suspended.",
+      "directly_observable": true
+    },
+    {
+      "name": "subject_to_entry_ban_in_other_member_state",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person is the subject of an entry ban in another Member State that has neither been lifted nor suspended.",
+      "directly_observable": true
+    },
+    {
+      "name": "criterion_2_6_met",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The objective criterion in paragraph 2(6) is met: new residence or protection application submitted immediately after a refusal, termination, or removal decision."
+    },
+    {
+      "name": "new_residence_application_after_refusal_or_termination",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person has submitted a new residence application immediately after a decision refusing entry or residence or terminating their stay.",
+      "directly_observable": true
+    },
+    {
+      "name": "new_protection_application_after_refusal_or_termination",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person has submitted a new application for international protection immediately after a decision refusing entry or residence or terminating their stay.",
+      "directly_observable": true
+    },
+    {
+      "name": "new_residence_application_after_removal_measure",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person has submitted a new residence application immediately after a refusal-of-entry or removal measure.",
+      "directly_observable": true
+    },
+    {
+      "name": "new_protection_application_after_removal_measure",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person has submitted a new application for international protection immediately after a refusal-of-entry or removal measure.",
+      "directly_observable": true
+    },
+    {
+      "name": "criterion_2_7_met",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The objective criterion in paragraph 2(7) is met: the person concealed having provided fingerprints in another Dublin-bound State after submitting a protection application."
+    },
+    {
+      "name": "concealed_prior_fingerprints_in_other_state",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person, while being questioned, concealed that they had already provided fingerprints in another State bound by European regulations on determining the responsible State for examining a protection application.",
+      "directly_observable": true
+    },
+    {
+      "name": "criterion_2_8_met",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The objective criterion in paragraph 2(8) is met: multiple protection or residence applications in the Kingdom or other Member States resulting in negative decisions or no residence permit."
+    },
+    {
+      "name": "submitted_multiple_applications_with_negative_outcome",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person has submitted multiple applications for international protection or residence in the Kingdom or other Member States, resulting in negative decisions or no residence permit.",
+      "directly_observable": true
+    },
+    {
+      "name": "criterion_2_9_met",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The objective criterion in paragraph 2(9) is met: the person concealed having previously submitted a protection application in another Dublin-bound State."
+    },
+    {
+      "name": "concealed_prior_protection_application_in_other_state",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person, while being questioned, concealed that they had previously submitted an application for international protection in another State bound by European regulations on determining the responsible State.",
+      "directly_observable": true
+    },
+    {
+      "name": "criterion_2_10_met",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The objective criterion in paragraph 2(10) is met: the person declared or it appears from their file that they came to the Kingdom for purposes other than those for which they submitted a protection or residence application."
+    },
+    {
+      "name": "declared_came_for_other_purposes",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person has declared that they came to the Kingdom for purposes other than those for which they submitted a protection or residence application.",
+      "directly_observable": true
+    },
+    {
+      "name": "file_shows_came_for_other_purposes",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "It appears from the person's file that they came to the Kingdom for purposes other than those for which they submitted a protection or residence application.",
+      "directly_observable": true
+    },
+    {
+      "name": "criterion_2_11_met",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The objective criterion in paragraph 2(11) is met: the person is subject to a fine for submitting a manifestly unlawful appeal to the Council for Alien Law Litigation."
+    },
+    {
+      "name": "subject_to_fine_for_manifestly_unlawful_appeal",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The person is the subject of a fine because they submitted a manifestly unlawful appeal to the Council for Alien Law Litigation.",
+      "directly_observable": true
+    }
+  ],
+  "functions": [],
+  "rules": [
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "proves_belgian_nationality",
+          "args": [
+            "p"
+          ],
+          "negated": true
+        }
+      ],
+      "then": [
+        {
+          "pred": "is_alien",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_union_citizen",
+              "args": [
+                "p"
+              ],
+              "negated": true
+            },
+            {
+              "pred": "enjoys_community_free_movement_right",
+              "args": [
+                "p"
+              ],
+              "negated": true
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "is_third_country_national",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_alien",
+              "args": [
+                "p"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "meets_entry_or_stay_conditions",
+              "args": [
+                "p"
+              ],
+              "negated": true
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "has_illegal_stay",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "possesses_valid_travel_document",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "is_identified_alien",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "national_authority_recognised_as_national",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "is_identified_alien",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "falls_within_minister_laissez_passer_nationality_category",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "is_identified_alien",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "reasons_to_believe_will_abscond",
+              "args": [
+                "p"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_subject_of_removal_or_protection_procedure",
+              "args": [
+                "p"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "risk_established_by_paragraph2_criteria",
+              "args": [
+                "p"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "risk_of_absconding",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "at_least_one_paragraph2_criterion_met",
+              "args": [
+                "p"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "individual_examination_performed",
+              "args": [
+                "p"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "risk_established_by_paragraph2_criteria",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "risk_of_absconding",
+              "args": [
+                "p"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "individual_examination_performed",
+              "args": [
+                "p"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "at_least_one_paragraph2_criterion_met",
+              "args": [
+                "p"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "risk_of_absconding_current_and_real",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "no_residence_application_after_illegal_entry_or_stay",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_1_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "no_protection_application_within_time_limit",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_1_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "used_false_or_misleading_information",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_2_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "used_false_or_falsified_documents",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_2_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "committed_fraud_in_procedure",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_2_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "used_other_unlawful_means",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_2_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "does_not_cooperate_with_authorities",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_3_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "declared_unwilling_to_comply_with_transfer_or_removal",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_4_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "failed_to_comply_with_transfer_or_removal",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_4_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "declared_unwilling_to_comply_with_entry_ban",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_4_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "failed_to_comply_with_entry_ban",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_4_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "declared_unwilling_to_comply_with_less_coercive_measure",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_4_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "failed_to_comply_with_less_coercive_measure",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_4_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "declared_unwilling_to_comply_with_liberty_restricting_measure",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_4_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "failed_to_comply_with_liberty_restricting_measure",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_4_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "declared_unwilling_to_comply_with_equivalent_member_state_measure",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_4_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "failed_to_comply_with_equivalent_member_state_measure",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_4_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "subject_to_entry_ban_in_kingdom",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_5_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "subject_to_entry_ban_in_other_member_state",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_5_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "new_residence_application_after_refusal_or_termination",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_6_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "new_protection_application_after_refusal_or_termination",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_6_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "new_residence_application_after_removal_measure",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_6_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "new_protection_application_after_removal_measure",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_6_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "concealed_prior_fingerprints_in_other_state",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_7_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "submitted_multiple_applications_with_negative_outcome",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_8_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "concealed_prior_protection_application_in_other_state",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_9_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "declared_came_for_other_purposes",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_10_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "file_shows_came_for_other_purposes",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_10_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "pred": "subject_to_fine_for_manifestly_unlawful_appeal",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "then": [
+        {
+          "pred": "criterion_2_11_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "p",
+          "type": "Person"
+        }
+      ],
+      "if": [
+        {
+          "or": [
+            {
+              "pred": "criterion_2_1_met",
+              "args": [
+                "p"
+              ],
+              "negated": false
+            },
+            {
+              "or": [
+                {
+                  "pred": "criterion_2_2_met",
+                  "args": [
+                    "p"
+                  ],
+                  "negated": false
+                },
+                {
+                  "or": [
+                    {
+                      "pred": "criterion_2_3_met",
+                      "args": [
+                        "p"
+                      ],
+                      "negated": false
+                    },
+                    {
+                      "or": [
+                        {
+                          "pred": "criterion_2_4_met",
+                          "args": [
+                            "p"
+                          ],
+                          "negated": false
+                        },
+                        {
+                          "or": [
+                            {
+                              "pred": "criterion_2_5_met",
+                              "args": [
+                                "p"
+                              ],
+                              "negated": false
+                            },
+                            {
+                              "or": [
+                                {
+                                  "pred": "criterion_2_6_met",
+                                  "args": [
+                                    "p"
+                                  ],
+                                  "negated": false
+                                },
+                                {
+                                  "or": [
+                                    {
+                                      "pred": "criterion_2_7_met",
+                                      "args": [
+                                        "p"
+                                      ],
+                                      "negated": false
+                                    },
+                                    {
+                                      "or": [
+                                        {
+                                          "pred": "criterion_2_8_met",
+                                          "args": [
+                                            "p"
+                                          ],
+                                          "negated": false
+                                        },
+                                        {
+                                          "or": [
+                                            {
+                                              "pred": "criterion_2_9_met",
+                                              "args": [
+                                                "p"
+                                              ],
+                                              "negated": false
+                                            },
+                                            {
+                                              "or": [
+                                                {
+                                                  "pred": "criterion_2_10_met",
+                                                  "args": [
+                                                    "p"
+                                                  ],
+                                                  "negated": false
+                                                },
+                                                {
+                                                  "pred": "criterion_2_11_met",
+                                                  "args": [
+                                                    "p"
+                                                  ],
+                                                  "negated": false
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "at_least_one_paragraph2_criterion_met",
+          "args": [
+            "p"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    }
+  ]
+}

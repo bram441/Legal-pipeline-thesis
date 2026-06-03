@@ -1,0 +1,126 @@
+{
+  "intent": "deduction",
+  "symbolic_status": "ok",
+  "status": "ok",
+  "scorable": true,
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "routing": {
+    "question": "Moet BV Start volgens artikel 1:24, paragraaf 3 meteen rekening houden met het overschrijden van meer dan één criterium in het eerste boekjaar?",
+    "detected_question_type": "boolean",
+    "selected_intent": "deduction",
+    "selected_reason": "expected.mode=boolean",
+    "scorable": true,
+    "fallback_intent": null,
+    "warnings": [],
+    "legal_output_symbols": [
+      "estimate_must_be_taken_into_account_immediately"
+    ],
+    "query_hint_type": "boolean",
+    "expected_question_type": "boolean"
+  },
+  "satisfiability_check": {
+    "stage": "pre_query",
+    "kb_case_satisfiable": true,
+    "status": "ok",
+    "details": "theory satisfiable",
+    "intent_backend": "idp_z3.tasks.satisfiable_check",
+    "duration_seconds": 0.1619
+  },
+  "warnings": [],
+  "deduction": {
+    "intent": "deduction",
+    "status": "ok",
+    "output_kind": "epistemic_boolean",
+    "predicate": "estimate_must_be_taken_into_account_immediately",
+    "args": [
+      "bv_start",
+      "eerste_boekjaar"
+    ],
+    "possible": true,
+    "certain": true,
+    "label": "entailed",
+    "atom": "estimate_must_be_taken_into_account_immediately(x0,x1)",
+    "constraint": "? x0 in Company, x1 in FinancialYear: __sel0(x0) & __sel1(x1) & estimate_must_be_taken_into_account_immediately(x0,x1)",
+    "certainty_class": "decisive",
+    "sat": true,
+    "internal_intent": "deduction",
+    "antecedent_coverage": [
+      {
+        "rule_index": 18,
+        "target": "estimate_must_be_taken_into_account_immediately(bv_start,eerste_boekjaar)",
+        "conditions": [
+          {
+            "atom": "has_legal_personality(bv_start)",
+            "status": "present"
+          },
+          {
+            "atom": "first_financial_year(bv_start,eerste_boekjaar)",
+            "status": "present"
+          },
+          {
+            "atom": "good_faith_estimate_at_beginning_of_year(bv_start,eerste_boekjaar)",
+            "status": "present"
+          },
+          {
+            "atom": "more_than_one_estimated_criterion_exceeded(bv_start,eerste_boekjaar)",
+            "status": "helper_defined"
+          }
+        ]
+      }
+    ]
+  },
+  "model_expansion": null,
+  "get_range": null,
+  "satisfiable": null,
+  "explanation": null,
+  "execution_query": {
+    "type": "predicate",
+    "predicate": "estimate_must_be_taken_into_account_immediately",
+    "mode": "boolean",
+    "args": [
+      "bv_start",
+      "eerste_boekjaar"
+    ],
+    "explain": false,
+    "predicate_kind": "derived",
+    "query_type": "predicate_boolean",
+    "internal_intent": "deduction"
+  },
+  "output_kind": "epistemic_boolean",
+  "certainty_class": "decisive",
+  "predicate": "estimate_must_be_taken_into_account_immediately",
+  "args": [
+    "bv_start",
+    "eerste_boekjaar"
+  ],
+  "label": "entailed",
+  "possible": true,
+  "certain": true,
+  "sat": true,
+  "antecedent_coverage": [
+    {
+      "rule_index": 18,
+      "target": "estimate_must_be_taken_into_account_immediately(bv_start,eerste_boekjaar)",
+      "conditions": [
+        {
+          "atom": "has_legal_personality(bv_start)",
+          "status": "present"
+        },
+        {
+          "atom": "first_financial_year(bv_start,eerste_boekjaar)",
+          "status": "present"
+        },
+        {
+          "atom": "good_faith_estimate_at_beginning_of_year(bv_start,eerste_boekjaar)",
+          "status": "present"
+        },
+        {
+          "atom": "more_than_one_estimated_criterion_exceeded(bv_start,eerste_boekjaar)",
+          "status": "helper_defined"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+A company is a micro-company if the company is a small company with legal personality, and the company is not a subsidiary company, and the company is not a parent company, and not more than one micro-company criterion is exceeded for the company on the balance sheet date of the last closed financial year.
+
+The employee criterion is exceeded for a company if the annual average number of employees is greater than 10.
+
+The turnover criterion is exceeded for a company if the annual net turnover exclusive of value added tax as referred to in article 1:26/1 is greater than 900,000 euros.
+
+The balance sheet criterion is exceeded for a company if the balance sheet total is greater than 450,000 euros.
+
+More than one micro-company criterion is exceeded if the employee criterion is exceeded and the turnover criterion is exceeded.
+
+More than one micro-company criterion is exceeded if the employee criterion is exceeded and the balance sheet criterion is exceeded.
+
+More than one micro-company criterion is exceeded if the turnover criterion is exceeded and the balance sheet criterion is exceeded.
+
+Not more than one micro-company criterion is exceeded if more than one micro-company criterion is not exceeded.

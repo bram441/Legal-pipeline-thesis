@@ -1,0 +1,210 @@
+{
+  "intent": "deduction",
+  "symbolic_status": "ok",
+  "status": "ok",
+  "scorable": true,
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "routing": {
+    "question": "Moet BV Start volgens artikel 1:24, paragraaf 3 meteen rekening houden met het overschrijden van meer dan één criterium in het eerste boekjaar?",
+    "detected_question_type": "boolean",
+    "selected_intent": "deduction",
+    "selected_reason": "expected.mode=boolean",
+    "scorable": true,
+    "fallback_intent": null,
+    "warnings": [],
+    "legal_output_symbols": [
+      "is_small_company"
+    ],
+    "query_hint_type": "boolean",
+    "expected_question_type": "boolean"
+  },
+  "satisfiability_check": {
+    "stage": "pre_query",
+    "kb_case_satisfiable": true,
+    "status": "ok",
+    "details": "theory satisfiable",
+    "intent_backend": "idp_z3.tasks.satisfiable_check",
+    "duration_seconds": 0.1445
+  },
+  "warnings": [],
+  "deduction": {
+    "intent": "deduction",
+    "status": "ok",
+    "output_kind": "epistemic_boolean",
+    "predicate": "is_small_company",
+    "args": [
+      "bv_start",
+      "eerste_boekjaar"
+    ],
+    "possible": false,
+    "certain": false,
+    "label": "contradicted",
+    "atom": "is_small_company(x0,x1)",
+    "constraint": "? x0 in Company, x1 in FinancialYear: __sel0(x0) & __sel1(x1) & is_small_company(x0,x1)",
+    "certainty_class": "decisive",
+    "sat": true,
+    "internal_intent": "deduction",
+    "antecedent_coverage": [
+      {
+        "rule_index": 8,
+        "target": "is_small_company(bv_start,eerste_boekjaar)",
+        "conditions": [
+          {
+            "atom": "has_legal_personality(bv_start)",
+            "status": "present"
+          },
+          {
+            "atom": "previous_financial_year",
+            "status": "unknown"
+          },
+          {
+            "atom": "more_than_one_criterion_exceeded",
+            "status": "unknown"
+          }
+        ]
+      },
+      {
+        "rule_index": 9,
+        "target": "is_small_company(bv_start,eerste_boekjaar)",
+        "conditions": [
+          {
+            "atom": "has_legal_personality(bv_start)",
+            "status": "present"
+          },
+          {
+            "atom": "is_first_financial_year(bv_start,eerste_boekjaar)",
+            "status": "present"
+          },
+          {
+            "atom": "estimated_more_than_one_criterion_exceeded(bv_start,eerste_boekjaar)",
+            "status": "helper_defined"
+          }
+        ]
+      },
+      {
+        "rule_index": 10,
+        "target": "is_small_company(bv_start,eerste_boekjaar)",
+        "conditions": [
+          {
+            "atom": "previous_financial_year",
+            "status": "unknown"
+          },
+          {
+            "atom": "more_than_one_criterion_exceeded",
+            "status": "unknown"
+          }
+        ]
+      },
+      {
+        "rule_index": 11,
+        "target": "is_small_company(bv_start,eerste_boekjaar)",
+        "conditions": [
+          {
+            "atom": "is_first_financial_year(bv_start,eerste_boekjaar)",
+            "status": "present"
+          },
+          {
+            "atom": "estimated_more_than_one_criterion_exceeded(bv_start,eerste_boekjaar)",
+            "status": "helper_defined"
+          }
+        ]
+      }
+    ]
+  },
+  "model_expansion": null,
+  "get_range": null,
+  "satisfiable": null,
+  "explanation": null,
+  "execution_query": {
+    "type": "predicate",
+    "predicate": "is_small_company",
+    "mode": "boolean",
+    "args": [
+      "bv_start",
+      "eerste_boekjaar"
+    ],
+    "explain": false,
+    "predicate_kind": "derived",
+    "query_type": "predicate_boolean",
+    "internal_intent": "deduction"
+  },
+  "output_kind": "epistemic_boolean",
+  "certainty_class": "decisive",
+  "predicate": "is_small_company",
+  "args": [
+    "bv_start",
+    "eerste_boekjaar"
+  ],
+  "label": "contradicted",
+  "possible": false,
+  "certain": false,
+  "sat": true,
+  "antecedent_coverage": [
+    {
+      "rule_index": 8,
+      "target": "is_small_company(bv_start,eerste_boekjaar)",
+      "conditions": [
+        {
+          "atom": "has_legal_personality(bv_start)",
+          "status": "present"
+        },
+        {
+          "atom": "previous_financial_year",
+          "status": "unknown"
+        },
+        {
+          "atom": "more_than_one_criterion_exceeded",
+          "status": "unknown"
+        }
+      ]
+    },
+    {
+      "rule_index": 9,
+      "target": "is_small_company(bv_start,eerste_boekjaar)",
+      "conditions": [
+        {
+          "atom": "has_legal_personality(bv_start)",
+          "status": "present"
+        },
+        {
+          "atom": "is_first_financial_year(bv_start,eerste_boekjaar)",
+          "status": "present"
+        },
+        {
+          "atom": "estimated_more_than_one_criterion_exceeded(bv_start,eerste_boekjaar)",
+          "status": "helper_defined"
+        }
+      ]
+    },
+    {
+      "rule_index": 10,
+      "target": "is_small_company(bv_start,eerste_boekjaar)",
+      "conditions": [
+        {
+          "atom": "previous_financial_year",
+          "status": "unknown"
+        },
+        {
+          "atom": "more_than_one_criterion_exceeded",
+          "status": "unknown"
+        }
+      ]
+    },
+    {
+      "rule_index": 11,
+      "target": "is_small_company(bv_start,eerste_boekjaar)",
+      "conditions": [
+        {
+          "atom": "is_first_financial_year(bv_start,eerste_boekjaar)",
+          "status": "present"
+        },
+        {
+          "atom": "estimated_more_than_one_criterion_exceeded(bv_start,eerste_boekjaar)",
+          "status": "helper_defined"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,267 @@
+{
+  "types": {
+    "Person": {
+      "name": "Person",
+      "kind": "entity",
+      "aliases": [],
+      "source": "kb_symbol_table"
+    },
+    "Property": {
+      "name": "Property",
+      "kind": "entity",
+      "aliases": [],
+      "source": "kb_symbol_table"
+    }
+  },
+  "predicates": {
+    "is_surviving_legally_cohabiting_partner_of": {
+      "name": "is_surviving_legally_cohabiting_partner_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person is the surviving legally cohabiting partner of the second person (the deceased).",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "is_family_principal_residence": {
+      "name": "is_family_principal_residence",
+      "args": [
+        "Property",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The property served as the family's principal residence at the time the estate of the deceased opened.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "is_household_effects_of": {
+      "name": "is_household_effects_of",
+      "args": [
+        "Property",
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first property represents the household effects present in the second property (the principal residence).",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "called_to_estate_with_heirs": {
+      "name": "called_to_estate_with_heirs",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person (surviving partner) is called to the estate of the second person (deceased) together with any heirs.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "subject_to_legal_reversion_4_24": {
+      "name": "subject_to_legal_reversion_4_24",
+      "args": [
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The property is the subject of a right of legal reversion referred to in article 4.24.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "subject_to_legal_reversion_4_25": {
+      "name": "subject_to_legal_reversion_4_25",
+      "args": [
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The property is the subject of a right of legal reversion referred to in article 4.25.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": true,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": true,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "subject_to_legal_reversion": {
+      "name": "subject_to_legal_reversion",
+      "args": [
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The property is subject to a right of legal reversion under article 4.24 or 4.25.",
+      "legal_output": null,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": false,
+      "temporal_support": false
+    },
+    "acquires_usufruct_of_principal_residence": {
+      "name": "acquires_usufruct_of_principal_residence",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The surviving legally cohabiting partner acquires the usufruct of the immovable property that served as the family's principal residence from the estate of the deceased.",
+      "legal_output": true,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": true,
+      "temporal_support": false
+    },
+    "acquires_usufruct_of_household_effects": {
+      "name": "acquires_usufruct_of_household_effects",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The surviving legally cohabiting partner acquires the usufruct of the household effects present in the family's principal residence from the estate of the deceased.",
+      "legal_output": true,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": true,
+      "temporal_support": false
+    },
+    "exercises_usufruct_of_principal_residence": {
+      "name": "exercises_usufruct_of_principal_residence",
+      "args": [
+        "Person",
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The surviving legally cohabiting partner exercises the right of usufruct over the immovable property that served as the family's principal residence, notwithstanding a right of legal reversion.",
+      "legal_output": true,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": true,
+      "temporal_support": false
+    },
+    "exercises_usufruct_of_household_effects": {
+      "name": "exercises_usufruct_of_household_effects",
+      "args": [
+        "Person",
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The surviving legally cohabiting partner exercises the right of usufruct over the household effects present in the family's principal residence, notwithstanding a right of legal reversion.",
+      "legal_output": true,
+      "output_category": null,
+      "directly_observable": false,
+      "background": false,
+      "case_input": false,
+      "assertable_in_case": false,
+      "factual_case_input": false,
+      "factual_criteria_input": false,
+      "case_given_input_predicate": null,
+      "query_target_candidate": true,
+      "temporal_support": false
+    }
+  },
+  "functions": {},
+  "assertable_case_symbols": {
+    "predicates": [
+      "called_to_estate_with_heirs",
+      "is_family_principal_residence",
+      "is_household_effects_of",
+      "is_surviving_legally_cohabiting_partner_of",
+      "subject_to_legal_reversion_4_24",
+      "subject_to_legal_reversion_4_25"
+    ],
+    "functions": []
+  },
+  "factual_case_input_predicates": [],
+  "factual_criteria_input_predicates": [],
+  "legal_output_query_targets": [
+    "acquires_usufruct_of_household_effects",
+    "acquires_usufruct_of_principal_residence",
+    "exercises_usufruct_of_household_effects",
+    "exercises_usufruct_of_principal_residence"
+  ],
+  "temporal_support_symbols": []
+}

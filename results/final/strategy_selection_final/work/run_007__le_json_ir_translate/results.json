@@ -1,0 +1,637 @@
+{
+  "id": "run_007",
+  "law": {
+    "text": "Chapter 4. Succession entitlement of the spouse and the legally cohabiting partner\n\nSection 1. The surviving spouse\n\nArt. 4.17. Inheritance rights of the surviving spouse\n\npar. 1. When the deceased leaves descendants, adopted children or descendants of these, the surviving spouse acquires the usufruct of the entire estate.\n\npar. 2. When the deceased leaves relatives in the ascending line or close collateral relatives, the surviving spouse acquires:\n(1) the full ownership of the share of the first to die in the common property and in the property held exclusively in undivided co-ownership between the spouses, and\n(2) the usufruct of the remaining goods of their own property.\n(3) the usufruct of the goods subject to the right of legal reversion referred to in article 4.24 or in article 4.25, unless otherwise provided in the deed of donation or in the will.\n\npar. 3. When the deceased leaves other heirs or no heirs, the surviving spouse acquires the full ownership of the entire estate.\n\nArt. 4.18. Usufruct over donated goods\n\nUpon the death of the donor, the surviving spouse who is called to the estate receives the usufruct of the goods that the donor donated and over which the donor reserved the usufruct, on the condition that the spouse already held that capacity at the time of the donation and that the donor remained the holder of this usufruct until the day of their death.\n\nUpon the death of the donor, the surviving spouse who is called to the estate receives the usufruct of the immovable property that served as the family's principal residence at the time the estate opened and of the household effects present therein, on the condition that the donor had reserved the usufruct of those goods upon the donation of those goods, that the spouse was legally cohabiting with the donor at the time of the donation, and that the donor remained the holder of this usufruct until the day of their death.\n\nThe spouse may renounce that usufruct. Articles 4.244 to 4.253 apply to that renunciation when it takes place during the lifetime of the donor.\n\nArt. 4.20. Right to lease\n\nThe surviving spouse acquires exclusively, to the exclusion of all other heirs, the right to the lease of the immovable property that served as the family's principal residence at the time the estate of the deceased opened.\n\nArt. 4.22. Exclusion or forfeiture\n\npar. 1. The surviving spouse may be wholly or partially excluded from their inheritance rights or declared to have forfeited them if they have been wholly or partially deprived of parental authority over the children born of their marriage with the deceased.\n\npar. 2. The legal action is brought by the descendants within one year calculated either from the opening of the estate or from the deprivation of parental authority.\n\nThe judgment takes effect from the date on which the action was brought.\n\npar. 3. If the usufruct has already been converted into the full ownership of a good or into a sum of money, or if the bare ownership of the goods referred to in article 4.61, paragraph 7, has already been transferred, the exclusion or the declaration of forfeiture gives rise to a right to compensation.\n\nThat compensation is determined by the court and corresponds to the value of the usufruct, taking into account the presumed life expectancy of the usufructuary at the time the legal action was brought.\n\nIf the usufruct has been converted into a life annuity, the judgment has retroactive effect to the same point in time.\n\nSection 2. The surviving legally cohabiting partner\n\nArt. 4.23. Inheritance rights and right to lease of the surviving legally cohabiting partner\n\npar. 1. The surviving legally cohabiting partner acquires, regardless of which heirs they are called to the estate with, the usufruct of the immovable property that served as the family's principal residence at the time the estate of the deceased opened, and of the household effects present therein.\n\nThe surviving legally cohabiting partner also exercises this right if the goods referred to in the first paragraph are the subject of a right of legal reversion referred to in article 4.24 or in article 4.25.\n\npar. 2. The surviving legally cohabiting partner who is called to the estate receives upon the death of the donor the usufruct of the immovable property that served as the family's principal residence at the time the estate opened and of the household effects present therein, if the donor had reserved the usufruct of these goods upon the donation of these goods, and on the condition that the legally cohabiting partner already held that capacity at the time of the donation and that the donor remained the holder of this usufruct until the day of their death.\n\nThe legally cohabiting partner may renounce the usufruct referred to in the first paragraph. Articles 4.244 to 4.253 apply to that renunciation when it takes place during the lifetime of the donor.\n\npar. 3. The surviving legally cohabiting partner acquires exclusively, to the exclusion of all other heirs, the right to the lease of the immovable property that served as the family's principal residence at the time the estate of the predeceased legally cohabiting partner opened, and acquires the usufruct of the household effects present therein.\n\npar. 4. The foregoing provisions do not apply when the surviving legally cohabiting partner is a descendant of the predeceased legally cohabiting partner.\n\npar. 5. Notwithstanding any provision to the contrary, any person who acquires the bare ownership may demand that an inventory of the household effects and a statement of condition of the immovable property that served as the family's principal residence be drawn up.\n\npar. 6. The rules concerning the usufruct of the surviving spouse that are included in articles 4.22 and 4.60 to 4.64 apply mutatis mutandis to the usufruct of the surviving legally cohabiting partner."
+  },
+  "kb_used": {
+    "fo": "vocabulary V {\n  type Person\n  type Property\n  is_surviving_legally_cohabiting_partner_of: Person * Person -> Bool\n  is_family_principal_residence: Property * Person -> Bool\n  is_household_effects_of: Property * Property -> Bool\n  called_to_estate_with_heirs: Person * Person -> Bool\n  subject_to_legal_reversion_4_24: Property -> Bool\n  subject_to_legal_reversion_4_25: Property -> Bool\n  subject_to_legal_reversion: Property -> Bool\n  acquires_usufruct_of_principal_residence: Person * Person -> Bool\n  acquires_usufruct_of_household_effects: Person * Person -> Bool\n  exercises_usufruct_of_principal_residence: Person * Property -> Bool\n  exercises_usufruct_of_household_effects: Person * Property -> Bool\n}\n\ntheory T:V {\n  ! survivor in Person, deceased in Person, prop in Property: (((is_surviving_legally_cohabiting_partner_of(survivor,deceased)) & (is_family_principal_residence(prop,deceased)) & (called_to_estate_with_heirs(survivor,deceased)))) => ((acquires_usufruct_of_principal_residence(survivor,deceased))).\n  ! survivor in Person, deceased in Person, prop in Property, effects in Property: (((is_surviving_legally_cohabiting_partner_of(survivor,deceased)) & (is_family_principal_residence(prop,deceased)) & (is_household_effects_of(effects,prop)) & (called_to_estate_with_heirs(survivor,deceased)))) => ((acquires_usufruct_of_household_effects(survivor,deceased))).\n  ! prop in Property: (((subject_to_legal_reversion_4_24(prop)) | (subject_to_legal_reversion_4_25(prop)))) => ((subject_to_legal_reversion(prop))).\n  ! survivor in Person, deceased in Person, prop in Property: (((is_surviving_legally_cohabiting_partner_of(survivor,deceased)) & (is_family_principal_residence(prop,deceased)) & (acquires_usufruct_of_principal_residence(survivor,deceased)) & (subject_to_legal_reversion(prop)))) => ((exercises_usufruct_of_principal_residence(survivor,prop))).\n  ! survivor in Person, deceased in Person, prop in Property, effects in Property: (((is_surviving_legally_cohabiting_partner_of(survivor,deceased)) & (is_family_principal_residence(prop,deceased)) & (is_household_effects_of(effects,prop)) & (acquires_usufruct_of_household_effects(survivor,deceased)) & (subject_to_legal_reversion(effects)))) => ((exercises_usufruct_of_household_effects(survivor,effects))).\n}"
+  },
+  "case": {
+    "text": "Mira and Noor were legally cohabiting. Mira dies. Noor is the surviving legal cohabitant, comes to the estate, and is not a descendant of Mira. The dwelling was their principal family residence."
+  },
+  "kb_compile_strategy": "le_json_ir_translate",
+  "kb_compile_backend": "json_ir",
+  "extraction_backend": "json_ir",
+  "pipeline_backend_mode": "json_ir",
+  "kb_compile_flags": {
+    "use_le": true,
+    "uses_translation": true,
+    "json_ir_generation": "symbols_then_rules"
+  },
+  "strategy_metadata": {
+    "strategy_name": "le_json_ir_translate",
+    "canonical_strategy_name": "le_json_ir_translate",
+    "kb_backend": "json_ir",
+    "pipeline_backend_mode": "json_ir",
+    "uses_le_intermediate": true,
+    "json_ir_generation": "symbols_then_rules",
+    "belief_scoring": false,
+    "law_scope_mode": "cited",
+    "repair_enabled": true,
+    "json_ir_structured_repair_enabled": true,
+    "json_ir_max_symbol_versions": 3,
+    "json_ir_max_rules_attempts_per_symbol_version": 2,
+    "json_ir_max_kb_llm_calls": 8,
+    "json_ir_outer_cache_retries_enabled": false,
+    "json_ir_outer_cache_max_attempts": 1,
+    "configured_translation": true,
+    "effective_translation": true,
+    "translation_source": "strategy",
+    "uses_translation": true
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Does Noor have the usufruct of the family home pursuant to Article 4.23, paragraph 1?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "Art. 4.23 par. 1 gives the surviving legal cohabitant usufruct of the real estate that served as the family home, unless the par. 4 descendant exclusion applies. The case states Noor is not a descendant.",
+        "target": "noor"
+      },
+      "pipeline": {
+        "sat": true,
+        "case": {
+          "facts": [
+            "is_surviving_legally_cohabiting_partner_of(noor,mira).",
+            "is_family_principal_residence(dwelling,mira).",
+            "called_to_estate_with_heirs(noor,mira)."
+          ],
+          "case_given_factual_inputs": [],
+          "entities": {
+            "Property": [
+              "dwelling"
+            ],
+            "Person": [
+              "mira",
+              "noor"
+            ]
+          },
+          "schema_environment": {
+            "types": {
+              "Person": {
+                "name": "Person",
+                "kind": "entity",
+                "aliases": [],
+                "source": "kb_symbol_table"
+              },
+              "Property": {
+                "name": "Property",
+                "kind": "entity",
+                "aliases": [],
+                "source": "kb_symbol_table"
+              }
+            },
+            "predicates": {
+              "is_surviving_legally_cohabiting_partner_of": {
+                "name": "is_surviving_legally_cohabiting_partner_of",
+                "args": [
+                  "Person",
+                  "Person"
+                ],
+                "returns": "Bool",
+                "kind": "observable",
+                "description": "The first person is the surviving legally cohabiting partner of the second person (the deceased).",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": true,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "is_family_principal_residence": {
+                "name": "is_family_principal_residence",
+                "args": [
+                  "Property",
+                  "Person"
+                ],
+                "returns": "Bool",
+                "kind": "observable",
+                "description": "The property served as the family's principal residence at the time the estate of the deceased opened.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": true,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "is_household_effects_of": {
+                "name": "is_household_effects_of",
+                "args": [
+                  "Property",
+                  "Property"
+                ],
+                "returns": "Bool",
+                "kind": "observable",
+                "description": "The first property represents the household effects present in the second property (the principal residence).",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": true,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "called_to_estate_with_heirs": {
+                "name": "called_to_estate_with_heirs",
+                "args": [
+                  "Person",
+                  "Person"
+                ],
+                "returns": "Bool",
+                "kind": "observable",
+                "description": "The first person (surviving partner) is called to the estate of the second person (deceased) together with any heirs.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": true,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "subject_to_legal_reversion_4_24": {
+                "name": "subject_to_legal_reversion_4_24",
+                "args": [
+                  "Property"
+                ],
+                "returns": "Bool",
+                "kind": "observable",
+                "description": "The property is the subject of a right of legal reversion referred to in article 4.24.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": true,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "subject_to_legal_reversion_4_25": {
+                "name": "subject_to_legal_reversion_4_25",
+                "args": [
+                  "Property"
+                ],
+                "returns": "Bool",
+                "kind": "observable",
+                "description": "The property is the subject of a right of legal reversion referred to in article 4.25.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": true,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "subject_to_legal_reversion": {
+                "name": "subject_to_legal_reversion",
+                "args": [
+                  "Property"
+                ],
+                "returns": "Bool",
+                "kind": "helper",
+                "description": "The property is subject to a right of legal reversion under article 4.24 or 4.25.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": false,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": false,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "acquires_usufruct_of_principal_residence": {
+                "name": "acquires_usufruct_of_principal_residence",
+                "args": [
+                  "Person",
+                  "Person"
+                ],
+                "returns": "Bool",
+                "kind": "derived",
+                "description": "The surviving legally cohabiting partner acquires the usufruct of the immovable property that served as the family's principal residence from the estate of the deceased.",
+                "legal_output": true,
+                "output_category": null,
+                "directly_observable": false,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": false,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": true,
+                "temporal_support": false
+              },
+              "acquires_usufruct_of_household_effects": {
+                "name": "acquires_usufruct_of_household_effects",
+                "args": [
+                  "Person",
+                  "Person"
+                ],
+                "returns": "Bool",
+                "kind": "derived",
+                "description": "The surviving legally cohabiting partner acquires the usufruct of the household effects present in the family's principal residence from the estate of the deceased.",
+                "legal_output": true,
+                "output_category": null,
+                "directly_observable": false,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": false,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": true,
+                "temporal_support": false
+              },
+              "exercises_usufruct_of_principal_residence": {
+                "name": "exercises_usufruct_of_principal_residence",
+                "args": [
+                  "Person",
+                  "Property"
+                ],
+                "returns": "Bool",
+                "kind": "derived",
+                "description": "The surviving legally cohabiting partner exercises the right of usufruct over the immovable property that served as the family's principal residence, notwithstanding a right of legal reversion.",
+                "legal_output": true,
+                "output_category": null,
+                "directly_observable": false,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": false,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": true,
+                "temporal_support": false
+              },
+              "exercises_usufruct_of_household_effects": {
+                "name": "exercises_usufruct_of_household_effects",
+                "args": [
+                  "Person",
+                  "Property"
+                ],
+                "returns": "Bool",
+                "kind": "derived",
+                "description": "The surviving legally cohabiting partner exercises the right of usufruct over the household effects present in the family's principal residence, notwithstanding a right of legal reversion.",
+                "legal_output": true,
+                "output_category": null,
+                "directly_observable": false,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": false,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": true,
+                "temporal_support": false
+              }
+            },
+            "functions": {},
+            "assertable_case_symbols": {
+              "predicates": [
+                "called_to_estate_with_heirs",
+                "is_family_principal_residence",
+                "is_household_effects_of",
+                "is_surviving_legally_cohabiting_partner_of",
+                "subject_to_legal_reversion_4_24",
+                "subject_to_legal_reversion_4_25"
+              ],
+              "functions": []
+            },
+            "factual_case_input_predicates": [],
+            "factual_criteria_input_predicates": [],
+            "legal_output_query_targets": [
+              "acquires_usufruct_of_household_effects",
+              "acquires_usufruct_of_principal_residence",
+              "exercises_usufruct_of_household_effects",
+              "exercises_usufruct_of_principal_residence"
+            ],
+            "temporal_support_symbols": []
+          },
+          "entity_type_mapping": {
+            "entities": {
+              "dwelling": {
+                "declared_type": "Property",
+                "resolved_type": "Property",
+                "source": "fact_argument",
+                "evidence": [
+                  {
+                    "source": "fact_argument",
+                    "symbol": "is_family_principal_residence",
+                    "arg_index": 0,
+                    "expected_type": "Property"
+                  }
+                ]
+              },
+              "mira": {
+                "declared_type": "Person",
+                "resolved_type": "Person",
+                "source": "fact_argument+query_argument",
+                "evidence": [
+                  {
+                    "source": "fact_argument",
+                    "symbol": "is_surviving_legally_cohabiting_partner_of",
+                    "arg_index": 1,
+                    "expected_type": "Person"
+                  },
+                  {
+                    "source": "fact_argument",
+                    "symbol": "is_family_principal_residence",
+                    "arg_index": 1,
+                    "expected_type": "Person"
+                  },
+                  {
+                    "source": "fact_argument",
+                    "symbol": "called_to_estate_with_heirs",
+                    "arg_index": 1,
+                    "expected_type": "Person"
+                  },
+                  {
+                    "source": "query_argument",
+                    "symbol": "acquires_usufruct_of_principal_residence",
+                    "arg_index": 1,
+                    "expected_type": "Person"
+                  }
+                ]
+              },
+              "noor": {
+                "declared_type": "Person",
+                "resolved_type": "Person",
+                "source": "fact_argument+query_argument",
+                "evidence": [
+                  {
+                    "source": "fact_argument",
+                    "symbol": "is_surviving_legally_cohabiting_partner_of",
+                    "arg_index": 0,
+                    "expected_type": "Person"
+                  },
+                  {
+                    "source": "fact_argument",
+                    "symbol": "called_to_estate_with_heirs",
+                    "arg_index": 0,
+                    "expected_type": "Person"
+                  },
+                  {
+                    "source": "query_argument",
+                    "symbol": "acquires_usufruct_of_principal_residence",
+                    "arg_index": 0,
+                    "expected_type": "Person"
+                  }
+                ]
+              }
+            },
+            "unmapped_entities": [],
+            "conflicts": [],
+            "query_arguments_with_inferred_types": [
+              {
+                "entity": "noor",
+                "arg_index": 0,
+                "expected_type": "Person",
+                "predicate": "acquires_usufruct_of_principal_residence"
+              },
+              {
+                "entity": "mira",
+                "arg_index": 1,
+                "expected_type": "Person",
+                "predicate": "acquires_usufruct_of_principal_residence"
+              }
+            ]
+          },
+          "resolved_entity_domains": {
+            "Property": [
+              "dwelling"
+            ],
+            "Person": [
+              "mira",
+              "noor"
+            ]
+          }
+        },
+        "query": {
+          "type": "predicate",
+          "predicate": "acquires_usufruct_of_principal_residence",
+          "mode": "boolean",
+          "args": [
+            "noor",
+            "mira"
+          ],
+          "explain": false,
+          "predicate_kind": "derived",
+          "query_type": "predicate_boolean",
+          "internal_intent": "deduction"
+        },
+        "symbolic_result": {
+          "intent": "deduction",
+          "symbolic_status": "ok",
+          "status": "ok",
+          "scorable": true,
+          "detected_question_type": "boolean",
+          "selected_intent": "deduction",
+          "selected_reason": "expected.mode=boolean",
+          "routing": {
+            "question": "Does Noor have the usufruct of the family home pursuant to Article 4.23, paragraph 1?",
+            "detected_question_type": "boolean",
+            "selected_intent": "deduction",
+            "selected_reason": "expected.mode=boolean",
+            "scorable": true,
+            "fallback_intent": null,
+            "warnings": [],
+            "legal_output_symbols": [
+              "acquires_usufruct_of_household_effects",
+              "acquires_usufruct_of_principal_residence",
+              "exercises_usufruct_of_household_effects",
+              "exercises_usufruct_of_principal_residence"
+            ],
+            "query_hint_type": "boolean",
+            "expected_question_type": "boolean"
+          },
+          "satisfiability_check": {
+            "stage": "pre_query",
+            "kb_case_satisfiable": true,
+            "status": "ok",
+            "details": "theory satisfiable",
+            "intent_backend": "idp_z3.tasks.satisfiable_check",
+            "duration_seconds": 0.0585
+          },
+          "warnings": [],
+          "deduction": {
+            "intent": "deduction",
+            "status": "ok",
+            "output_kind": "epistemic_boolean",
+            "predicate": "acquires_usufruct_of_principal_residence",
+            "args": [
+              "noor",
+              "mira"
+            ],
+            "possible": true,
+            "certain": true,
+            "label": "entailed",
+            "atom": "acquires_usufruct_of_principal_residence(x0,x1)",
+            "constraint": "? x0 in Person, x1 in Person: __sel0(x0) & __sel1(x1) & acquires_usufruct_of_principal_residence(x0,x1)",
+            "certainty_class": "decisive",
+            "sat": true,
+            "internal_intent": "deduction",
+            "antecedent_coverage": [
+              {
+                "rule_index": 0,
+                "target": "acquires_usufruct_of_principal_residence(noor,mira)",
+                "conditions": [
+                  {
+                    "atom": "is_surviving_legally_cohabiting_partner_of(noor,mira)",
+                    "status": "present"
+                  },
+                  {
+                    "atom": "is_family_principal_residence(dwelling,mira)",
+                    "status": "present"
+                  },
+                  {
+                    "atom": "called_to_estate_with_heirs(noor,mira)",
+                    "status": "present"
+                  }
+                ]
+              }
+            ]
+          },
+          "model_expansion": null,
+          "get_range": null,
+          "satisfiable": null,
+          "explanation": null,
+          "execution_query": {
+            "type": "predicate",
+            "predicate": "acquires_usufruct_of_principal_residence",
+            "mode": "boolean",
+            "args": [
+              "noor",
+              "mira"
+            ],
+            "explain": false,
+            "predicate_kind": "derived",
+            "query_type": "predicate_boolean",
+            "internal_intent": "deduction"
+          },
+          "output_kind": "epistemic_boolean",
+          "certainty_class": "decisive",
+          "predicate": "acquires_usufruct_of_principal_residence",
+          "args": [
+            "noor",
+            "mira"
+          ],
+          "label": "entailed",
+          "possible": true,
+          "certain": true,
+          "sat": true,
+          "antecedent_coverage": [
+            {
+              "rule_index": 0,
+              "target": "acquires_usufruct_of_principal_residence(noor,mira)",
+              "conditions": [
+                {
+                  "atom": "is_surviving_legally_cohabiting_partner_of(noor,mira)",
+                  "status": "present"
+                },
+                {
+                  "atom": "is_family_principal_residence(dwelling,mira)",
+                  "status": "present"
+                },
+                {
+                  "atom": "called_to_estate_with_heirs(noor,mira)",
+                  "status": "present"
+                }
+              ]
+            }
+          ]
+        },
+        "symbolic_intent_routing": {
+          "question": "Does Noor have the usufruct of the family home pursuant to Article 4.23, paragraph 1?",
+          "detected_question_type": "boolean",
+          "selected_intent": "deduction",
+          "selected_reason": "expected.mode=boolean",
+          "scorable": true,
+          "fallback_intent": null,
+          "warnings": [],
+          "legal_output_symbols": [
+            "acquires_usufruct_of_household_effects",
+            "acquires_usufruct_of_principal_residence",
+            "exercises_usufruct_of_household_effects",
+            "exercises_usufruct_of_principal_residence"
+          ],
+          "query_hint_type": "boolean",
+          "expected_question_type": "boolean"
+        },
+        "prediction": {
+          "query_type": "predicate_boolean",
+          "internal_intent": "deduction",
+          "output_kind": "epistemic_boolean",
+          "status": "ok",
+          "certainty_class": "decisive",
+          "mode": "boolean",
+          "label": "entailed",
+          "belief_yes": 1.0,
+          "credence_yes_pct": 100,
+          "verdict_strength_pct": 100
+        },
+        "natural_language": "Yes. Noor, Mira: The surviving legally cohabiting partner acquires the usufruct of the immovable property that served as the family's principal residence from the estate of the deceased.",
+        "explanation": null,
+        "extraction_prompt": "You are debugging a legal extraction failure.\n\nGiven KB_SCHEMA, CASE, and QUESTION, identify the likely generic cause of failure.\nFocus on schema mismatch, missing observable facts, wrong argument order, wrong entity type, selected observable instead of derived predicate, or unsupported query shape.\n\nDo not invent new law-specific fixes.\nReturn concise bullet points and one generic repair suggestion.\n\nKB_SCHEMA:\n{\n  \"types\": [\n    \"Person\",\n    \"Property\"\n  ],\n  \"predicates\": [\n    {\n      \"name\": \"is_surviving_legally_cohabiting_partner_of\",\n      \"args\": [\n        \"Person\",\n        \"Person\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"observable\",\n      \"description\": \"The first person is the surviving legally cohabiting partner of the second person (the deceased).\",\n      \"directly_observable\": true\n    },\n    {\n      \"name\": \"is_family_principal_residence\",\n      \"args\": [\n        \"Property\",\n        \"Person\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"observable\",\n      \"description\": \"The property served as the family's principal residence at the time the estate of the deceased opened.\",\n      \"directly_observable\": true\n    },\n    {\n      \"name\": \"is_household_effects_of\",\n      \"args\": [\n        \"Property\",\n        \"Property\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"observable\",\n      \"description\": \"The first property represents the household effects present in the second property (the principal residence).\",\n      \"directly_observable\": true\n    },\n    {\n      \"name\": \"called_to_estate_with_heirs\",\n      \"args\": [\n        \"Person\",\n        \"Person\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"observable\",\n      \"description\": \"The first person (surviving partner) is called to the estate of the second person (deceased) together with any heirs.\",\n      \"directly_observable\": true\n    },\n    {\n      \"name\": \"subject_to_legal_reversion_4_24\",\n      \"args\": [\n        \"Property\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"observable\",\n      \"description\": \"The property is the subject of a right of legal reversion referred to in article 4.24.\",\n      \"directly_observable\": true\n    },\n    {\n      \"name\": \"subject_to_legal_reversion_4_25\",\n      \"args\": [\n        \"Property\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"observable\",\n      \"description\": \"The property is the subject of a right of legal reversion referred to in article 4.25.\",\n      \"directly_observable\": true\n    },\n    {\n      \"name\": \"subject_to_legal_reversion\",\n      \"args\": [\n        \"Property\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"helper\",\n      \"description\": \"The property is subject to a right of legal reversion under article 4.24 or 4.25.\"\n    },\n    {\n      \"name\": \"acquires_usufruct_of_principal_residence\",\n      \"args\": [\n        \"Person\",\n        \"Person\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"derived\",\n      \"description\": \"The surviving legally cohabiting partner acquires the usufruct of the immovable property that served as the family's principal residence from the estate of the deceased.\",\n      \"legal_output\": true\n    },\n    {\n      \"name\": \"acquires_usufruct_of_household_effects\",\n      \"args\": [\n        \"Person\",\n        \"Person\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"derived\",\n      \"description\": \"The surviving legally cohabiting partner acquires the usufruct of the household effects present in the family's principal residence from the estate of the deceased.\",\n      \"legal_output\": true\n    },\n    {\n      \"name\": \"exercises_usufruct_of_principal_residence\",\n      \"args\": [\n        \"Person\",\n        \"Property\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"derived\",\n      \"description\": \"The surviving legally cohabiting partner exercises the right of usufruct over the immovable property that served as the family's principal residence, notwithstanding a right of legal reversion.\",\n      \"legal_output\": true\n    },\n    {\n      \"name\": \"exercises_usufruct_of_household_effects\",\n      \"args\": [\n        \"Person\",\n        \"Property\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"derived\",\n      \"description\": \"The surviving legally cohabiting partner exercises the right of usufruct over the household effects present in the family's principal residence, notwithstanding a right of legal reversion.\",\n      \"legal_output\": true\n    }\n  ],\n  \"functions\": [],\n  \"rules\": [\n    {\n      \"forall\": [\n        {\n          \"var\": \"survivor\",\n          \"type\": \"Person\"\n        },\n        {\n          \"var\": \"deceased\",\n          \"type\": \"Person\"\n        },\n        {\n          \"var\": \"prop\",\n          \"type\": \"Property\"\n        }\n      ],\n      \"if\": [\n        {\n          \"and\": [\n            {\n              \"pred\": \"is_surviving_legally_cohabiting_partner_of\",\n              \"args\": [\n                \"survivor\",\n                \"deceased\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"is_family_principal_residence\",\n              \"args\": [\n                \"prop\",\n                \"deceased\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"called_to_estate_with_heirs\",\n              \"args\": [\n                \"survivor\",\n                \"deceased\"\n              ],\n              \"negated\": false\n            }\n          ]\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"acquires_usufruct_of_principal_residence\",\n          \"args\": [\n            \"survivor\",\n            \"deceased\"\n          ],\n          \"negated\": false\n        }\n      ],\n      \"operator\": \"implies\"\n    },\n    {\n      \"forall\": [\n        {\n          \"var\": \"survivor\",\n          \"type\": \"Person\"\n        },\n        {\n          \"var\": \"deceased\",\n          \"type\": \"Person\"\n        },\n        {\n          \"var\": \"prop\",\n          \"type\": \"Property\"\n        },\n        {\n          \"var\": \"effects\",\n          \"type\": \"Property\"\n        }\n      ],\n      \"if\": [\n        {\n          \"and\": [\n            {\n              \"pred\": \"is_surviving_legally_cohabiting_partner_of\",\n              \"args\": [\n                \"survivor\",\n                \"deceased\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"is_family_principal_residence\",\n              \"args\": [\n                \"prop\",\n                \"deceased\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"is_household_effects_of\",\n              \"args\": [\n                \"effects\",\n                \"prop\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"called_to_estate_with_heirs\",\n              \"args\": [\n                \"survivor\",\n                \"deceased\"\n              ],\n              \"negated\": false\n            }\n          ]\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"acquires_usufruct_of_household_effects\",\n          \"args\": [\n            \"survivor\",\n            \"deceased\"\n          ],\n          \"negated\": false\n        }\n      ],\n      \"operator\": \"implies\"\n    },\n    {\n      \"forall\": [\n        {\n          \"var\": \"prop\",\n          \"type\": \"Property\"\n        }\n      ],\n      \"if\": [\n        {\n          \"or\": [\n            {\n              \"pred\": \"subject_to_legal_reversion_4_24\",\n              \"args\": [\n                \"prop\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"subject_to_legal_reversion_4_25\",\n              \"args\": [\n                \"prop\"\n              ],\n              \"negated\": false\n            }\n          ]\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"subject_to_legal_reversion\",\n          \"args\": [\n            \"prop\"\n          ],\n          \"negated\": false\n        }\n      ],\n      \"operator\": \"implies\"\n    },\n    {\n      \"forall\": [\n        {\n          \"var\": \"survivor\",\n          \"type\": \"Person\"\n        },\n        {\n          \"var\": \"deceased\",\n          \"type\": \"Person\"\n        },\n        {\n          \"var\": \"prop\",\n          \"type\": \"Property\"\n        }\n      ],\n      \"if\": [\n        {\n          \"and\": [\n            {\n              \"pred\": \"is_surviving_legally_cohabiting_partner_of\",\n              \"args\": [\n                \"survivor\",\n                \"deceased\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"is_family_principal_residence\",\n              \"args\": [\n                \"prop\",\n                \"deceased\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"acquires_usufruct_of_principal_residence\",\n              \"args\": [\n                \"survivor\",\n                \"deceased\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"subject_to_legal_reversion\",\n              \"args\": [\n                \"prop\"\n              ],\n              \"negated\": false\n            }\n          ]\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"exercises_usufruct_of_principal_residence\",\n          \"args\": [\n            \"survivor\",\n            \"prop\"\n          ],\n          \"negated\": false\n        }\n      ],\n      \"operator\": \"implies\"\n    },\n    {\n      \"forall\": [\n        {\n          \"var\": \"survivor\",\n          \"type\": \"Person\"\n        },\n        {\n          \"var\": \"deceased\",\n          \"type\": \"Person\"\n        },\n        {\n          \"var\": \"prop\",\n          \"type\": \"Property\"\n        },\n        {\n          \"var\": \"effects\",\n          \"type\": \"Property\"\n        }\n      ],\n      \"if\": [\n        {\n          \"and\": [\n            {\n              \"pred\": \"is_surviving_legally_cohabiting_partner_of\",\n              \"args\": [\n                \"survivor\",\n                \"deceased\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"is_family_principal_residence\",\n              \"args\": [\n                \"prop\",\n                \"deceased\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"is_household_effects_of\",\n              \"args\": [\n                \"effects\",\n                \"prop\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"acquires_usufruct_of_household_effects\",\n              \"args\": [\n                \"survivor\",\n                \"deceased\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"subject_to_legal_reversion\",\n              \"args\": [\n                \"effects\"\n              ],\n              \"negated\": false\n            }\n          ]\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"exercises_usufruct_of_household_effects\",\n          \"args\": [\n            \"survivor\",\n            \"effects\"\n          ],\n          \"negated\": false\n        }\n      ],\n      \"operator\": \"implies\"\n    }\n  ]\n}\n\nCASE:\nMira and Noor were legally cohabiting. Mira dies. Noor is the surviving legal cohabitant, comes to the estate, and is not a descendant of Mira. The dwelling was their principal family residence.\n\nQUESTION:\nDoes Noor have the usufruct of the family home pursuant to Article 4.23, paragraph 1?",
+        "raw_extracted": {
+          "case": {
+            "facts": [
+              "is_surviving_legally_cohabiting_partner_of(noor,mira).",
+              "is_family_principal_residence(dwelling,mira).",
+              "called_to_estate_with_heirs(noor,mira)."
+            ],
+            "case_given_factual_inputs": [],
+            "entities": {
+              "Person": [
+                "mira",
+                "noor"
+              ],
+              "Property": [
+                "dwelling"
+              ]
+            }
+          },
+          "query": {
+            "type": "predicate",
+            "predicate": "acquires_usufruct_of_principal_residence",
+            "mode": "boolean",
+            "args": [
+              "noor",
+              "mira"
+            ],
+            "explain": false,
+            "predicate_kind": "derived",
+            "query_type": "predicate_boolean",
+            "internal_intent": "deduction"
+          }
+        }
+      }
+    }
+  ]
+}

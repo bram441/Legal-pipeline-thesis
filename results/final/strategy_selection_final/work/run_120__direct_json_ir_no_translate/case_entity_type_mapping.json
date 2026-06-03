@@ -1,0 +1,114 @@
+{
+  "entities": {
+    "bv_horizon": {
+      "declared_type": "Company",
+      "resolved_type": "Company",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "has_legal_personality",
+          "arg_index": 0,
+          "expected_type": "Company"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "case_given_more_than_one_criterion_exceeded",
+          "arg_index": 0,
+          "expected_type": "Company"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "case_given_more_than_one_criterion_exceeded",
+          "arg_index": 0,
+          "expected_type": "Company"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "loses_kleine_vennootschap_status_from",
+          "arg_index": 0,
+          "expected_type": "Company"
+        }
+      ]
+    },
+    "fy_2024": {
+      "declared_type": "FinancialYear",
+      "resolved_type": "FinancialYear",
+      "source": "fact_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "previous_financial_year",
+          "arg_index": 1,
+          "expected_type": "FinancialYear"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "case_given_more_than_one_criterion_exceeded",
+          "arg_index": 1,
+          "expected_type": "FinancialYear"
+        }
+      ]
+    },
+    "fy_2025": {
+      "declared_type": "FinancialYear",
+      "resolved_type": "FinancialYear",
+      "source": "fact_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "previous_financial_year",
+          "arg_index": 0,
+          "expected_type": "FinancialYear"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "next_financial_year",
+          "arg_index": 0,
+          "expected_type": "FinancialYear"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "case_given_more_than_one_criterion_exceeded",
+          "arg_index": 1,
+          "expected_type": "FinancialYear"
+        }
+      ]
+    },
+    "fy_2026": {
+      "declared_type": "FinancialYear",
+      "resolved_type": "FinancialYear",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "next_financial_year",
+          "arg_index": 1,
+          "expected_type": "FinancialYear"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "loses_kleine_vennootschap_status_from",
+          "arg_index": 1,
+          "expected_type": "FinancialYear"
+        }
+      ]
+    }
+  },
+  "unmapped_entities": [],
+  "conflicts": [],
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "bv_horizon",
+      "arg_index": 0,
+      "expected_type": "Company",
+      "predicate": "loses_kleine_vennootschap_status_from"
+    },
+    {
+      "entity": "fy_2026",
+      "arg_index": 1,
+      "expected_type": "FinancialYear",
+      "predicate": "loses_kleine_vennootschap_status_from"
+    }
+  ]
+}

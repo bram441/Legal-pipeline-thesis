@@ -1,0 +1,38 @@
+{
+  "mode": "cited",
+  "original_length": 5877,
+  "scope_mode": "exact_citation",
+  "cited_article": "4.17",
+  "cited_paragraph": 1,
+  "cited_point": null,
+  "selected_chunk_ids": [
+    "4.17/p1"
+  ],
+  "selected_granularity": "paragraph",
+  "included_dependency_chunks": [],
+  "contains_effect_language": false,
+  "question_asks_legal_effect": false,
+  "citations_structured": [
+    {
+      "article": "4.17",
+      "paragraph": 1,
+      "point": null,
+      "lid": null,
+      "raw": "Article 4.17, paragraph 1",
+      "confidence": 0.9
+    },
+    {
+      "article": "4.17",
+      "paragraph": null,
+      "point": null,
+      "lid": null,
+      "raw": "Article 4.17",
+      "confidence": 0.75
+    }
+  ],
+  "citations": [
+    "4:17(1)",
+    "4:17"
+  ],
+  "selected_length": 152
+}

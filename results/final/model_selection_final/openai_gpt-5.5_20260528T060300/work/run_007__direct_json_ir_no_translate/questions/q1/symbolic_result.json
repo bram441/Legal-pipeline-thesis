@@ -1,0 +1,170 @@
+{
+  "intent": "deduction",
+  "symbolic_status": "ok",
+  "status": "ok",
+  "scorable": true,
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "routing": {
+    "question": "Heeft Noor volgens artikel 4.23, paragraaf 1 het vruchtgebruik van de gezinswoning?",
+    "detected_question_type": "boolean",
+    "selected_intent": "deduction",
+    "selected_reason": "expected.mode=boolean",
+    "scorable": true,
+    "fallback_intent": null,
+    "warnings": [],
+    "legal_output_symbols": [
+      "has_usufruct_right_over"
+    ],
+    "query_hint_type": "boolean",
+    "expected_question_type": "boolean"
+  },
+  "satisfiability_check": {
+    "stage": "pre_query",
+    "kb_case_satisfiable": true,
+    "status": "ok",
+    "details": "theory satisfiable",
+    "intent_backend": "idp_z3.tasks.satisfiable_check",
+    "duration_seconds": 0.0356
+  },
+  "warnings": [],
+  "deduction": {
+    "intent": "deduction",
+    "status": "ok",
+    "output_kind": "epistemic_boolean",
+    "predicate": "has_usufruct_right_over",
+    "args": [
+      "noor",
+      "woning"
+    ],
+    "possible": true,
+    "certain": true,
+    "label": "entailed",
+    "atom": "has_usufruct_right_over(x0,x1)",
+    "constraint": "? x0 in Person, x1 in Asset: __sel0(x0) & __sel1(x1) & has_usufruct_right_over(x0,x1)",
+    "certainty_class": "decisive",
+    "sat": true,
+    "internal_intent": "deduction",
+    "antecedent_coverage": [
+      {
+        "rule_index": 0,
+        "target": "has_usufruct_right_over(noor,woning)",
+        "conditions": [
+          {
+            "atom": "is_surviving_legal_cohabitant_of(noor,mira)",
+            "status": "present"
+          },
+          {
+            "atom": "is_immovable_property(woning)",
+            "status": "present"
+          },
+          {
+            "atom": "served_as_principal_family_dwelling_at_succession_opening(woning,mira)",
+            "status": "present"
+          }
+        ]
+      },
+      {
+        "rule_index": 1,
+        "target": "has_usufruct_right_over(noor,woning)",
+        "conditions": [
+          {
+            "atom": "is_surviving_legal_cohabitant_of(noor,mira)",
+            "status": "present"
+          },
+          {
+            "atom": "is_immovable_property(woning)",
+            "status": "present"
+          },
+          {
+            "atom": "served_as_principal_family_dwelling_at_succession_opening(woning,mira)",
+            "status": "present"
+          },
+          {
+            "atom": "is_household_good(woning)",
+            "status": "missing_non_blocking"
+          },
+          {
+            "atom": "present_in_asset_at_succession_opening(woning,woning,mira)",
+            "status": "missing_non_blocking"
+          }
+        ]
+      }
+    ]
+  },
+  "model_expansion": null,
+  "get_range": null,
+  "satisfiable": null,
+  "explanation": null,
+  "execution_query": {
+    "type": "predicate",
+    "predicate": "has_usufruct_right_over",
+    "mode": "boolean",
+    "args": [
+      "noor",
+      "woning"
+    ],
+    "explain": false,
+    "predicate_kind": "derived",
+    "query_type": "predicate_boolean",
+    "internal_intent": "deduction"
+  },
+  "output_kind": "epistemic_boolean",
+  "certainty_class": "decisive",
+  "predicate": "has_usufruct_right_over",
+  "args": [
+    "noor",
+    "woning"
+  ],
+  "label": "entailed",
+  "possible": true,
+  "certain": true,
+  "sat": true,
+  "antecedent_coverage": [
+    {
+      "rule_index": 0,
+      "target": "has_usufruct_right_over(noor,woning)",
+      "conditions": [
+        {
+          "atom": "is_surviving_legal_cohabitant_of(noor,mira)",
+          "status": "present"
+        },
+        {
+          "atom": "is_immovable_property(woning)",
+          "status": "present"
+        },
+        {
+          "atom": "served_as_principal_family_dwelling_at_succession_opening(woning,mira)",
+          "status": "present"
+        }
+      ]
+    },
+    {
+      "rule_index": 1,
+      "target": "has_usufruct_right_over(noor,woning)",
+      "conditions": [
+        {
+          "atom": "is_surviving_legal_cohabitant_of(noor,mira)",
+          "status": "present"
+        },
+        {
+          "atom": "is_immovable_property(woning)",
+          "status": "present"
+        },
+        {
+          "atom": "served_as_principal_family_dwelling_at_succession_opening(woning,mira)",
+          "status": "present"
+        },
+        {
+          "atom": "is_household_good(woning)",
+          "status": "missing_non_blocking"
+        },
+        {
+          "atom": "present_in_asset_at_succession_opening(woning,woning,mira)",
+          "status": "missing_non_blocking"
+        }
+      ]
+    }
+  ]
+}

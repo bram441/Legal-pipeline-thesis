@@ -1,0 +1,156 @@
+{
+  "query": {
+    "predicate": "has_illegal_residence",
+    "args": [
+      "bilal"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "entailed",
+    "certain": true,
+    "possible": true,
+    "certainty_class": "decisive"
+  },
+  "extracted_case": {
+    "facts": [
+      "is_present_on_territory(bilal).",
+      "previously_met_entry_or_residence_conditions(bilal)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "Person": [
+        "belgian",
+        "bilal"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 2,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_present_on_territory",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "meets_entry_or_residence_conditions",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "has_illegal_residence"
+      ]
+    },
+    {
+      "rule_index": 3,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_present_on_territory",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "previously_met_entry_or_residence_conditions",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "has_illegal_residence"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 2,
+      "target": "has_illegal_residence(bilal)",
+      "conditions": [
+        {
+          "atom": "is_present_on_territory(bilal)",
+          "status": "present"
+        },
+        {
+          "atom": "meets_entry_or_residence_conditions(bilal)",
+          "status": "missing_non_blocking"
+        }
+      ]
+    },
+    {
+      "rule_index": 3,
+      "target": "has_illegal_residence(bilal)",
+      "conditions": [
+        {
+          "atom": "is_present_on_territory(bilal)",
+          "status": "present"
+        },
+        {
+          "atom": "previously_met_entry_or_residence_conditions(bilal)",
+          "status": "present"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "is_present_on_territory",
+      "symbol_type": "predicate",
+      "atom": "is_present_on_territory(bilal)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "He is present on Belgian territory and no longer meets the conditions for residence on the territory."
+      ],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "meets_entry_or_residence_conditions",
+      "symbol_type": "predicate",
+      "atom": "meets_entry_or_residence_conditions(bilal)",
+      "kind": "observable",
+      "gap_status": "missing_entirely",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "He is present on Belgian territory and no longer meets the conditions for residence on the territory."
+      ],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "previously_met_entry_or_residence_conditions",
+      "symbol_type": "predicate",
+      "atom": "previously_met_entry_or_residence_conditions(bilal)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "He is present on Belgian territory and no longer meets the conditions for residence on the territory."
+      ],
+      "deriving_rule_indices": []
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "extraction_gap",
+    "secondary": [],
+    "rationale": "Assertable observables or temporal facts required by the derivation chain were not extracted from the case although the case text contains relevant qualitative evidence."
+  }
+}

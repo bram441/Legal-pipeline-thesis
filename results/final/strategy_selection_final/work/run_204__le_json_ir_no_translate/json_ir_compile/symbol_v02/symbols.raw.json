@@ -1,0 +1,261 @@
+{
+  "types": ["Person", "Document"],
+  "predicates": [
+    {
+      "name": "provides_proof_of_belgian_nationality",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The person provides proof that they hold Belgian nationality."
+    },
+    {
+      "name": "is_citizen_of_union",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The person is a citizen of the European Union."
+    },
+    {
+      "name": "falls_under_community_free_movement_law",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The person falls under Community law on free movement as defined in Article 2, point 5, of the Schengen Borders Code."
+    },
+    {
+      "name": "is_present_on_territory",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The person is present on the territory."
+    },
+    {
+      "name": "satisfies_conditions_for_access_or_residence",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The person satisfies the conditions for access to or residence on the territory."
+    },
+    {
+      "name": "reasons_to_believe_will_abscond",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "There are reasons to believe that the foreigner will abscond."
+    },
+    {
+      "name": "subject_to_removal_procedure",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The foreigner is subject to a removal procedure."
+    },
+    {
+      "name": "subject_to_international_protection_procedure",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The foreigner is subject to a procedure for granting international protection."
+    },
+    {
+      "name": "subject_to_responsible_member_state_determination_procedure",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The foreigner is subject to a procedure for determining or transferring to the member state responsible for examining the request for international protection."
+    },
+    {
+      "name": "individual_examination_performed",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "An individual examination of the foreigner has been performed for the purpose of establishing a risk of absconding."
+    },
+    {
+      "name": "possesses_valid_travel_document",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The foreigner is in possession of a valid travel document, valid passport, or valid identity document."
+    },
+    {
+      "name": "recognised_as_national_by_own_authority",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The foreigner has been recognised as a national by the national authority of their country."
+    },
+    {
+      "name": "own_authority_willing_to_issue_laissez_passer",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The national authority of the foreigner's country has declared itself willing to issue a laissez-passer."
+    },
+    {
+      "name": "falls_under_nationality_category_for_ministerial_laissez_passer",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The foreigner falls under a category of nationalities for which the minister can issue a laissez-passer directly."
+    },
+    {
+      "name": "criterion_1_no_residence_or_protection_application",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The foreigner did not submit a residence application after illegal entry or during illegal residence, or did not submit a request for international protection within the period provided by law."
+    },
+    {
+      "name": "criterion_2_false_information_or_fraud",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The foreigner used false or misleading information, false or falsified documents, committed fraud, or used other unlawful means in the context of a relevant procedure."
+    },
+    {
+      "name": "criterion_3_non_cooperation_with_authorities",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The foreigner does not cooperate or has not cooperated with the authorities responsible for implementation or supervision of regulations on access, residence, establishment, and removal."
+    },
+    {
+      "name": "criterion_4_non_compliance_with_measures",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The foreigner has made clear they do not wish to comply with, or has already failed to comply with, a transfer, pushback, removal, entry ban, freedom-restricting, or equivalent measure."
+    },
+    {
+      "name": "criterion_5_subject_to_entry_ban",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The foreigner is subject to an entry ban in the Kingdom and/or in another member state that has neither been lifted nor suspended."
+    },
+    {
+      "name": "criterion_6_new_application_after_negative_decision",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The foreigner submitted a new residence application or request for international protection immediately after a decision refusing entry or residence, ending residence, or a pushback or removal measure."
+    },
+    {
+      "name": "criterion_7_concealed_fingerprints_in_other_state",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The foreigner, when questioned, concealed that they had already given fingerprints in another Dublin-bound state after submitting a request for international protection."
+    },
+    {
+      "name": "criterion_8_multiple_applications_with_negative_outcome",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The foreigner submitted multiple requests for international protection and/or residence applications in the Kingdom or other member states resulting in negative decisions or no residence permit."
+    },
+    {
+      "name": "criterion_9_concealed_prior_protection_request",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The foreigner, when questioned, concealed that they had previously submitted a request for international protection in another Dublin-bound state."
+    },
+    {
+      "name": "criterion_10_declared_purpose_inconsistent_with_application",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The foreigner declared or it appears from their file that they came to the Kingdom for purposes other than those for which they submitted a request for international protection or a residence application."
+    },
+    {
+      "name": "criterion_11_fined_for_manifestly_unlawful_appeal",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The foreigner is subject to a fine because they submitted a manifestly unlawful appeal to the Council for Alien Law Litigation."
+    },
+    {
+      "name": "at_least_one_absconding_criterion_met",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "At least one of the objective absconding criteria (1 through 11) is met for the foreigner."
+    },
+    {
+      "name": "subject_to_relevant_procedure",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The foreigner is subject to a removal procedure, an international protection procedure, or a responsible member state determination procedure."
+    },
+    {
+      "name": "is_foreigner",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The person is a foreigner because they do not provide proof of Belgian nationality.",
+      "output_category": "classification"
+    },
+    {
+      "name": "is_third_country_national",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The person is a national of a third country: not a Union citizen and not covered by Community free movement law.",
+      "output_category": "classification"
+    },
+    {
+      "name": "is_in_illegal_residence",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The foreigner is in illegal residence: present on the territory and not or no longer satisfying conditions for access or residence.",
+      "output_category": "classification"
+    },
+    {
+      "name": "is_identified_foreigner",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The foreigner is identified: holds a valid travel/identity document, is recognised by their national authority willing to issue a laissez-passer, or falls under a nationality category for ministerial laissez-passer.",
+      "output_category": "classification"
+    },
+    {
+      "name": "risk_of_absconding_exists",
+      "args": ["Person"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "A risk of absconding exists for the foreigner, established after individual examination on the basis of at least one objective criterion, with reasons to believe absconding will occur, and the foreigner being subject to a relevant procedure.",
+      "legal_output": true,
+      "output_category": "legal_effect"
+    }
+  ],
+  "functions": []
+}

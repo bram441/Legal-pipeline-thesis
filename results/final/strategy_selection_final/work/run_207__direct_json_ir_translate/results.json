@@ -1,0 +1,522 @@
+{
+  "id": "run_207",
+  "law": {
+    "text": "Chapter 4. Succession entitlement of the spouse and the legally cohabiting partner\n\nSection 1. The surviving spouse\n\nArt. 4.17. Inheritance rights of the surviving spouse\n\npar. 1. When the deceased leaves descendants, adopted children or descendants of these, the surviving spouse acquires the usufruct of the entire estate.\n\npar. 2. When the deceased leaves relatives in the ascending line or close collateral relatives, the surviving spouse acquires:\n(1) the full ownership of the share of the first to die in the common property and in the property held exclusively in undivided co-ownership between the spouses, and\n(2) the usufruct of the remaining goods of their own property.\n(3) the usufruct of the goods subject to the right of legal reversion referred to in article 4.24 or in article 4.25, unless otherwise provided in the deed of donation or in the will.\n\npar. 3. When the deceased leaves other heirs or no heirs, the surviving spouse acquires the full ownership of the entire estate.\n\nArt. 4.18. Usufruct over donated goods\n\nUpon the death of the donor, the surviving spouse who is called to the estate receives the usufruct of the goods that the donor donated and of which the donor reserved the usufruct, on the condition that the spouse already held that capacity at the time of the donation and that the donor remained the holder of this usufruct until the day of their death.\n\nUpon the death of the donor, the surviving spouse who is called to the estate receives the usufruct of the immovable property that served as the family's principal residence at the time the estate opened and of the household effects present therein, on the condition that the donor had reserved the usufruct of those goods upon the donation thereof, that the spouse was legally cohabiting with the donor at the time of the donation, and that the donor remained the holder of this usufruct until the day of their death.\n\nThe spouse may renounce that usufruct. Articles 4.244 to 4.253 apply to such renunciation when it takes place during the lifetime of the donor.\n\nArt. 4.20. Right to lease\n\nThe surviving spouse acquires exclusively, to the exclusion of all other heirs, the right to the lease of the immovable property that served as the family's principal residence at the time the estate of the deceased opened.\n\nArt. 4.22. Exclusion or forfeiture\n\npar. 1. The surviving spouse may be wholly or partially excluded from or declared to have forfeited their inheritance rights if they have been wholly or partially deprived of parental authority over the children born of their marriage with the deceased.\n\npar. 2. The legal action is brought by the descendants within one year calculated either from the opening of the estate or from the deprivation of parental authority.\n\nThe judgment takes effect from the date on which the action was brought.\n\npar. 3. If the usufruct has already been converted into the full ownership of a good or into a sum of money, or if the bare ownership of the goods referred to in article 4.61, paragraph 7, has already been transferred, the exclusion or declaration of forfeiture gives rise to a right to compensation.\n\nThat compensation is determined by the court and corresponds to the value of the usufruct, having regard also to the presumed life expectancy of the usufructuary at the time the legal action was brought.\n\nIf the usufruct has been converted into a life annuity, the judgment has retroactive effect to the same point in time.\n\nSection 2. The surviving legally cohabiting partner\n\nArt. 4.23. Inheritance rights and right to lease of the surviving legally cohabiting partner\n\npar. 1. The surviving legally cohabiting partner acquires, regardless of which heirs they are called to the estate with, the usufruct of the immovable property that served as the family's principal residence at the time the estate of the deceased opened, and of the household effects present therein.\n\nThe surviving legally cohabiting partner also exercises this right if the goods referred to in the first paragraph are the subject of a right of legal reversion referred to in article 4.24 or in article 4.25.\n\npar. 2. The surviving legally cohabiting partner who is called to the estate receives upon the death of the donor the usufruct of the immovable property that served as the family's principal residence at the time the estate opened and of the household effects present therein, if the donor had reserved the usufruct of these goods upon the donation thereof, and on the condition that the legally cohabiting partner already held that capacity at the time of the donation and that the donor remained the holder of this usufruct until the day of their death.\n\nThe legally cohabiting partner may renounce the usufruct referred to in the first paragraph. Articles 4.244 to 4.253 apply to such renunciation when it takes place during the lifetime of the donor.\n\npar. 3. The surviving legally cohabiting partner acquires exclusively, to the exclusion of all other heirs, the right to the lease of the immovable property that served as the family's principal residence at the time the estate of the predeceased legally cohabiting partner opened, and acquires the usufruct of the household effects present therein.\n\npar. 4. The foregoing provisions do not apply when the surviving legally cohabiting partner is a descendant of the predeceased legally cohabiting partner.\n\npar. 5. Notwithstanding any provision to the contrary, any person who acquires the bare ownership may require that an inventory of the household effects and a statement of condition of the immovable property that served as the family's principal residence be drawn up.\n\npar. 6. The rules concerning the usufruct of the surviving spouse contained in articles 4.22 and 4.60 to 4.64 apply mutatis mutandis to the usufruct of the surviving legally cohabiting partner."
+  },
+  "kb_used": {
+    "fo": "vocabulary V {\n  type Person\n  type Property\n  is_surviving_spouse_of: Person * Person -> Bool\n  is_heir_of: Person * Person -> Bool\n  served_as_family_principal_residence: Property * Person -> Bool\n  property_is_leased: Property -> Bool\n  acquires_right_to_lease: Person * Property -> Bool\n  excluded_from_lease_right: Person * Property -> Bool\n}\n\ntheory T:V {\n  ! spouse in Person, deceased in Person, prop in Property: (((is_surviving_spouse_of(spouse,deceased)) & (served_as_family_principal_residence(prop,deceased)) & (property_is_leased(prop)))) => ((acquires_right_to_lease(spouse,prop))).\n  ! heir in Person, spouse in Person, deceased in Person, prop in Property: (((is_heir_of(heir,deceased)) & (is_surviving_spouse_of(spouse,deceased)) & (acquires_right_to_lease(spouse,prop)))) => ((excluded_from_lease_right(heir,prop))).\n}"
+  },
+  "case": {
+    "text": "Willem and Yara were married. Yara dies. At the time the estate opened, the apartment in Ghent was the principal family home."
+  },
+  "kb_compile_strategy": "direct_json_ir_translate",
+  "kb_compile_backend": "json_ir",
+  "extraction_backend": "json_ir",
+  "pipeline_backend_mode": "json_ir",
+  "kb_compile_flags": {
+    "use_le": false,
+    "uses_translation": true,
+    "json_ir_generation": "symbols_then_rules"
+  },
+  "strategy_metadata": {
+    "strategy_name": "direct_json_ir_translate",
+    "canonical_strategy_name": "direct_json_ir_translate",
+    "kb_backend": "json_ir",
+    "pipeline_backend_mode": "json_ir",
+    "uses_le_intermediate": false,
+    "json_ir_generation": "symbols_then_rules",
+    "belief_scoring": false,
+    "law_scope_mode": "cited",
+    "repair_enabled": true,
+    "json_ir_structured_repair_enabled": true,
+    "json_ir_max_symbol_versions": 3,
+    "json_ir_max_rules_attempts_per_symbol_version": 2,
+    "json_ir_max_kb_llm_calls": 8,
+    "json_ir_outer_cache_retries_enabled": false,
+    "json_ir_outer_cache_max_attempts": 1,
+    "configured_translation": true,
+    "effective_translation": true,
+    "translation_source": "strategy",
+    "uses_translation": true
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Does Willem acquire, pursuant to Article 4.20, the right to the tenancy of the family home as the sole beneficiary?",
+      "expected": {
+        "mode": "boolean",
+        "value": true,
+        "reason": "Art. 4.20: the surviving spouse exclusively obtains the rental right of the real estate that served as the family home."
+      },
+      "pipeline": {
+        "sat": true,
+        "case": {
+          "facts": [
+            "is_surviving_spouse_of(willem,yara).",
+            "served_as_family_principal_residence(apartment_ghent,yara)."
+          ],
+          "case_given_factual_inputs": [],
+          "entities": {
+            "Property": [
+              "apartment_ghent"
+            ],
+            "Person": [
+              "ghent",
+              "willem",
+              "yara"
+            ]
+          },
+          "schema_environment": {
+            "types": {
+              "Person": {
+                "name": "Person",
+                "kind": "entity",
+                "aliases": [],
+                "source": "kb_symbol_table"
+              },
+              "Property": {
+                "name": "Property",
+                "kind": "entity",
+                "aliases": [],
+                "source": "kb_symbol_table"
+              }
+            },
+            "predicates": {
+              "is_surviving_spouse_of": {
+                "name": "is_surviving_spouse_of",
+                "args": [
+                  "Person",
+                  "Person"
+                ],
+                "returns": "Bool",
+                "kind": "observable",
+                "description": "The first person is the surviving spouse of the second person (the deceased). This is a background status that may be directly asserted in a case.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": true,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "is_heir_of": {
+                "name": "is_heir_of",
+                "args": [
+                  "Person",
+                  "Person"
+                ],
+                "returns": "Bool",
+                "kind": "observable",
+                "description": "The first person is an heir of the second person (the deceased).",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": true,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "served_as_family_principal_residence": {
+                "name": "served_as_family_principal_residence",
+                "args": [
+                  "Property",
+                  "Person"
+                ],
+                "returns": "Bool",
+                "kind": "observable",
+                "description": "The property served as the family's principal residence at the time the estate of the deceased opened.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": true,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "property_is_leased": {
+                "name": "property_is_leased",
+                "args": [
+                  "Property"
+                ],
+                "returns": "Bool",
+                "kind": "observable",
+                "description": "The property is subject to a lease agreement.",
+                "legal_output": null,
+                "output_category": null,
+                "directly_observable": true,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": true,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": false,
+                "temporal_support": false
+              },
+              "acquires_right_to_lease": {
+                "name": "acquires_right_to_lease",
+                "args": [
+                  "Person",
+                  "Property"
+                ],
+                "returns": "Bool",
+                "kind": "derived",
+                "description": "The surviving spouse acquires exclusively the right to the lease of the property, to the exclusion of all other heirs.",
+                "legal_output": true,
+                "output_category": "right",
+                "directly_observable": false,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": false,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": true,
+                "temporal_support": false
+              },
+              "excluded_from_lease_right": {
+                "name": "excluded_from_lease_right",
+                "args": [
+                  "Person",
+                  "Property"
+                ],
+                "returns": "Bool",
+                "kind": "derived",
+                "description": "The heir is excluded from the right to the lease of the property because the surviving spouse acquires it exclusively.",
+                "legal_output": null,
+                "output_category": "exception",
+                "directly_observable": false,
+                "background": false,
+                "case_input": false,
+                "assertable_in_case": false,
+                "factual_case_input": false,
+                "factual_criteria_input": false,
+                "case_given_input_predicate": null,
+                "query_target_candidate": true,
+                "temporal_support": false
+              }
+            },
+            "functions": {},
+            "assertable_case_symbols": {
+              "predicates": [
+                "is_heir_of",
+                "is_surviving_spouse_of",
+                "property_is_leased",
+                "served_as_family_principal_residence"
+              ],
+              "functions": []
+            },
+            "factual_case_input_predicates": [],
+            "factual_criteria_input_predicates": [],
+            "legal_output_query_targets": [
+              "acquires_right_to_lease",
+              "excluded_from_lease_right"
+            ],
+            "temporal_support_symbols": []
+          },
+          "entity_type_mapping": {
+            "entities": {
+              "apartment_ghent": {
+                "declared_type": "Property",
+                "resolved_type": "Property",
+                "source": "fact_argument+query_argument",
+                "evidence": [
+                  {
+                    "source": "fact_argument",
+                    "symbol": "served_as_family_principal_residence",
+                    "arg_index": 0,
+                    "expected_type": "Property"
+                  },
+                  {
+                    "source": "query_argument",
+                    "symbol": "acquires_right_to_lease",
+                    "arg_index": 1,
+                    "expected_type": "Property"
+                  }
+                ]
+              },
+              "ghent": {
+                "declared_type": "Person",
+                "resolved_type": "Person",
+                "source": "declared",
+                "evidence": []
+              },
+              "willem": {
+                "declared_type": "Person",
+                "resolved_type": "Person",
+                "source": "fact_argument+query_argument",
+                "evidence": [
+                  {
+                    "source": "fact_argument",
+                    "symbol": "is_surviving_spouse_of",
+                    "arg_index": 0,
+                    "expected_type": "Person"
+                  },
+                  {
+                    "source": "query_argument",
+                    "symbol": "acquires_right_to_lease",
+                    "arg_index": 0,
+                    "expected_type": "Person"
+                  }
+                ]
+              },
+              "yara": {
+                "declared_type": "Person",
+                "resolved_type": "Person",
+                "source": "fact_argument",
+                "evidence": [
+                  {
+                    "source": "fact_argument",
+                    "symbol": "is_surviving_spouse_of",
+                    "arg_index": 1,
+                    "expected_type": "Person"
+                  },
+                  {
+                    "source": "fact_argument",
+                    "symbol": "served_as_family_principal_residence",
+                    "arg_index": 1,
+                    "expected_type": "Person"
+                  }
+                ]
+              }
+            },
+            "unmapped_entities": [],
+            "conflicts": [],
+            "query_arguments_with_inferred_types": [
+              {
+                "entity": "willem",
+                "arg_index": 0,
+                "expected_type": "Person",
+                "predicate": "acquires_right_to_lease"
+              },
+              {
+                "entity": "apartment_ghent",
+                "arg_index": 1,
+                "expected_type": "Property",
+                "predicate": "acquires_right_to_lease"
+              }
+            ]
+          },
+          "resolved_entity_domains": {
+            "Property": [
+              "apartment_ghent"
+            ],
+            "Person": [
+              "ghent",
+              "willem",
+              "yara"
+            ]
+          }
+        },
+        "query": {
+          "type": "predicate",
+          "predicate": "acquires_right_to_lease",
+          "mode": "boolean",
+          "args": [
+            "willem",
+            "apartment_ghent"
+          ],
+          "explain": false,
+          "predicate_kind": "derived",
+          "query_type": "predicate_boolean",
+          "internal_intent": "deduction"
+        },
+        "symbolic_result": {
+          "intent": "deduction",
+          "symbolic_status": "ok",
+          "status": "ok",
+          "scorable": true,
+          "detected_question_type": "boolean",
+          "selected_intent": "deduction",
+          "selected_reason": "expected.mode=boolean",
+          "routing": {
+            "question": "Does Willem acquire, pursuant to Article 4.20, the right to the tenancy of the family home as the sole beneficiary?",
+            "detected_question_type": "boolean",
+            "selected_intent": "deduction",
+            "selected_reason": "expected.mode=boolean",
+            "scorable": true,
+            "fallback_intent": null,
+            "warnings": [],
+            "legal_output_symbols": [
+              "acquires_right_to_lease",
+              "excluded_from_lease_right"
+            ],
+            "query_hint_type": "boolean",
+            "expected_question_type": "boolean"
+          },
+          "satisfiability_check": {
+            "stage": "pre_query",
+            "kb_case_satisfiable": true,
+            "status": "ok",
+            "details": "theory satisfiable",
+            "intent_backend": "idp_z3.tasks.satisfiable_check",
+            "duration_seconds": 0.0367
+          },
+          "warnings": [],
+          "deduction": {
+            "intent": "deduction",
+            "status": "ok",
+            "output_kind": "epistemic_boolean",
+            "predicate": "acquires_right_to_lease",
+            "args": [
+              "willem",
+              "apartment_ghent"
+            ],
+            "possible": true,
+            "certain": false,
+            "label": "unknown",
+            "atom": "acquires_right_to_lease(x0,x1)",
+            "constraint": "? x0 in Person, x1 in Property: __sel0(x0) & __sel1(x1) & acquires_right_to_lease(x0,x1)",
+            "certainty_class": "inconclusive",
+            "sat": true,
+            "internal_intent": "deduction",
+            "antecedent_coverage": [
+              {
+                "rule_index": 0,
+                "target": "acquires_right_to_lease(willem,apartment_ghent)",
+                "conditions": [
+                  {
+                    "atom": "is_surviving_spouse_of(willem,yara)",
+                    "status": "present"
+                  },
+                  {
+                    "atom": "served_as_family_principal_residence(apartment_ghent,yara)",
+                    "status": "present"
+                  },
+                  {
+                    "atom": "property_is_leased(apartment_ghent)",
+                    "status": "missing"
+                  }
+                ]
+              }
+            ],
+            "extraction_repair_hint": "The selected legal conclusion could not be proven because an observable antecedent required by the KB rule was not asserted from the case. Re-check the case text for facts matching these observable schema symbols: property_is_leased: The property is subject to a lease agreement.."
+          },
+          "model_expansion": null,
+          "get_range": null,
+          "satisfiable": null,
+          "explanation": null,
+          "execution_query": {
+            "type": "predicate",
+            "predicate": "acquires_right_to_lease",
+            "mode": "boolean",
+            "args": [
+              "willem",
+              "apartment_ghent"
+            ],
+            "explain": false,
+            "predicate_kind": "derived",
+            "query_type": "predicate_boolean",
+            "internal_intent": "deduction"
+          },
+          "output_kind": "epistemic_boolean",
+          "certainty_class": "inconclusive",
+          "predicate": "acquires_right_to_lease",
+          "args": [
+            "willem",
+            "apartment_ghent"
+          ],
+          "label": "unknown",
+          "possible": true,
+          "certain": false,
+          "sat": true,
+          "antecedent_coverage": [
+            {
+              "rule_index": 0,
+              "target": "acquires_right_to_lease(willem,apartment_ghent)",
+              "conditions": [
+                {
+                  "atom": "is_surviving_spouse_of(willem,yara)",
+                  "status": "present"
+                },
+                {
+                  "atom": "served_as_family_principal_residence(apartment_ghent,yara)",
+                  "status": "present"
+                },
+                {
+                  "atom": "property_is_leased(apartment_ghent)",
+                  "status": "missing"
+                }
+              ]
+            }
+          ],
+          "extraction_repair_hint": "The selected legal conclusion could not be proven because an observable antecedent required by the KB rule was not asserted from the case. Re-check the case text for facts matching these observable schema symbols: property_is_leased: The property is subject to a lease agreement.."
+        },
+        "symbolic_intent_routing": {
+          "question": "Does Willem acquire, pursuant to Article 4.20, the right to the tenancy of the family home as the sole beneficiary?",
+          "detected_question_type": "boolean",
+          "selected_intent": "deduction",
+          "selected_reason": "expected.mode=boolean",
+          "scorable": true,
+          "fallback_intent": null,
+          "warnings": [],
+          "legal_output_symbols": [
+            "acquires_right_to_lease",
+            "excluded_from_lease_right"
+          ],
+          "query_hint_type": "boolean",
+          "expected_question_type": "boolean"
+        },
+        "prediction": {
+          "query_type": "predicate_boolean",
+          "internal_intent": "deduction",
+          "output_kind": "epistemic_boolean",
+          "status": "ok",
+          "certainty_class": "inconclusive",
+          "mode": "boolean",
+          "label": "unknown",
+          "belief_yes": 0.5,
+          "credence_yes_pct": 50,
+          "verdict_strength_pct": 0
+        },
+        "natural_language": "Cannot determine with certainty. acquires_right_to_lease(willem, apartment_ghent) is not logically forced either way (label: unknown).",
+        "explanation": null,
+        "extraction_prompt": "You are debugging a legal extraction failure.\n\nGiven KB_SCHEMA, CASE, and QUESTION, identify the likely generic cause of failure.\nFocus on schema mismatch, missing observable facts, wrong argument order, wrong entity type, selected observable instead of derived predicate, or unsupported query shape.\n\nDo not invent new law-specific fixes.\nReturn concise bullet points and one generic repair suggestion.\n\nKB_SCHEMA:\n{\n  \"types\": [\n    \"Person\",\n    \"Property\"\n  ],\n  \"predicates\": [\n    {\n      \"name\": \"is_surviving_spouse_of\",\n      \"args\": [\n        \"Person\",\n        \"Person\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"observable\",\n      \"description\": \"The first person is the surviving spouse of the second person (the deceased). This is a background status that may be directly asserted in a case.\",\n      \"directly_observable\": true\n    },\n    {\n      \"name\": \"is_heir_of\",\n      \"args\": [\n        \"Person\",\n        \"Person\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"observable\",\n      \"description\": \"The first person is an heir of the second person (the deceased).\",\n      \"directly_observable\": true\n    },\n    {\n      \"name\": \"served_as_family_principal_residence\",\n      \"args\": [\n        \"Property\",\n        \"Person\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"observable\",\n      \"description\": \"The property served as the family's principal residence at the time the estate of the deceased opened.\",\n      \"directly_observable\": true\n    },\n    {\n      \"name\": \"property_is_leased\",\n      \"args\": [\n        \"Property\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"observable\",\n      \"description\": \"The property is subject to a lease agreement.\",\n      \"directly_observable\": true\n    },\n    {\n      \"name\": \"acquires_right_to_lease\",\n      \"args\": [\n        \"Person\",\n        \"Property\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"derived\",\n      \"description\": \"The surviving spouse acquires exclusively the right to the lease of the property, to the exclusion of all other heirs.\",\n      \"legal_output\": true,\n      \"output_category\": \"right\"\n    },\n    {\n      \"name\": \"excluded_from_lease_right\",\n      \"args\": [\n        \"Person\",\n        \"Property\"\n      ],\n      \"returns\": \"Bool\",\n      \"kind\": \"derived\",\n      \"description\": \"The heir is excluded from the right to the lease of the property because the surviving spouse acquires it exclusively.\",\n      \"output_category\": \"exception\"\n    }\n  ],\n  \"functions\": [],\n  \"rules\": [\n    {\n      \"forall\": [\n        {\n          \"var\": \"spouse\",\n          \"type\": \"Person\"\n        },\n        {\n          \"var\": \"deceased\",\n          \"type\": \"Person\"\n        },\n        {\n          \"var\": \"prop\",\n          \"type\": \"Property\"\n        }\n      ],\n      \"if\": [\n        {\n          \"and\": [\n            {\n              \"pred\": \"is_surviving_spouse_of\",\n              \"args\": [\n                \"spouse\",\n                \"deceased\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"served_as_family_principal_residence\",\n              \"args\": [\n                \"prop\",\n                \"deceased\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"property_is_leased\",\n              \"args\": [\n                \"prop\"\n              ],\n              \"negated\": false\n            }\n          ]\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"acquires_right_to_lease\",\n          \"args\": [\n            \"spouse\",\n            \"prop\"\n          ],\n          \"negated\": false\n        }\n      ],\n      \"operator\": \"implies\"\n    },\n    {\n      \"forall\": [\n        {\n          \"var\": \"heir\",\n          \"type\": \"Person\"\n        },\n        {\n          \"var\": \"spouse\",\n          \"type\": \"Person\"\n        },\n        {\n          \"var\": \"deceased\",\n          \"type\": \"Person\"\n        },\n        {\n          \"var\": \"prop\",\n          \"type\": \"Property\"\n        }\n      ],\n      \"if\": [\n        {\n          \"and\": [\n            {\n              \"pred\": \"is_heir_of\",\n              \"args\": [\n                \"heir\",\n                \"deceased\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"is_surviving_spouse_of\",\n              \"args\": [\n                \"spouse\",\n                \"deceased\"\n              ],\n              \"negated\": false\n            },\n            {\n              \"pred\": \"acquires_right_to_lease\",\n              \"args\": [\n                \"spouse\",\n                \"prop\"\n              ],\n              \"negated\": false\n            }\n          ]\n        }\n      ],\n      \"then\": [\n        {\n          \"pred\": \"excluded_from_lease_right\",\n          \"args\": [\n            \"heir\",\n            \"prop\"\n          ],\n          \"negated\": false\n        }\n      ],\n      \"operator\": \"implies\"\n    }\n  ]\n}\n\nCASE:\nWillem and Yara were married. Yara dies. At the time the estate opened, the apartment in Ghent was the principal family home.\n\nQUESTION:\nDoes Willem acquire, pursuant to Article 4.20, the right to the tenancy of the family home as the sole beneficiary?",
+        "raw_extracted": {
+          "case": {
+            "facts": [
+              "is_surviving_spouse_of(willem,yara).",
+              "served_as_family_principal_residence(apartment_ghent,yara)."
+            ],
+            "case_given_factual_inputs": [],
+            "entities": {
+              "Person": [
+                "ghent",
+                "willem",
+                "yara"
+              ],
+              "Property": [
+                "apartment_ghent"
+              ]
+            }
+          },
+          "query": {
+            "type": "predicate",
+            "predicate": "acquires_right_to_lease",
+            "mode": "boolean",
+            "args": [
+              "willem",
+              "apartment_ghent"
+            ],
+            "explain": false,
+            "predicate_kind": "derived",
+            "query_type": "predicate_boolean",
+            "internal_intent": "deduction"
+          }
+        }
+      }
+    }
+  ]
+}

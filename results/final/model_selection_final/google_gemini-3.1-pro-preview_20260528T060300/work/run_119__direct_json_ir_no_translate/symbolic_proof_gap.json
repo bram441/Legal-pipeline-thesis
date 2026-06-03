@@ -1,0 +1,557 @@
+{
+  "query": {
+    "predicate": "is_small_company",
+    "args": [
+      "bv_start",
+      "eerste_boekjaar"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "contradicted",
+    "certain": false,
+    "possible": false,
+    "certainty_class": "decisive"
+  },
+  "extracted_case": {
+    "facts": [
+      "has_legal_personality(bv_start).",
+      "is_starting_company(bv_start).",
+      "is_first_financial_year(bv_start,eerste_boekjaar).",
+      "estimated_annual_average_employees(bv_start,eerste_boekjaar) = 55.",
+      "estimated_annual_net_turnover(bv_start,eerste_boekjaar) = 12000000.0.",
+      "estimated_balance_sheet_total(bv_start,eerste_boekjaar) = 5000000.0."
+    ],
+    "value_assertions": [
+      "estimated_annual_average_employees(bv_start,eerste_boekjaar) = 55.",
+      "estimated_annual_net_turnover(bv_start,eerste_boekjaar) = 12000000.0.",
+      "estimated_balance_sheet_total(bv_start,eerste_boekjaar) = 5000000.0."
+    ],
+    "entities": {
+      "Company": [
+        "bv_start"
+      ],
+      "FinancialYear": [
+        "eerste_boekjaar"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 0,
+      "requirements": {
+        "predicates": [],
+        "function_compares": [
+          {
+            "function": "annual_average_employees"
+          }
+        ]
+      },
+      "then_predicates": [
+        "employee_threshold_exceeded"
+      ]
+    },
+    {
+      "rule_index": 1,
+      "requirements": {
+        "predicates": [],
+        "function_compares": [
+          {
+            "function": "annual_net_turnover"
+          }
+        ]
+      },
+      "then_predicates": [
+        "turnover_threshold_exceeded"
+      ]
+    },
+    {
+      "rule_index": 2,
+      "requirements": {
+        "predicates": [],
+        "function_compares": [
+          {
+            "function": "balance_sheet_total"
+          }
+        ]
+      },
+      "then_predicates": [
+        "balance_sheet_threshold_exceeded"
+      ]
+    },
+    {
+      "rule_index": 3,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "employee_threshold_exceeded",
+            "args": [
+              "c",
+              "y"
+            ]
+          },
+          {
+            "predicate": "turnover_threshold_exceeded",
+            "args": [
+              "c",
+              "y"
+            ]
+          },
+          {
+            "predicate": "employee_threshold_exceeded",
+            "args": [
+              "c",
+              "y"
+            ]
+          },
+          {
+            "predicate": "balance_sheet_threshold_exceeded",
+            "args": [
+              "c",
+              "y"
+            ]
+          },
+          {
+            "predicate": "turnover_threshold_exceeded",
+            "args": [
+              "c",
+              "y"
+            ]
+          },
+          {
+            "predicate": "balance_sheet_threshold_exceeded",
+            "args": [
+              "c",
+              "y"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "more_than_one_criterion_exceeded"
+      ]
+    },
+    {
+      "rule_index": 4,
+      "requirements": {
+        "predicates": [],
+        "function_compares": [
+          {
+            "function": "estimated_annual_average_employees"
+          }
+        ]
+      },
+      "then_predicates": [
+        "estimated_employee_threshold_exceeded"
+      ]
+    },
+    {
+      "rule_index": 5,
+      "requirements": {
+        "predicates": [],
+        "function_compares": [
+          {
+            "function": "estimated_annual_net_turnover"
+          }
+        ]
+      },
+      "then_predicates": [
+        "estimated_turnover_threshold_exceeded"
+      ]
+    },
+    {
+      "rule_index": 6,
+      "requirements": {
+        "predicates": [],
+        "function_compares": [
+          {
+            "function": "estimated_balance_sheet_total"
+          }
+        ]
+      },
+      "then_predicates": [
+        "estimated_balance_sheet_threshold_exceeded"
+      ]
+    },
+    {
+      "rule_index": 7,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "estimated_employee_threshold_exceeded",
+            "args": [
+              "c",
+              "y"
+            ]
+          },
+          {
+            "predicate": "estimated_turnover_threshold_exceeded",
+            "args": [
+              "c",
+              "y"
+            ]
+          },
+          {
+            "predicate": "estimated_employee_threshold_exceeded",
+            "args": [
+              "c",
+              "y"
+            ]
+          },
+          {
+            "predicate": "estimated_balance_sheet_threshold_exceeded",
+            "args": [
+              "c",
+              "y"
+            ]
+          },
+          {
+            "predicate": "estimated_turnover_threshold_exceeded",
+            "args": [
+              "c",
+              "y"
+            ]
+          },
+          {
+            "predicate": "estimated_balance_sheet_threshold_exceeded",
+            "args": [
+              "c",
+              "y"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "estimated_more_than_one_criterion_exceeded"
+      ]
+    },
+    {
+      "rule_index": 8,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "has_legal_personality",
+            "args": [
+              "c"
+            ]
+          },
+          {
+            "predicate": "previous_financial_year",
+            "args": [
+              "y",
+              "prev_y"
+            ]
+          },
+          {
+            "predicate": "more_than_one_criterion_exceeded",
+            "args": [
+              "c",
+              "prev_y"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "is_small_company"
+      ]
+    },
+    {
+      "rule_index": 9,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "has_legal_personality",
+            "args": [
+              "c"
+            ]
+          },
+          {
+            "predicate": "is_first_financial_year",
+            "args": [
+              "c",
+              "y"
+            ]
+          },
+          {
+            "predicate": "estimated_more_than_one_criterion_exceeded",
+            "args": [
+              "c",
+              "y"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "is_small_company"
+      ]
+    },
+    {
+      "rule_index": 10,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "previous_financial_year",
+            "args": [
+              "y",
+              "prev_y"
+            ]
+          },
+          {
+            "predicate": "more_than_one_criterion_exceeded",
+            "args": [
+              "c",
+              "prev_y"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "is_small_company"
+      ]
+    },
+    {
+      "rule_index": 11,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_first_financial_year",
+            "args": [
+              "c",
+              "y"
+            ]
+          },
+          {
+            "predicate": "estimated_more_than_one_criterion_exceeded",
+            "args": [
+              "c",
+              "y"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "is_small_company"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 8,
+      "target": "is_small_company(bv_start,eerste_boekjaar)",
+      "conditions": [
+        {
+          "atom": "has_legal_personality(bv_start)",
+          "status": "present"
+        },
+        {
+          "atom": "previous_financial_year",
+          "status": "unknown"
+        },
+        {
+          "atom": "more_than_one_criterion_exceeded",
+          "status": "unknown"
+        }
+      ]
+    },
+    {
+      "rule_index": 9,
+      "target": "is_small_company(bv_start,eerste_boekjaar)",
+      "conditions": [
+        {
+          "atom": "has_legal_personality(bv_start)",
+          "status": "present"
+        },
+        {
+          "atom": "is_first_financial_year(bv_start,eerste_boekjaar)",
+          "status": "present"
+        },
+        {
+          "atom": "estimated_more_than_one_criterion_exceeded(bv_start,eerste_boekjaar)",
+          "status": "helper_defined"
+        }
+      ]
+    },
+    {
+      "rule_index": 10,
+      "target": "is_small_company(bv_start,eerste_boekjaar)",
+      "conditions": [
+        {
+          "atom": "previous_financial_year",
+          "status": "unknown"
+        },
+        {
+          "atom": "more_than_one_criterion_exceeded",
+          "status": "unknown"
+        }
+      ]
+    },
+    {
+      "rule_index": 11,
+      "target": "is_small_company(bv_start,eerste_boekjaar)",
+      "conditions": [
+        {
+          "atom": "is_first_financial_year(bv_start,eerste_boekjaar)",
+          "status": "present"
+        },
+        {
+          "atom": "estimated_more_than_one_criterion_exceeded(bv_start,eerste_boekjaar)",
+          "status": "helper_defined"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "has_legal_personality",
+      "symbol_type": "predicate",
+      "atom": "has_legal_personality(bv_start)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "previous_financial_year",
+      "symbol_type": "predicate",
+      "atom": "previous_financial_year",
+      "kind": "observable",
+      "gap_status": "missing_entirely",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "more_than_one_criterion_exceeded",
+      "symbol_type": "predicate",
+      "atom": "more_than_one_criterion_exceeded",
+      "kind": "helper",
+      "gap_status": "derivable_from_rules",
+      "assertable_in_case": false,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        3
+      ]
+    },
+    {
+      "symbol": "is_first_financial_year",
+      "symbol_type": "predicate",
+      "atom": "is_first_financial_year(bv_start,eerste_boekjaar)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "estimated_more_than_one_criterion_exceeded",
+      "symbol_type": "predicate",
+      "atom": "estimated_more_than_one_criterion_exceeded(bv_start,eerste_boekjaar)",
+      "kind": "helper",
+      "gap_status": "derivable_from_rules",
+      "assertable_in_case": false,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        7
+      ]
+    },
+    {
+      "symbol": "annual_average_employees",
+      "symbol_type": "function",
+      "atom": "annual_average_employees(...)",
+      "kind": "observable",
+      "gap_status": "blocked_by_missing_numeric",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        0
+      ]
+    },
+    {
+      "symbol": "annual_net_turnover",
+      "symbol_type": "function",
+      "atom": "annual_net_turnover(...)",
+      "kind": "observable",
+      "gap_status": "blocked_by_missing_numeric",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        1
+      ]
+    },
+    {
+      "symbol": "balance_sheet_total",
+      "symbol_type": "function",
+      "atom": "balance_sheet_total(...)",
+      "kind": "observable",
+      "gap_status": "blocked_by_missing_numeric",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        2
+      ]
+    },
+    {
+      "symbol": "estimated_annual_average_employees",
+      "symbol_type": "function",
+      "atom": "estimated_annual_average_employees(...)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        4
+      ]
+    },
+    {
+      "symbol": "estimated_annual_net_turnover",
+      "symbol_type": "function",
+      "atom": "estimated_annual_net_turnover(...)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        5
+      ]
+    },
+    {
+      "symbol": "estimated_balance_sheet_total",
+      "symbol_type": "function",
+      "atom": "estimated_balance_sheet_total(...)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        6
+      ]
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "extraction_gap",
+    "secondary": [],
+    "rationale": "Assertable observables or temporal facts required by the derivation chain were not extracted from the case although the case text contains relevant qualitative evidence."
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "rules": [
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "prop", "type": "Property"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_longest_living_legal_cohabitant", "args": ["survivor", "deceased"], "negated": false},
+            {"pred": "is_deceased", "args": ["deceased"], "negated": false},
+            {"pred": "inherits_together_with_heirs", "args": ["survivor", "deceased"], "negated": false},
+            {"pred": "is_main_family_residence", "args": ["prop", "deceased"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "acquires_usufruct_of_residence", "args": ["survivor", "prop"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "deceased", "type": "Person"},
+        {"var": "goods", "type": "Property"},
+        {"var": "residence", "type": "Property"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "is_longest_living_legal_cohabitant", "args": ["survivor", "deceased"], "negated": false},
+            {"pred": "is_deceased", "args": ["deceased"], "negated": false},
+            {"pred": "inherits_together_with_heirs", "args": ["survivor", "deceased"], "negated": false},
+            {"pred": "is_main_family_residence", "args": ["residence", "deceased"], "negated": false},
+            {"pred": "is_household_goods", "args": ["goods", "residence"], "negated": false}
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "acquires_usufruct_of_household_goods", "args": ["survivor", "goods"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "prop", "type": "Property"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "acquires_usufruct_of_residence", "args": ["survivor", "prop"], "negated": false},
+            {
+              "or": [
+                {"pred": "subject_to_legal_return_4_24", "args": ["prop"], "negated": false},
+                {"pred": "subject_to_legal_return_4_25", "args": ["prop"], "negated": false}
+              ]
+            }
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "exercises_usufruct_despite_legal_return", "args": ["survivor", "prop"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "goods", "type": "Property"}
+      ],
+      "if": [
+        {
+          "and": [
+            {"pred": "acquires_usufruct_of_household_goods", "args": ["survivor", "goods"], "negated": false},
+            {
+              "or": [
+                {"pred": "subject_to_legal_return_4_24", "args": ["goods"], "negated": false},
+                {"pred": "subject_to_legal_return_4_25", "args": ["goods"], "negated": false}
+              ]
+            }
+          ]
+        }
+      ],
+      "then": [
+        {"pred": "exercises_usufruct_despite_legal_return", "args": ["survivor", "goods"], "negated": false}
+      ],
+      "operator": "implies"
+    }
+  ]
+}

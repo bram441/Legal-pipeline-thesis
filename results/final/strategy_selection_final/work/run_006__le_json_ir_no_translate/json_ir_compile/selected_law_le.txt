@@ -1,0 +1,23 @@
+A company is a small company if the company has legal personality and not more than one small-company criterion is exceeded for the company on the balance sheet date of the last closed financial year.
+
+The employee criterion is exceeded for a company in a financial year if the annual average number of employees of the company is greater than 50.
+
+The turnover criterion is exceeded for a company in a financial year if the annual net turnover of the company, excluding value added tax, as referred to in article 1:26/1, is greater than 11,250,000 euro.
+
+The balance sheet criterion is exceeded for a company in a financial year if the balance sheet total of the company is greater than 6,000,000 euro.
+
+More than one small-company criterion is exceeded for a company in a financial year if the employee criterion and the turnover criterion are both exceeded for the company in that financial year.
+
+More than one small-company criterion is exceeded for a company in a financial year if the employee criterion and the balance sheet criterion are both exceeded for the company in that financial year.
+
+More than one small-company criterion is exceeded for a company in a financial year if the turnover criterion and the balance sheet criterion are both exceeded for the company in that financial year.
+
+Not more than one small-company criterion is exceeded for a company in a financial year if more than one small-company criterion is not exceeded for the company in that financial year.
+
+A change in small-company status has legal effect for a company from the financial year following the second consecutive financial year in which the change condition occurred.
+
+A change condition occurred for a company in a financial year if more than one small-company criterion was exceeded for the company in that financial year and more than one small-company criterion was exceeded for the company in the immediately preceding financial year.
+
+A change condition occurred for a company in a financial year if more than one small-company criterion was not exceeded for the company in that financial year and more than one small-company criterion was not exceeded for the company in the immediately preceding financial year.
+
+A financial year Y2 is the financial year following financial year Y1 if Y2 immediately succeeds Y1.

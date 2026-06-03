@@ -1,0 +1,14 @@
+{
+  "question": "Has a risk of absconding been established pursuant to Article 1, paragraph 1, point 11 and paragraph 2?",
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "scorable": true,
+  "fallback_intent": null,
+  "warnings": [],
+  "legal_output_symbols": [
+    "risk_of_absconding"
+  ],
+  "query_hint_type": "boolean",
+  "expected_question_type": "boolean"
+}

@@ -1,0 +1,48 @@
+{
+  "types": ["Person"],
+  "predicates": [
+    {
+      "name": "is_legally_cohabiting_partner_of",
+      "args": ["Person", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the legally cohabiting partner of the second person."
+    },
+    {
+      "name": "is_surviving_cohabiting_partner",
+      "args": ["Person", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the surviving legally cohabiting partner of the second (predeceased) person."
+    },
+    {
+      "name": "is_descendant_of",
+      "args": ["Person", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is a descendant of the second person."
+    },
+    {
+      "name": "exception_applies_surviving_partner_is_descendant",
+      "args": ["Person", "Person"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The exception applies because the surviving legally cohabiting partner is a descendant of the predeceased legally cohabiting partner, making the preceding provisions inapplicable.",
+      "legal_output": true,
+      "output_category": "exception"
+    },
+    {
+      "name": "preceding_provisions_apply",
+      "args": ["Person", "Person"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The preceding statutory provisions apply to the surviving legally cohabiting partner in relation to the predeceased partner.",
+      "legal_output": true,
+      "output_category": "legal_effect"
+    }
+  ],
+  "functions": []
+}

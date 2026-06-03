@@ -1,0 +1,56 @@
+{
+  "rules": [
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "predeceased", "type": "Person"}
+      ],
+      "if": [
+        {"pred": "is_surviving_cohabiting_partner", "args": ["survivor", "predeceased"], "negated": false},
+        {"pred": "is_descendant_of", "args": ["survivor", "predeceased"], "negated": false}
+      ],
+      "then": [
+        {"pred": "surviving_partner_is_descendant_of_predeceased", "args": ["survivor"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"}
+      ],
+      "if": [
+        {"pred": "surviving_partner_is_descendant_of_predeceased", "args": ["survivor"], "negated": false}
+      ],
+      "then": [
+        {"pred": "exception_applies_surviving_partner_is_descendant", "args": ["survivor"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"}
+      ],
+      "if": [
+        {"pred": "exception_applies_surviving_partner_is_descendant", "args": ["survivor"], "negated": false}
+      ],
+      "then": [
+        {"pred": "preceding_provisions_apply", "args": ["survivor"], "negated": true}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {"var": "survivor", "type": "Person"},
+        {"var": "predeceased", "type": "Person"}
+      ],
+      "if": [
+        {"pred": "is_surviving_cohabiting_partner", "args": ["survivor", "predeceased"], "negated": false},
+        {"pred": "surviving_partner_is_descendant_of_predeceased", "args": ["survivor"], "negated": true}
+      ],
+      "then": [
+        {"pred": "preceding_provisions_apply", "args": ["survivor"], "negated": false}
+      ],
+      "operator": "implies"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+vocabulary V {
+  type Person
+  is_surviving_legal_cohabitant_of: Person * Person -> Bool
+  is_descendant_of: Person * Person -> Bool
+  preceding_provisions_not_applicable: Person * Person -> Bool
+}
+
+theory T:V {
+  ! survivor in Person, predeceased in Person: (((is_surviving_legal_cohabitant_of(survivor,predeceased)) & (is_descendant_of(survivor,predeceased)))) => ((preceding_provisions_not_applicable(survivor,predeceased))).
+}

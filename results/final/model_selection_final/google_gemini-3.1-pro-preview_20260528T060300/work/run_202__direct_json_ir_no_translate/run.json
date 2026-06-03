@@ -1,0 +1,50 @@
+{
+  "id": "run_202",
+  "law": {
+    "path": "example_laws_clean/erfrecht_clean.txt"
+  },
+  "case": {
+    "text": "Tom en Ulla leefden samen zonder huwelijk en zonder wettelijke samenwoonst. Tom overlijdt en laat één kind na."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Heeft Ulla volgens artikel 4.17, paragraaf 1 recht op het vruchtgebruik van de gehele nalatenschap?",
+      "expected": {
+        "mode": "boolean",
+        "value": false,
+        "reason": "Art. 4.17 par. 1 applies to the surviving spouse; Ulla was not married to Tom, so the spouse usufruct rule does not apply."
+      }
+    }
+  ],
+  "kb_compile_strategy": "direct_json_ir_no_translate",
+  "kb_compile_backend": "json_ir",
+  "extraction_backend": "json_ir",
+  "pipeline_backend_mode": "json_ir",
+  "kb_compile_flags": {
+    "use_le": false,
+    "uses_translation": false,
+    "json_ir_generation": "symbols_then_rules"
+  },
+  "strategy_metadata": {
+    "strategy_name": "direct_json_ir_no_translate",
+    "canonical_strategy_name": "direct_json_ir_no_translate",
+    "kb_backend": "json_ir",
+    "pipeline_backend_mode": "json_ir",
+    "uses_le_intermediate": false,
+    "json_ir_generation": "symbols_then_rules",
+    "belief_scoring": false,
+    "law_scope_mode": "cited",
+    "repair_enabled": true,
+    "json_ir_structured_repair_enabled": true,
+    "json_ir_max_symbol_versions": 3,
+    "json_ir_max_rules_attempts_per_symbol_version": 2,
+    "json_ir_max_kb_llm_calls": 8,
+    "json_ir_outer_cache_retries_enabled": false,
+    "json_ir_outer_cache_max_attempts": 1,
+    "configured_translation": false,
+    "effective_translation": false,
+    "translation_source": "main_cli_no_translate",
+    "uses_translation": false
+  }
+}

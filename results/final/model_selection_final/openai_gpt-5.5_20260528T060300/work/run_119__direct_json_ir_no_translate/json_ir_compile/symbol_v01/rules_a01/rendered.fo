@@ -1,0 +1,48 @@
+vocabulary V {
+  type Company
+  type FinancialYear
+  has_legal_personality: Company -> Bool
+  last_closed_financial_year: Company * FinancialYear -> Bool
+  first_financial_year: Company * FinancialYear -> Bool
+  good_faith_estimate_at_beginning_of_year: Company * FinancialYear -> Bool
+  employee_threshold_exceeded: Company * FinancialYear -> Bool
+  turnover_threshold_exceeded: Company * FinancialYear -> Bool
+  balance_sheet_threshold_exceeded: Company * FinancialYear -> Bool
+  more_than_one_criterion_exceeded: Company * FinancialYear -> Bool
+  no_more_than_one_criterion_exceeded: Company * FinancialYear -> Bool
+  estimated_employee_threshold_exceeded: Company * FinancialYear -> Bool
+  estimated_turnover_threshold_exceeded: Company * FinancialYear -> Bool
+  estimated_balance_sheet_threshold_exceeded: Company * FinancialYear -> Bool
+  more_than_one_estimated_criterion_exceeded: Company * FinancialYear -> Bool
+  no_more_than_one_estimated_criterion_exceeded: Company * FinancialYear -> Bool
+  is_small_company: Company * FinancialYear -> Bool
+  estimate_must_be_taken_into_account_immediately: Company * FinancialYear -> Bool
+  annual_average_employees: Company * FinancialYear -> Int
+  annual_net_turnover_excluding_vat: Company * FinancialYear -> Real
+  balance_sheet_total: Company * FinancialYear -> Real
+  estimated_annual_average_employees: Company * FinancialYear -> Int
+  estimated_annual_net_turnover_excluding_vat: Company * FinancialYear -> Real
+  estimated_balance_sheet_total: Company * FinancialYear -> Real
+}
+
+theory T:V {
+  ! company in Company, year in FinancialYear: ((annual_average_employees(company,year) > 50)) => ((employee_threshold_exceeded(company,year))).
+  ! company in Company, year in FinancialYear: ((annual_net_turnover_excluding_vat(company,year) > 11250000.0)) => ((turnover_threshold_exceeded(company,year))).
+  ! company in Company, year in FinancialYear: ((balance_sheet_total(company,year) > 6000000.0)) => ((balance_sheet_threshold_exceeded(company,year))).
+  ! company in Company, year in FinancialYear: (((employee_threshold_exceeded(company,year)) & (turnover_threshold_exceeded(company,year)))) => ((more_than_one_criterion_exceeded(company,year))).
+  ! company in Company, year in FinancialYear: (((employee_threshold_exceeded(company,year)) & (balance_sheet_threshold_exceeded(company,year)))) => ((more_than_one_criterion_exceeded(company,year))).
+  ! company in Company, year in FinancialYear: (((turnover_threshold_exceeded(company,year)) & (balance_sheet_threshold_exceeded(company,year)))) => ((more_than_one_criterion_exceeded(company,year))).
+  ! company in Company, year in FinancialYear: ((~more_than_one_criterion_exceeded(company,year))) => ((no_more_than_one_criterion_exceeded(company,year))).
+  ! company in Company, year in FinancialYear: (((has_legal_personality(company)) & (last_closed_financial_year(company,year)) & (~more_than_one_criterion_exceeded(company,year)))) => ((is_small_company(company,year))).
+  ! company in Company, year in FinancialYear: (((has_legal_personality(company)) & (last_closed_financial_year(company,year)) & (more_than_one_criterion_exceeded(company,year)))) => ((~is_small_company(company,year))).
+  ! company in Company, year in FinancialYear: (((good_faith_estimate_at_beginning_of_year(company,year)) & (estimated_annual_average_employees(company,year) > 50))) => ((estimated_employee_threshold_exceeded(company,year))).
+  ! company in Company, year in FinancialYear: (((good_faith_estimate_at_beginning_of_year(company,year)) & (estimated_annual_net_turnover_excluding_vat(company,year) > 11250000.0))) => ((estimated_turnover_threshold_exceeded(company,year))).
+  ! company in Company, year in FinancialYear: (((good_faith_estimate_at_beginning_of_year(company,year)) & (estimated_balance_sheet_total(company,year) > 6000000.0))) => ((estimated_balance_sheet_threshold_exceeded(company,year))).
+  ! company in Company, year in FinancialYear: (((estimated_employee_threshold_exceeded(company,year)) & (estimated_turnover_threshold_exceeded(company,year)))) => ((more_than_one_estimated_criterion_exceeded(company,year))).
+  ! company in Company, year in FinancialYear: (((estimated_employee_threshold_exceeded(company,year)) & (estimated_balance_sheet_threshold_exceeded(company,year)))) => ((more_than_one_estimated_criterion_exceeded(company,year))).
+  ! company in Company, year in FinancialYear: (((estimated_turnover_threshold_exceeded(company,year)) & (estimated_balance_sheet_threshold_exceeded(company,year)))) => ((more_than_one_estimated_criterion_exceeded(company,year))).
+  ! company in Company, year in FinancialYear: ((~more_than_one_estimated_criterion_exceeded(company,year))) => ((no_more_than_one_estimated_criterion_exceeded(company,year))).
+  ! company in Company, year in FinancialYear: (((has_legal_personality(company)) & (first_financial_year(company,year)) & (good_faith_estimate_at_beginning_of_year(company,year)) & (~more_than_one_estimated_criterion_exceeded(company,year)))) => ((is_small_company(company,year))).
+  ! company in Company, year in FinancialYear: (((has_legal_personality(company)) & (first_financial_year(company,year)) & (good_faith_estimate_at_beginning_of_year(company,year)) & (more_than_one_estimated_criterion_exceeded(company,year)))) => ((~is_small_company(company,year))).
+  ! company in Company, year in FinancialYear: (((has_legal_personality(company)) & (first_financial_year(company,year)) & (good_faith_estimate_at_beginning_of_year(company,year)) & (more_than_one_estimated_criterion_exceeded(company,year)))) => ((estimate_must_be_taken_into_account_immediately(company,year))).
+}

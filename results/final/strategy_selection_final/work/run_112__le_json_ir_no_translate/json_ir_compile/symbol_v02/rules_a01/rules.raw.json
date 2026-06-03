@@ -1,0 +1,274 @@
+{
+  "rules": [
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "provides_proof_of_belgian_nationality", "args": ["p"], "negated": true}
+      ],
+      "then": [
+        {"pred": "is_foreigner", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"and": [
+          {"pred": "is_citizen_of_union", "args": ["p"], "negated": true},
+          {"pred": "falls_under_community_free_movement_law", "args": ["p"], "negated": true}
+        ]}
+      ],
+      "then": [
+        {"pred": "is_third_country_national", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"and": [
+          {"pred": "present_on_territory", "args": ["p"], "negated": false},
+          {"pred": "satisfies_conditions_for_access_or_residence", "args": ["p"], "negated": true}
+        ]}
+      ],
+      "then": [
+        {"pred": "in_illegal_residence", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"or": [
+          {"pred": "subject_to_removal_procedure", "args": ["p"], "negated": false},
+          {"pred": "subject_to_international_protection_procedure", "args": ["p"], "negated": false},
+          {"pred": "subject_to_dublin_transfer_procedure", "args": ["p"], "negated": false}
+        ]}
+      ],
+      "then": [
+        {"pred": "subject_to_relevant_procedure", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"and": [
+          {"pred": "is_foreigner", "args": ["p"], "negated": false},
+          {"pred": "subject_to_relevant_procedure", "args": ["p"], "negated": false},
+          {"pred": "individual_examination_performed", "args": ["p"], "negated": false},
+          {"pred": "at_least_one_absconding_criterion_met", "args": ["p"], "negated": false}
+        ]}
+      ],
+      "then": [
+        {"pred": "risk_of_absconding", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "possesses_valid_travel_document", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "is_identified_foreigner", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "recognised_as_national_by_country_authority", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "is_identified_foreigner", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "falls_under_laissez_passer_nationality_category", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "is_identified_foreigner", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"or": [
+          {"pred": "did_not_submit_residence_application_after_illegal_entry_or_during_illegal_residence", "args": ["p"], "negated": false},
+          {"pred": "did_not_submit_protection_application_within_legal_period", "args": ["p"], "negated": false}
+        ]}
+      ],
+      "then": [
+        {"pred": "criterion_failure_to_apply_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "used_false_or_misleading_information", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "criterion_fraud_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "does_not_cooperate_with_authorities", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "criterion_non_cooperation_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "non_compliant_with_transfer_refoulement_or_removal_measure", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "criterion_non_compliance_with_measures_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "non_compliant_with_entry_ban", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "criterion_non_compliance_with_measures_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "non_compliant_with_less_coercive_measure", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "criterion_non_compliance_with_measures_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "non_compliant_with_freedom_restricting_measure_for_public_order", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "criterion_non_compliance_with_measures_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "non_compliant_with_equivalent_measure_by_other_member_state", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "criterion_non_compliance_with_measures_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "subject_to_active_entry_ban", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "criterion_entry_ban_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "submitted_new_application_after_negative_decision", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "criterion_new_application_after_decision_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "concealed_fingerprints_in_other_dublin_state", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "criterion_concealment_of_fingerprints_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "submitted_multiple_applications_with_negative_outcome", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "criterion_multiple_applications_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "concealed_prior_application_in_other_dublin_state", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "criterion_concealment_of_prior_application_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "declared_or_file_shows_purpose_other_than_application", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "criterion_declared_purpose_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"pred": "subject_to_fine_for_manifestly_unlawful_appeal", "args": ["p"], "negated": false}
+      ],
+      "then": [
+        {"pred": "criterion_manifestly_unfounded_appeal_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [{"var": "p", "type": "Person"}],
+      "if": [
+        {"or": [
+          {"pred": "criterion_failure_to_apply_met", "args": ["p"], "negated": false},
+          {"pred": "criterion_fraud_met", "args": ["p"], "negated": false},
+          {"pred": "criterion_non_cooperation_met", "args": ["p"], "negated": false},
+          {"pred": "criterion_non_compliance_with_measures_met", "args": ["p"], "negated": false},
+          {"pred": "criterion_entry_ban_met", "args": ["p"], "negated": false},
+          {"pred": "criterion_new_application_after_decision_met", "args": ["p"], "negated": false},
+          {"pred": "criterion_concealment_of_fingerprints_met", "args": ["p"], "negated": false},
+          {"pred": "criterion_multiple_applications_met", "args": ["p"], "negated": false},
+          {"pred": "criterion_concealment_of_prior_application_met", "args": ["p"], "negated": false},
+          {"pred": "criterion_declared_purpose_met", "args": ["p"], "negated": false},
+          {"pred": "criterion_manifestly_unfounded_appeal_met", "args": ["p"], "negated": false}
+        ]}
+      ],
+      "then": [
+        {"pred": "at_least_one_absconding_criterion_met", "args": ["p"], "negated": false}
+      ],
+      "operator": "implies"
+    }
+  ]
+}

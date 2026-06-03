@@ -1,0 +1,24 @@
+{
+  "case_entities_rendered_to_domains": {
+    "Person": [
+      "peter",
+      "sara"
+    ]
+  },
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "peter",
+      "arg_index": 0,
+      "expected_type": "Person",
+      "predicate": "obtains_usufruct_of_entire_estate"
+    },
+    {
+      "entity": "sara",
+      "arg_index": 1,
+      "expected_type": "Person",
+      "predicate": "obtains_usufruct_of_entire_estate"
+    }
+  ],
+  "unmapped_case_entities": [],
+  "pre_solver_domain_validation_errors": []
+}

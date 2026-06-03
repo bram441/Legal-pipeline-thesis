@@ -1,0 +1,474 @@
+{
+  "types": [
+    "Person",
+    "Property",
+    "Asset"
+  ],
+  "predicates": [
+    {
+      "name": "is_surviving_legally_cohabiting_partner_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person is the surviving legally cohabiting partner of the second person (the deceased).",
+      "directly_observable": true
+    },
+    {
+      "name": "estate_has_opened",
+      "args": [
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The estate of the deceased person has opened."
+    },
+    {
+      "name": "served_as_family_principal_residence",
+      "args": [
+        "Property",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The property served as the family principal residence at the time the estate of the deceased opened."
+    },
+    {
+      "name": "is_household_effects_in",
+      "args": [
+        "Asset",
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The asset consists of household effects present in the given immovable property.",
+      "directly_observable": true
+    },
+    {
+      "name": "subject_to_legal_reversion_4_24",
+      "args": [
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The immovable property is the subject of a right of legal reversion referred to in article 4.24.",
+      "directly_observable": true
+    },
+    {
+      "name": "subject_to_legal_reversion_4_25",
+      "args": [
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The immovable property is the subject of a right of legal reversion referred to in article 4.25.",
+      "directly_observable": true
+    },
+    {
+      "name": "household_effects_subject_to_legal_reversion_4_24",
+      "args": [
+        "Asset",
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The household effects present in the immovable property are the subject of a right of legal reversion referred to in article 4.24.",
+      "directly_observable": true
+    },
+    {
+      "name": "household_effects_subject_to_legal_reversion_4_25",
+      "args": [
+        "Asset",
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The household effects present in the immovable property are the subject of a right of legal reversion referred to in article 4.25.",
+      "directly_observable": true
+    },
+    {
+      "name": "acquires_usufruct_of_family_residence",
+      "args": [
+        "Person",
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The surviving legally cohabiting partner acquires the usufruct of the immovable property that served as the family principal residence.",
+      "legal_output": true
+    },
+    {
+      "name": "acquires_usufruct_of_household_effects",
+      "args": [
+        "Person",
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The surviving legally cohabiting partner acquires the usufruct of the household effects present in the family principal residence.",
+      "legal_output": true
+    },
+    {
+      "name": "exercises_usufruct_of_family_residence",
+      "args": [
+        "Person",
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The surviving legally cohabiting partner exercises the usufruct of the immovable property that served as the family principal residence, notwithstanding a right of legal reversion.",
+      "legal_output": true
+    },
+    {
+      "name": "exercises_usufruct_of_household_effects",
+      "args": [
+        "Person",
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The surviving legally cohabiting partner exercises the usufruct of the household effects present in the family principal residence, notwithstanding a right of legal reversion.",
+      "legal_output": true
+    },
+    {
+      "name": "property_subject_to_any_legal_reversion",
+      "args": [
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The immovable property is subject to a right of legal reversion under article 4.24 or article 4.25."
+    },
+    {
+      "name": "household_effects_subject_to_any_legal_reversion",
+      "args": [
+        "Asset",
+        "Property"
+      ],
+      "returns": "Bool",
+      "kind": "helper",
+      "description": "The household effects in the property are subject to a right of legal reversion under article 4.24 or article 4.25."
+    }
+  ],
+  "functions": [],
+  "rules": [
+    {
+      "forall": [
+        {
+          "var": "survivor",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "prop",
+          "type": "Property"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_legally_cohabiting_partner_of",
+              "args": [
+                "survivor",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "estate_has_opened",
+              "args": [
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "served_as_family_principal_residence",
+              "args": [
+                "prop",
+                "deceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "acquires_usufruct_of_family_residence",
+          "args": [
+            "survivor",
+            "prop"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "survivor",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "prop",
+          "type": "Property"
+        },
+        {
+          "var": "asset",
+          "type": "Asset"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_legally_cohabiting_partner_of",
+              "args": [
+                "survivor",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "estate_has_opened",
+              "args": [
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "served_as_family_principal_residence",
+              "args": [
+                "prop",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_household_effects_in",
+              "args": [
+                "asset",
+                "prop"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "acquires_usufruct_of_household_effects",
+          "args": [
+            "survivor",
+            "asset"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "prop",
+          "type": "Property"
+        }
+      ],
+      "if": [
+        {
+          "or": [
+            {
+              "pred": "subject_to_legal_reversion_4_24",
+              "args": [
+                "prop"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "subject_to_legal_reversion_4_25",
+              "args": [
+                "prop"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "property_subject_to_any_legal_reversion",
+          "args": [
+            "prop"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "asset",
+          "type": "Asset"
+        },
+        {
+          "var": "prop",
+          "type": "Property"
+        }
+      ],
+      "if": [
+        {
+          "or": [
+            {
+              "pred": "household_effects_subject_to_legal_reversion_4_24",
+              "args": [
+                "asset",
+                "prop"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "household_effects_subject_to_legal_reversion_4_25",
+              "args": [
+                "asset",
+                "prop"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "household_effects_subject_to_any_legal_reversion",
+          "args": [
+            "asset",
+            "prop"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "survivor",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "prop",
+          "type": "Property"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "acquires_usufruct_of_family_residence",
+              "args": [
+                "survivor",
+                "prop"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "property_subject_to_any_legal_reversion",
+              "args": [
+                "prop"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "exercises_usufruct_of_family_residence",
+          "args": [
+            "survivor",
+            "prop"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "survivor",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "prop",
+          "type": "Property"
+        },
+        {
+          "var": "asset",
+          "type": "Asset"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "acquires_usufruct_of_household_effects",
+              "args": [
+                "survivor",
+                "asset"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_household_effects_in",
+              "args": [
+                "asset",
+                "prop"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "household_effects_subject_to_any_legal_reversion",
+              "args": [
+                "asset",
+                "prop"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "exercises_usufruct_of_household_effects",
+          "args": [
+            "survivor",
+            "asset"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    }
+  ]
+}

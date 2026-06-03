@@ -1,0 +1,16 @@
+vocabulary V {
+  type Person
+  type ImmovableProperty
+  is_surviving_spouse_of: Person * Person -> Bool
+  served_as_family_main_residence_at_estate_opening: ImmovableProperty * Person -> Bool
+  is_heir_of: Person * Person -> Bool
+  acquires_right_to_lease: Person * ImmovableProperty -> Bool
+  excluded_from_right_to_lease: Person * ImmovableProperty -> Bool
+  is_sole_beneficiary_of_lease_right: Person * ImmovableProperty -> Bool
+}
+
+theory T:V {
+  ! spouse in Person, deceased in Person, property in ImmovableProperty: (((is_surviving_spouse_of(spouse,deceased)) & (served_as_family_main_residence_at_estate_opening(property,deceased)))) => ((acquires_right_to_lease(spouse,property))).
+  ! spouse in Person, deceased in Person, property in ImmovableProperty: (((is_surviving_spouse_of(spouse,deceased)) & (served_as_family_main_residence_at_estate_opening(property,deceased)))) => ((is_sole_beneficiary_of_lease_right(spouse,property))).
+  ! heir in Person, spouse in Person, deceased in Person, property in ImmovableProperty: (((is_heir_of(heir,deceased)) & (is_surviving_spouse_of(spouse,deceased)) & (acquires_right_to_lease(spouse,property)) & (~is_surviving_spouse_of(heir,deceased)))) => ((excluded_from_right_to_lease(heir,property))).
+}

@@ -1,0 +1,40 @@
+{
+  "types": ["Person"],
+  "predicates": [
+    {
+      "name": "is_surviving_legal_cohabitant_of",
+      "args": ["Person", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the surviving legal cohabitant of the second (predeceased) person."
+    },
+    {
+      "name": "is_descendant_of",
+      "args": ["Person", "Person"],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is a descendant of the second person."
+    },
+    {
+      "name": "exception_applies_surviving_cohabitant_is_descendant",
+      "args": ["Person", "Person"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The exception applies: the provisions of paragraphs 1 to 3 do not apply because the surviving legal cohabitant is a descendant of the predeceased legal cohabitant.",
+      "legal_output": true,
+      "output_category": "exception"
+    },
+    {
+      "name": "paragraphs_1_to_3_apply",
+      "args": ["Person", "Person"],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The provisions of paragraphs 1 to 3 apply to the surviving legal cohabitant in relation to the predeceased legal cohabitant.",
+      "legal_output": true,
+      "output_category": "legal_effect"
+    }
+  ],
+  "functions": []
+}

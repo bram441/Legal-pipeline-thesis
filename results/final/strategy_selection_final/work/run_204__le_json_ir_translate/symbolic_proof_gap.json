@@ -1,0 +1,107 @@
+{
+  "query": {
+    "predicate": "has_illegal_stay",
+    "args": [
+      "omar"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "unknown",
+    "certain": false,
+    "possible": true,
+    "certainty_class": "inconclusive"
+  },
+  "extracted_case": {
+    "facts": [
+      "is_present_on_territory(omar).",
+      "meets_entry_or_stay_conditions(omar).",
+      "not provides_proof_of_belgian_nationality(omar)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "Person": [
+        "belgian",
+        "omar"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 2,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_present_on_territory",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "meets_entry_or_stay_conditions",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "has_illegal_stay"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 2,
+      "target": "has_illegal_stay(omar)",
+      "conditions": [
+        {
+          "atom": "is_present_on_territory(omar)",
+          "status": "present"
+        },
+        {
+          "atom": "meets_entry_or_stay_conditions(omar)",
+          "status": "present"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "is_present_on_territory",
+      "symbol_type": "predicate",
+      "atom": "is_present_on_territory(omar)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "Omar is a foreign national with a valid residence permit and resides lawfully on Belgian territory."
+      ],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "meets_entry_or_stay_conditions",
+      "symbol_type": "predicate",
+      "atom": "meets_entry_or_stay_conditions(omar)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "Omar is a foreign national with a valid residence permit and resides lawfully on Belgian territory."
+      ],
+      "deriving_rule_indices": []
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "extraction_gap",
+    "secondary": [],
+    "rationale": "Symbolic result is inconclusive and antecedents are not fully grounded in case facts."
+  }
+}

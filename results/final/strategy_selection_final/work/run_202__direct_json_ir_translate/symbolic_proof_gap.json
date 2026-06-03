@@ -1,0 +1,129 @@
+{
+  "query": {
+    "predicate": "acquires_usufruct_of_entire_estate",
+    "args": [
+      "ulla",
+      "tom"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "unknown",
+    "certain": false,
+    "possible": true,
+    "certainty_class": "inconclusive"
+  },
+  "extracted_case": {
+    "facts": [
+      "is_deceased(tom).",
+      "leaves_descendants(tom).",
+      "not is_surviving_spouse_of(ulla,tom)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "Person": [
+        "child_of_tom",
+        "tom",
+        "ulla"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 0,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "is_surviving_spouse_of",
+            "args": [
+              "spouse",
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "is_deceased",
+            "args": [
+              "deceased"
+            ]
+          },
+          {
+            "predicate": "leaves_descendants",
+            "args": [
+              "deceased"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "acquires_usufruct_of_entire_estate"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 0,
+      "target": "acquires_usufruct_of_entire_estate(ulla,tom)",
+      "conditions": [
+        {
+          "atom": "is_surviving_spouse_of(ulla,tom)",
+          "status": "present"
+        },
+        {
+          "atom": "is_deceased(tom)",
+          "status": "present"
+        },
+        {
+          "atom": "leaves_descendants(tom)",
+          "status": "present"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "is_surviving_spouse_of",
+      "symbol_type": "predicate",
+      "atom": "is_surviving_spouse_of(ulla,tom)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "is_deceased",
+      "symbol_type": "predicate",
+      "atom": "is_deceased(tom)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "leaves_descendants",
+      "symbol_type": "predicate",
+      "atom": "leaves_descendants(tom)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "Tom dies and leaves behind one child."
+      ],
+      "deriving_rule_indices": []
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "extraction_gap",
+    "secondary": [],
+    "rationale": "Symbolic result is inconclusive and antecedents are not fully grounded in case facts."
+  }
+}

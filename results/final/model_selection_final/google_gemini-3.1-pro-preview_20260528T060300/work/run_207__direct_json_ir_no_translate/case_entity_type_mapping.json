@@ -1,0 +1,89 @@
+{
+  "entities": {
+    "appartement_in_gent": {
+      "declared_type": "Property",
+      "resolved_type": "Property",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_immovable_property",
+          "arg_index": 0,
+          "expected_type": "Property"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "served_as_principal_residence_at_opening_of_succession",
+          "arg_index": 0,
+          "expected_type": "Property"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "acquires_right_to_rent",
+          "arg_index": 1,
+          "expected_type": "Property"
+        }
+      ]
+    },
+    "gent": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "declared",
+      "evidence": []
+    },
+    "willem": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_surviving_spouse_of",
+          "arg_index": 0,
+          "expected_type": "Person"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "acquires_right_to_rent",
+          "arg_index": 0,
+          "expected_type": "Person"
+        }
+      ]
+    },
+    "yara": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "is_surviving_spouse_of",
+          "arg_index": 1,
+          "expected_type": "Person"
+        },
+        {
+          "source": "fact_argument",
+          "symbol": "served_as_principal_residence_at_opening_of_succession",
+          "arg_index": 1,
+          "expected_type": "Person"
+        }
+      ]
+    }
+  },
+  "unmapped_entities": [],
+  "conflicts": [],
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "willem",
+      "arg_index": 0,
+      "expected_type": "Person",
+      "predicate": "acquires_right_to_rent"
+    },
+    {
+      "entity": "appartement_in_gent",
+      "arg_index": 1,
+      "expected_type": "Property",
+      "predicate": "acquires_right_to_rent"
+    }
+  ]
+}

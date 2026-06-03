@@ -1,0 +1,105 @@
+{
+  "intent": "deduction",
+  "symbolic_status": "ok",
+  "status": "ok",
+  "scorable": true,
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "routing": {
+    "question": "Is er voor Omar sprake van illegaal verblijf in de zin van artikel 1, paragraaf 1, punt 4?",
+    "detected_question_type": "boolean",
+    "selected_intent": "deduction",
+    "selected_reason": "expected.mode=boolean",
+    "scorable": true,
+    "fallback_intent": null,
+    "warnings": [],
+    "legal_output_symbols": [],
+    "query_hint_type": "boolean",
+    "expected_question_type": "boolean"
+  },
+  "satisfiability_check": {
+    "stage": "pre_query",
+    "kb_case_satisfiable": true,
+    "status": "ok",
+    "details": "theory satisfiable",
+    "intent_backend": "idp_z3.tasks.satisfiable_check",
+    "duration_seconds": 0.1137
+  },
+  "warnings": [],
+  "deduction": {
+    "intent": "deduction",
+    "status": "ok",
+    "output_kind": "epistemic_boolean",
+    "predicate": "is_third_country_national",
+    "args": [
+      "omar"
+    ],
+    "possible": true,
+    "certain": true,
+    "label": "entailed",
+    "atom": "is_third_country_national(x0)",
+    "constraint": "? x0 in Person: __sel0(x0) & is_third_country_national(x0)",
+    "certainty_class": "decisive",
+    "sat": true,
+    "internal_intent": "deduction",
+    "antecedent_coverage": [
+      {
+        "rule_index": 1,
+        "target": "is_third_country_national(omar)",
+        "conditions": [
+          {
+            "atom": "is_eu_citizen(omar)",
+            "status": "missing"
+          },
+          {
+            "atom": "covered_by_eu_free_movement_law(omar)",
+            "status": "missing"
+          }
+        ]
+      }
+    ]
+  },
+  "model_expansion": null,
+  "get_range": null,
+  "satisfiable": null,
+  "explanation": null,
+  "execution_query": {
+    "type": "predicate",
+    "predicate": "is_third_country_national",
+    "mode": "boolean",
+    "args": [
+      "omar"
+    ],
+    "explain": false,
+    "predicate_kind": "derived",
+    "query_type": "predicate_boolean",
+    "internal_intent": "deduction"
+  },
+  "output_kind": "epistemic_boolean",
+  "certainty_class": "decisive",
+  "predicate": "is_third_country_national",
+  "args": [
+    "omar"
+  ],
+  "label": "entailed",
+  "possible": true,
+  "certain": true,
+  "sat": true,
+  "antecedent_coverage": [
+    {
+      "rule_index": 1,
+      "target": "is_third_country_national(omar)",
+      "conditions": [
+        {
+          "atom": "is_eu_citizen(omar)",
+          "status": "missing"
+        },
+        {
+          "atom": "covered_by_eu_free_movement_law(omar)",
+          "status": "missing"
+        }
+      ]
+    }
+  ]
+}

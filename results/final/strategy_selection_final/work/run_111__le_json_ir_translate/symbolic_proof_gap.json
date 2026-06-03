@@ -1,0 +1,227 @@
+{
+  "query": {
+    "predicate": "risk_of_absconding",
+    "args": [
+      "dana"
+    ],
+    "mode": "boolean",
+    "type": "predicate"
+  },
+  "symbolic_outcome": {
+    "status": "ok",
+    "label": "unknown",
+    "certain": false,
+    "possible": true,
+    "certainty_class": "inconclusive"
+  },
+  "extracted_case": {
+    "facts": [
+      "not proves_belgian_nationality(dana).",
+      "is_subject_of_removal_or_protection_procedure(dana).",
+      "used_false_or_falsified_documents(dana)."
+    ],
+    "value_assertions": [],
+    "entities": {
+      "Person": [
+        "dana"
+      ]
+    }
+  },
+  "deriving_rules": [
+    {
+      "rule_index": 6,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "reasons_to_believe_will_abscond",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "is_subject_of_removal_or_protection_procedure",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "risk_established_by_paragraph2_criteria",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "risk_of_absconding"
+      ]
+    },
+    {
+      "rule_index": 7,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "at_least_one_paragraph2_criterion_met",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "individual_examination_performed",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "risk_established_by_paragraph2_criteria"
+      ]
+    },
+    {
+      "rule_index": 38,
+      "requirements": {
+        "predicates": [
+          {
+            "predicate": "criterion_2_1_met",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "criterion_2_2_met",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "criterion_2_3_met",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "criterion_2_4_met",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "criterion_2_5_met",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "criterion_2_6_met",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "criterion_2_7_met",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "criterion_2_8_met",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "criterion_2_9_met",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "criterion_2_10_met",
+            "args": [
+              "p"
+            ]
+          },
+          {
+            "predicate": "criterion_2_11_met",
+            "args": [
+              "p"
+            ]
+          }
+        ],
+        "function_compares": []
+      },
+      "then_predicates": [
+        "at_least_one_paragraph2_criterion_met"
+      ]
+    }
+  ],
+  "antecedent_coverage": [
+    {
+      "rule_index": 6,
+      "target": "risk_of_absconding(dana)",
+      "conditions": [
+        {
+          "atom": "reasons_to_believe_will_abscond(dana)",
+          "status": "missing"
+        },
+        {
+          "atom": "is_subject_of_removal_or_protection_procedure(dana)",
+          "status": "present"
+        },
+        {
+          "atom": "risk_established_by_paragraph2_criteria(dana)",
+          "status": "helper_defined"
+        }
+      ]
+    }
+  ],
+  "antecedents": [
+    {
+      "symbol": "reasons_to_believe_will_abscond",
+      "symbol_type": "predicate",
+      "atom": "reasons_to_believe_will_abscond(dana)",
+      "kind": "observable",
+      "gap_status": "missing_entirely",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "is_subject_of_removal_or_protection_procedure",
+      "symbol_type": "predicate",
+      "atom": "is_subject_of_removal_or_protection_procedure(dana)",
+      "kind": "observable",
+      "gap_status": "directly_present",
+      "assertable_in_case": true,
+      "explicit_case_text_evidence": true,
+      "case_text_snippets": [
+        "Dana is a foreign national and is the subject of a removal procedure."
+      ],
+      "deriving_rule_indices": []
+    },
+    {
+      "symbol": "risk_established_by_paragraph2_criteria",
+      "symbol_type": "predicate",
+      "atom": "risk_established_by_paragraph2_criteria(dana)",
+      "kind": "helper",
+      "gap_status": "derivable_from_rules",
+      "assertable_in_case": false,
+      "explicit_case_text_evidence": false,
+      "case_text_snippets": [],
+      "deriving_rule_indices": [
+        7
+      ]
+    }
+  ],
+  "temporal_query_issues": [],
+  "query_period_binding": null,
+  "classification": {
+    "primary": "extraction_gap",
+    "secondary": [],
+    "rationale": "Assertable observables or temporal facts required by the derivation chain were not extracted from the case although the case text contains relevant qualitative evidence."
+  }
+}

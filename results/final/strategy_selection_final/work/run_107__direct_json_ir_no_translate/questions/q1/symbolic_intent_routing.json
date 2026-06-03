@@ -1,0 +1,15 @@
+{
+  "question": "Valt Ahmed onder de definitie van een vreemdeling in artikel 1, paragraaf 1, punt 1?",
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "scorable": true,
+  "fallback_intent": null,
+  "warnings": [],
+  "legal_output_symbols": [
+    "is_identified_foreigner",
+    "risk_of_absconding"
+  ],
+  "query_hint_type": "boolean",
+  "expected_question_type": "boolean"
+}

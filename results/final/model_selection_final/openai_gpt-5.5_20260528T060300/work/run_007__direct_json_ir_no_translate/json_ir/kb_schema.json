@@ -1,0 +1,218 @@
+{
+  "types": [
+    "Person",
+    "Asset"
+  ],
+  "predicates": [
+    {
+      "name": "is_surviving_legal_cohabitant_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first person is the surviving legal cohabitant of the second person.",
+      "directly_observable": true
+    },
+    {
+      "name": "is_immovable_property",
+      "args": [
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The asset is immovable property.",
+      "directly_observable": true
+    },
+    {
+      "name": "is_household_good",
+      "args": [
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The asset is a household good.",
+      "directly_observable": true
+    },
+    {
+      "name": "served_as_principal_family_dwelling_at_succession_opening",
+      "args": [
+        "Asset",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The asset served as the family's principal dwelling at the opening of the succession of the person.",
+      "directly_observable": true
+    },
+    {
+      "name": "present_in_asset_at_succession_opening",
+      "args": [
+        "Asset",
+        "Asset",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The first asset was present in the second asset at the opening of the succession of the person."
+    },
+    {
+      "name": "subject_to_legal_reversion",
+      "args": [
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The asset is subject to a right of legal reversion.",
+      "directly_observable": true
+    },
+    {
+      "name": "has_usufruct_right_over",
+      "args": [
+        "Person",
+        "Asset"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "description": "The person has the legal usufruct right over the asset.",
+      "legal_output": true,
+      "output_category": "right"
+    }
+  ],
+  "functions": [],
+  "rules": [
+    {
+      "forall": [
+        {
+          "var": "cohabitant",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "dwelling",
+          "type": "Asset"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_legal_cohabitant_of",
+              "args": [
+                "cohabitant",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_immovable_property",
+              "args": [
+                "dwelling"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "served_as_principal_family_dwelling_at_succession_opening",
+              "args": [
+                "dwelling",
+                "deceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "has_usufruct_right_over",
+          "args": [
+            "cohabitant",
+            "dwelling"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    },
+    {
+      "forall": [
+        {
+          "var": "cohabitant",
+          "type": "Person"
+        },
+        {
+          "var": "deceased",
+          "type": "Person"
+        },
+        {
+          "var": "dwelling",
+          "type": "Asset"
+        },
+        {
+          "var": "good",
+          "type": "Asset"
+        }
+      ],
+      "if": [
+        {
+          "and": [
+            {
+              "pred": "is_surviving_legal_cohabitant_of",
+              "args": [
+                "cohabitant",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_immovable_property",
+              "args": [
+                "dwelling"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "served_as_principal_family_dwelling_at_succession_opening",
+              "args": [
+                "dwelling",
+                "deceased"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "is_household_good",
+              "args": [
+                "good"
+              ],
+              "negated": false
+            },
+            {
+              "pred": "present_in_asset_at_succession_opening",
+              "args": [
+                "good",
+                "dwelling",
+                "deceased"
+              ],
+              "negated": false
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "pred": "has_usufruct_right_over",
+          "args": [
+            "cohabitant",
+            "good"
+          ],
+          "negated": false
+        }
+      ],
+      "operator": "implies"
+    }
+  ]
+}

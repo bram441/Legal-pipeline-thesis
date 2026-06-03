@@ -1,0 +1,10 @@
+{
+  "case_given_factual_inputs": [],
+  "accepted_threshold_satisfaction_facts": [],
+  "case_text_has_numeric_values": true,
+  "case_text_numeric_values_explicit": true,
+  "bridge_predicates_generated": false,
+  "rejected_query_predicate_assertions": [],
+  "rejected_legal_outputs": [],
+  "query_predicate": null
+}

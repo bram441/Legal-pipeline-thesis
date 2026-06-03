@@ -1,0 +1,1 @@
+JSON_IR_SCHEMA_DESIGN_ERROR: Predicate 'is_alien' takes argument type 'Alien', which is semantically identical to the status it concludes. This prevents ordinary entities from being classified. Use a broader argument type (Person, LegalEntity, Entity, Organization, Company, etc.) inferred from the law—not a narrow type named after the status. Repair layer: symbols.

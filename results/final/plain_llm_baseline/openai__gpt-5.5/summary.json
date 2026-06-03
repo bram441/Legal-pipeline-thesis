@@ -1,0 +1,21 @@
+{
+  "model": "openai/gpt-5.5",
+  "counts": {
+    "total": 37,
+    "valid_output": 35,
+    "invalid_output": 2,
+    "gold_available": 37,
+    "correct": 35,
+    "wrong": 0,
+    "unknown_predicted": 0,
+    "true_predicted": 23,
+    "false_predicted": 12,
+    "errors": 0,
+    "prompt_tokens": 57166,
+    "completion_tokens": 4114,
+    "total_tokens": 61280
+  },
+  "valid_output_rate": 0.9459459459459459,
+  "accuracy_if_gold_available": 0.9459459459459459,
+  "wrong_rate_if_gold_available": 0.0
+}

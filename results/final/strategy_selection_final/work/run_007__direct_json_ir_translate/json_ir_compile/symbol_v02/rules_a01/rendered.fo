@@ -1,0 +1,17 @@
+vocabulary V {
+  type Person
+  type Property
+  is_surviving_legally_cohabiting_partner_of: Person * Person -> Bool
+  is_heir_called_to_estate_of: Person * Person -> Bool
+  served_as_family_principal_residence_at_opening: Property * Person -> Bool
+  is_household_effects_of: Property * Person -> Bool
+  subject_to_legal_reversion_right: Property -> Bool
+  acquires_usufruct_of: Person * Property -> Bool
+}
+
+theory T:V {
+  ! survivor in Person, deceased in Person, prop in Property: (((is_surviving_legally_cohabiting_partner_of(survivor,deceased)) & (is_heir_called_to_estate_of(survivor,deceased)) & (served_as_family_principal_residence_at_opening(prop,deceased)))) => ((acquires_usufruct_of(survivor,prop))).
+  ! survivor in Person, deceased in Person, prop in Property: (((is_surviving_legally_cohabiting_partner_of(survivor,deceased)) & (is_heir_called_to_estate_of(survivor,deceased)) & (is_household_effects_of(prop,deceased)))) => ((acquires_usufruct_of(survivor,prop))).
+  ! survivor in Person, deceased in Person, prop in Property: (((is_surviving_legally_cohabiting_partner_of(survivor,deceased)) & (is_heir_called_to_estate_of(survivor,deceased)) & (served_as_family_principal_residence_at_opening(prop,deceased)) & (subject_to_legal_reversion_right(prop)))) => ((acquires_usufruct_of(survivor,prop))).
+  ! survivor in Person, deceased in Person, prop in Property: (((is_surviving_legally_cohabiting_partner_of(survivor,deceased)) & (is_heir_called_to_estate_of(survivor,deceased)) & (is_household_effects_of(prop,deceased)) & (subject_to_legal_reversion_right(prop)))) => ((acquires_usufruct_of(survivor,prop))).
+}

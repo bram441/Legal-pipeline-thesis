@@ -1,0 +1,47 @@
+A person is a foreigner if that person does not provide proof that they hold Belgian nationality.
+
+A person is a national of a third country if that person is not a citizen of the Union and is not a person who falls under Community law on free movement as defined in Article 2, point 5, of the Schengen Borders Code.
+
+A foreigner is in illegal residence if that foreigner is present on the territory and does not or no longer satisfies the conditions for access to or residence on the territory.
+
+A risk of absconding exists for a foreigner if there are reasons to believe that the foreigner will abscond, the foreigner is subject to a removal procedure or a procedure for granting international protection or a procedure for determining or transferring to the Member State responsible for examining the application for international protection, and one or more of the objective criteria listed in paragraph 2 are present, taking into account all circumstances specific to each case.
+
+A risk of absconding must be current and real.
+
+A risk of absconding is established after an individual examination.
+
+A foreigner is an identified foreigner if that foreigner is in possession of a valid travel document, a valid passport, or a valid identity document.
+
+A foreigner is an identified foreigner if that foreigner has been recognised as a national by the national authority of their country and that authority has declared itself willing to issue a laissez-passer.
+
+A foreigner is an identified foreigner if that foreigner falls under a category of nationalities for which the minister may issue a laissez-passer directly.
+
+The absconding criterion based on failure to apply is present for a foreigner if the foreigner did not submit a residence application after illegal entry or during illegal residence, or did not submit an application for international protection within the period provided by the law.
+
+The absconding criterion based on fraud is present for a foreigner if the foreigner used false or misleading information, false or falsified documents, committed fraud, or used other unlawful means in the context of a procedure for international protection, residence, removal, or pushback.
+
+The absconding criterion based on non-cooperation is present for a foreigner if the foreigner does not cooperate or has not cooperated in the context of their relations with the authorities responsible for implementing and/or supervising compliance with the regulations on access to the territory, residence, establishment, and removal of foreigners.
+
+The absconding criterion based on non-compliance with measures is present for a foreigner if the foreigner has clearly indicated that they do not wish to comply with, or has already failed to comply with, a transfer, pushback, or removal measure.
+
+The absconding criterion based on non-compliance with measures is present for a foreigner if the foreigner has clearly indicated that they do not wish to comply with, or has already failed to comply with, an entry ban that has neither been lifted nor suspended.
+
+The absconding criterion based on non-compliance with measures is present for a foreigner if the foreigner has clearly indicated that they do not wish to comply with, or has already failed to comply with, a less coercive measure than a deprivation of liberty measure aimed at guaranteeing their transfer, pushback, or removal, whether a freedom-restricting measure or another measure.
+
+The absconding criterion based on non-compliance with measures is present for a foreigner if the foreigner has clearly indicated that they do not wish to comply with, or has already failed to comply with, a freedom-restricting measure aimed at guaranteeing public order or national security.
+
+The absconding criterion based on non-compliance with measures is present for a foreigner if the foreigner has clearly indicated that they do not wish to comply with, or has already failed to comply with, a measure taken by another Member State that is equivalent to a transfer, pushback, or removal measure, an entry ban, a less coercive measure, or a freedom-restricting measure as referred to above.
+
+The absconding criterion based on entry ban is present for a foreigner if the foreigner is subject to an entry ban in the Kingdom and/or in another Member State that has neither been lifted nor suspended.
+
+The absconding criterion based on new application after decision is present for a foreigner if the foreigner submitted a new residence application or a new application for international protection immediately after being subject to a decision refusing entry or residence, a decision ending their residence, or a pushback or removal measure.
+
+The absconding criterion based on concealment of fingerprints is present for a foreigner if the foreigner, while being questioned on that point, concealed that they had already provided fingerprints in another State bound by the European regulations on determining the State responsible for examining an application for international protection, after having submitted an application for international protection.
+
+The absconding criterion based on multiple applications is present for a foreigner if the foreigner has submitted multiple applications for international protection and/or residence applications in the Kingdom or in one or more other Member States, which have resulted in a negative decision or have not led to the issuance of a residence permit.
+
+The absconding criterion based on concealment of prior application is present for a foreigner if the foreigner, while being questioned on that point, concealed that they had previously submitted an application for international protection in another State bound by the European regulations on determining the State responsible for examining an application for international protection.
+
+The absconding criterion based on declared purpose is present for a foreigner if the foreigner has declared, or if it appears from their file, that they came to the Kingdom for purposes other than those for which they submitted an application for international protection or a residence application.
+
+The absconding criterion based on manifestly unfounded appeal is present for a foreigner if the foreigner is subject to a fine because they submitted a manifestly unlawful appeal before the Council for Alien Law Litigation.

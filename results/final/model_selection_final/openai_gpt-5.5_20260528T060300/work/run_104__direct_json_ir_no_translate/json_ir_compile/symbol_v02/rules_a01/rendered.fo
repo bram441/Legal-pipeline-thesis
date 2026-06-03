@@ -1,0 +1,16 @@
+vocabulary V {
+  type Person
+  type Asset
+  is_surviving_legal_cohabitant_of: Person * Person -> Bool
+  is_immovable_property: Asset -> Bool
+  served_as_principal_family_dwelling_at_estate_opening: Asset * Person -> Bool
+  is_household_effect: Asset -> Bool
+  present_in_dwelling_at_estate_opening: Asset * Asset * Person -> Bool
+  subject_to_legal_return_right: Asset -> Bool
+  obtains_usufruct_over: Person * Asset -> Bool
+}
+
+theory T:V {
+  ! survivor in Person, deceased in Person, dwelling in Asset: (((is_surviving_legal_cohabitant_of(survivor,deceased)) & (is_immovable_property(dwelling)) & (served_as_principal_family_dwelling_at_estate_opening(dwelling,deceased)))) => ((obtains_usufruct_over(survivor,dwelling))).
+  ! survivor in Person, deceased in Person, dwelling in Asset, effect in Asset: (((is_surviving_legal_cohabitant_of(survivor,deceased)) & (is_immovable_property(dwelling)) & (served_as_principal_family_dwelling_at_estate_opening(dwelling,deceased)) & (is_household_effect(effect)) & (present_in_dwelling_at_estate_opening(effect,dwelling,deceased)))) => ((obtains_usufruct_over(survivor,effect))).
+}

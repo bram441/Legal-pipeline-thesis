@@ -1,0 +1,67 @@
+{
+  "types": [
+    "Person",
+    "ImmovableProperty"
+  ],
+  "predicates": [
+    {
+      "name": "is_surviving_spouse_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is the surviving spouse of the second person."
+    },
+    {
+      "name": "is_heir_of",
+      "args": [
+        "Person",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "directly_observable": true,
+      "description": "The first person is an heir of the second person."
+    },
+    {
+      "name": "served_as_family_principal_dwelling_at_estate_opening",
+      "args": [
+        "ImmovableProperty",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "observable",
+      "description": "The immovable property served as the family's principal dwelling when the deceased person's estate opened."
+    },
+    {
+      "name": "obtains_exclusive_lease_right",
+      "args": [
+        "Person",
+        "ImmovableProperty",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "output_category": "right",
+      "description": "The surviving spouse obtains the exclusive right to the lease of the immovable property in relation to the deceased person's estate."
+    },
+    {
+      "name": "excluded_from_lease_right",
+      "args": [
+        "Person",
+        "ImmovableProperty",
+        "Person"
+      ],
+      "returns": "Bool",
+      "kind": "derived",
+      "legal_output": true,
+      "output_category": "legal_effect",
+      "description": "The heir is excluded from the right to the lease of the immovable property in relation to the deceased person's estate."
+    }
+  ],
+  "functions": []
+}

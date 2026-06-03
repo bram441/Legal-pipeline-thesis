@@ -1,0 +1,51 @@
+{
+  "cardinality_violations": [],
+  "numeric_provenance_issues": [],
+  "law_thresholds": [
+    50.0,
+    6000000.0,
+    11250000.0
+  ],
+  "missing_helper": null,
+  "secondary_missing_helpers": [],
+  "computed_observable_predicate": null,
+  "computed_observable_helper_kind_hint": null,
+  "temporal_support": {
+    "detected_temporal_terms": [
+      "achtereenvolgende"
+    ],
+    "requires_temporal_support": false,
+    "legal_effect_context": true,
+    "has_period_like_types": true,
+    "has_temporal_support_symbols": true,
+    "existing_period_types": [
+      "FinancialYear"
+    ],
+    "existing_temporal_symbols": [
+      {
+        "name": "previous_financial_year",
+        "kind": "observable",
+        "role": "temporal_relation",
+        "description": "The second financial year is immediately before the first financial year."
+      },
+      {
+        "name": "next_financial_year",
+        "kind": "observable",
+        "role": "temporal_relation",
+        "description": "The second financial year is immediately after the first financial year."
+      }
+    ],
+    "legal_output_predicates": [
+      "is_small_company",
+      "loses_small_company_status_from",
+      "gains_small_company_status_from"
+    ],
+    "missing_temporal_support_symbol": false,
+    "repair_route": null
+  },
+  "missing_temporal_support_symbol": false,
+  "repair_route": null,
+  "secondary_diagnostics_text": "",
+  "validation_evidence_fingerprint": "12ea5cf0b2a2e504",
+  "evidence_consumed_by_repair": false
+}

@@ -1,0 +1,39 @@
+{
+  "entities": {
+    "ahmed": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "fact_argument+query_argument",
+      "evidence": [
+        {
+          "source": "fact_argument",
+          "symbol": "provides_proof_of_belgian_nationality",
+          "arg_index": 0,
+          "expected_type": "Person"
+        },
+        {
+          "source": "query_argument",
+          "symbol": "is_alien",
+          "arg_index": 0,
+          "expected_type": "Person"
+        }
+      ]
+    },
+    "belgian": {
+      "declared_type": "Person",
+      "resolved_type": "Person",
+      "source": "declared",
+      "evidence": []
+    }
+  },
+  "unmapped_entities": [],
+  "conflicts": [],
+  "query_arguments_with_inferred_types": [
+    {
+      "entity": "ahmed",
+      "arg_index": 0,
+      "expected_type": "Person",
+      "predicate": "is_alien"
+    }
+  ]
+}

@@ -1,0 +1,164 @@
+{
+  "intent": "deduction",
+  "symbolic_status": "ok",
+  "status": "ok",
+  "scorable": true,
+  "detected_question_type": "boolean",
+  "selected_intent": "deduction",
+  "selected_reason": "expected.mode=boolean",
+  "routing": {
+    "question": "Is BV ParentCo een microvennootschap volgens artikel 1:25, paragraaf 1?",
+    "detected_question_type": "boolean",
+    "selected_intent": "deduction",
+    "selected_reason": "expected.mode=boolean",
+    "scorable": true,
+    "fallback_intent": null,
+    "warnings": [],
+    "legal_output_symbols": [
+      "is_micro_company"
+    ],
+    "query_hint_type": "boolean",
+    "expected_question_type": "boolean"
+  },
+  "satisfiability_check": {
+    "stage": "pre_query",
+    "kb_case_satisfiable": true,
+    "status": "ok",
+    "details": "theory satisfiable",
+    "intent_backend": "idp_z3.tasks.satisfiable_check",
+    "duration_seconds": 0.0625
+  },
+  "warnings": [],
+  "deduction": {
+    "intent": "deduction",
+    "status": "ok",
+    "output_kind": "epistemic_boolean",
+    "predicate": "is_micro_company",
+    "args": [
+      "parentco",
+      "fy_last"
+    ],
+    "possible": true,
+    "certain": false,
+    "label": "unknown",
+    "atom": "is_micro_company(x0,x1)",
+    "constraint": "? x0 in Company, x1 in FinancialYear: __sel0(x0) & __sel1(x1) & is_micro_company(x0,x1)",
+    "certainty_class": "inconclusive",
+    "sat": true,
+    "internal_intent": "deduction",
+    "antecedent_coverage": [
+      {
+        "rule_index": 6,
+        "target": "is_micro_company(parentco,fy_last)",
+        "conditions": [
+          {
+            "atom": "is_small_company_with_legal_personality(parentco)",
+            "status": "present"
+          },
+          {
+            "atom": "is_subsidiary_company(parentco)",
+            "status": "missing"
+          },
+          {
+            "atom": "is_parent_company(parentco)",
+            "status": "present"
+          },
+          {
+            "atom": "is_last_closed_financial_year(parentco,fy_last)",
+            "status": "present"
+          },
+          {
+            "atom": "more_than_one_micro_criterion_exceeded(parentco,fy_last)",
+            "status": "helper_defined"
+          }
+        ]
+      },
+      {
+        "rule_index": 7,
+        "target": "is_micro_company(parentco,fy_last)",
+        "conditions": [
+          {
+            "atom": "is_last_closed_financial_year(parentco,fy_last)",
+            "status": "present"
+          },
+          {
+            "atom": "more_than_one_micro_criterion_exceeded(parentco,fy_last)",
+            "status": "helper_defined"
+          }
+        ]
+      }
+    ],
+    "extraction_repair_hint": "The selected legal conclusion could not be proven because an observable antecedent required by the KB rule was not asserted from the case. Re-check the case text for facts matching these observable schema symbols: is_subsidiary_company: The company is a subsidiary company.."
+  },
+  "model_expansion": null,
+  "get_range": null,
+  "satisfiable": null,
+  "explanation": null,
+  "execution_query": {
+    "type": "predicate",
+    "predicate": "is_micro_company",
+    "mode": "boolean",
+    "args": [
+      "parentco",
+      "fy_last"
+    ],
+    "explain": false,
+    "predicate_kind": "derived",
+    "query_type": "predicate_boolean",
+    "internal_intent": "deduction"
+  },
+  "output_kind": "epistemic_boolean",
+  "certainty_class": "inconclusive",
+  "predicate": "is_micro_company",
+  "args": [
+    "parentco",
+    "fy_last"
+  ],
+  "label": "unknown",
+  "possible": true,
+  "certain": false,
+  "sat": true,
+  "antecedent_coverage": [
+    {
+      "rule_index": 6,
+      "target": "is_micro_company(parentco,fy_last)",
+      "conditions": [
+        {
+          "atom": "is_small_company_with_legal_personality(parentco)",
+          "status": "present"
+        },
+        {
+          "atom": "is_subsidiary_company(parentco)",
+          "status": "missing"
+        },
+        {
+          "atom": "is_parent_company(parentco)",
+          "status": "present"
+        },
+        {
+          "atom": "is_last_closed_financial_year(parentco,fy_last)",
+          "status": "present"
+        },
+        {
+          "atom": "more_than_one_micro_criterion_exceeded(parentco,fy_last)",
+          "status": "helper_defined"
+        }
+      ]
+    },
+    {
+      "rule_index": 7,
+      "target": "is_micro_company(parentco,fy_last)",
+      "conditions": [
+        {
+          "atom": "is_last_closed_financial_year(parentco,fy_last)",
+          "status": "present"
+        },
+        {
+          "atom": "more_than_one_micro_criterion_exceeded(parentco,fy_last)",
+          "status": "helper_defined"
+        }
+      ]
+    }
+  ],
+  "extraction_repair_hint": "The selected legal conclusion could not be proven because an observable antecedent required by the KB rule was not asserted from the case. Re-check the case text for facts matching these observable schema symbols: is_subsidiary_company: The company is a subsidiary company.."
+}
