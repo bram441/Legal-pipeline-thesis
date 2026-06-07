@@ -32,7 +32,7 @@ def paraphrase_liability_explanation(rule_line, fact_lines, conclusion_line, mod
 
     provider = _provider()
     if provider != "openai":
-        raise NLExplanationError("PIPELINE_NL_EXPLAINER_PROVIDER must be 'openai' for now (got: " + provider + ")")
+        raise NLExplanationError("PIPELINE_NL_EXPLAINER_PROVIDER currently supports only 'openai'")
 
     try:
         client = get_llm_client()

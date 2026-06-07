@@ -41,7 +41,7 @@ ENV_MAP = {
     ("debug", "quiet"): "PIPELINE_QUIET",
 }
 
-# Extra variables that may exist in newer branches. They are harmless if code ignores them.
+# Optional compatibility variables for configurations that support extraction retry overrides.
 EXTRA_ENV_MAP = {
     ("evaluation", "pragmatic_factual_criteria_mode"): "EVALUATION_PRAGMATIC_FACTUAL_CRITERIA_MODE",
     ("evaluation", "run_pre_query_satisfiability_check"): "EVALUATION_RUN_PRE_QUERY_SATISFIABILITY_CHECK",
@@ -64,8 +64,6 @@ def env_from_profile(profile: dict[str, Any]) -> dict[str, str]:
         for (section, key), env_name in mapping.items():
             if isinstance(profile.get(section), dict) and key in profile[section]:
                 out[env_name] = _env_value(profile[section][key])
-    # extraction.max_retries does not currently have a stable env override in older versions.
-    # If your pipeline supports this variable later, it will start working automatically.
     if isinstance(profile.get("extraction"), dict) and "max_retries" in profile["extraction"]:
         out["PIPELINE_EXTRACTION_MAX_RETRIES"] = _env_value(profile["extraction"]["max_retries"])
     return out

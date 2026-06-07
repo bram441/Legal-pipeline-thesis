@@ -86,8 +86,8 @@ def _make_run_json(src: dict[str, Any], *, explain: bool) -> dict[str, Any]:
     if not question:
         raise ValueError(f"{run_id}: missing question")
 
-    # IMPORTANT: no expected answer is included here. The main pipeline will therefore
-    # write results.json for inspection, but no meaningful automatic score is produced.
+    # No expected answer is included here. The pipeline writes results.json for manual inspection,
+    # but no meaningful automatic score is produced.
     return {
         "id": run_id,
         "law": {

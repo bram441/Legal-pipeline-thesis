@@ -285,10 +285,9 @@ def build_structure_block_from_facts(
     # other entity types (so an Estate individual listed under entities.Estate is not copied
     # onto Person when Person is primary).
     #
-    # IMPORTANT:
-    # - The first KB type is not always the runtime domain for predicate arguments
-    #   (e.g. first type may be "Vreemdeling", while predicates use "Persoon").
-    # - Therefore, when typed entities are provided, seed domain per entity type.
+    # The first KB type is not always the runtime domain for predicate arguments
+    # (e.g. first type may be "Vreemdeling", while predicates use "Persoon").
+    # When typed entities are provided, seed each domain by entity type.
     domain_type = kb_primary_type if kb_primary_type else None
     constants_from_facts = set(constants)  # constants appearing in fact literals
     non_primary_entity_values = set()
@@ -381,7 +380,7 @@ def build_structure_block_from_facts(
             map_items.append(left + " -> " + rhs)
         function_lines.append(fun + " := {" + ",".join(map_items) + "}.")
 
-    # Assemble structure lines (IMPORTANT: define lines BEFORE appending)
+    # Assemble structure lines after domain inference.
     lines = []
     types_defined = set()
 
